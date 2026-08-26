@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { UploadCloud, Image as ImageIcon, Sparkles, FileSearch, CheckCircle2 } from 'lucide-react';
-import { generateSampleSonarImageDataUrl } from '../../services/demoData';
+import { UploadCloud, Image as ImageIcon, Sparkles, FileSearch, CheckCircle2, Download, ExternalLink } from 'lucide-react';
+import { generateSampleSonarPngBlob, getSampleSonarImagePath } from '../../services/demoData';
 
 interface DropZoneProps {
   onImageSelected: (file: File | null, previewUrl: string | null) => void;
@@ -15,6 +15,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isLoadingSample, setIsLoadingSample] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -45,13 +46,31 @@ export const DropZone: React.FC<DropZoneProps> = ({
   };
 
   const loadSampleTrack = async (seed: number, name: string) => {
-    const dataUrl = generateSampleSonarImageDataUrl(seed, name);
-    const res = await fetch(dataUrl);
-    const blob = await res.blob();
-    const file = new File([blob], `${name.toLowerCase().replace(/\s+/g, '_')}.png`, {
-      type: 'image/png',
-    });
-    onImageSelected(file, dataUrl);
+    setIsLoadingSample(true);
+    try {
+      // Generate genuine binary raster PNG blob (compatible with backend PIL)
+      const pngBlob = await generateSampleSonarPngBlob(seed, name);
+      const filename = `${name.toLowerCase().replace(/\s+/g, '_')}.png`;
+      const file = new File([pngBlob], filename, {
+        type: 'image/png',
+      });
+      const objectUrl = URL.createObjectURL(pngBlob);
+      onImageSelected(file, objectUrl);
+    } catch (err) {
+      console.error('Failed to load sample image:', err);
+    } finally {
+      setIsLoadingSample(false);
+    }
+  };
+
+  const downloadSampleImage = (seed: number, filename: string) => {
+    const url = getSampleSonarImagePath(seed);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
   };
 
   return (
@@ -90,7 +109,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
                 {selectedFile ? selectedFile.name : 'Selected Sonar Scan'}
               </span>
               <span className="text-xs text-slate-400 font-mono">
-                (Click to replace file)
+                (Click or drop another file to replace)
               </span>
             </div>
           </div>
@@ -104,7 +123,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
                 Upload Side-Scan Sonar Imagery
               </h4>
               <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                Drag and drop raw acoustic files, or click to browse your filesystem.
+                Drag and drop raw acoustic sonar files, or click to browse your computer.
               </p>
             </div>
             <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-slate-400 pt-2">
@@ -125,7 +144,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
         )}
       </div>
 
-      {/* Benchmark Presets Bar */}
+      {/* Benchmark Presets Bar (1-Click Load into Workspace) */}
       <div className="p-4 rounded-2xl glass-panel space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
@@ -133,18 +152,19 @@ export const DropZone: React.FC<DropZoneProps> = ({
             Calibrated Sonar Benchmarks (1-Click Load)
           </span>
           <span className="text-[11px] text-slate-400 font-mono">
-            Synthetic Seabed Targets
+            Genuine PNG Acoustics
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <button
             type="button"
+            disabled={isLoadingSample}
             onClick={(e) => {
               e.stopPropagation();
               loadSampleTrack(1, 'Vizag Harbor Mine Contact');
             }}
-            className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-red-500/40 text-left transition-all group"
+            className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-red-500/40 text-left transition-all group active:scale-[0.99]"
           >
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold text-slate-200 group-hover:text-red-400">
@@ -157,11 +177,12 @@ export const DropZone: React.FC<DropZoneProps> = ({
 
           <button
             type="button"
+            disabled={isLoadingSample}
             onClick={(e) => {
               e.stopPropagation();
               loadSampleTrack(2, 'Kochi Approach Obstacles');
             }}
-            className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-cyan-500/40 text-left transition-all group"
+            className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-cyan-500/40 text-left transition-all group active:scale-[0.99]"
           >
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold text-slate-200 group-hover:text-cyan-300">
@@ -174,11 +195,12 @@ export const DropZone: React.FC<DropZoneProps> = ({
 
           <button
             type="button"
+            disabled={isLoadingSample}
             onClick={(e) => {
               e.stopPropagation();
               loadSampleTrack(3, 'Mumbai High Clear Trench');
             }}
-            className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-emerald-500/40 text-left transition-all group"
+            className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-emerald-500/40 text-left transition-all group active:scale-[0.99]"
           >
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold text-slate-200 group-hover:text-emerald-300">
@@ -187,6 +209,37 @@ export const DropZone: React.FC<DropZoneProps> = ({
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             </div>
             <p className="text-[11px] text-slate-400 mt-1 font-mono">Clean survey baseline</p>
+          </button>
+        </div>
+      </div>
+
+      {/* Download Sample Files Bar */}
+      <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+        <span className="text-slate-400 flex items-center gap-1.5">
+          <Download className="w-3.5 h-3.5 text-cyan-400" />
+          Download Sonar Test Files (.PNG) to Your Device:
+        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => downloadSampleImage(1, 'sonar_track_vizag_milco.png')}
+            className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-cyan-300 transition-colors"
+          >
+            Vizag MILCO .png
+          </button>
+          <button
+            type="button"
+            onClick={() => downloadSampleImage(2, 'sonar_track_kochi_nombo.png')}
+            className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-cyan-300 transition-colors"
+          >
+            Kochi NOMBO .png
+          </button>
+          <button
+            type="button"
+            onClick={() => downloadSampleImage(3, 'sonar_track_mumbai_trench.png')}
+            className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-cyan-300 transition-colors"
+          >
+            Mumbai Trench .png
           </button>
         </div>
       </div>

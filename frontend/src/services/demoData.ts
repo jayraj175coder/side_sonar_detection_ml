@@ -1,89 +1,138 @@
 import { PredictionResponse, StatsResponse } from '../types';
 
-// Procedural SVG-based side-scan sonar image generator for standalone demo mode
-export function generateSampleSonarImageDataUrl(seed: number, label: string): string {
-  const width = 800;
-  const height = 600;
+// Returns sample sonar PNG paths from public directory
+export function getSampleSonarImagePath(seed: number): string {
+  if (seed === 1) return '/samples/sonar_track_vizag_milco.png';
+  if (seed === 2) return '/samples/sonar_track_kochi_nombo.png';
+  return '/samples/sonar_track_mumbai_trench.png';
+}
 
-  // Create an authentic side-scan sonar gradient & acoustic texture
-  let noisePats = '';
-  for (let i = 0; i < 40; i++) {
-    const y = (i * 15 + seed * 7) % height;
-    const opacity = ((i % 5) * 0.08 + 0.05).toFixed(2);
-    noisePats += `<line x1="0" y1="${y}" x2="${width}" y2="${y + 2}" stroke="#38BDF8" stroke-width="1" stroke-opacity="${opacity}" stroke-dasharray="4 8 12 4" />`;
+// Client-side HTML5 canvas generator that always yields genuine PNG raster blobs
+export async function generateSampleSonarPngBlob(seed: number, label: string): Promise<Blob> {
+  // Try fetching the pre-rendered high-quality PNG first
+  try {
+    const path = getSampleSonarImagePath(seed);
+    const res = await fetch(path);
+    if (res.ok) {
+      return await res.blob();
+    }
+  } catch (e) {
+    // Fall back to offscreen canvas generation
   }
 
-  // Draw acoustic center nadir track (water column)
-  const nadirWidth = 60;
+  const width = 800;
+  const height = 600;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    throw new Error('Canvas 2D context unavailable');
+  }
+
+  // Draw authentic side-scan sonar gradient & acoustic texture
+  const gradient = ctx.createLinearGradient(0, 0, width, 0);
+  gradient.addColorStop(0, '#050C1A');
+  gradient.addColorStop(0.42, '#0E2342');
+  gradient.addColorStop(0.5, '#030712');
+  gradient.addColorStop(0.58, '#0E2342');
+  gradient.addColorStop(1, '#050C1A');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+
+  // Acoustic speckle lines
+  ctx.strokeStyle = '#38BDF8';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 45; i++) {
+    const y = (i * 14 + seed * 7) % height;
+    ctx.globalAlpha = ((i % 5) * 0.08 + 0.04);
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1.0;
+
+  // Center nadir water column gap
+  const nadirWidth = 56;
   const nadirX = width / 2 - nadirWidth / 2;
+  ctx.fillStyle = '#020617';
+  ctx.fillRect(nadirX, 0, nadirWidth, height);
 
-  const svg = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-    <defs>
-      <linearGradient id="sonarBg_${seed}" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#050C1A" />
-        <stop offset="42%" stop-color="#0E2342" />
-        <stop offset="50%" stop-color="#030712" />
-        <stop offset="58%" stop-color="#0E2342" />
-        <stop offset="100%" stop-color="#050C1A" />
-      </linearGradient>
-      <radialGradient id="targetGlow_${seed}" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#F97316" stop-opacity="0.8" />
-        <stop offset="60%" stop-color="#F97316" stop-opacity="0.2" />
-        <stop offset="100%" stop-color="#0E2342" stop-opacity="0" />
-      </radialGradient>
-      <radialGradient id="obstacleGlow_${seed}" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.8" />
-        <stop offset="70%" stop-color="#06B6D4" stop-opacity="0.1" />
-        <stop offset="100%" stop-color="#0E2342" stop-opacity="0" />
-      </radialGradient>
-    </defs>
-    
-    <!-- Background acoustic field -->
-    <rect width="${width}" height="${height}" fill="url(#sonarBg_${seed})" />
-    
-    <!-- Acoustic scanlines & seabed textures -->
-    ${noisePats}
-    
-    <!-- Water column / nadir gap -->
-    <rect x="${nadirX}" y="0" width="${nadirWidth}" height="${height}" fill="#020617" opacity="0.95" />
-    <line x1="${width / 2}" y1="0" x2="${width / 2}" y2="${height}" stroke="#06B6D4" stroke-width="1" stroke-dasharray="6 6" opacity="0.4" />
-    
-    <!-- Seabed acoustic reflections & acoustic shadows -->
-    ${
-      seed === 1
-        ? `
-      <!-- MILCO target high-backscatter & acoustic shadow -->
-      <ellipse cx="280" cy="240" rx="35" ry="18" fill="url(#targetGlow_${seed})" />
-      <polygon points="265,232 295,232 290,248 260,248" fill="#FEF08A" opacity="0.9" />
-      <polygon points="295,232 370,225 365,255 290,248" fill="#020617" opacity="0.9" />
-      <!-- NOMBO boulder -->
-      <circle cx="560" cy="380" r="22" fill="url(#obstacleGlow_${seed})" />
-      <polygon points="560,370 620,365 615,395 560,390" fill="#020617" opacity="0.85" />
-    `
-        : seed === 2
-        ? `
-      <!-- Multiple NOMBO obstacles -->
-      <ellipse cx="230" cy="320" rx="28" ry="16" fill="url(#obstacleGlow_${seed})" />
-      <polygon points="230,312 290,308 285,328 230,328" fill="#020617" opacity="0.85" />
-      <ellipse cx="580" cy="180" rx="32" ry="20" fill="url(#obstacleGlow_${seed})" />
-      <polygon points="580,170 650,165 645,190 580,190" fill="#020617" opacity="0.85" />
-    `
-        : `
-      <!-- Clear survey seabed with subtle ripple patterns -->
-      <path d="M 50,150 Q 200,160 350,150 T 750,150" stroke="#0E7490" stroke-width="1.5" fill="none" opacity="0.3" />
-      <path d="M 50,320 Q 200,330 350,320 T 750,320" stroke="#0E7490" stroke-width="1.5" fill="none" opacity="0.3" />
-      <path d="M 50,480 Q 200,490 350,480 T 750,480" stroke="#0E7490" stroke-width="1.5" fill="none" opacity="0.3" />
-    `
-    }
-    
-    <!-- Telemetry overlay in image -->
-    <text x="20" y="30" fill="#38BDF8" font-family="monospace" font-size="12" opacity="0.7">SONARX SSS-900 kHz | RANGE: 50m | ${label}</text>
-    <text x="20" y="${height - 20}" fill="#94A3B8" font-family="monospace" font-size="11" opacity="0.6">ALT: 8.4m | SPEED: 3.2 kts | LAT: 17.686° N | LON: 83.218° E | REGION: ENC VIZAG</text>
-  </svg>
-  `;
+  // Targets
+  if (seed === 1) {
+    // MILCO high-backscatter target
+    ctx.fillStyle = '#FEF08A';
+    ctx.beginPath();
+    ctx.ellipse(280, 240, 24, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Acoustic shadow
+    ctx.fillStyle = '#020617';
+    ctx.beginPath();
+    ctx.moveTo(280, 234);
+    ctx.lineTo(370, 226);
+    ctx.lineTo(365, 254);
+    ctx.lineTo(280, 246);
+    ctx.closePath();
+    ctx.fill();
 
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    // NOMBO boulder
+    ctx.fillStyle = '#38BDF8';
+    ctx.beginPath();
+    ctx.arc(560, 380, 16, 0, Math.PI * 2);
+    ctx.fill();
+    // Shadow
+    ctx.fillStyle = '#020617';
+    ctx.beginPath();
+    ctx.moveTo(560, 372);
+    ctx.lineTo(620, 366);
+    ctx.lineTo(615, 394);
+    ctx.lineTo(560, 388);
+    ctx.closePath();
+    ctx.fill();
+  } else if (seed === 2) {
+    // Multiple NOMBO obstacles
+    ctx.fillStyle = '#38BDF8';
+    ctx.beginPath();
+    ctx.ellipse(230, 320, 20, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#020617';
+    ctx.beginPath();
+    ctx.moveTo(230, 314);
+    ctx.lineTo(290, 310);
+    ctx.lineTo(285, 330);
+    ctx.lineTo(230, 326);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#38BDF8';
+    ctx.beginPath();
+    ctx.ellipse(580, 180, 22, 14, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#020617';
+    ctx.beginPath();
+    ctx.moveTo(580, 172);
+    ctx.lineTo(650, 166);
+    ctx.lineTo(645, 192);
+    ctx.lineTo(580, 188);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Telemetry HUD text
+  ctx.font = '12px monospace';
+  ctx.fillStyle = '#38BDF8';
+  ctx.fillText(`SONARX SSS-900 kHz | RANGE: 50m | ${label}`, 20, 30);
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '11px monospace';
+  ctx.fillText('ALT: 8.4m | SPEED: 3.2 kts | LAT: 17.686° N | LON: 83.218° E | REGION: ENC VIZAG', 20, height - 20);
+
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      resolve(blob || new Blob([], { type: 'image/png' }));
+    }, 'image/png');
+  });
 }
 
 export const DEMO_SCANS: PredictionResponse[] = [
@@ -104,7 +153,7 @@ export const DEMO_SCANS: PredictionResponse[] = [
       latitude: 17.6842,
       longitude: 83.3215,
     },
-    imageUrl: generateSampleSonarImageDataUrl(1, 'TRACK-ALPHA-VIZAG'),
+    imageUrl: '/samples/sonar_track_vizag_milco.png',
     detections: [
       {
         id: 'det_demo_1',
@@ -147,7 +196,7 @@ export const DEMO_SCANS: PredictionResponse[] = [
       latitude: 9.9312,
       longitude: 76.2673,
     },
-    imageUrl: generateSampleSonarImageDataUrl(2, 'TRACK-BRAVO-KOCHI'),
+    imageUrl: '/samples/sonar_track_kochi_nombo.png',
     detections: [
       {
         id: 'det_demo_3',
@@ -190,7 +239,7 @@ export const DEMO_SCANS: PredictionResponse[] = [
       latitude: 18.9220,
       longitude: 72.8347,
     },
-    imageUrl: generateSampleSonarImageDataUrl(3, 'TRACK-CHARLIE-MUMBAI'),
+    imageUrl: '/samples/sonar_track_mumbai_trench.png',
     detections: [],
   },
 ];

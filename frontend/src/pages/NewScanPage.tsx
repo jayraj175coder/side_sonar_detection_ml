@@ -80,8 +80,8 @@ export const NewScanPage: React.FC = () => {
           highest_confidence: 0.892,
           status: 'completed',
           location: {
-            latitude: lat ?? 25.6842,
-            longitude: lon ?? -80.1215,
+            latitude: lat ?? 17.6842,
+            longitude: lon ?? 83.3215,
           },
           imageUrl: previewUrl || undefined,
           detections: [

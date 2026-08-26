@@ -194,8 +194,8 @@ VITE_API_URL=http://localhost:8000
 curl -X POST "http://localhost:8000/api/predict" \
   -F "file=@sonar_track.png" \
   -F "confidence=0.25" \
-  -F "latitude=25.6842" \
-  -F "longitude=-80.1215"
+  -F "latitude=17.6868" \
+  -F "longitude=83.2185"
 ```
 
 ```json
@@ -213,8 +213,8 @@ curl -X POST "http://localhost:8000/api/predict" \
   "highest_confidence": 0.912,
   "status": "completed",
   "location": {
-    "latitude": 25.6842,
-    "longitude": -80.1215
+    "latitude": 17.6868,
+    "longitude": 83.2185
   },
   "detections": [
     {

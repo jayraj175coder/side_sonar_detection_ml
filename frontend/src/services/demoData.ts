@@ -79,7 +79,7 @@ export function generateSampleSonarImageDataUrl(seed: number, label: string): st
     
     <!-- Telemetry overlay in image -->
     <text x="20" y="30" fill="#38BDF8" font-family="monospace" font-size="12" opacity="0.7">SONARX SSS-900 kHz | RANGE: 50m | ${label}</text>
-    <text x="20" y="${height - 20}" fill="#94A3B8" font-family="monospace" font-size="11" opacity="0.6">ALT: 8.4m | SPEED: 3.2 kts | LAT: 24.892° N | LON: -80.641° W</text>
+    <text x="20" y="${height - 20}" fill="#94A3B8" font-family="monospace" font-size="11" opacity="0.6">ALT: 8.4m | SPEED: 3.2 kts | LAT: 17.686° N | LON: 83.218° E | REGION: ENC VIZAG</text>
   </svg>
   `;
 
@@ -89,7 +89,7 @@ export function generateSampleSonarImageDataUrl(seed: number, label: string): st
 export const DEMO_SCANS: PredictionResponse[] = [
   {
     scan_id: 'DEMO-SCAN-8841',
-    filename: 'sonar_track_biscayne_milco_01.png',
+    filename: 'sonar_track_vizag_harbor_milco_01.png',
     image_width: 800,
     image_height: 600,
     inference_ms: 9.6,
@@ -101,10 +101,10 @@ export const DEMO_SCANS: PredictionResponse[] = [
     highest_confidence: 0.912,
     status: 'completed',
     location: {
-      latitude: 25.6842,
-      longitude: -80.1215,
+      latitude: 17.6842,
+      longitude: 83.3215,
     },
-    imageUrl: generateSampleSonarImageDataUrl(1, 'TRACK-ALPHA-01'),
+    imageUrl: generateSampleSonarImageDataUrl(1, 'TRACK-ALPHA-VIZAG'),
     detections: [
       {
         id: 'det_demo_1',
@@ -132,7 +132,7 @@ export const DEMO_SCANS: PredictionResponse[] = [
   },
   {
     scan_id: 'DEMO-SCAN-4920',
-    filename: 'sonar_track_key_largo_reef_02.png',
+    filename: 'sonar_track_kochi_channel_nombo_02.png',
     image_width: 800,
     image_height: 600,
     inference_ms: 10.1,
@@ -144,10 +144,10 @@ export const DEMO_SCANS: PredictionResponse[] = [
     highest_confidence: 0.835,
     status: 'completed',
     location: {
-      latitude: 25.0865,
-      longitude: -80.4478,
+      latitude: 9.9312,
+      longitude: 76.2673,
     },
-    imageUrl: generateSampleSonarImageDataUrl(2, 'TRACK-BRAVO-02'),
+    imageUrl: generateSampleSonarImageDataUrl(2, 'TRACK-BRAVO-KOCHI'),
     detections: [
       {
         id: 'det_demo_3',
@@ -175,7 +175,7 @@ export const DEMO_SCANS: PredictionResponse[] = [
   },
   {
     scan_id: 'DEMO-SCAN-1193',
-    filename: 'sonar_track_tortugas_trench_03.png',
+    filename: 'sonar_track_mumbai_high_trench_03.png',
     image_width: 800,
     image_height: 600,
     inference_ms: 9.4,
@@ -187,10 +187,10 @@ export const DEMO_SCANS: PredictionResponse[] = [
     highest_confidence: 0.0,
     status: 'completed',
     location: {
-      latitude: 24.6288,
-      longitude: -82.8732,
+      latitude: 18.9220,
+      longitude: 72.8347,
     },
-    imageUrl: generateSampleSonarImageDataUrl(3, 'TRACK-CHARLIE-03'),
+    imageUrl: generateSampleSonarImageDataUrl(3, 'TRACK-CHARLIE-MUMBAI'),
     detections: [],
   },
 ];

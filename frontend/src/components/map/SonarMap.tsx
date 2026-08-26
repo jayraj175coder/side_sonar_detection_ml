@@ -18,6 +18,7 @@ import {
   Sparkles,
   Layers,
   ArrowRight,
+  Globe2,
 } from 'lucide-react';
 import { PredictionResponse } from '../../types';
 import { Badge } from '../common/Badge';
@@ -57,25 +58,6 @@ const createPinIcon = (scan: PredictionResponse, isSelected: boolean) => {
   });
 };
 
-// Cluster Icon for nearby markers
-const createClusterIcon = (count: number, hasMilco: boolean) => {
-  const color = hasMilco ? '#EF4444' : '#06B6D4';
-  const html = `
-    <div style="position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
-      <div style="position: absolute; width: 44px; height: 44px; border-radius: 50%; background-color: ${color}; opacity: 0.2; animation: pulse 2s infinite;"></div>
-      <div style="position: absolute; width: 32px; height: 32px; border-radius: 50%; background: #090E1D; border: 2px solid ${color}; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 16px ${color}40;">
-        <span style="color: #F8FAFC; font-family: monospace; font-size: 11px; font-weight: bold;">${count}</span>
-      </div>
-    </div>
-  `;
-  return L.divIcon({
-    className: 'custom-cluster-marker',
-    html,
-    iconSize: [44, 44],
-    iconAnchor: [22, 22],
-  });
-};
-
 // Helper Map Controller for Pan/Zoom & Custom Controls
 const MapController: React.FC<{
   scans: PredictionResponse[];
@@ -112,7 +94,7 @@ export const SonarMap: React.FC = () => {
   const [selectedScan, setSelectedScan] = useState<PredictionResponse | null>(null);
   const mapRef = useRef<L.Map | null>(null);
 
-  const defaultCenter: [number, number] = [25.1, -81.4]; // Florida Straits / Maritime Test Range
+  const defaultCenter: [number, number] = [17.6868, 83.2185]; // Visakhapatnam, Eastern Naval Command
 
   // Filter geolocated scans
   const geolocatedScans = useMemo(() => {
@@ -159,7 +141,7 @@ export const SonarMap: React.FC = () => {
 
   const handleRecenterDemoArea = () => {
     if (mapRef.current) {
-      mapRef.current.flyTo(defaultCenter, 8, { duration: 1.2 });
+      mapRef.current.flyTo(defaultCenter, 9, { duration: 1.2 });
     }
   };
 
@@ -172,13 +154,19 @@ export const SonarMap: React.FC = () => {
     <div className="relative w-full h-[calc(100vh-140px)] min-h-[580px] rounded-2xl overflow-hidden glass-panel border border-cyan-500/20 shadow-2xl">
       {/* 1. Floating Top Search & Filter Bar (Glassmorphic Overlay) */}
       <div className="absolute top-4 left-4 right-4 md:left-6 md:right-20 z-[400] pointer-events-none">
-        <div className="pointer-events-auto max-w-4xl mx-auto p-3 rounded-xl bg-[#080F20]/80 backdrop-blur-xl border border-cyan-500/20 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+        <div className="pointer-events-auto max-w-5xl mx-auto p-3 rounded-xl bg-[#080F20]/85 backdrop-blur-xl border border-cyan-500/20 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+          {/* Hackathon Region Badge */}
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 text-xs font-mono font-bold shadow-sm">
+            <Globe2 className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span>Demo Region: Bay of Bengal, India</span>
+          </div>
+
           {/* Search Box */}
-          <div className="relative flex-1 min-w-[200px]">
+          <div className="relative flex-1 min-w-[180px]">
             <Search className="w-4 h-4 text-cyan-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search survey coordinates, Scan ID, or track..."
+              placeholder="Search Vizag/Kochi tracks, Scan ID, or coordinates..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-3 py-1.5 text-xs font-mono rounded-lg bg-slate-950/80 border border-slate-800 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400"
@@ -206,7 +194,7 @@ export const SonarMap: React.FC = () => {
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                MILCO Hazards
+                MILCO
               </button>
               <button
                 onClick={() => setClassFilter('NOMBO')}
@@ -216,7 +204,7 @@ export const SonarMap: React.FC = () => {
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                NOMBO Obstacles
+                NOMBO
               </button>
             </div>
 
@@ -266,7 +254,7 @@ export const SonarMap: React.FC = () => {
         <button
           onClick={handleRecenterDemoArea}
           className="w-9 h-9 rounded-lg bg-[#080F20]/85 backdrop-blur-xl border border-cyan-500/25 text-slate-200 hover:text-cyan-300 hover:border-cyan-400 flex items-center justify-center transition-all shadow-lg active:scale-95"
-          title="Center Sonar Operations Range"
+          title="Center Eastern Naval Command Range (Visakhapatnam)"
         >
           <Navigation className="w-4 h-4" />
         </button>
@@ -275,7 +263,7 @@ export const SonarMap: React.FC = () => {
       {/* 3. Live Dark Interactive Leaflet Map Canvas */}
       <MapContainer
         center={defaultCenter}
-        zoom={8}
+        zoom={9}
         className="w-full h-full"
         ref={(ref) => {
           if (ref) mapRef.current = ref;
@@ -371,7 +359,7 @@ export const SonarMap: React.FC = () => {
                 <span className="text-slate-500">Coordinates:</span>
                 <span className="text-cyan-300 font-bold">
                   {selectedScan.location.latitude?.toFixed(4)}°N,{' '}
-                  {selectedScan.location.longitude?.toFixed(4)}°W
+                  {selectedScan.location.longitude?.toFixed(4)}°E
                 </span>
               </div>
               <div className="flex justify-between text-slate-300">

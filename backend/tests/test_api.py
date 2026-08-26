@@ -68,7 +68,7 @@ def test_live_onnx_inference():
     response = client.post(
         "/api/predict",
         files={"file": ("live_sonar_scan.png", buf.getvalue(), "image/png")},
-        data={"confidence": "0.15", "latitude": "24.55", "longitude": "-81.78"},
+        data={"confidence": "0.15", "latitude": "17.6868", "longitude": "83.2185"},
     )
     assert response.status_code == 200
     data = response.json()
@@ -78,8 +78,8 @@ def test_live_onnx_inference():
     assert data["image_height"] == 480
     assert data["inference_ms"] > 0
     assert "detections" in data
-    assert data["location"]["latitude"] == 24.55
-    assert data["location"]["longitude"] == -81.78
+    assert data["location"]["latitude"] == 17.6868
+    assert data["location"]["longitude"] == 83.2185
 
 
 def test_scan_repository_workflow():
@@ -103,7 +103,7 @@ def test_scan_repository_workflow():
                 bbox=BoundingBox(x1=400, y1=200, x2=550, y2=350),
             ),
         ],
-        location=Location(latitude=24.55, longitude=-81.78),
+        location=Location(latitude=17.6868, longitude=83.2185),
         created_at="2026-08-26T12:00:00Z",
         confidence_threshold=0.25,
         total_detections=2,

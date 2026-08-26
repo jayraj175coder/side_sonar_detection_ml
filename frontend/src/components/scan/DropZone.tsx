@@ -142,47 +142,47 @@ export const DropZone: React.FC<DropZoneProps> = ({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              loadSampleTrack(1, 'Biscayne Mine Contact');
+              loadSampleTrack(1, 'Vizag Harbor Mine Contact');
             }}
             className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-red-500/40 text-left transition-all group"
           >
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold text-slate-200 group-hover:text-red-400">
-                Track 1: MILCO Target
+                Track 1: Vizag MILCO
               </p>
               <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 font-mono">High-contrast mine contact</p>
+            <p className="text-[11px] text-slate-400 mt-1 font-mono">Bay of Bengal mine contact</p>
           </button>
 
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              loadSampleTrack(2, 'Key Largo Obstacles');
+              loadSampleTrack(2, 'Kochi Approach Obstacles');
             }}
             className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-cyan-500/40 text-left transition-all group"
           >
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold text-slate-200 group-hover:text-cyan-300">
-                Track 2: NOMBO Field
+                Track 2: Kochi NOMBO
               </p>
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1 font-mono">Seafloor debris & coral</p>
+            <p className="text-[11px] text-slate-400 mt-1 font-mono">Arabian Sea bottom debris</p>
           </button>
 
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              loadSampleTrack(3, 'Tortugas Clear Trench');
+              loadSampleTrack(3, 'Mumbai High Clear Trench');
             }}
             className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-emerald-500/40 text-left transition-all group"
           >
             <div className="flex items-center justify-between">
               <p className="text-xs font-bold text-slate-200 group-hover:text-emerald-300">
-                Track 3: Clear Seabed
+                Track 3: Mumbai Trench
               </p>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             </div>

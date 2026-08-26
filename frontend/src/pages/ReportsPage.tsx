@@ -159,7 +159,7 @@ export const ReportsPage: React.FC = () => {
             </p>
             <p className="font-bold text-slate-100 print:text-black mt-0.5">
               {hasGeo
-                ? `${activeScan.location.latitude?.toFixed(4)}°N, ${activeScan.location.longitude?.toFixed(4)}°W`
+                ? `${activeScan.location.latitude?.toFixed(4)}°N, ${activeScan.location.longitude?.toFixed(4)}°E`
                 : 'Ungeolocated track'}
             </p>
           </div>
@@ -280,7 +280,7 @@ export const ReportsPage: React.FC = () => {
 
         {/* Sign-off footer */}
         <div className="pt-4 border-t border-slate-800 print:border-gray-300 flex justify-between items-center text-[10px] font-mono text-slate-400 print:text-gray-500">
-          <span>SONARX System ID: SNX-NODE-01</span>
+          <span>SONARX System ID: SNX-ENC-NODE-01 (Visakhapatnam Operations)</span>
           <span>Verified Maritime Inspection Briefing</span>
         </div>
       </div>

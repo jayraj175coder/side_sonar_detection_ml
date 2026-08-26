@@ -107,7 +107,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             <input
               type="number"
               step="any"
-              placeholder="25.6842"
+              placeholder="17.6868"
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
               className="w-full px-3 py-2 text-xs font-mono rounded-xl bg-slate-950/80 border border-slate-800 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-400"
@@ -115,12 +115,12 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           </div>
           <div>
             <label className="block text-[10px] font-mono text-slate-400 uppercase mb-1">
-              Longitude (°W)
+              Longitude (°E)
             </label>
             <input
               type="number"
               step="any"
-              placeholder="-80.1215"
+              placeholder="83.2185"
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
               className="w-full px-3 py-2 text-xs font-mono rounded-xl bg-slate-950/80 border border-slate-800 text-slate-100 placeholder-slate-600 focus:outline-none focus:border-cyan-400"
@@ -130,27 +130,27 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
 
         {/* Preset Chips */}
         <div className="flex items-center gap-1.5 text-[10px] font-mono flex-wrap">
-          <span className="text-slate-400">Range Presets:</span>
+          <span className="text-slate-400">Naval Ranges:</span>
           <button
             type="button"
-            onClick={() => handleApplyPresetCoords(25.6842, -80.1215)}
+            onClick={() => handleApplyPresetCoords(17.6868, 83.2185)}
             className="px-2 py-0.5 rounded-md bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
           >
-            Biscayne
+            Visakhapatnam (ENC)
           </button>
           <button
             type="button"
-            onClick={() => handleApplyPresetCoords(25.0865, -80.4478)}
+            onClick={() => handleApplyPresetCoords(9.9312, 76.2673)}
             className="px-2 py-0.5 rounded-md bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
           >
-            Key Largo
+            Kochi (SNC)
           </button>
           <button
             type="button"
-            onClick={() => handleApplyPresetCoords(24.6288, -82.8732)}
+            onClick={() => handleApplyPresetCoords(18.9220, 72.8347)}
             className="px-2 py-0.5 rounded-md bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
           >
-            Tortugas
+            Mumbai (WNC)
           </button>
         </div>
       </div>

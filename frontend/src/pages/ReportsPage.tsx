@@ -11,12 +11,13 @@ import {
   Cpu,
   Radio,
   Sliders,
+  Sparkles,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Badge } from '../components/common/Badge';
 
 export const ReportsPage: React.FC = () => {
-  const { scans, currentScan, setCurrentScan, isDemoMode } = useApp();
+  const { scans, currentScan, setCurrentScan } = useApp();
   const [selectedScanId, setSelectedScanId] = useState<string>(
     currentScan?.scan_id || scans[0]?.scan_id || ''
   );
@@ -42,8 +43,8 @@ export const ReportsPage: React.FC = () => {
 
   if (!activeScan) {
     return (
-      <div className="p-12 text-center rounded-xl bg-[#0C1427] border border-[#1E2E4E] space-y-3">
-        <FileText className="w-10 h-10 text-slate-400 mx-auto" />
+      <div className="p-12 text-center rounded-3xl glass-panel space-y-3">
+        <FileText className="w-12 h-12 text-slate-400 mx-auto" />
         <h3 className="text-base font-bold text-slate-200 font-mono">
           No Scan Available for Report
         </h3>
@@ -61,9 +62,9 @@ export const ReportsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Selector & Action Bar (Hidden during Print) */}
-      <div className="print:hidden p-4 rounded-xl bg-[#0C1427] border border-[#1E2E4E] flex flex-wrap items-center justify-between gap-4">
+      <div className="print:hidden p-4 rounded-2xl glass-panel flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <label className="text-xs font-mono text-slate-400">
+          <label className="text-xs font-mono text-slate-400 font-bold">
             Select Track:
           </label>
           <select
@@ -73,7 +74,7 @@ export const ReportsPage: React.FC = () => {
               const found = scans.find((s) => s.scan_id === e.target.value);
               if (found) setCurrentScan(found);
             }}
-            className="px-3 py-1.5 text-xs font-mono rounded bg-slate-900 border border-slate-800 text-slate-200 focus:outline-none focus:border-cyan-500"
+            className="px-3.5 py-2 text-xs font-mono rounded-xl bg-slate-950/80 border border-slate-800 text-slate-200 focus:outline-none focus:border-cyan-400"
           >
             {scans.map((s) => (
               <option key={s.scan_id} value={s.scan_id}>
@@ -83,54 +84,58 @@ export const ReportsPage: React.FC = () => {
           </select>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={handleDownloadJson}
-            className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-slate-300 flex items-center gap-1.5 transition-colors"
+            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-slate-300 flex items-center gap-2 transition-all"
           >
-            <Download className="w-3.5 h-3.5 text-cyan-400" />
+            <Download className="w-4 h-4 text-cyan-400" />
             <span>Download JSON</span>
           </button>
           <button
             onClick={handlePrint}
-            className="px-3.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs font-mono flex items-center gap-1.5 transition-colors shadow-md"
+            className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold text-xs font-mono flex items-center gap-2 transition-all shadow-lg shadow-cyan-500/25 active:scale-95"
           >
-            <Printer className="w-3.5 h-3.5" />
+            <Printer className="w-4 h-4" />
             <span>Print / Export PDF</span>
           </button>
         </div>
       </div>
 
       {/* Structured Inspection Document (Printable Sheet) */}
-      <div className="p-8 rounded-xl bg-[#0A1020] border border-[#1E2E4E] text-slate-200 space-y-6 shadow-2xl print:bg-white print:text-black print:border-none print:p-0">
+      <div className="p-8 md:p-10 rounded-3xl glass-panel border border-cyan-500/20 text-slate-200 space-y-6 shadow-2xl print:bg-white print:text-black print:border-none print:p-0">
         {/* Document Header */}
-        <div className="border-b border-[#1E2E4E] pb-6 flex items-start justify-between">
+        <div className="border-b border-slate-800 pb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <Radio className="w-6 h-6 text-cyan-400 print:text-blue-600" />
-              <h2 className="text-xl font-bold font-mono tracking-wider text-slate-100 print:text-black">
-                SONARX ACOUSTIC INSPECTION REPORT
-              </h2>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 print:text-blue-600">
+                <Radio className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl md:text-2xl font-extrabold font-mono tracking-wider text-slate-100 print:text-black">
+                  SONARX ACOUSTIC INSPECTION BRIEFING
+                </h2>
+                <p className="text-xs text-slate-400 print:text-gray-600 font-mono mt-0.5">
+                  Autonomous YOLOv8n Maritime Sonar Target Classification Intelligence
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-slate-400 print:text-gray-600 font-mono mt-1">
-              Autonomous YOLOv8n Maritime Sonar Target Classification Intelligence
-            </p>
           </div>
 
           <div className="text-right font-mono text-xs space-y-1">
-            <p className="text-cyan-400 print:text-blue-700 font-bold text-sm">
+            <p className="text-cyan-400 print:text-blue-700 font-extrabold text-base">
               {activeScan.scan_id}
             </p>
             <p className="text-slate-400 print:text-gray-600 text-[11px]">
               Generated: {new Date().toUTCString()}
             </p>
-            <div>
+            <div className="pt-1">
               {isCritical ? (
-                <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/40 text-[10px] font-bold">
+                <span className="px-2.5 py-1 rounded-md bg-red-500/20 text-red-400 border border-red-500/40 text-[10px] font-bold">
                   HAZARD: MILCO IDENTIFIED
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-bold">
+                <span className="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-bold">
                   SURVEY CLEAR / ROUTINE
                 </span>
               )}
@@ -139,7 +144,7 @@ export const ReportsPage: React.FC = () => {
         </div>
 
         {/* Survey Metadata Matrix */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono p-4 rounded-lg bg-[#060A14] print:bg-gray-100 border border-[#15233E] print:border-gray-300">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono p-4 rounded-2xl bg-slate-950/80 print:bg-gray-100 border border-slate-800 print:border-gray-300">
           <div>
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
               Source Scan
@@ -178,34 +183,34 @@ export const ReportsPage: React.FC = () => {
 
         {/* Target Classification Breakdown Cards */}
         <div className="grid grid-cols-3 gap-4 text-xs font-mono">
-          <div className="p-4 rounded-lg bg-[#0C1427] print:bg-gray-50 border border-[#1E2E4E] print:border-gray-300">
-            <p className="text-slate-400 print:text-gray-600 text-[11px] uppercase">
+          <div className="p-4 rounded-2xl bg-[#0C1427] print:bg-gray-50 border border-slate-800 print:border-gray-300">
+            <p className="text-slate-400 print:text-gray-600 text-[11px] uppercase font-semibold">
               Total Target Contacts
             </p>
-            <p className="text-2xl font-bold text-slate-100 print:text-black mt-1">
+            <p className="text-2xl font-extrabold text-slate-100 print:text-black mt-1">
               {activeScan.total_detections}
             </p>
           </div>
-          <div className="p-4 rounded-lg bg-red-950/20 print:bg-red-50 border border-red-500/30 print:border-red-300">
+          <div className="p-4 rounded-2xl bg-red-950/20 print:bg-red-50 border border-red-500/30 print:border-red-300">
             <p className="text-red-400 print:text-red-700 text-[11px] uppercase font-bold">
               MILCO Mine Contacts
             </p>
-            <p className="text-2xl font-bold text-red-400 print:text-red-700 mt-1">
+            <p className="text-2xl font-extrabold text-red-400 print:text-red-700 mt-1">
               {activeScan.milco_count}
             </p>
           </div>
-          <div className="p-4 rounded-lg bg-cyan-950/20 print:bg-blue-50 border border-cyan-500/30 print:border-blue-300">
+          <div className="p-4 rounded-2xl bg-cyan-950/20 print:bg-blue-50 border border-cyan-500/30 print:border-blue-300">
             <p className="text-cyan-400 print:text-blue-700 text-[11px] uppercase font-bold">
               NOMBO Obstacles
             </p>
-            <p className="text-2xl font-bold text-cyan-400 print:text-blue-700 mt-1">
+            <p className="text-2xl font-extrabold text-cyan-400 print:text-blue-700 mt-1">
               {activeScan.nombo_count}
             </p>
           </div>
         </div>
 
         {/* Analyst Narrative Section */}
-        <div className="p-4 rounded-lg bg-[#080E1C] print:bg-gray-50 border border-[#15233E] print:border-gray-300 space-y-2">
+        <div className="p-5 rounded-2xl bg-[#080E1C] print:bg-gray-50 border border-slate-800 print:border-gray-300 space-y-2">
           <h4 className="text-xs font-bold font-mono text-cyan-300 print:text-blue-700 uppercase tracking-wider">
             Automated Intelligence Summary
           </h4>
@@ -222,17 +227,17 @@ export const ReportsPage: React.FC = () => {
             Acoustic Target Register
           </h4>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono border border-[#1E2E4E] print:border-gray-300">
-              <thead className="bg-[#080E1C] print:bg-gray-100 text-slate-400 print:text-gray-700 uppercase tracking-wider border-b border-[#1E2E4E] print:border-gray-300">
+            <table className="w-full text-left text-xs font-mono border border-slate-800 print:border-gray-300 rounded-xl overflow-hidden">
+              <thead className="bg-[#080E1C] print:bg-gray-100 text-slate-400 print:text-gray-700 uppercase tracking-wider border-b border-slate-800 print:border-gray-300">
                 <tr>
-                  <th className="py-2 px-3">Item #</th>
-                  <th className="py-2 px-3">Target ID</th>
-                  <th className="py-2 px-3">Classification</th>
-                  <th className="py-2 px-3">Confidence Score</th>
-                  <th className="py-2 px-3">Pixel Bounding Box [X1, Y1, X2, Y2]</th>
+                  <th className="py-2.5 px-3">Item #</th>
+                  <th className="py-2.5 px-3">Target ID</th>
+                  <th className="py-2.5 px-3">Classification</th>
+                  <th className="py-2.5 px-3">Confidence Score</th>
+                  <th className="py-2.5 px-3">Pixel Bounding Box [X1, Y1, X2, Y2]</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#15233E] print:divide-gray-200">
+              <tbody className="divide-y divide-slate-800/60 print:divide-gray-200">
                 {activeScan.detections.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="py-4 text-center text-slate-400 print:text-gray-500">
@@ -242,13 +247,13 @@ export const ReportsPage: React.FC = () => {
                 ) : (
                   activeScan.detections.map((d, index) => (
                     <tr key={d.id} className="text-slate-300 print:text-black">
-                      <td className="py-2 px-3 text-slate-400 print:text-gray-500">
+                      <td className="py-2.5 px-3 text-slate-400 print:text-gray-500">
                         {index + 1}
                       </td>
-                      <td className="py-2 px-3 font-semibold text-cyan-300 print:text-blue-700">
+                      <td className="py-2.5 px-3 font-semibold text-cyan-300 print:text-blue-700">
                         {d.id}
                       </td>
-                      <td className="py-2 px-3 font-bold">
+                      <td className="py-2.5 px-3 font-bold">
                         <span
                           className={
                             d.type === 'MILCO'
@@ -259,10 +264,10 @@ export const ReportsPage: React.FC = () => {
                           {d.type}
                         </span>
                       </td>
-                      <td className="py-2 px-3 font-bold">
+                      <td className="py-2.5 px-3 font-bold">
                         {(d.confidence * 100).toFixed(1)}%
                       </td>
-                      <td className="py-2 px-3 text-slate-400 print:text-gray-600 text-[11px]">
+                      <td className="py-2.5 px-3 text-slate-400 print:text-gray-600 text-[11px]">
                         [{d.bbox.x1.toFixed(0)}, {d.bbox.y1.toFixed(0)}, {d.bbox.x2.toFixed(0)}, {d.bbox.y2.toFixed(0)}]
                       </td>
                     </tr>
@@ -274,9 +279,9 @@ export const ReportsPage: React.FC = () => {
         </div>
 
         {/* Sign-off footer */}
-        <div className="pt-4 border-t border-[#1E2E4E] print:border-gray-300 flex justify-between items-center text-[10px] font-mono text-slate-400 print:text-gray-500">
+        <div className="pt-4 border-t border-slate-800 print:border-gray-300 flex justify-between items-center text-[10px] font-mono text-slate-400 print:text-gray-500">
           <span>SONARX System ID: SNX-NODE-01</span>
-          <span>Verified Maritime Inspection Artifact</span>
+          <span>Verified Maritime Inspection Briefing</span>
         </div>
       </div>
     </div>

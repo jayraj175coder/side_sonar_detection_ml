@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { UploadCloud, Image as ImageIcon, Sparkles, FileSearch } from 'lucide-react';
+import { UploadCloud, Image as ImageIcon, Sparkles, FileSearch, CheckCircle2 } from 'lucide-react';
 import { generateSampleSonarImageDataUrl } from '../../services/demoData';
 
 interface DropZoneProps {
@@ -46,7 +46,6 @@ export const DropZone: React.FC<DropZoneProps> = ({
 
   const loadSampleTrack = async (seed: number, name: string) => {
     const dataUrl = generateSampleSonarImageDataUrl(seed, name);
-    // Convert dataUrl to a real File object
     const res = await fetch(dataUrl);
     const blob = await res.blob();
     const file = new File([blob], `${name.toLowerCase().replace(/\s+/g, '_')}.png`, {
@@ -57,18 +56,18 @@ export const DropZone: React.FC<DropZoneProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Drag & Drop Area */}
+      {/* Main Drag & Drop Zone */}
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`relative min-h-[360px] rounded-xl border-2 border-dashed transition-all duration-200 cursor-pointer flex flex-col items-center justify-center p-8 overflow-hidden group ${
+        className={`relative min-h-[380px] rounded-3xl glass-panel border-2 border-dashed transition-all duration-300 cursor-pointer flex flex-col items-center justify-center p-8 overflow-hidden group ${
           isDragging
-            ? 'border-cyan-400 bg-cyan-950/20'
+            ? 'border-cyan-400 bg-cyan-950/30 scale-[1.01]'
             : previewUrl
-            ? 'border-[#1E2E4E] bg-[#0A1020]'
-            : 'border-[#1E2E4E] hover:border-cyan-500/50 bg-[#080E1C]/60 hover:bg-[#0A1224]'
+            ? 'border-cyan-500/30 bg-[#091024]/90'
+            : 'border-cyan-500/20 hover:border-cyan-400/60 bg-[#0A1226]/60 hover:bg-[#0E1A38]/70 hover:shadow-2xl'
         }`}
       >
         <input
@@ -80,45 +79,45 @@ export const DropZone: React.FC<DropZoneProps> = ({
         />
 
         {previewUrl ? (
-          <div className="relative w-full h-full flex flex-col items-center justify-center">
+          <div className="relative w-full h-full flex flex-col items-center justify-center space-y-3">
             <img
               src={previewUrl}
               alt="Sonar scan preview"
-              className="max-h-[320px] w-auto object-contain rounded-lg border border-[#1E2E4E] shadow-2xl"
+              className="max-h-[300px] w-auto object-contain rounded-2xl border border-cyan-500/30 shadow-[0_12px_40px_rgba(0,0,0,0.8)]"
             />
-            <div className="mt-3 flex items-center gap-3">
-              <span className="text-xs font-mono text-cyan-300 bg-cyan-950/60 px-2.5 py-1 rounded border border-cyan-500/30">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono font-bold text-cyan-300 bg-cyan-950/80 px-3 py-1 rounded-lg border border-cyan-500/30 shadow-md">
                 {selectedFile ? selectedFile.name : 'Selected Sonar Scan'}
               </span>
-              <span className="text-xs text-slate-400">
-                Click or drag to change image
+              <span className="text-xs text-slate-400 font-mono">
+                (Click to replace file)
               </span>
             </div>
           </div>
         ) : (
           <div className="text-center space-y-4 max-w-md">
-            <div className="w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400 group-hover:scale-105 transition-transform">
-              <UploadCloud className="w-8 h-8" />
+            <div className="w-18 h-18 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400 group-hover:scale-110 group-hover:border-cyan-400 shadow-lg shadow-cyan-950/50 transition-all duration-300">
+              <UploadCloud className="w-9 h-9" />
             </div>
             <div>
-              <h4 className="text-base font-semibold text-slate-200">
+              <h4 className="text-lg font-extrabold text-slate-100 tracking-tight">
                 Upload Side-Scan Sonar Imagery
               </h4>
-              <p className="text-xs text-slate-400 mt-1">
-                Drag and drop raw acoustic files, or click to browse filesystem.
+              <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                Drag and drop raw acoustic files, or click to browse your filesystem.
               </p>
             </div>
-            <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-slate-400">
-              <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+            <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-slate-400 pt-2">
+              <span className="px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800">
                 PNG
               </span>
-              <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
-                JPG
+              <span className="px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800">
+                JPG / JPEG
               </span>
-              <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+              <span className="px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800">
                 WebP
               </span>
-              <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+              <span className="px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800">
                 TIFF
               </span>
             </div>
@@ -126,56 +125,68 @@ export const DropZone: React.FC<DropZoneProps> = ({
         )}
       </div>
 
-      {/* Quick Sample Tracks for Judges / Reviewers */}
-      <div className="p-4 rounded-lg bg-[#0C1427] border border-[#1E2E4E] space-y-2.5">
+      {/* Benchmark Presets Bar */}
+      <div className="p-4 rounded-2xl glass-panel space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-            <FileSearch className="w-3.5 h-3.5 text-cyan-400" />
-            Quick Benchmark Samples
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+            <FileSearch className="w-4 h-4 text-cyan-400" />
+            Calibrated Sonar Benchmarks (1-Click Load)
           </span>
-          <span className="text-[11px] text-slate-400">
-            Pre-calibrated acoustic tracks
+          <span className="text-[11px] text-slate-400 font-mono">
+            Synthetic Seabed Targets
           </span>
         </div>
-        <div className="grid grid-cols-3 gap-2">
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               loadSampleTrack(1, 'Biscayne Mine Contact');
             }}
-            className="px-3 py-2 rounded bg-slate-900/80 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/40 text-left transition-all group"
+            className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-red-500/40 text-left transition-all group"
           >
-            <p className="text-xs font-semibold text-slate-200 group-hover:text-cyan-300">
-              Sample 1: MILCO Track
-            </p>
-            <p className="text-[10px] text-slate-400 mt-0.5">High-contrast mine contact</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-slate-200 group-hover:text-red-400">
+                Track 1: MILCO Target
+              </p>
+              <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1 font-mono">High-contrast mine contact</p>
           </button>
+
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               loadSampleTrack(2, 'Key Largo Obstacles');
             }}
-            className="px-3 py-2 rounded bg-slate-900/80 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/40 text-left transition-all group"
+            className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-cyan-500/40 text-left transition-all group"
           >
-            <p className="text-xs font-semibold text-slate-200 group-hover:text-cyan-300">
-              Sample 2: NOMBO Field
-            </p>
-            <p className="text-[10px] text-slate-400 mt-0.5">Seafloor debris & boulders</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-slate-200 group-hover:text-cyan-300">
+                Track 2: NOMBO Field
+              </p>
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1 font-mono">Seafloor debris & coral</p>
           </button>
+
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               loadSampleTrack(3, 'Tortugas Clear Trench');
             }}
-            className="px-3 py-2 rounded bg-slate-900/80 hover:bg-cyan-950/40 border border-slate-800 hover:border-cyan-500/40 text-left transition-all group"
+            className="p-3 rounded-xl bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-800/80 hover:border-emerald-500/40 text-left transition-all group"
           >
-            <p className="text-xs font-semibold text-slate-200 group-hover:text-cyan-300">
-              Sample 3: Clear Seabed
-            </p>
-            <p className="text-[10px] text-slate-400 mt-0.5">Clean survey baseline</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-slate-200 group-hover:text-emerald-300">
+                Track 3: Clear Seabed
+              </p>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1 font-mono">Clean survey baseline</p>
           </button>
         </div>
       </div>

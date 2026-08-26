@@ -15,33 +15,33 @@ export const Badge: React.FC<BadgeProps> = ({
   size = 'md',
   className = '',
 }) => {
-  let colorStyles = 'bg-slate-800 text-slate-300 border-slate-700';
+  let colorStyles = 'bg-slate-800/80 text-slate-300 border-slate-700/60 shadow-sm';
 
   if (type === 'MILCO' || variant === 'danger') {
     colorStyles = 'bg-red-500/15 text-red-400 border-red-500/40 shadow-sm shadow-red-950/40';
   } else if (type === 'NOMBO' || variant === 'info') {
-    colorStyles = 'bg-cyan-500/15 text-cyan-400 border-cyan-500/40 shadow-sm shadow-cyan-950/40';
+    colorStyles = 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40 shadow-sm shadow-cyan-950/40';
   } else if (variant === 'success') {
-    colorStyles = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40';
+    colorStyles = 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40 shadow-sm shadow-emerald-950/30';
   } else if (variant === 'warning') {
-    colorStyles = 'bg-amber-500/15 text-amber-400 border-amber-500/40';
+    colorStyles = 'bg-amber-500/15 text-amber-400 border-amber-500/40 shadow-sm shadow-amber-950/30';
   }
 
   const sizeStyles = {
-    sm: 'px-2 py-0.5 text-xs font-medium',
+    sm: 'px-2 py-0.5 text-[10px] font-semibold',
     md: 'px-2.5 py-1 text-xs font-semibold',
-    lg: 'px-3 py-1.5 text-sm font-semibold',
+    lg: 'px-3.5 py-1.5 text-sm font-semibold',
   }[size];
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded border font-mono uppercase tracking-wider ${sizeStyles} ${colorStyles} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-md border font-mono uppercase tracking-wider ${sizeStyles} ${colorStyles} ${className}`}
     >
       <span
         className={`w-1.5 h-1.5 rounded-full ${
-          type === 'MILCO'
+          type === 'MILCO' || variant === 'danger'
             ? 'bg-red-400 animate-pulse'
-            : type === 'NOMBO'
+            : type === 'NOMBO' || variant === 'info'
             ? 'bg-cyan-400'
             : variant === 'success'
             ? 'bg-emerald-400'

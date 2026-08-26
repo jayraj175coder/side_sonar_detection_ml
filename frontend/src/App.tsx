@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { OverviewPage } from './pages/OverviewPage';
@@ -8,9 +8,19 @@ import { DetectionMapPage } from './pages/DetectionMapPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { ModelInfoPage } from './pages/ModelInfoPage';
 import { useApp } from './context/AppContext';
+import {
+  LayoutDashboard,
+  ScanLine,
+  History,
+  MapPin,
+  FileText,
+  Cpu,
+} from 'lucide-react';
+import { TabType } from './types';
 
 export const App: React.FC = () => {
-  const { activeTab } = useApp();
+  const { activeTab, setActiveTab } = useApp();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const getPageHeaderInfo = () => {
     switch (activeTab) {
@@ -54,16 +64,31 @@ export const App: React.FC = () => {
 
   const headerInfo = getPageHeaderInfo();
 
+  const mobileNavItems: { id: TabType; label: string; icon: React.ComponentType<any> }[] = [
+    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'scan', label: 'Scan', icon: ScanLine },
+    { id: 'map', label: 'Map', icon: MapPin },
+    { id: 'history', label: 'Archive', icon: History },
+    { id: 'reports', label: 'Reports', icon: FileText },
+  ];
+
   return (
-    <div className="flex h-screen bg-[#070B14] text-slate-100 overflow-hidden font-sans">
-      {/* Fixed Left Sidebar */}
-      <Sidebar />
+    <div className="flex h-screen bg-[#060913] text-slate-100 overflow-hidden font-sans select-none">
+      {/* Fixed Left Sidebar (Desktop + Mobile Drawer) */}
+      <Sidebar
+        isMobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
+      />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <Header title={headerInfo.title} subtitle={headerInfo.subtitle} />
+      {/* Main Content Viewport */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto pb-16 md:pb-0">
+        <Header
+          title={headerInfo.title}
+          subtitle={headerInfo.subtitle}
+          onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        />
 
-        <main className="flex-1 p-8 max-w-7xl w-full mx-auto space-y-6">
+        <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6">
           {activeTab === 'overview' && <OverviewPage />}
           {activeTab === 'scan' && <NewScanPage />}
           {activeTab === 'history' && <ScanHistoryPage />}
@@ -71,6 +96,28 @@ export const App: React.FC = () => {
           {activeTab === 'reports' && <ReportsPage />}
           {activeTab === 'model' && <ModelInfoPage />}
         </main>
+      </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#070D1B]/90 backdrop-blur-xl border-t border-slate-800 flex items-center justify-around z-40 px-2">
+        {mobileNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex flex-col items-center justify-center p-1 rounded-xl transition-all ${
+                isActive
+                  ? 'text-cyan-400 font-bold'
+                  : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''}`} />
+              <span className="text-[10px] font-mono mt-0.5">{item.label}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

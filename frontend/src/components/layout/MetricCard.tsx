@@ -19,44 +19,51 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   trend,
 }) => {
   const borderVariants = {
-    cyan: 'border-cyan-500/20 hover:border-cyan-500/40 text-cyan-400',
-    red: 'border-red-500/20 hover:border-red-500/40 text-red-400',
-    blue: 'border-blue-500/20 hover:border-blue-500/40 text-blue-400',
+    cyan: 'border-cyan-500/20 hover:border-cyan-500/50 text-cyan-400',
+    red: 'border-red-500/20 hover:border-red-500/50 text-red-400',
+    blue: 'border-blue-500/20 hover:border-blue-500/50 text-blue-400',
     neutral: 'border-slate-800 hover:border-slate-700 text-slate-400',
   };
 
   const glowVariants = {
-    cyan: 'from-cyan-950/20 to-transparent',
-    red: 'from-red-950/20 to-transparent',
-    blue: 'from-blue-950/20 to-transparent',
-    neutral: 'from-slate-900/20 to-transparent',
+    cyan: 'from-cyan-950/30 via-transparent to-transparent',
+    red: 'from-red-950/30 via-transparent to-transparent',
+    blue: 'from-blue-950/30 via-transparent to-transparent',
+    neutral: 'from-slate-900/30 via-transparent to-transparent',
+  };
+
+  const iconBgVariants = {
+    cyan: 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-cyan-950/50',
+    red: 'bg-red-950/60 border-red-500/30 text-red-400 shadow-red-950/50',
+    blue: 'bg-blue-950/60 border-blue-500/30 text-blue-400 shadow-blue-950/50',
+    neutral: 'bg-slate-900 border-slate-800 text-slate-400',
   };
 
   return (
     <div
-      className={`relative overflow-hidden rounded-lg bg-[#0C1427]/80 backdrop-blur border p-5 transition-all duration-200 ${borderVariants[variant]}`}
+      className={`relative overflow-hidden rounded-2xl glass-panel p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl ${borderVariants[variant]}`}
     >
       <div
-        className={`absolute inset-0 bg-gradient-to-br ${glowVariants[variant]} pointer-events-none opacity-40`}
+        className={`absolute inset-0 bg-gradient-to-br ${glowVariants[variant]} pointer-events-none opacity-60`}
       />
-      <div className="relative flex items-start justify-between">
+      <div className="relative flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-mono font-medium tracking-wider uppercase text-slate-400">
+          <p className="text-[11px] font-mono font-semibold tracking-wider uppercase text-slate-400">
             {title}
           </p>
-          <h3 className="mt-2 text-2xl font-bold text-slate-100 font-mono tracking-tight">
+          <h3 className="mt-2 text-2xl font-extrabold text-slate-100 font-mono tracking-tight">
             {value}
           </h3>
           {subtitle && (
-            <p className="mt-1 text-xs text-slate-400">{subtitle}</p>
+            <p className="mt-1 text-xs text-slate-400 font-medium">{subtitle}</p>
           )}
           {trend && (
-            <p className="mt-1 text-xs text-cyan-400 font-mono flex items-center gap-1">
+            <p className="mt-1.5 text-xs text-cyan-400 font-mono font-semibold flex items-center gap-1">
               <span>↗</span> {trend}
             </p>
           )}
         </div>
-        <div className={`p-2.5 rounded-md bg-slate-900/80 border border-slate-800 ${borderVariants[variant]}`}>
+        <div className={`p-2.5 rounded-xl border shadow-lg shrink-0 ${iconBgVariants[variant]}`}>
           <Icon className="w-5 h-5" />
         </div>
       </div>

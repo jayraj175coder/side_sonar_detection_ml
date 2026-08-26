@@ -6,12 +6,13 @@ import {
   Shield,
   Gauge,
   Zap,
-  TrendingUp,
-  FileText,
-  Eye,
-  Trash2,
-  Calendar,
   Sparkles,
+  Radio,
+  ArrowRight,
+  ChevronRight,
+  TrendingUp,
+  Activity,
+  Layers,
 } from 'lucide-react';
 import { MetricCard } from '../components/layout/MetricCard';
 import { Badge } from '../components/common/Badge';
@@ -26,6 +27,8 @@ import {
   PieChart,
   Pie,
   Cell,
+  AreaChart,
+  Area,
 } from 'recharts';
 
 export const OverviewPage: React.FC = () => {
@@ -59,15 +62,14 @@ export const OverviewPage: React.FC = () => {
         ).toFixed(1)
       : '0.0';
 
-  // Chart Data: Class Distribution
+  // Chart Data
   const pieData = [
-    { name: 'MILCO (Mine-Like)', value: milcoTotal, color: '#EF4444' },
-    { name: 'NOMBO (Obstacle)', value: nomboTotal, color: '#06B6D4' },
+    { name: 'MILCO (Mine-Like Contacts)', value: milcoTotal, color: '#EF4444' },
+    { name: 'NOMBO (Obstacle Hazards)', value: nomboTotal, color: '#06B6D4' },
   ];
 
-  // Chart Data: Scans Activity
   const activityData = scans.slice(0, 7).reverse().map((s, idx) => ({
-    name: `Scan ${idx + 1}`,
+    name: `Track ${idx + 1}`,
     scanId: s.scan_id,
     milco: s.milco_count,
     nombo: s.nombo_count,
@@ -83,47 +85,95 @@ export const OverviewPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Banner if Demo Mode */}
-      {isDemoMode && (
-        <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs font-mono text-amber-300">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>
-              <strong>Demo Environment Active:</strong> Displaying pre-computed benchmark survey dataset.
-            </span>
-          </div>
-          <span className="text-[11px] text-amber-400/80">Offline Autonomous Mode</span>
-        </div>
-      )}
+    <div className="space-y-8">
+      {/* 1. Hero Banner with Animated Sonar Radar Core */}
+      <div className="relative overflow-hidden rounded-3xl glass-panel border border-cyan-500/25 p-6 md:p-8 bg-gradient-to-r from-[#0C162E]/90 via-[#0B152B]/80 to-[#070D1B]/90 shadow-2xl">
+        {/* Background Radial Glow */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Top 6 KPI Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+              <span>YOLOv8n ONNX Autonomous Sonar Intelligence</span>
+            </div>
+
+            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight leading-tight">
+              Real-Time Seabed Object Classification & Inspection
+            </h2>
+
+            <p className="text-sm text-slate-300 leading-relaxed font-sans">
+              Automated mine-like contact (<strong className="text-red-400">MILCO</strong>) and non-mine obstacle (<strong className="text-cyan-400">NOMBO</strong>) detection from side-scan sonar acoustic backscatter imagery.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                onClick={() => setActiveTab('scan')}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold font-mono text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <ScanLine className="w-4 h-4" />
+                <span>Launch New Scan</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1" />
+              </button>
+
+              <button
+                onClick={() => setActiveTab('map')}
+                className="px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-200 font-mono text-xs flex items-center gap-2 transition-all"
+              >
+                <Radio className="w-4 h-4 text-cyan-400" />
+                <span>View Geospatial Map</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Tactical Radar Graphic Box */}
+          <div className="hidden lg:flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-950/60 border border-cyan-500/20 shadow-inner shrink-0">
+            <div className="relative w-28 h-28 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full border border-cyan-500/20" />
+              <div className="absolute inset-3 rounded-full border border-cyan-500/30" />
+              <div className="absolute inset-6 rounded-full border border-cyan-500/40" />
+              <div className="absolute inset-0 rounded-full border border-cyan-400/40 animate-ping opacity-60" />
+              <div className="w-12 h-12 rounded-full bg-cyan-500/15 border border-cyan-400 flex items-center justify-center text-cyan-300">
+                <Radio className="w-6 h-6 animate-pulse" />
+              </div>
+            </div>
+            <p className="mt-3 text-[11px] font-mono font-bold text-cyan-300">
+              OPERATIONAL READY
+            </p>
+            <p className="text-[10px] font-mono text-slate-400">
+              Latency ~{avgLatency}ms
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Top 6 KPI Metric Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <MetricCard
-          title="Total Scans"
+          title="Total Tracks"
           value={totalScans}
-          subtitle="Processed tracks"
+          subtitle="Processed scans"
           icon={ScanLine}
           variant="cyan"
         />
         <MetricCard
-          title="Objects Detected"
+          title="Targets Logged"
           value={objectsDetected}
-          subtitle="Acoustic targets"
+          subtitle="Acoustic contacts"
           icon={Crosshair}
           variant="blue"
         />
         <MetricCard
-          title="MILCO Targets"
+          title="MILCO Hazards"
           value={milcoTotal}
           subtitle="Mine-like contacts"
           icon={AlertOctagon}
           variant="red"
         />
         <MetricCard
-          title="NOMBO Targets"
+          title="NOMBO Obstacles"
           value={nomboTotal}
-          subtitle="Bottom obstacles"
+          subtitle="Bottom debris"
           icon={Shield}
           variant="cyan"
         />
@@ -143,13 +193,13 @@ export const OverviewPage: React.FC = () => {
         />
       </div>
 
-      {/* Charts Section */}
+      {/* 3. Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Activity Timeline */}
-        <div className="lg:col-span-2 p-5 rounded-xl bg-[#0C1427] border border-[#1E2E4E] space-y-4">
+        <div className="lg:col-span-2 p-6 rounded-2xl glass-panel space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h4 className="text-sm font-bold text-slate-100 font-mono uppercase tracking-wider">
+              <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
                 Detection Activity Over Recent Tracks
               </h4>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -157,16 +207,16 @@ export const OverviewPage: React.FC = () => {
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1.5 text-red-400">
+              <span className="flex items-center gap-1.5 text-red-400 font-semibold">
                 <span className="w-2.5 h-2.5 rounded-sm bg-red-500" /> MILCO
               </span>
-              <span className="flex items-center gap-1.5 text-cyan-400">
+              <span className="flex items-center gap-1.5 text-cyan-400 font-semibold">
                 <span className="w-2.5 h-2.5 rounded-sm bg-cyan-500" /> NOMBO
               </span>
             </div>
           </div>
 
-          <div className="h-64 w-full">
+          <div className="h-64 w-full pt-2">
             {activityData.length === 0 ? (
               <div className="h-full flex items-center justify-center text-xs font-mono text-slate-400">
                 No survey tracks processed yet.
@@ -186,15 +236,26 @@ export const OverviewPage: React.FC = () => {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0F172A',
-                      borderColor: '#1E293B',
-                      borderRadius: '8px',
+                      backgroundColor: '#091024',
+                      borderColor: 'rgba(56, 189, 248, 0.2)',
+                      borderRadius: '12px',
                       fontFamily: 'monospace',
                       fontSize: '12px',
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
                     }}
                   />
-                  <Bar dataKey="milco" name="MILCO" fill="#EF4444" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="nombo" name="NOMBO" fill="#06B6D4" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="milco"
+                    name="MILCO"
+                    fill="#EF4444"
+                    radius={[6, 6, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="nombo"
+                    name="NOMBO"
+                    fill="#06B6D4"
+                    radius={[6, 6, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -202,13 +263,13 @@ export const OverviewPage: React.FC = () => {
         </div>
 
         {/* Right 1 Col: Classification Ratio Donut */}
-        <div className="p-5 rounded-xl bg-[#0C1427] border border-[#1E2E4E] space-y-4 flex flex-col justify-between">
+        <div className="p-6 rounded-2xl glass-panel space-y-4 flex flex-col justify-between">
           <div>
-            <h4 className="text-sm font-bold text-slate-100 font-mono uppercase tracking-wider">
-              Classification Distribution
+            <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
+              Classification Ratio
             </h4>
             <p className="text-xs text-slate-400 mt-0.5">
-              Cumulative target taxonomy ratio
+              Cumulative target taxonomy distribution
             </p>
           </div>
 
@@ -226,9 +287,9 @@ export const OverviewPage: React.FC = () => {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={45}
-                    outerRadius={75}
-                    paddingAngle={4}
+                    innerRadius={50}
+                    outerRadius={80}
+                    paddingAngle={6}
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -236,11 +297,12 @@ export const OverviewPage: React.FC = () => {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0F172A',
-                      borderColor: '#1E293B',
-                      borderRadius: '8px',
+                      backgroundColor: '#091024',
+                      borderColor: 'rgba(56, 189, 248, 0.2)',
+                      borderRadius: '12px',
                       fontFamily: 'monospace',
                       fontSize: '12px',
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
                     }}
                   />
                 </PieChart>
@@ -248,24 +310,24 @@ export const OverviewPage: React.FC = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono border-t border-slate-800/80 pt-3">
-            <div className="p-2 rounded bg-slate-900 border border-slate-800">
-              <p className="text-red-400 font-bold text-base">{milcoTotal}</p>
+          <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono border-t border-slate-800 pt-3">
+            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-red-500/20">
+              <p className="text-red-400 font-extrabold text-lg">{milcoTotal}</p>
               <p className="text-[10px] text-slate-400 uppercase mt-0.5">MILCO</p>
             </div>
-            <div className="p-2 rounded bg-slate-900 border border-slate-800">
-              <p className="text-cyan-400 font-bold text-base">{nomboTotal}</p>
+            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-cyan-500/20">
+              <p className="text-cyan-400 font-extrabold text-lg">{nomboTotal}</p>
               <p className="text-[10px] text-slate-400 uppercase mt-0.5">NOMBO</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Recent Scans Table */}
-      <div className="p-6 rounded-xl bg-[#0C1427] border border-[#1E2E4E] space-y-4">
+      {/* 4. Recent Scans Table */}
+      <div className="p-6 rounded-2xl glass-panel space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-bold text-slate-100 font-mono uppercase tracking-wider">
+            <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
               Recent Survey Scans
             </h4>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -273,16 +335,16 @@ export const OverviewPage: React.FC = () => {
             </p>
           </div>
           <button
-            onClick={() => setActiveTab('scan')}
-            className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold text-xs font-mono flex items-center gap-1.5 transition-colors"
+            onClick={() => setActiveTab('history')}
+            className="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 hover:underline"
           >
-            <ScanLine className="w-3.5 h-3.5" />
-            <span>Launch New Scan</span>
+            <span>View Full Archive</span>
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {scans.length === 0 ? (
-          <div className="p-8 text-center rounded-lg bg-[#080E1C] border border-slate-800 space-y-3">
+          <div className="p-8 text-center rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
             <ScanLine className="w-8 h-8 text-slate-400 mx-auto" />
             <p className="text-xs font-mono text-slate-400">
               No sonar scans in history yet. Upload a scan or enable Demo Mode.
@@ -291,28 +353,28 @@ export const OverviewPage: React.FC = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-[#080E1C] text-slate-400 border-b border-slate-800 uppercase tracking-wider">
+              <thead className="bg-[#080E1C]/80 text-slate-400 border-b border-slate-800 uppercase tracking-wider">
                 <tr>
-                  <th className="py-2.5 px-3">Scan ID</th>
-                  <th className="py-2.5 px-3">File</th>
-                  <th className="py-2.5 px-3">Timestamp</th>
-                  <th className="py-2.5 px-3">Detections</th>
-                  <th className="py-2.5 px-3">MILCO / NOMBO</th>
-                  <th className="py-2.5 px-3">Peak Confidence</th>
-                  <th className="py-2.5 px-3">Latency</th>
-                  <th className="py-2.5 px-3 text-right">Actions</th>
+                  <th className="py-3 px-3">Scan ID</th>
+                  <th className="py-3 px-3">Source Track</th>
+                  <th className="py-3 px-3">Timestamp</th>
+                  <th className="py-3 px-3">Detections</th>
+                  <th className="py-3 px-3">MILCO / NOMBO</th>
+                  <th className="py-3 px-3">Peak Confidence</th>
+                  <th className="py-3 px-3">Latency</th>
+                  <th className="py-3 px-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
                 {scans.slice(0, 6).map((scan) => (
                   <tr
                     key={scan.scan_id}
-                    className="hover:bg-slate-900/60 transition-colors text-slate-300"
+                    className="hover:bg-cyan-950/20 transition-colors text-slate-300"
                   >
                     <td className="py-3 px-3 font-bold text-cyan-300">
                       {scan.scan_id}
                     </td>
-                    <td className="py-3 px-3 text-slate-300 max-w-[180px] truncate">
+                    <td className="py-3 px-3 text-slate-200 max-w-[180px] truncate">
                       {scan.filename}
                     </td>
                     <td className="py-3 px-3 text-slate-400 text-[11px]">
@@ -322,15 +384,15 @@ export const OverviewPage: React.FC = () => {
                         minute: '2-digit',
                       })}
                     </td>
-                    <td className="py-3 px-3 font-semibold text-slate-100">
+                    <td className="py-3 px-3 font-bold text-slate-100">
                       {scan.total_detections}
                     </td>
                     <td className="py-3 px-3 space-x-1">
-                      <span className="text-red-400 font-semibold">
+                      <span className="text-red-400 font-bold">
                         {scan.milco_count}M
                       </span>
-                      <span className="text-slate-400">/</span>
-                      <span className="text-cyan-400 font-semibold">
+                      <span className="text-slate-500">/</span>
+                      <span className="text-cyan-400 font-bold">
                         {scan.nombo_count}N
                       </span>
                     </td>
@@ -340,20 +402,12 @@ export const OverviewPage: React.FC = () => {
                     <td className="py-3 px-3 text-slate-400">
                       {scan.inference_ms.toFixed(1)} ms
                     </td>
-                    <td className="py-3 px-3 text-right space-x-2">
+                    <td className="py-3 px-3 text-right">
                       <button
                         onClick={() => handleInspect(scan.scan_id)}
-                        className="px-2 py-1 rounded bg-cyan-950/60 hover:bg-cyan-900 border border-cyan-500/30 text-cyan-300 hover:text-cyan-200 transition-colors"
-                        title="Inspect Scan"
+                        className="px-3 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:text-cyan-200 transition-all font-semibold"
                       >
                         Inspect
-                      </button>
-                      <button
-                        onClick={() => deleteScan(scan.scan_id)}
-                        className="p-1 rounded text-slate-400 hover:text-red-400 transition-colors"
-                        title="Delete Scan"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 inline" />
                       </button>
                     </td>
                   </tr>

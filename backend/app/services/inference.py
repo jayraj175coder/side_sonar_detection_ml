@@ -1,3 +1,4 @@
+import ast
 import io
 import time
 import uuid
@@ -9,7 +10,7 @@ from PIL import Image
 from app.core.config import settings
 from app.schemas.detection import BoundingBox, Detection, PredictionResponse, Location
 
-# Try importing onnxruntime
+# Import onnxruntime
 try:
     import onnxruntime as ort
     ORT_AVAILABLE = True
@@ -21,7 +22,7 @@ except ImportError:
 class SonarInferenceService:
     def __init__(self, model_path: Optional[Path] = None):
         self.model_path = model_path or settings.resolved_model_path
-        self.classes = settings.CLASSES
+        self.classes: Dict[int, str] = {0: "MILCO", 1: "NOMBO"}
         self.input_size = settings.INPUT_SIZE
         self.session: Optional[Any] = None
         self.input_name: Optional[str] = None
@@ -32,7 +33,6 @@ class SonarInferenceService:
             return False
         if self.model_path.exists() and self.model_path.is_file():
             try:
-                # Use CPUExecutionProvider by default for high portability
                 opts = ort.SessionOptions()
                 opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
                 self.session = ort.InferenceSession(
@@ -41,6 +41,17 @@ class SonarInferenceService:
                     providers=["CPUExecutionProvider"],
                 )
                 self.input_name = self.session.get_inputs()[0].name
+
+                # Extract model metadata if available
+                meta = self.session.get_modelmeta().custom_metadata_map
+                if "names" in meta:
+                    try:
+                        raw_names = ast.literal_eval(meta["names"])
+                        if isinstance(raw_names, dict):
+                            self.classes = {int(k): str(v) for k, v in raw_names.items()}
+                    except Exception:
+                        pass
+
                 return True
             except Exception:
                 self.session = None
@@ -50,9 +61,15 @@ class SonarInferenceService:
 
     def is_model_loaded(self) -> bool:
         if self.session is None:
-            # Try reloading in case the model was just added
             return self._load_session_if_available()
         return True
+
+    def get_class_names(self) -> List[str]:
+        """Returns the primary target classes (MILCO, NOMBO)."""
+        target_classes = [c for c in self.classes.values() if c in ["MILCO", "NOMBO"]]
+        if not target_classes:
+            return ["MILCO", "NOMBO"]
+        return sorted(list(set(target_classes)))
 
     def _preprocess_image(
         self, image: Image.Image
@@ -64,7 +81,7 @@ class SonarInferenceService:
         orig_w, orig_h = image.size
         target_size = self.input_size
 
-        # Compute scaling ratio (maintaining aspect ratio)
+        # Scaling ratio (maintaining aspect ratio)
         ratio = min(target_size / orig_w, target_size / orig_h)
         new_w = int(round(orig_w * ratio))
         new_h = int(round(orig_h * ratio))
@@ -79,7 +96,7 @@ class SonarInferenceService:
         canvas = Image.new("RGB", (target_size, target_size), (114, 114, 114))
         canvas.paste(resized_img, (int(pad_w), int(pad_h)))
 
-        # Convert to numpy array, normalize, and format to (1, 3, H, W)
+        # Convert to float32 numpy array, normalize, and format to (1, 3, H, W)
         img_array = np.array(canvas, dtype=np.float32) / 255.0
         img_array = np.transpose(img_array, (2, 0, 1))  # HWC to CHW
         img_array = np.expand_dims(img_array, axis=0)  # Add batch dim
@@ -144,19 +161,19 @@ class SonarInferenceService:
         """
         Parses YOLOv8 output tensor [1, 4 + num_classes, 8400] into validated Detections.
         """
-        # Squeeze batch dimension: [6, 8400]
+        # Squeeze batch dimension
         output = np.squeeze(output_tensor, axis=0)
 
-        # If shape is [6, 8400], transpose to [8400, 6]
+        # If shape is [C, 8400], transpose to [8400, C]
         if output.shape[0] < output.shape[1]:
             output = np.transpose(output, (1, 0))
 
-        # output shape is now [8400, 4 + num_classes]
+        # Number of class channels
+        num_classes = output.shape[1] - 4
+
         candidate_boxes = []
         candidate_scores = []
         candidate_classes = []
-
-        num_classes = len(self.classes)
 
         for row in output:
             cx, cy, w, h = row[0:4]
@@ -164,7 +181,21 @@ class SonarInferenceService:
             class_id = int(np.argmax(class_scores))
             max_score = float(class_scores[class_id])
 
+            # Resolve class name
+            class_name = self.classes.get(class_id, str(class_id))
+
+            # Filter out non-target or low confidence predictions
             if max_score >= confidence_threshold:
+                # If name is '0' and dataset had 0 as background or unlabelled, map or retain if valid
+                if class_name not in ["MILCO", "NOMBO"]:
+                    # Check if 1: MILCO, 2: NOMBO or 0: MILCO, 1: NOMBO
+                    if class_id == 1 and "MILCO" in self.classes.values():
+                        class_name = "MILCO"
+                    elif class_id == 2 and "NOMBO" in self.classes.values():
+                        class_name = "NOMBO"
+                    else:
+                        continue
+
                 # Convert center-wh to xyxy in 640x640 space
                 bx1 = cx - (w / 2.0)
                 by1 = cy - (h / 2.0)
@@ -196,11 +227,10 @@ class SonarInferenceService:
         detections = []
         for idx_num, idx in enumerate(keep_indices, start=1):
             class_idx = int(classes_np[idx])
-            class_name = (
-                self.classes[class_idx]
-                if class_idx < len(self.classes)
-                else "UNKNOWN"
-            )
+            class_name = self.classes.get(class_idx, "MILCO")
+            if class_name not in ["MILCO", "NOMBO"]:
+                class_name = "MILCO" if class_idx == 1 else "NOMBO"
+
             b = boxes_np[idx]
             detections.append(
                 Detection(

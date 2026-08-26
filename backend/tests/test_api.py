@@ -58,23 +58,28 @@ def test_predict_empty_file():
     assert "empty" in response.json()["detail"].lower()
 
 
-def test_predict_model_missing_behavior():
-    # When model is not present, predict should cleanly return 503 Service Unavailable
-    # Create a small valid test image in-memory
-    img = Image.new("RGB", (300, 300), color=(50, 50, 50))
+def test_live_onnx_inference():
+    # Test real ONNX inference on a synthetic sonar image
+    img = Image.new("RGB", (640, 480), color=(20, 30, 40))
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     buf.seek(0)
 
     response = client.post(
         "/api/predict",
-        files={"file": ("sonar_scan.png", buf.getvalue(), "image/png")},
-        data={"confidence": "0.3"},
+        files={"file": ("live_sonar_scan.png", buf.getvalue(), "image/png")},
+        data={"confidence": "0.15", "latitude": "24.55", "longitude": "-81.78"},
     )
-    # Either 200 if model exists or 503 if model is not placed yet
-    assert response.status_code in [200, 503]
-    if response.status_code == 503:
-        assert "best.onnx" in response.json()["detail"]
+    assert response.status_code == 200
+    data = response.json()
+    assert "scan_id" in data
+    assert data["filename"] == "live_sonar_scan.png"
+    assert data["image_width"] == 640
+    assert data["image_height"] == 480
+    assert data["inference_ms"] > 0
+    assert "detections" in data
+    assert data["location"]["latitude"] == 24.55
+    assert data["location"]["longitude"] == -81.78
 
 
 def test_scan_repository_workflow():

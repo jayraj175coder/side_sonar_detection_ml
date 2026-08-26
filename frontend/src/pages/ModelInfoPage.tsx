@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Badge } from '../components/common/Badge';
+import { HolographicGlobe } from '../components/common/HolographicGlobe';
 
 export const ModelInfoPage: React.FC = () => {
   const { modelInfo, apiHealth, isDemoMode } = useApp();
@@ -39,9 +40,14 @@ export const ModelInfoPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* 1. Top Model Header */}
-      <div className="p-6 md:p-8 rounded-3xl glass-panel flex flex-wrap items-center justify-between gap-4 border border-cyan-500/20 shadow-2xl">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-lg shadow-cyan-950/40">
+      <div className="relative overflow-hidden p-6 md:p-8 rounded-3xl glass-panel flex flex-wrap items-center justify-between gap-6 border border-cyan-500/20 shadow-2xl bg-gradient-to-r from-[#0C162E]/95 via-[#0A1226]/90 to-[#070D1B]/95">
+        {/* Ambient 3D Rotating Globe in Background */}
+        <div className="absolute -right-8 -top-8 opacity-20 pointer-events-none hidden md:block">
+          <HolographicGlobe size={260} />
+        </div>
+
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-lg shadow-cyan-950/40 shrink-0">
             <Cpu className="w-7 h-7" />
           </div>
           <div>
@@ -59,7 +65,7 @@ export const ModelInfoPage: React.FC = () => {
           </div>
         </div>
 
-        <div>
+        <div className="relative z-10 flex items-center gap-3">
           {isModelActive ? (
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold shadow-md shadow-emerald-950/40">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />

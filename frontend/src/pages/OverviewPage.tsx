@@ -31,6 +31,8 @@ import {
   Area,
 } from 'recharts';
 
+import { HolographicGlobe } from '../components/common/HolographicGlobe';
+
 export const OverviewPage: React.FC = () => {
   const { stats, scans, setActiveTab, setCurrentScan, deleteScan, isDemoMode } =
     useApp();
@@ -126,23 +128,22 @@ export const OverviewPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Tactical Radar Graphic Box */}
-          <div className="hidden lg:flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-950/60 border border-cyan-500/20 shadow-inner shrink-0">
-            <div className="relative w-28 h-28 flex items-center justify-center">
-              <div className="absolute inset-0 rounded-full border border-cyan-500/20" />
-              <div className="absolute inset-3 rounded-full border border-cyan-500/30" />
-              <div className="absolute inset-6 rounded-full border border-cyan-500/40" />
-              <div className="absolute inset-0 rounded-full border border-cyan-400/40 animate-ping opacity-60" />
-              <div className="w-12 h-12 rounded-full bg-cyan-500/15 border border-cyan-400 flex items-center justify-center text-cyan-300">
-                <Radio className="w-6 h-6 animate-pulse" />
-              </div>
+          {/* Revolving 3D Holographic Earth & Telemetry Card */}
+          <div className="relative flex flex-col items-center justify-center p-4 rounded-3xl bg-slate-950/70 border border-cyan-500/25 shadow-2xl shrink-0 overflow-hidden group">
+            {/* Ambient Pulse Glow */}
+            <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none" />
+            
+            <HolographicGlobe size={180} className="relative z-10 my-1" />
+
+            <div className="relative z-10 text-center space-y-0.5 pt-1 border-t border-slate-800/80 w-full">
+              <p className="text-[11px] font-mono font-bold text-cyan-300 tracking-wider flex items-center justify-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                GLOBAL TELEMETRY
+              </p>
+              <p className="text-[10px] font-mono text-slate-400">
+                Acoustic Sensor Mesh Active
+              </p>
             </div>
-            <p className="mt-3 text-[11px] font-mono font-bold text-cyan-300">
-              OPERATIONAL READY
-            </p>
-            <p className="text-[10px] font-mono text-slate-400">
-              Latency ~{avgLatency}ms
-            </p>
           </div>
         </div>
       </div>

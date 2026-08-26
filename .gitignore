@@ -27,6 +27,10 @@ wheels/
 .coverage
 htmlcov/
 
+# Data Storage
+backend/data/*.json
+!backend/data/.gitkeep
+
 # Environment
 .env
 .env.local

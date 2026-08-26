@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: sonarx-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_PATH
+        value: ./models/best.onnx
+      - key: CONFIDENCE_THRESHOLD
+        value: "0.25"
+      - key: CORS_ORIGINS
+        value: '["*"]'

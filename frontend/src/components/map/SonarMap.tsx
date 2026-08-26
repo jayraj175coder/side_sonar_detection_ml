@@ -269,10 +269,10 @@ export const SonarMap: React.FC = () => {
           if (ref) mapRef.current = ref;
         }}
       >
-        {/* Dark Nautical Map Tiles via CartoDB Dark Matter */}
+        {/* 100% Free OpenStreetMap with Tactical Dark Filter (No API Key Required) */}
         <TileLayer
-          attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://openstreetmap.org">OpenStreetMap</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={19}
         />
 

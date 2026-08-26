@@ -118,12 +118,17 @@
   z-index: 1;
 }
 
+/* 100% Free & No-API-Key Dark Tactical Nautical Map Styling */
+.leaflet-tile-pane {
+  filter: brightness(0.6) invert(1) contrast(2.6) hue-rotate(195deg) saturate(0.35) brightness(0.85) !important;
+}
+
 .leaflet-control-zoom {
   display: none !important; /* Replaced by our sleek floating custom UI controls */
 }
 
 .leaflet-control-attribution {
-  background: rgba(6, 9, 19, 0.8) !important;
+  background: rgba(6, 9, 19, 0.85) !important;
   color: #64748B !important;
   font-size: 10px !important;
   backdrop-filter: blur(4px);

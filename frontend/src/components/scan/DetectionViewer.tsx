@@ -15,6 +15,9 @@ import {
   Layers,
   ArrowRight,
   RefreshCw,
+  Sliders,
+  Sparkles,
+  Info,
 } from 'lucide-react';
 import { PredictionResponse, Detection } from '../../types';
 import { Badge } from '../common/Badge';
@@ -50,6 +53,12 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   const handleZoomIn = () => setZoomLevel((z) => Math.min(z + 0.25, 3));
   const handleZoomOut = () => setZoomLevel((z) => Math.max(z - 0.25, 0.75));
   const handleResetZoom = () => setZoomLevel(1);
+
+  const handleAutoTune = () => {
+    // If highest confidence is > 0, set threshold to slightly below it or 0.05
+    const target = Math.max(0.01, Math.min(0.25, scan.highest_confidence > 0 ? scan.highest_confidence - 0.005 : 0.05));
+    setActiveThreshold(parseFloat(target.toFixed(2)));
+  };
 
   const handleExportJson = () => {
     const dataStr =
@@ -129,20 +138,65 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
       <div className="rounded-3xl glass-panel overflow-hidden shadow-2xl border border-cyan-500/20">
         {/* Canvas Toolbar */}
         <div className="p-3.5 bg-[#080F22]/90 backdrop-blur border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
+          {/* Dynamic Confidence Slider & Presets */}
+          <div className="flex items-center gap-2.5 flex-wrap">
             <span className="text-xs font-mono text-slate-400">Confidence Cutoff:</span>
             <input
               type="range"
-              min="0.05"
+              min="0.01"
               max="0.95"
               step="0.01"
               value={activeThreshold}
               onChange={(e) => setActiveThreshold(parseFloat(e.target.value))}
-              className="w-28 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+              className="w-24 sm:w-32 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
             />
             <span className="text-xs font-mono text-cyan-400 font-extrabold bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">
               {(activeThreshold * 100).toFixed(0)}%
             </span>
+
+            {/* Quick Preset Buttons */}
+            <div className="flex items-center gap-1 text-[10px] font-mono">
+              <button
+                onClick={() => setActiveThreshold(0.25)}
+                className={`px-2 py-0.5 rounded-md border transition-all ${
+                  activeThreshold === 0.25
+                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold'
+                    : 'bg-slate-950 text-slate-400 border-slate-800'
+                }`}
+              >
+                25%
+              </button>
+              <button
+                onClick={() => setActiveThreshold(0.05)}
+                className={`px-2 py-0.5 rounded-md border transition-all ${
+                  activeThreshold === 0.05
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold'
+                    : 'bg-slate-950 text-slate-400 border-slate-800'
+                }`}
+              >
+                5%
+              </button>
+              <button
+                onClick={() => setActiveThreshold(0.01)}
+                className={`px-2 py-0.5 rounded-md border transition-all ${
+                  activeThreshold === 0.01
+                    ? 'bg-red-500/20 text-red-300 border-red-500/40 font-bold'
+                    : 'bg-slate-950 text-slate-400 border-slate-800'
+                }`}
+              >
+                1%
+              </button>
+              {scan.highest_confidence > 0 && scan.highest_confidence < 0.25 && (
+                <button
+                  onClick={handleAutoTune}
+                  className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 font-bold flex items-center gap-1 hover:bg-cyan-500/20 transition-all"
+                  title="Auto-tune cutoff to reveal peak candidate"
+                >
+                  <Sparkles className="w-3 h-3" />
+                  Auto-Tune ({(scan.highest_confidence * 100).toFixed(0)}%)
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -291,7 +345,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
         </div>
       </div>
 
-      {/* 3. Detection Inventory Table */}
+      {/* 3. Detection Inventory Table or Low-Confidence Diagnostic Guidance */}
       <div className="p-6 rounded-3xl glass-panel space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -321,8 +375,38 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
         </div>
 
         {visibleDetections.length === 0 ? (
-          <div className="p-6 text-center rounded-2xl bg-slate-950/60 border border-slate-800 text-slate-400 text-xs font-mono">
-            No contacts identified above threshold ({activeThreshold.toFixed(2)}).
+          <div className="p-6 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="space-y-2 flex-1">
+                <p className="text-xs font-mono font-bold text-slate-200">
+                  0 Contacts Exceeded Current Cutoff ({(activeThreshold * 100).toFixed(0)}%)
+                </p>
+                <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                  The model did not find any contacts above the <strong className="text-cyan-300">{(activeThreshold * 100).toFixed(0)}%</strong> threshold.
+                  {scan.highest_confidence > 0 ? (
+                    <> Peak acoustic confidence detected in this scan is <strong className="text-amber-400 font-mono">{(scan.highest_confidence * 100).toFixed(1)}%</strong>.</>
+                  ) : null}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <button
+                    onClick={handleAutoTune}
+                    className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Auto-Tune Threshold to {(scan.highest_confidence > 0 ? Math.min(25, scan.highest_confidence * 100) : 5).toFixed(0)}%</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveThreshold(0.01)}
+                    className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono transition-colors"
+                  >
+                    Deep Scan (1% Cutoff)
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="overflow-x-auto">

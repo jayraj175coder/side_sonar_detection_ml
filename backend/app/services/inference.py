@@ -157,9 +157,10 @@ class SonarInferenceService:
         orig_w: int,
         orig_h: int,
         confidence_threshold: float,
-    ) -> List[Detection]:
+    ) -> Tuple[List[Detection], float]:
         """
         Parses YOLOv8 output tensor [1, 4 + num_classes, 8400] into validated Detections.
+        Returns (detections_list, peak_confidence_score).
         """
         # Squeeze batch dimension
         output = np.squeeze(output_tensor, axis=0)
@@ -174,47 +175,55 @@ class SonarInferenceService:
         candidate_boxes = []
         candidate_scores = []
         candidate_classes = []
+        peak_confidence = 0.0
+
+        # Map target class indices: MILCO and NOMBO
+        target_class_map: Dict[int, str] = {}
+        for c_idx in range(num_classes):
+            c_name = self.classes.get(c_idx, str(c_idx))
+            if c_name in ["MILCO", "NOMBO"]:
+                target_class_map[c_idx] = c_name
+            elif c_idx == 1 and "MILCO" in self.classes.values():
+                target_class_map[c_idx] = "MILCO"
+            elif c_idx == 2 and "NOMBO" in self.classes.values():
+                target_class_map[c_idx] = "NOMBO"
+
+        # Fallback if names dict was default {0: '0', 1: '1'}
+        if not target_class_map:
+            target_class_map = {0: "MILCO", 1: "NOMBO"} if num_classes == 2 else {1: "MILCO", 2: "NOMBO"}
 
         for row in output:
             cx, cy, w, h = row[0:4]
             class_scores = row[4 : 4 + num_classes]
-            class_id = int(np.argmax(class_scores))
-            max_score = float(class_scores[class_id])
 
-            # Resolve class name
-            class_name = self.classes.get(class_id, str(class_id))
+            # Evaluate each target class channel
+            for class_id, class_name in target_class_map.items():
+                if class_id >= len(class_scores):
+                    continue
+                score = float(class_scores[class_id])
+                if score > peak_confidence:
+                    peak_confidence = score
 
-            # Filter out non-target or low confidence predictions
-            if max_score >= confidence_threshold:
-                # If name is '0' and dataset had 0 as background or unlabelled, map or retain if valid
-                if class_name not in ["MILCO", "NOMBO"]:
-                    # Check if 1: MILCO, 2: NOMBO or 0: MILCO, 1: NOMBO
-                    if class_id == 1 and "MILCO" in self.classes.values():
-                        class_name = "MILCO"
-                    elif class_id == 2 and "NOMBO" in self.classes.values():
-                        class_name = "NOMBO"
-                    else:
-                        continue
+                if score >= confidence_threshold:
+                    # Convert center-wh to xyxy in 640x640 space
+                    bx1 = cx - (w / 2.0)
+                    by1 = cy - (h / 2.0)
+                    bx2 = cx + (w / 2.0)
+                    by2 = cy + (h / 2.0)
 
-                # Convert center-wh to xyxy in 640x640 space
-                bx1 = cx - (w / 2.0)
-                by1 = cy - (h / 2.0)
-                bx2 = cx + (w / 2.0)
-                by2 = cy + (h / 2.0)
+                    # Transform back to original image space
+                    orig_x1 = max(0.0, min(float(orig_w), (bx1 - pad_w) / ratio))
+                    orig_y1 = max(0.0, min(float(orig_h), (by1 - pad_h) / ratio))
+                    orig_x2 = max(0.0, min(float(orig_w), (bx2 - pad_w) / ratio))
+                    orig_y2 = max(0.0, min(float(orig_h), (by2 - pad_h) / ratio))
 
-                # Transform back to original image space
-                orig_x1 = max(0.0, min(float(orig_w), (bx1 - pad_w) / ratio))
-                orig_y1 = max(0.0, min(float(orig_h), (by1 - pad_h) / ratio))
-                orig_x2 = max(0.0, min(float(orig_w), (bx2 - pad_w) / ratio))
-                orig_y2 = max(0.0, min(float(orig_h), (by2 - pad_h) / ratio))
-
-                if orig_x2 > orig_x1 and orig_y2 > orig_y1:
-                    candidate_boxes.append([orig_x1, orig_y1, orig_x2, orig_y2])
-                    candidate_scores.append(max_score)
-                    candidate_classes.append(class_id)
+                    if orig_x2 > orig_x1 and orig_y2 > orig_y1:
+                        candidate_boxes.append([orig_x1, orig_y1, orig_x2, orig_y2])
+                        candidate_scores.append(score)
+                        candidate_classes.append(class_id)
 
         if not candidate_boxes:
-            return []
+            return [], round(peak_confidence, 3)
 
         boxes_np = np.array(candidate_boxes, dtype=np.float32)
         scores_np = np.array(candidate_scores, dtype=np.float32)
@@ -227,9 +236,7 @@ class SonarInferenceService:
         detections = []
         for idx_num, idx in enumerate(keep_indices, start=1):
             class_idx = int(classes_np[idx])
-            class_name = self.classes.get(class_idx, "MILCO")
-            if class_name not in ["MILCO", "NOMBO"]:
-                class_name = "MILCO" if class_idx == 1 else "NOMBO"
+            class_name = target_class_map.get(class_idx, "MILCO")
 
             b = boxes_np[idx]
             detections.append(
@@ -246,7 +253,7 @@ class SonarInferenceService:
                 )
             )
 
-        return detections
+        return detections, round(peak_confidence, 3)
 
     def predict(
         self,
@@ -297,7 +304,7 @@ class SonarInferenceService:
             raise RuntimeError(f"ONNX inference execution failed: {str(e)}")
 
         # Postprocess detections
-        detections = self._postprocess_output(
+        detections, peak_conf = self._postprocess_output(
             outputs[0],
             ratio,
             pad_w,
@@ -312,9 +319,9 @@ class SonarInferenceService:
         milco_count = sum(1 for d in detections if d.type == "MILCO")
         nombo_count = sum(1 for d in detections if d.type == "NOMBO")
         highest_conf = (
-            max((d.confidence for d in detections), default=0.0)
+            max((d.confidence for d in detections), default=peak_conf)
             if detections
-            else 0.0
+            else peak_conf
         )
 
         scan_id = f"SCAN-{uuid.uuid4().hex[:8].upper()}"

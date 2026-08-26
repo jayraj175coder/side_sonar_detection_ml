@@ -66,7 +66,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         </div>
       </div>
 
-      {/* Confidence Threshold Slider */}
+      {/* Confidence Threshold Slider & Sensitivity Presets */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="text-slate-300 font-medium">Confidence Threshold</span>
@@ -76,7 +76,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         </div>
         <input
           type="range"
-          min="0.05"
+          min="0.01"
           max="0.95"
           step="0.01"
           value={confidence}
@@ -84,9 +84,49 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
         />
         <div className="flex justify-between text-[10px] font-mono text-slate-400">
-          <span>0.05 (Max Recall)</span>
-          <span>0.50</span>
+          <span>0.01 (Max Sensitivity)</span>
+          <span>0.25 (Standard)</span>
           <span>0.95 (High Precision)</span>
+        </div>
+
+        {/* Quick Sensitivity Mode Chips */}
+        <div className="flex items-center gap-1.5 pt-1 text-[10px] font-mono">
+          <span className="text-slate-400">Presets:</span>
+          <button
+            type="button"
+            onClick={() => setConfidence(0.25)}
+            className={`px-2 py-0.5 rounded-md border transition-all ${
+              confidence === 0.25
+                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold'
+                : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
+            }`}
+          >
+            Standard (25%)
+          </button>
+          <button
+            type="button"
+            onClick={() => setConfidence(0.05)}
+            className={`px-2 py-0.5 rounded-md border transition-all ${
+              confidence === 0.05
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold'
+                : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
+            }`}
+            title="Recommended for faint contacts, out-of-distribution imagery, or large structures"
+          >
+            Sensitive (5%)
+          </button>
+          <button
+            type="button"
+            onClick={() => setConfidence(0.01)}
+            className={`px-2 py-0.5 rounded-md border transition-all ${
+              confidence === 0.01
+                ? 'bg-red-500/20 text-red-300 border-red-500/40 font-bold'
+                : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
+            }`}
+            title="Max recall deep scan"
+          >
+            Ultra Scan (1%)
+          </button>
         </div>
       </div>
 

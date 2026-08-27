@@ -15,7 +15,6 @@ export const NewScanPage: React.FC = () => {
     isDemoMode,
     refreshData,
     isBackendConnected,
-    selectedPipeline,
   } = useApp();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -107,7 +106,7 @@ export const NewScanPage: React.FC = () => {
           throw new Error('No local image file to upload to live backend.');
         }
 
-        result = await api.predict(selectedFile, confidence, lat, lon, selectedPipeline);
+        result = await api.predict(selectedFile, confidence, lat, lon);
         setCurrentStage(3);
         await new Promise((r) => setTimeout(r, 200));
         setCurrentStage(4);

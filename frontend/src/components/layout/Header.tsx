@@ -8,8 +8,8 @@ import {
   Menu,
   Server,
   Zap,
+  Cpu,
   Layers,
-  Trash2,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -28,11 +28,10 @@ export const Header: React.FC<HeaderProps> = ({
     isBackendConnected,
     isDemoMode,
     setIsDemoMode,
-    selectedPipeline,
-    setSelectedPipeline,
     refreshData,
     isLoading,
     currentScan,
+    modelInfo,
   } = useApp();
 
   return (
@@ -69,31 +68,13 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Action Controls & Mode Switcher */}
       <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-        {/* Pipeline Selector */}
-        <div className="hidden lg:flex items-center rounded-xl bg-slate-950/80 border border-slate-800 p-1 text-[11px] font-mono">
-          <button
-            onClick={() => setSelectedPipeline('debris')}
-            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
-              selectedPipeline === 'debris'
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-            title="SIH Marine Debris & Underwater Anomaly Pipeline with Clutter Filtering"
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>SIH Debris AI</span>
-          </button>
-          <button
-            onClick={() => setSelectedPipeline('baseline')}
-            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
-              selectedPipeline === 'baseline'
-                ? 'bg-red-500/20 text-red-300 border border-red-500/40 font-bold shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-            title="Baseline Sonar Anomaly Pipeline (MILCO / NOMBO)"
-          >
-            <span>MILCO Baseline</span>
-          </button>
+        {/* Active Model Badge */}
+        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-cyan-500/30 shadow-inner">
+          <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="text-xs font-mono text-cyan-300 font-bold">
+            {modelInfo?.name ? 'YOLOv8n — MILCO/NOMBO Baseline' : 'YOLOv8n — MILCO/NOMBO Baseline'}
+          </span>
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
         </div>
 
         {/* Demo Mode Toggle */}

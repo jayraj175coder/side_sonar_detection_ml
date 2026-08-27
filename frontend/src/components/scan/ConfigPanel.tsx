@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sliders, MapPin, Cpu, Play, Navigation, Sparkles, Layers, ShieldCheck } from 'lucide-react';
+import { Sliders, MapPin, Cpu, Play, Navigation, Sparkles, Layers, Info } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 interface ConfigPanelProps {
@@ -25,111 +25,57 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   isAnalyzing,
   hasFile,
 }) => {
-  const { modelInfo, selectedPipeline, setSelectedPipeline } = useApp();
+  const { modelInfo } = useApp();
 
   const handleApplyPresetCoords = (lat: number, lon: number) => {
     setLatitude(lat.toString());
     setLongitude(lon.toString());
   };
 
-  const isDebrisPipeline = selectedPipeline === 'debris';
+  const modelClasses = modelInfo?.classes?.length ? modelInfo.classes.join(', ') : 'MILCO, NOMBO';
 
   return (
     <div className="space-y-5 p-6 rounded-3xl glass-panel">
-      {/* Title & Pipeline Badge */}
+      {/* Title & Architecture Tag */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-4">
         <div className="flex items-center gap-2.5 text-sm font-extrabold text-slate-100 uppercase tracking-wider font-mono">
           <Sliders className="w-4 h-4 text-cyan-400" />
-          <span>Inference Engine</span>
+          <span>Inference Settings</span>
         </div>
         <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
           ONNX Runtime
         </span>
       </div>
 
-      {/* Model Pipeline Selector */}
-      <div className="space-y-2">
-        <label className="text-xs font-mono font-semibold text-slate-300 flex items-center justify-between">
-          <span className="flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5 text-cyan-400" />
-            Detection Pipeline Track
-          </span>
-          <span className="text-[10px] text-slate-400">SIH vs Baseline</span>
-        </label>
-        <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-          <button
-            type="button"
-            onClick={() => setSelectedPipeline('debris')}
-            className={`p-3 rounded-2xl border text-left transition-all ${
-              isDebrisPipeline
-                ? 'bg-cyan-950/60 border-cyan-500/50 text-cyan-200 shadow-md shadow-cyan-950/40 ring-1 ring-cyan-500/30'
-                : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <p className="font-bold text-slate-100 flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              SIH Marine Debris
-            </p>
-            <p className="text-[10px] text-slate-400 mt-1">
-              Debris, ALDFG / Fishing Gear, Seabed Anomalies + Clutter Filter
-            </p>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setSelectedPipeline('baseline')}
-            className={`p-3 rounded-2xl border text-left transition-all ${
-              !isDebrisPipeline
-                ? 'bg-red-950/60 border-red-500/50 text-red-200 shadow-md shadow-red-950/40 ring-1 ring-red-500/30'
-                : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <p className="font-bold text-slate-100">Baseline Detector</p>
-            <p className="text-[10px] text-slate-400 mt-1">
-              MILCO Mine Contacts & NOMBO Bottom Obstacles
-            </p>
-          </button>
-        </div>
-      </div>
-
       {/* Model Spec Badge Box */}
-      <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2">
+      <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2.5">
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="text-slate-400 flex items-center gap-1.5">
             <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-            Active Backbone
+            Loaded Model
           </span>
           <span className="text-cyan-300 font-bold">
-            {isDebrisPipeline ? 'YOLOv8n-MarineDebris-Anomaly' : 'YOLOv8n-MILCO-NOMBO'}
+            {modelInfo?.name || 'YOLOv8n — MILCO/NOMBO Baseline'}
           </span>
         </div>
         <div className="flex items-center justify-between text-xs font-mono text-slate-400">
           <span>Input Resolution</span>
-          <span className="text-slate-200">640 × 640 px (RGB Tensor)</span>
+          <span className="text-slate-200">640 × 640 px (RGB)</span>
         </div>
         <div className="flex items-center justify-between text-xs font-mono text-slate-400">
-          <span>Target Classes</span>
-          <span className="text-slate-200 font-semibold">
-            {isDebrisPipeline
-              ? 'Debris, Fishing Gear, Structure, Anomaly'
-              : 'MILCO, NOMBO'}
-          </span>
+          <span>Trained Classes</span>
+          <span className="text-slate-200 font-semibold">{modelClasses}</span>
         </div>
-        {isDebrisPipeline && (
-          <div className="flex items-center justify-between text-xs font-mono pt-1 border-t border-slate-800/60">
-            <span className="text-emerald-400 flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Clutter Rejection
-            </span>
-            <span className="text-emerald-300 font-bold text-[10px]">Active (Multi-Stage)</span>
-          </div>
-        )}
+        <div className="pt-1.5 border-t border-slate-800/60 text-[11px] font-mono text-slate-400 flex items-center justify-between">
+          <span>SIH Marine Sonar V2:</span>
+          <span className="text-amber-400 font-semibold">In Development / Not Installed</span>
+        </div>
       </div>
 
-      {/* Confidence Threshold Slider & Sensitivity Presets */}
+      {/* Confidence Threshold Slider & Presets */}
       <div className="space-y-2.5">
         <div className="flex items-center justify-between text-xs font-mono">
-          <span className="text-slate-300 font-medium">Confidence Threshold</span>
+          <span className="text-slate-300 font-medium">Model Confidence Cutoff</span>
           <span className="text-cyan-400 font-extrabold bg-cyan-950/80 px-2.5 py-0.5 rounded-md border border-cyan-500/30">
             {(confidence * 100).toFixed(0)}% ({confidence.toFixed(2)})
           </span>
@@ -144,8 +90,8 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
         />
         <div className="flex justify-between text-[10px] font-mono text-slate-400">
-          <span>0.01 (Max Sensitivity)</span>
-          <span>0.25 (Standard)</span>
+          <span>0.01 (High Recall)</span>
+          <span>0.25 (Default)</span>
           <span>0.95 (High Precision)</span>
         </div>
 
@@ -171,7 +117,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold'
                 : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
             }`}
-            title="Recommended for faint debris, complex seabed, or large structures"
+            title="Inspect low-confidence acoustic candidates"
           >
             Sensitive (5%)
           </button>
@@ -183,9 +129,9 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 ? 'bg-red-500/20 text-red-300 border-red-500/40 font-bold'
                 : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
             }`}
-            title="Max recall deep scan"
+            title="Maximum recall sweep"
           >
-            Ultra Scan (1%)
+            Deep Scan (1%)
           </button>
         </div>
       </div>

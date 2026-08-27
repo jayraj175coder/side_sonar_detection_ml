@@ -114,10 +114,10 @@ export const ReportsPage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-extrabold font-mono tracking-wider text-slate-100 print:text-black">
-                  MARINE DEBRIS & ANOMALY INSPECTION BRIEFING
+                  SONARX ACOUSTIC INSPECTION BRIEFING
                 </h2>
                 <p className="text-xs text-slate-400 print:text-gray-600 font-mono mt-0.5">
-                  AI-Assisted Side-Scan Sonar Acoustic Backscatter Perception
+                  Autonomous YOLOv8n Maritime Sonar Target Classification
                 </p>
               </div>
             </div>
@@ -131,8 +131,8 @@ export const ReportsPage: React.FC = () => {
               Generated: {new Date().toUTCString()}
             </p>
             <div className="pt-1">
-              <span className="px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold">
-                AI-DETECTED CANDIDATE • REQUIRES VERIFICATION
+              <span className="px-2.5 py-1 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold">
+                BASELINE MODEL EVALUATION
               </span>
             </div>
           </div>
@@ -142,7 +142,7 @@ export const ReportsPage: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono p-4 rounded-2xl bg-slate-950/80 print:bg-gray-100 border border-slate-800 print:border-gray-300">
           <div>
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
-              Source Scan
+              Source Track
             </p>
             <p className="font-bold text-slate-100 print:text-black truncate mt-0.5">
               {activeScan.filename}
@@ -150,10 +150,10 @@ export const ReportsPage: React.FC = () => {
           </div>
           <div>
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
-              Pipeline Mode
+              Active Model
             </p>
-            <p className="font-bold text-cyan-300 print:text-blue-600 mt-0.5 uppercase">
-              {activeScan.pipeline || 'DEBRIS'}
+            <p className="font-bold text-cyan-300 print:text-blue-600 mt-0.5">
+              {activeScan.model_name || 'YOLOv8n-MILCO-NOMBO'}
             </p>
           </div>
           <div>
@@ -168,7 +168,7 @@ export const ReportsPage: React.FC = () => {
           </div>
           <div>
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
-              Inference / Filter Latency
+              Inference Latency
             </p>
             <p className="font-bold text-slate-100 print:text-black mt-0.5">
               {activeScan.inference_ms.toFixed(1)} ms
@@ -176,18 +176,22 @@ export const ReportsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Executive Analyst Assessment */}
+        {/* Executive Assessment */}
         <div className="space-y-2 p-5 rounded-2xl bg-cyan-950/20 border border-cyan-500/20 print:border-gray-300 print:bg-gray-50">
           <h3 className="text-xs font-bold font-mono text-cyan-300 print:text-blue-800 uppercase tracking-wider flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" />
             Executive Acoustic Analysis
           </h3>
           <p className="text-xs text-slate-300 print:text-gray-800 leading-relaxed font-sans">
-            AI-assisted acoustic analysis of swath '{activeScan.filename}' identified {activeScan.total_detections} potential contact candidate(s) above confidence threshold {activeScan.confidence_threshold.toFixed(2)}.
-            {activeScan.clutter_filtered_count !== undefined && activeScan.clutter_filtered_count > 0 ? (
-              <> Acoustic clutter filtering rejected {activeScan.clutter_filtered_count} background sediment/speckle artifact(s).</>
-            ) : null}
-            {' '}Peak candidate confidence score is {(activeScan.highest_confidence * 100).toFixed(1)}%.
+            {activeScan.total_detections > 0 ? (
+              <>
+                Acoustic analysis of swath '{activeScan.filename}' identified {activeScan.total_detections} target(s) ({activeScan.milco_count} MILCO, {activeScan.nombo_count} NOMBO) above confidence threshold {activeScan.confidence_threshold.toFixed(2)}. Peak target confidence is {(activeScan.highest_confidence * 100).toFixed(1)}%.
+              </>
+            ) : (
+              <>
+                Acoustic analysis of swath '{activeScan.filename}' at confidence cutoff {activeScan.confidence_threshold.toFixed(2)} returned 0 detections. Highest model confidence detected: {(activeScan.highest_confidence * 100).toFixed(1)}% (Potential low-confidence anomaly).
+              </>
+            )}
           </p>
         </div>
 
@@ -198,7 +202,7 @@ export const ReportsPage: React.FC = () => {
           </h3>
           {activeScan.detections.length === 0 ? (
             <div className="p-4 rounded-xl bg-slate-950/60 print:bg-gray-100 text-center text-xs font-mono text-slate-400 print:text-gray-600">
-              No contacts exceeded the {activeScan.confidence_threshold.toFixed(2)} confidence threshold.
+              No contacts exceeded the {activeScan.confidence_threshold.toFixed(2)} confidence cutoff.
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -207,7 +211,7 @@ export const ReportsPage: React.FC = () => {
                   <tr>
                     <th className="py-2.5 px-3">Target ID</th>
                     <th className="py-2.5 px-3">Classification</th>
-                    <th className="py-2.5 px-3">Confidence Tier</th>
+                    <th className="py-2.5 px-3">Model Confidence</th>
                     <th className="py-2.5 px-3">Bounding Box [X1, Y1, X2, Y2]</th>
                     <th className="py-2.5 px-3">Assessment</th>
                   </tr>
@@ -220,14 +224,14 @@ export const ReportsPage: React.FC = () => {
                         <Badge type={det.type} label={det.type} size="sm" />
                       </td>
                       <td className="py-2 px-3 font-bold">
-                        {(det.confidence * 100).toFixed(1)}% ({det.confidence_tier || 'MEDIUM'})
+                        {(det.confidence * 100).toFixed(1)}%
                       </td>
                       <td className="py-2 px-3 text-[11px] text-slate-400 print:text-gray-600">
                         [{det.bbox.x1.toFixed(0)}, {det.bbox.y1.toFixed(0)},{' '}
                         {det.bbox.x2.toFixed(0)}, {det.bbox.y2.toFixed(0)}]
                       </td>
-                      <td className="py-2 px-3 text-[11px] font-bold text-amber-400 print:text-amber-700">
-                        AI CANDIDATE
+                      <td className="py-2 px-3 text-[11px] font-bold text-cyan-400 print:text-blue-700">
+                        {det.type === 'MILCO' ? 'MINE CONTACT' : 'BOTTOM OBSTACLE'}
                       </td>
                     </tr>
                   ))}
@@ -244,14 +248,14 @@ export const ReportsPage: React.FC = () => {
             <span>CONFIDENTIALITY & SCIENTIFIC NOTICE</span>
           </div>
           <p className="leading-relaxed text-[11px]">
-            Detections generated by this system represent AI-detected acoustic candidates derived from side-scan sonar backscatter. Final confirmation of marine debris, ghost nets, or navigational seabed hazards requires ground-truth validation via ROV, diver inspection, or multi-angle acoustic surveys.
+            Detections are generated by the YOLOv8n MILCO/NOMBO baseline model. The Marine Sonar V2 pipeline is under active development to add dedicated pipeline, ALDFG, and shipwreck detection classes. Ground-truth field verification is required for all candidate contacts.
           </p>
         </div>
 
         {/* Document Footer */}
         <div className="border-t border-slate-800 pt-4 flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-400 print:text-gray-500">
-          <span>SONARX Marine Debris Intelligence Platform</span>
-          <span>System ID: SNX-SIH-NODE-01</span>
+          <span>SONARX Target Inspection Platform</span>
+          <span>System ID: SNX-ENC-NODE-01</span>
         </div>
       </div>
     </div>

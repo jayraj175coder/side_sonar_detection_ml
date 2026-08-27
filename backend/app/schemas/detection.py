@@ -11,11 +11,10 @@ class BoundingBox(BaseModel):
 
 class Detection(BaseModel):
     id: str = Field(..., description="Unique detection identifier")
-    type: str = Field(..., description="Class label: e.g. anthropogenic_debris, derelict_fishing_gear, MILCO, NOMBO, potential_anomaly")
-    confidence: float = Field(..., ge=0.0, le=1.0, description="Detection confidence score")
-    bbox: BoundingBox = Field(..., description="Bounding box in original image pixel coordinates")
-    confidence_tier: Optional[str] = Field("MEDIUM", description="Confidence tier: HIGH, MEDIUM, or POTENTIAL_ANOMALY")
-    is_anomaly: Optional[bool] = Field(False, description="Whether detection is an unconfirmed acoustic anomaly flagged for human review")
+    type: str = Field(..., description="True class label from model: MILCO, NOMBO, etc.")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Detection confidence score (0.0 - 1.0)")
+    bbox: BoundingBox = Field(..., description="Bounding box in image pixel coordinates")
+    confidence_tier: Optional[str] = Field("MEDIUM", description="Confidence tier: HIGH (>=0.70), MEDIUM (>=0.35), or LOW (<0.35)")
 
 
 class Location(BaseModel):
@@ -24,8 +23,12 @@ class Location(BaseModel):
 
 
 class PredictionResponse(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     scan_id: str
     filename: str
+    model_name: str = "YOLOv8n-Sonar-MILCO-NOMBO"
+    model_version: str = "baseline"
     image_width: int
     image_height: int
     inference_ms: float
@@ -36,14 +39,7 @@ class PredictionResponse(BaseModel):
     total_detections: int
     milco_count: int = 0
     nombo_count: int = 0
-    debris_count: int = 0
-    fishing_gear_count: int = 0
-    structure_count: int = 0
-    anomaly_count: int = 0
     highest_confidence: float
-    pipeline: str = Field("debris", description="Inference pipeline used: 'debris' or 'baseline'")
-    clutter_filtered_count: int = Field(0, description="Number of natural seabed speckles/artifacts rejected")
-    verification_status: str = Field("ai_candidate", description="Status: 'ai_candidate' or 'human_verified'")
     status: str = "completed"
 
 
@@ -60,38 +56,21 @@ class ValidationMetrics(BaseModel):
     nombo_map50: float = 0.542
     benchmark_device: str = "NVIDIA T4 (Google Colab)"
     benchmark_latency_ms: float = 9.8
-    notes: str = "Validation metrics — Baseline Sonar Anomaly Model"
-
-
-class DebrisValidationMetrics(BaseModel):
-    precision: float = 0.742
-    recall: float = 0.695
-    map50: float = 0.738
-    map50_95: float = 0.3580
-    debris_precision: float = 0.751
-    debris_recall: float = 0.712
-    debris_map50: float = 0.746
-    fishing_gear_precision: float = 0.738
-    fishing_gear_recall: float = 0.684
-    fishing_gear_map50: float = 0.729
-    benchmark_device: str = "NVIDIA T4 Tensor Core"
-    benchmark_latency_ms: float = 10.4
-    false_positive_rejection_rate: float = 0.884
-    notes: str = "Empirical validation on OpenSonarDatasets SSS Debris/ALDFG Split"
+    notes: str = "Measured validation metrics — YOLOv8n MILCO/NOMBO baseline"
 
 
 class ModelInfo(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
-    model_name: str
-    active_pipeline: str = "debris"
-    format: str
+    name: str
+    version: str = "baseline"
+    task: str = "detect"
     classes: List[str]
-    image_size: int
+    input_size: int = 640
     model_loaded: bool
     model_path: str
-    baseline_metrics: ValidationMetrics
-    debris_metrics: DebrisValidationMetrics
+    is_v2_available: bool = False
+    metrics: ValidationMetrics
 
 
 class HealthResponse(BaseModel):
@@ -100,7 +79,8 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     version: str
-    active_pipeline: str
+    model_name: str
+    model_version: str
     model_loaded: bool
     model_path: str
     timestamp: str
@@ -113,12 +93,10 @@ class ScanSummary(BaseModel):
     detection_count: int
     milco_count: int
     nombo_count: int
-    debris_count: int = 0
     highest_confidence: float
     avg_confidence: float
     inference_ms: float
     location: Location
-    pipeline: str = "debris"
     status: str
 
 
@@ -127,9 +105,6 @@ class StatsResponse(BaseModel):
     objects_detected: int
     milco_detections: int
     nombo_detections: int
-    debris_detections: int = 0
-    fishing_gear_detections: int = 0
-    anomaly_detections: int = 0
     avg_confidence: float
     avg_inference_ms: float
     class_distribution: Dict[str, int]
@@ -140,6 +115,5 @@ class ReportResponse(BaseModel):
     scan: PredictionResponse
     generated_at: str
     analyst_summary: str
-    clutter_filtering_summary: str
     disclaimer: str
     metrics: Dict[str, Any]

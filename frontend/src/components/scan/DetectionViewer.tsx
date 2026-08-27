@@ -12,12 +12,10 @@ import {
   Crosshair,
   AlertOctagon,
   Shield,
-  Layers,
   Sparkles,
   Info,
-  ShieldCheck,
-  HelpCircle,
   Activity,
+  Cpu,
 } from 'lucide-react';
 import { PredictionResponse, Detection } from '../../types';
 import { Badge } from '../common/Badge';
@@ -47,13 +45,6 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
     (d) => d.confidence >= activeThreshold
   );
 
-  const isDebrisPipeline = scan.pipeline === 'debris';
-
-  const debrisCount = visibleDetections.filter((d) => d.type === 'anthropogenic_debris').length;
-  const fishingGearCount = visibleDetections.filter((d) => d.type === 'derelict_fishing_gear').length;
-  const structureCount = visibleDetections.filter((d) => d.type === 'anthropogenic_structure').length;
-  const anomalyCount = visibleDetections.filter((d) => d.type === 'potential_anomaly' || d.is_anomaly).length;
-
   const milcoCount = visibleDetections.filter((d) => d.type === 'MILCO').length;
   const nomboCount = visibleDetections.filter((d) => d.type === 'NOMBO').length;
 
@@ -81,11 +72,9 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
     downloadAnchor.remove();
   };
 
-  const getColorForClass = (type: string, isAnomaly?: boolean) => {
-    if (isAnomaly || type === 'potential_anomaly') return '#A855F7'; // Purple
-    if (type === 'derelict_fishing_gear' || type === 'MILCO') return '#EF4444'; // Red
-    if (type === 'anthropogenic_debris' || type === 'NOMBO') return '#06B6D4'; // Cyan
-    if (type === 'anthropogenic_structure') return '#F59E0B'; // Amber
+  const getColorForClass = (type: string) => {
+    if (type === 'MILCO') return '#EF4444'; // Red
+    if (type === 'NOMBO') return '#06B6D4'; // Cyan
     return '#38BDF8';
   };
 
@@ -99,7 +88,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           </div>
           <div>
             <p className="text-[10px] font-mono font-semibold uppercase text-slate-400">
-              AI-Detected Candidates
+              Targets Identified
             </p>
             <p className="text-2xl font-extrabold text-slate-100 font-mono">
               {visibleDetections.length}
@@ -107,67 +96,33 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           </div>
         </div>
 
-        {isDebrisPipeline ? (
-          <>
-            <div className="p-4 rounded-2xl glass-panel border-cyan-500/30 flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">
-                <Layers className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] font-mono font-semibold uppercase text-cyan-400">
-                  Debris & Fishing Gear
-                </p>
-                <p className="text-2xl font-extrabold text-cyan-400 font-mono">
-                  {debrisCount + fishingGearCount}
-                </p>
-              </div>
-            </div>
+        <div className="p-4 rounded-2xl glass-panel border-red-500/30 flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400">
+            <AlertOctagon className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] font-mono font-semibold uppercase text-red-400">
+              MILCO Mine Contacts
+            </p>
+            <p className="text-2xl font-extrabold text-red-400 font-mono">
+              {milcoCount}
+            </p>
+          </div>
+        </div>
 
-            <div className="p-4 rounded-2xl glass-panel border-purple-500/30 flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-purple-950/60 border border-purple-500/40 text-purple-400">
-                <HelpCircle className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] font-mono font-semibold uppercase text-purple-400">
-                  Potential Anomalies
-                </p>
-                <p className="text-2xl font-extrabold text-purple-400 font-mono">
-                  {anomalyCount + structureCount}
-                </p>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="p-4 rounded-2xl glass-panel border-red-500/30 flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400">
-                <AlertOctagon className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] font-mono font-semibold uppercase text-red-400">
-                  MILCO Mine Contacts
-                </p>
-                <p className="text-2xl font-extrabold text-red-400 font-mono">
-                  {milcoCount}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl glass-panel border-cyan-500/30 flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">
-                <Shield className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[10px] font-mono font-semibold uppercase text-cyan-400">
-                  NOMBO Obstacles
-                </p>
-                <p className="text-2xl font-extrabold text-cyan-400 font-mono">
-                  {nomboCount}
-                </p>
-              </div>
-            </div>
-          </>
-        )}
+        <div className="p-4 rounded-2xl glass-panel border-cyan-500/30 flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">
+            <Shield className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] font-mono font-semibold uppercase text-cyan-400">
+              NOMBO Obstacles
+            </p>
+            <p className="text-2xl font-extrabold text-cyan-400 font-mono">
+              {nomboCount}
+            </p>
+          </div>
+        </div>
 
         <div className="p-4 rounded-2xl glass-panel flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300">
@@ -191,7 +146,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
         <div className="p-3.5 bg-[#080F22]/90 backdrop-blur border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
           {/* Dynamic Confidence Slider & Presets */}
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="text-xs font-mono text-slate-400">Confidence Cutoff:</span>
+            <span className="text-xs font-mono text-slate-400">Model Cutoff:</span>
             <input
               type="range"
               min="0.01"
@@ -241,24 +196,16 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                 <button
                   onClick={handleAutoTune}
                   className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 font-bold flex items-center gap-1 hover:bg-cyan-500/20 transition-all"
-                  title="Auto-tune cutoff to reveal peak candidate"
+                  title="Tune cutoff to inspect highest candidate"
                 >
                   <Sparkles className="w-3 h-3" />
-                  Auto-Tune ({(scan.highest_confidence * 100).toFixed(0)}%)
+                  Inspect ({(scan.highest_confidence * 100).toFixed(1)}%)
                 </button>
               )}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Clutter Filtering indicator */}
-            {scan.clutter_filtered_count !== undefined && scan.clutter_filtered_count > 0 && (
-              <span className="hidden lg:inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-950/50 px-2 py-1 rounded-lg border border-emerald-500/30">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                {scan.clutter_filtered_count} Clutter Filtered
-              </span>
-            )}
-
             {/* Toggle Bounding Boxes */}
             <button
               onClick={() => setShowBoxes(!showBoxes)}
@@ -321,7 +268,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
             className="relative inline-block transition-transform duration-150 origin-center"
             style={{ transform: `scale(${zoomLevel})` }}
           >
-            {/* The Real Sonar Image */}
+            {/* Real Sonar Image */}
             <img
               src={previewUrl}
               alt="Sonar inspection canvas"
@@ -338,13 +285,11 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               >
                 {visibleDetections.map((det) => {
                   const isSelected = selectedDetId === det.id;
-                  const strokeColor = getColorForClass(det.type, det.is_anomaly);
-                  const fillColor = `${strokeColor}33`; // 20% opacity hex
+                  const strokeColor = getColorForClass(det.type);
+                  const fillColor = `${strokeColor}33`;
                   const { x1, y1, x2, y2 } = det.bbox;
                   const boxWidth = x2 - x1;
                   const boxHeight = y2 - y1;
-
-                  const tier = det.confidence_tier || (det.confidence >= 0.7 ? 'HIGH' : det.confidence >= 0.35 ? 'MED' : 'ANOM');
 
                   return (
                     <g
@@ -365,19 +310,19 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                         rx={3}
                       />
 
-                      {/* Corner Tactical Reticles */}
+                      {/* Corner Reticles */}
                       <circle cx={x1} cy={y1} r={3.5} fill={strokeColor} />
                       <circle cx={x2} cy={y1} r={3.5} fill={strokeColor} />
                       <circle cx={x1} cy={y2} r={3.5} fill={strokeColor} />
                       <circle cx={x2} cy={y2} r={3.5} fill={strokeColor} />
 
-                      {/* Tag / Label */}
+                      {/* Label */}
                       {showLabels && (
                         <g transform={`translate(${x1}, ${Math.max(16, y1 - 6)})`}>
                           <rect
                             x={0}
                             y={-14}
-                            width={Math.max(110, det.type.length * 8 + 45)}
+                            width={det.type.length * 8 + 45}
                             height={16}
                             fill={strokeColor}
                             rx={3}
@@ -390,7 +335,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                             fontFamily="JetBrains Mono, monospace"
                             fontWeight="bold"
                           >
-                            {det.type.replace(/_/g, ' ')} [{(det.confidence * 100).toFixed(0)}%]
+                            {det.type} {(det.confidence * 100).toFixed(0)}%
                           </text>
                         </g>
                       )}
@@ -403,20 +348,20 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
         </div>
       </div>
 
-      {/* 3. Detection Inventory Table */}
+      {/* 3. Detection Inventory Table or Low-Confidence State */}
       <div className="p-6 rounded-3xl glass-panel space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <div className="flex items-center gap-2">
               <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-                Candidate Anomaly Register
+                Acoustic Contact Register
               </h4>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-cyan-950/60 text-cyan-300 border border-cyan-500/30">
-                Pipeline: {scan.pipeline?.toUpperCase() || 'DEBRIS'}
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-950 text-cyan-300 border border-slate-800">
+                Model: {scan.model_name || 'YOLOv8n-MILCO-NOMBO'}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Click any candidate row to isolate bounding box coordinates on the acoustic swath
+              Click any target row to inspect coordinates on the swath
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -440,34 +385,38 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
         {visibleDetections.length === 0 ? (
           <div className="p-6 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-3">
             <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <Info className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
               <div className="space-y-2 flex-1">
                 <p className="text-xs font-mono font-bold text-slate-200">
-                  0 Candidates Exceeded Current Cutoff ({(activeThreshold * 100).toFixed(0)}%)
+                  No model detections above {(activeThreshold * 100).toFixed(0)}% confidence.
                 </p>
                 <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                  The model did not find any contacts above the <strong className="text-cyan-300">{(activeThreshold * 100).toFixed(0)}%</strong> threshold.
+                  The current baseline model (<strong className="text-cyan-300 font-mono">YOLOv8n MILCO/NOMBO</strong>) was trained on mine-countermeasure contacts and bottom obstacles.
                   {scan.highest_confidence > 0 ? (
-                    <> Peak acoustic confidence detected in this scan is <strong className="text-amber-400 font-mono">{(scan.highest_confidence * 100).toFixed(1)}%</strong>.</>
-                  ) : null}
+                    <> Highest model confidence detected in this scan is <strong className="text-amber-400 font-mono">{(scan.highest_confidence * 100).toFixed(1)}%</strong> (Potential low-confidence acoustic anomaly).</>
+                  ) : (
+                    <> No candidate anomalies detected across the swath.</>
+                  )}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <button
-                    onClick={handleAutoTune}
-                    className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Auto-Tune Threshold to {(scan.highest_confidence > 0 ? Math.min(25, scan.highest_confidence * 100) : 5).toFixed(0)}%</span>
-                  </button>
+                {scan.highest_confidence > 0 && scan.highest_confidence < activeThreshold && (
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <button
+                      onClick={handleAutoTune}
+                      className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Inspect Candidate (Set Cutoff to {(scan.highest_confidence * 100).toFixed(1)}%)</span>
+                    </button>
 
-                  <button
-                    onClick={() => setActiveThreshold(0.01)}
-                    className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono transition-colors"
-                  >
-                    Deep Scan (1% Cutoff)
-                  </button>
-                </div>
+                    <button
+                      onClick={() => setActiveThreshold(0.01)}
+                      className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 text-xs font-mono transition-colors"
+                    >
+                      Deep Scan (1% Cutoff)
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -478,15 +427,15 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                 <tr>
                   <th className="py-3 px-3">Target ID</th>
                   <th className="py-3 px-3">Classification</th>
-                  <th className="py-3 px-3">Confidence Tier</th>
+                  <th className="py-3 px-3">Model Confidence</th>
                   <th className="py-3 px-3">Bounding Box [X1, Y1, X2, Y2]</th>
-                  <th className="py-3 px-3">Verification Status</th>
+                  <th className="py-3 px-3">Assessment</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
                 {visibleDetections.map((det) => {
                   const isSelected = selectedDetId === det.id;
-                  const tier = det.confidence_tier || (det.confidence >= 0.7 ? 'HIGH' : det.confidence >= 0.35 ? 'MEDIUM' : 'POTENTIAL_ANOMALY');
+                  const isMilco = det.type === 'MILCO';
 
                   return (
                     <tr
@@ -506,26 +455,22 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                           size="sm"
                         />
                       </td>
-                      <td className="py-3 px-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          tier === 'HIGH'
-                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                            : tier === 'MEDIUM'
-                            ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
-                            : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
-                        }`}>
-                          {tier} ({(det.confidence * 100).toFixed(1)}%)
-                        </span>
+                      <td className="py-3 px-3 font-bold text-slate-100">
+                        {(det.confidence * 100).toFixed(1)}%
                       </td>
                       <td className="py-3 px-3 text-slate-400 text-[11px]">
                         [{det.bbox.x1.toFixed(0)}, {det.bbox.y1.toFixed(0)},{' '}
                         {det.bbox.x2.toFixed(0)}, {det.bbox.y2.toFixed(0)}]
                       </td>
                       <td className="py-3 px-3">
-                        <span className="text-amber-400/90 text-[11px] font-medium flex items-center gap-1">
-                          <Activity className="w-3 h-3 animate-pulse" />
-                          AI-DETECTED CANDIDATE
-                        </span>
+                        {isMilco ? (
+                          <span className="text-red-400 font-bold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />
+                            CRITICAL CONTACT (MILCO)
+                          </span>
+                        ) : (
+                          <span className="text-cyan-400 font-medium">BOTTOM OBSTACLE (NOMBO)</span>
+                        )}
                       </td>
                     </tr>
                   );
@@ -534,14 +479,6 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
             </table>
           </div>
         )}
-
-        {/* Scientific Notice Banner */}
-        <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-[11px] text-slate-400 flex items-start gap-2.5">
-          <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-          <p className="leading-relaxed">
-            <strong className="text-slate-300 font-mono">Operational Notice:</strong> Detections generated represent AI-assisted acoustic candidates. In-situ confirmation of marine debris, ghost nets, or seabed hazards requires ROV, diver ground-truth, or multi-angle sonar passes.
-          </p>
-        </div>
 
         <div className="pt-2 flex justify-between items-center text-xs text-slate-400">
           <button

@@ -77,8 +77,7 @@ class ApiClient {
     file: File,
     confidence?: number,
     latitude?: number,
-    longitude?: number,
-    pipeline: string = 'debris'
+    longitude?: number
   ): Promise<PredictionResponse> {
     const formData = new FormData();
     formData.append('file', file);
@@ -92,7 +91,6 @@ class ApiClient {
     if (longitude !== undefined && longitude !== null) {
       formData.append('longitude', longitude.toString());
     }
-    formData.append('pipeline', pipeline);
 
     const response = await fetch(`${this.baseUrl}/api/predict`, {
       method: 'POST',

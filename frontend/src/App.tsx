@@ -46,8 +46,8 @@ export const App: React.FC = () => {
         };
       case 'reports':
         return {
-          title: 'Inspection Reports',
-          subtitle: 'Formal naval inspection reports and data export',
+          title: 'Acoustic Inspection Reports',
+          subtitle: 'Formal MoES environmental survey reports and data export',
         };
       case 'model':
         return {

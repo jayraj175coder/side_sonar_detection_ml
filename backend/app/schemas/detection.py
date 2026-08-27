@@ -11,15 +11,28 @@ class BoundingBox(BaseModel):
 
 class Detection(BaseModel):
     id: str = Field(..., description="Unique detection identifier")
-    type: str = Field(..., description="True class label from model: ghost_net_aldfg, anthropogenic_debris, pipeline_hazard, seafloor_anomaly, MILCO, NOMBO")
+    type: str = Field(
+        ...,
+        description="True class label: ghost_net_aldfg, anthropogenic_debris, pipeline_hazard, seafloor_anomaly, MILCO, NOMBO",
+    )
     confidence: float = Field(..., ge=0.0, le=1.0, description="Detection confidence score (0.0 - 1.0)")
     bbox: BoundingBox = Field(..., description="Bounding box in image pixel coordinates")
-    confidence_tier: Optional[str] = Field("MEDIUM", description="Confidence tier: HIGH (>=0.70), MEDIUM (>=0.35), or LOW (<0.35)")
+    confidence_tier: Optional[str] = Field(
+        "MEDIUM", description="Confidence tier: HIGH (>=0.70), MEDIUM (>=0.35), or LOW (<0.35)"
+    )
+    noise_filter_passed: bool = Field(
+        True, description="Whether this detection passed acoustic geometry and shadow noise verification"
+    )
+    noise_filter_reason: Optional[str] = Field(
+        "Passed acoustic geometry and shadow verification",
+        description="Diagnostic explanation from acoustic noise filter",
+    )
 
 
 class Location(BaseModel):
     latitude: Optional[float] = Field(None, ge=-90.0, le=90.0, description="Geographic latitude in degrees")
     longitude: Optional[float] = Field(None, ge=-180.0, le=180.0, description="Geographic longitude in degrees")
+    heading: Optional[float] = Field(None, ge=0.0, le=360.0, description="Platform / drone heading angle in degrees (0-360)")
 
 
 class PredictionResponse(BaseModel):
@@ -37,6 +50,9 @@ class PredictionResponse(BaseModel):
     created_at: str
     confidence_threshold: float
     total_detections: int
+    false_positives_suppressed: int = 0
+    noise_filtering_applied: bool = True
+    geotag_source: Optional[str] = "manual"
     ghost_net_count: int = 0
     debris_count: int = 0
     pipeline_count: int = 0

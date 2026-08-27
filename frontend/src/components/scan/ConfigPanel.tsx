@@ -1,5 +1,14 @@
-import React, { useState } from 'react';
-import { Sliders, MapPin, Cpu, Play, Navigation, Sparkles, Layers, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import React from 'react';
+import {
+  Sliders,
+  MapPin,
+  Cpu,
+  Play,
+  CheckCircle2,
+  Filter,
+  ShieldCheck,
+  FileSpreadsheet,
+} from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 interface ConfigPanelProps {
@@ -11,6 +20,9 @@ interface ConfigPanelProps {
   setLongitude: (val: string) => void;
   selectedModelVersion?: 'v2' | 'baseline';
   setSelectedModelVersion?: (v: 'v2' | 'baseline') => void;
+  noiseFilteringEnabled?: boolean;
+  setNoiseFilteringEnabled?: (val: boolean) => void;
+  hasPingLog?: boolean;
   onAnalyze: () => void;
   isAnalyzing: boolean;
   hasFile: boolean;
@@ -25,6 +37,9 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   setLongitude,
   selectedModelVersion = 'v2',
   setSelectedModelVersion,
+  noiseFilteringEnabled = true,
+  setNoiseFilteringEnabled,
+  hasPingLog = false,
   onAnalyze,
   isAnalyzing,
   hasFile,
@@ -86,11 +101,11 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             }`}
           >
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-bold font-mono text-red-300">MILCO Baseline</span>
+              <span className="text-[11px] font-bold font-mono text-red-300">Legacy Baseline</span>
               {!isV2 && <CheckCircle2 className="w-3.5 h-3.5 text-red-400" />}
             </div>
             <p className="text-[10px] text-slate-400 font-mono leading-tight">
-              Mine Contacts & Bottom Obstacles
+              Reference MILCO / NOMBO Track
             </p>
           </button>
         </div>
@@ -104,14 +119,44 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             Active Architecture
           </span>
           <span className="text-cyan-300 font-bold">
-            {isV2 ? 'YOLOv8n-SIH-Marine-Debris-V2' : 'YOLOv8n-Sonar-MILCO-NOMBO'}
+            {isV2 ? 'YOLOv8n-SIH-Marine-Debris-V2' : 'YOLOv8n-Sonar-MILCO-NOMBO (Legacy)'}
           </span>
         </div>
         <div className="flex items-center justify-between text-slate-400">
-          <span>Trained Classes</span>
+          <span>Target Classes</span>
           <span className="text-slate-200 font-semibold truncate max-w-[200px]">
             {isV2 ? 'ghost_net, debris, pipeline, anomaly' : 'MILCO, NOMBO'}
           </span>
+        </div>
+      </div>
+
+      {/* Noise Filtering & False-Positive Suppression Toggle */}
+      <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div>
+              <p className="text-xs font-mono font-bold text-slate-200">
+                Acoustic Noise Filter
+              </p>
+              <p className="text-[10px] text-slate-400 font-mono">
+                Post-NMS shadow & aspect ratio verification
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setNoiseFilteringEnabled && setNoiseFilteringEnabled(!noiseFilteringEnabled)}
+            className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-200 ${
+              noiseFilteringEnabled ? 'bg-cyan-500' : 'bg-slate-800'
+            }`}
+          >
+            <div
+              className={`bg-slate-950 w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
+                noiseFilteringEnabled ? 'translate-x-5' : 'translate-x-0'
+              }`}
+            />
+          </button>
         </div>
       </div>
 
@@ -139,7 +184,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         </div>
 
         {/* Quick Sensitivity Mode Chips */}
-        <div className="flex items-center gap-1.5 pt-1 text-[10px] font-mono">
+        <div className="flex items-center gap-1.5 pt-1 text-[10px] font-mono flex-wrap">
           <span className="text-slate-400">Presets:</span>
           <button
             type="button"
@@ -179,14 +224,23 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         </div>
       </div>
 
-      {/* Optional Geolocation Coordinates */}
+      {/* Geolocation Coordinates */}
       <div className="space-y-3 pt-3 border-t border-slate-800">
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="text-slate-300 font-medium flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-            Drone / Survey Coordinates
+            <span>Geotag Coordinates</span>
           </span>
-          <span className="text-[10px] text-slate-400">WGS84</span>
+          {hasPingLog ? (
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+              <FileSpreadsheet className="w-3 h-3" />
+              Auto (Ping Log)
+            </span>
+          ) : (
+            <span className="text-[10px] font-mono text-slate-400">
+              Manual / Fallback
+            </span>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
@@ -219,7 +273,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
 
         {/* Preset Chips */}
         <div className="flex items-center gap-1.5 text-[10px] font-mono flex-wrap">
-          <span className="text-slate-400">Indian Waters:</span>
+          <span className="text-slate-400">Coastal Presets:</span>
           <button
             type="button"
             onClick={() => handleApplyPresetCoords(17.6868, 83.2185)}

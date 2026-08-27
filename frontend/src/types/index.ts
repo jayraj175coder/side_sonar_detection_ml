@@ -11,11 +11,14 @@ export interface Detection {
   confidence: number;
   bbox: BoundingBox;
   confidence_tier?: 'HIGH' | 'MEDIUM' | 'LOW';
+  noise_filter_passed?: boolean;
+  noise_filter_reason?: string;
 }
 
 export interface Location {
   latitude: number | null;
   longitude: number | null;
+  heading?: number | null;
 }
 
 export interface PredictionResponse {
@@ -31,6 +34,9 @@ export interface PredictionResponse {
   created_at: string;
   confidence_threshold: number;
   total_detections: number;
+  false_positives_suppressed?: number;
+  noise_filtering_applied?: boolean;
+  geotag_source?: 'ping_log' | 'manual' | 'none' | string;
   ghost_net_count?: number;
   debris_count?: number;
   pipeline_count?: number;

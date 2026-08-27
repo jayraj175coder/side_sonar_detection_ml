@@ -95,7 +95,7 @@ export const SonarMap: React.FC = () => {
   const [selectedScan, setSelectedScan] = useState<PredictionResponse | null>(null);
   const mapRef = useRef<L.Map | null>(null);
 
-  const defaultCenter: [number, number] = [17.6868, 83.2185]; // Visakhapatnam, Eastern Naval Command
+  const defaultCenter: [number, number] = [17.6868, 83.2185]; // Visakhapatnam Coastal Survey Range
 
   // Filter geolocated scans
   const geolocatedScans = useMemo(() => {
@@ -255,7 +255,7 @@ export const SonarMap: React.FC = () => {
         <button
           onClick={handleRecenterDemoArea}
           className="w-9 h-9 rounded-lg bg-[#080F20]/85 backdrop-blur-xl border border-cyan-500/25 text-slate-200 hover:text-cyan-300 hover:border-cyan-400 flex items-center justify-center transition-all shadow-lg active:scale-95"
-          title="Center Eastern Naval Command Range (Visakhapatnam)"
+          title="Center Visakhapatnam Range"
         >
           <Navigation className="w-4 h-4" />
         </button>

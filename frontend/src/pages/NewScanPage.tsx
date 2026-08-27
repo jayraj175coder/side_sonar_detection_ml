@@ -18,11 +18,13 @@ export const NewScanPage: React.FC = () => {
   } = useApp();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedPingLogFile, setSelectedPingLogFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<number>(0.25);
   const [latitude, setLatitude] = useState<string>('');
   const [longitude, setLongitude] = useState<string>('');
   const [selectedModelVersion, setSelectedModelVersion] = useState<'v2' | 'baseline'>('v2');
+  const [noiseFilteringEnabled, setNoiseFilteringEnabled] = useState<boolean>(true);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [currentStage, setCurrentStage] = useState<number>(1);
   const [scanError, setScanError] = useState<string | null>(null);
@@ -34,10 +36,13 @@ export const NewScanPage: React.FC = () => {
     setSelectedFile(file);
     setPreviewUrl(preview);
     setScanError(null);
-    // If a new image is chosen, clear previous scan so we show the new preview
     if (file || preview) {
       setCurrentScan(null);
     }
+  };
+
+  const handlePingLogSelected = (file: File | null) => {
+    setSelectedPingLogFile(file);
   };
 
   const handleAnalyze = async () => {
@@ -83,11 +88,15 @@ export const NewScanPage: React.FC = () => {
             debris_count: 1,
             pipeline_count: 0,
             anomaly_count: 0,
+            false_positives_suppressed: 1,
+            noise_filtering_applied: noiseFilteringEnabled,
+            geotag_source: selectedPingLogFile ? 'ping_log' : (lat ? 'manual' : 'default'),
             highest_confidence: 0.884,
             status: 'completed',
             location: {
               latitude: lat ?? 17.6868,
               longitude: lon ?? 83.2185,
+              heading: 120.0,
             },
             imageUrl: previewUrl || undefined,
             detections: [
@@ -96,12 +105,16 @@ export const NewScanPage: React.FC = () => {
                 type: 'ghost_net_aldfg',
                 confidence: 0.884,
                 bbox: { x1: 90, y1: 150, x2: 210, y2: 280 },
+                noise_filter_passed: true,
+                noise_filter_reason: 'Passed acoustic geometry and shadow verification',
               },
               {
                 id: 'det_2',
                 type: 'anthropogenic_debris',
                 confidence: 0.762,
                 bbox: { x1: 390, y1: 290, x2: 480, y2: 370 },
+                noise_filter_passed: true,
+                noise_filter_reason: 'Passed acoustic geometry and shadow verification',
               },
             ],
           };
@@ -109,7 +122,7 @@ export const NewScanPage: React.FC = () => {
           result = {
             scan_id: scanId,
             filename: selectedFile?.name || 'external_sonar_swath.png',
-            model_name: 'YOLOv8n-Sonar-MILCO-NOMBO',
+            model_name: 'YOLOv8n-Sonar-MILCO-NOMBO (Legacy)',
             model_version: 'baseline',
             image_width: 640,
             image_height: 640,
@@ -119,11 +132,15 @@ export const NewScanPage: React.FC = () => {
             total_detections: 1,
             milco_count: 1,
             nombo_count: 0,
+            false_positives_suppressed: 0,
+            noise_filtering_applied: noiseFilteringEnabled,
+            geotag_source: selectedPingLogFile ? 'ping_log' : 'manual',
             highest_confidence: 0.892,
             status: 'completed',
             location: {
               latitude: lat ?? 17.6842,
               longitude: lon ?? 83.3215,
+              heading: 135.0,
             },
             imageUrl: previewUrl || undefined,
             detections: [
@@ -132,6 +149,8 @@ export const NewScanPage: React.FC = () => {
                 type: 'MILCO',
                 confidence: 0.892,
                 bbox: { x1: 240, y1: 215, x2: 375, y2: 265 },
+                noise_filter_passed: true,
+                noise_filter_reason: 'Passed acoustic geometry verification',
               },
             ],
           };
@@ -139,15 +158,25 @@ export const NewScanPage: React.FC = () => {
       } else {
         // Real Live FastAPI + ONNX Runtime execution
         setCurrentStage(2);
+        let imageToUpload: File;
         if (!selectedFile) {
-          // If user loaded from preset URL, create a blob file
           const res = await fetch(previewUrl!);
           const blob = await res.blob();
-          const file = new File([blob], 'sonar_scan.png', { type: 'image/png' });
-          result = await api.predict(file, confidence, lat, lon, selectedModelVersion);
+          imageToUpload = new File([blob], 'sonar_scan.png', { type: 'image/png' });
         } else {
-          result = await api.predict(selectedFile, confidence, lat, lon, selectedModelVersion);
+          imageToUpload = selectedFile;
         }
+
+        result = await api.predict(
+          imageToUpload,
+          confidence,
+          lat,
+          lon,
+          selectedModelVersion,
+          selectedPingLogFile,
+          noiseFilteringEnabled
+        );
+
         setCurrentStage(3);
         await new Promise((r) => setTimeout(r, 200));
         setCurrentStage(4);
@@ -165,6 +194,7 @@ export const NewScanPage: React.FC = () => {
 
   const handleResetScan = () => {
     setSelectedFile(null);
+    setSelectedPingLogFile(null);
     setPreviewUrl(null);
     setCurrentScan(null);
     setScanError(null);
@@ -180,13 +210,13 @@ export const NewScanPage: React.FC = () => {
         <div className="space-y-2 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
             <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Autonomous Side-Scan Sonar Deep Learning Pipeline</span>
+            <span>Ministry of Earth Sciences (MoES) SSS Perception Pipeline</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight">
-            Sonar Imagery Anomaly & Debris Perception
+            Marine Debris & Ghost Net Anomaly Detection
           </h2>
           <p className="text-xs md:text-sm text-slate-300 font-sans leading-relaxed">
-            Upload raw side-scan sonar image files (swaths/waterfalls) collected via USV/AUV drone or towed fish. Run edge ONNX inference to localize ghost nets, marine debris, pipelines, and seafloor anomalies.
+            Upload raw side-scan sonar image swaths collected via AUV/USV drones. Run edge ONNX inference to localize ghost nets (ALDFG), anthropogenic debris, pipelines, and seafloor anomalies with automated ping-log GPS geotagging.
           </p>
         </div>
 
@@ -227,6 +257,8 @@ export const NewScanPage: React.FC = () => {
               onImageSelected={handleImageSelected}
               previewUrl={previewUrl}
               selectedFile={selectedFile}
+              onPingLogSelected={handlePingLogSelected}
+              selectedPingLogFile={selectedPingLogFile}
             />
           )}
 
@@ -247,6 +279,9 @@ export const NewScanPage: React.FC = () => {
             setLongitude={setLongitude}
             selectedModelVersion={selectedModelVersion}
             setSelectedModelVersion={setSelectedModelVersion}
+            noiseFilteringEnabled={noiseFilteringEnabled}
+            setNoiseFilteringEnabled={setNoiseFilteringEnabled}
+            hasPingLog={!!selectedPingLogFile}
             onAnalyze={handleAnalyze}
             isAnalyzing={isAnalyzing}
             hasFile={!!selectedFile || !!previewUrl}

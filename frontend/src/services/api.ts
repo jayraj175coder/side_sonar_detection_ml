@@ -78,11 +78,16 @@ class ApiClient {
     confidence?: number,
     latitude?: number,
     longitude?: number,
-    modelVersion: string = 'v2'
+    modelVersion: string = 'v2',
+    pingLogFile?: File | null,
+    noiseFilteringEnabled: boolean = true
   ): Promise<PredictionResponse> {
     const formData = new FormData();
     formData.append('file', file);
 
+    if (pingLogFile) {
+      formData.append('ping_log', pingLogFile);
+    }
     if (confidence !== undefined && confidence !== null) {
       formData.append('confidence', confidence.toString());
     }
@@ -93,6 +98,7 @@ class ApiClient {
       formData.append('longitude', longitude.toString());
     }
     formData.append('model_version', modelVersion);
+    formData.append('noise_filtering_enabled', noiseFilteringEnabled ? 'true' : 'false');
 
     const response = await fetch(`${this.baseUrl}/api/predict`, {
       method: 'POST',

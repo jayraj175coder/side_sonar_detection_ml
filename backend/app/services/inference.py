@@ -16,6 +16,7 @@ from app.schemas.detection import (
     ValidationMetrics,
     ModelInfo,
 )
+from app.services.noise_filter import noise_filter
 
 try:
     import onnxruntime as ort
@@ -46,8 +47,16 @@ def resolve_model_path(filename: str) -> Path:
 class SonarInferenceService:
     """
     Production ONNX Runtime Inference Engine.
-    Executes real deep-learning inference using trained YOLOv8n ONNX models.
-    Supports SIH Marine Debris V2 and Baseline models dynamically.
+    Executes real deep-learning inference for Ministry of Earth Sciences (MoES)
+    marine debris, ghost net, subsea pipeline, and seabed anomaly perception.
+
+    Flagship Model (Default):
+      - YOLOv8n-SIH-Marine-Debris-V2 (`marine_sonar_v2.onnx`)
+      - Target Classes: ghost_net_aldfg, anthropogenic_debris, pipeline_hazard, seafloor_anomaly
+
+    Legacy / Reference Model:
+      - YOLOv8n-Sonar-MILCO-NOMBO (`best.onnx`)
+      - Preserved strictly as a reference baseline for contact comparison.
     """
 
     def __init__(self):
@@ -55,7 +64,7 @@ class SonarInferenceService:
         self.v2_model_path = resolve_model_path("marine_sonar_v2.onnx")
         self.baseline_model_path = resolve_model_path("best.onnx")
 
-        # Default to V2 (SIH Marine Debris) if available, else fallback to baseline
+        # Hard default to V2 (SIH Marine Debris Flagship)
         if self.v2_model_path.exists() and self.v2_model_path.is_file():
             self.active_path = self.v2_model_path
             self.model_version = "v2"
@@ -63,7 +72,7 @@ class SonarInferenceService:
         elif self.baseline_model_path.exists() and self.baseline_model_path.is_file():
             self.active_path = self.baseline_model_path
             self.model_version = "baseline"
-            self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO"
+            self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO (Legacy Reference)"
         else:
             self.active_path = self.v2_model_path
             self.model_version = "v2"
@@ -82,8 +91,7 @@ class SonarInferenceService:
     def _load_session(self, path: Path) -> bool:
         if not ORT_AVAILABLE:
             return False
-        
-        # If path does not exist, try re-resolving in case working directory changed
+
         if not (path.exists() and path.is_file()):
             resolved = resolve_model_path(path.name)
             if resolved.exists() and resolved.is_file():
@@ -130,12 +138,12 @@ class SonarInferenceService:
             pass
 
     def switch_model(self, version: str) -> bool:
-        """Allows dynamic switching between SIH V2 and Baseline model."""
+        """Allows switching between SIH Flagship V2 and Legacy Reference baseline."""
         if version == "baseline":
             target = resolve_model_path("best.onnx")
             if target.exists() and target.is_file():
                 self.model_version = "baseline"
-                self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO"
+                self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO (Legacy Reference)"
                 self.baseline_model_path = target
                 return self._load_session(target)
         else:
@@ -315,6 +323,8 @@ class SonarInferenceService:
                         x2=round(float(b[2]), 1),
                         y2=round(float(b[3]), 1),
                     ),
+                    noise_filter_passed=True,
+                    noise_filter_reason="Passed initial geometry validation",
                 )
             )
 
@@ -327,11 +337,18 @@ class SonarInferenceService:
         confidence_threshold: Optional[float] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
-        model_version: Optional[str] = None,
+        heading: Optional[float] = None,
+        geotag_source: Optional[str] = "manual",
+        model_version: Optional[str] = "v2",
+        noise_filtering_enabled: bool = True,
     ) -> PredictionResponse:
-        """Executes real ONNX inference on image bytes with user-supplied threshold."""
-        if model_version and model_version != self.model_version:
-            self.switch_model(model_version)
+        """
+        Executes real ONNX inference on side-scan sonar image bytes with post-NMS
+        acoustic noise filtering and automated geotagging integration.
+        """
+        target_version = model_version or "v2"
+        if target_version != self.model_version:
+            self.switch_model(target_version)
 
         if not self.is_model_loaded():
             raise FileNotFoundError(
@@ -352,7 +369,7 @@ class SonarInferenceService:
 
         start_time = time.perf_counter()
 
-        # Preprocess
+        # 1. Preprocess
         (
             input_tensor,
             ratio,
@@ -362,14 +379,14 @@ class SonarInferenceService:
             orig_h,
         ) = self._preprocess_image(pil_image)
 
-        # Forward pass
+        # 2. Forward pass
         try:
             outputs = self.session.run(None, {self.input_name: input_tensor})
         except Exception as e:
             raise RuntimeError(f"ONNX inference execution failed: {str(e)}")
 
-        # Postprocess detections
-        detections, peak_conf = self._postprocess_output(
+        # 3. Postprocess NMS detections
+        raw_detections, peak_conf = self._postprocess_output(
             outputs[0],
             ratio,
             pad_w,
@@ -379,18 +396,25 @@ class SonarInferenceService:
             threshold,
         )
 
+        # 4. Confidence Scoring & Acoustic Noise Filtering Module
+        filtered_detections, suppressed_cnt = noise_filter.filter_detections(
+            raw_detections,
+            image=pil_image,
+            enabled=noise_filtering_enabled,
+        )
+
         elapsed_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
 
-        ghost_net_cnt = sum(1 for d in detections if d.type == "ghost_net_aldfg")
-        debris_cnt = sum(1 for d in detections if d.type == "anthropogenic_debris")
-        pipeline_cnt = sum(1 for d in detections if d.type == "pipeline_hazard")
-        anomaly_cnt = sum(1 for d in detections if d.type == "seafloor_anomaly")
-        milco_cnt = sum(1 for d in detections if d.type == "MILCO")
-        nombo_cnt = sum(1 for d in detections if d.type == "NOMBO")
+        ghost_net_cnt = sum(1 for d in filtered_detections if d.type == "ghost_net_aldfg")
+        debris_cnt = sum(1 for d in filtered_detections if d.type == "anthropogenic_debris")
+        pipeline_cnt = sum(1 for d in filtered_detections if d.type == "pipeline_hazard")
+        anomaly_cnt = sum(1 for d in filtered_detections if d.type == "seafloor_anomaly")
+        milco_cnt = sum(1 for d in filtered_detections if d.type == "MILCO")
+        nombo_cnt = sum(1 for d in filtered_detections if d.type == "NOMBO")
 
         highest_conf = (
-            max((d.confidence for d in detections), default=peak_conf)
-            if detections
+            max((d.confidence for d in filtered_detections), default=peak_conf)
+            if filtered_detections
             else peak_conf
         )
 
@@ -405,11 +429,14 @@ class SonarInferenceService:
             image_width=orig_w,
             image_height=orig_h,
             inference_ms=elapsed_ms,
-            detections=detections,
-            location=Location(latitude=latitude, longitude=longitude),
+            detections=filtered_detections,
+            location=Location(latitude=latitude, longitude=longitude, heading=heading),
             created_at=created_at,
             confidence_threshold=threshold,
-            total_detections=len(detections),
+            total_detections=len(filtered_detections),
+            false_positives_suppressed=suppressed_cnt,
+            noise_filtering_applied=noise_filtering_enabled,
+            geotag_source=geotag_source or "manual",
             ghost_net_count=ghost_net_cnt,
             debris_count=debris_cnt,
             pipeline_count=pipeline_cnt,

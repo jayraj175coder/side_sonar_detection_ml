@@ -188,7 +188,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Tag */}
           <div className="pt-1 flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <span>Target: MILCO / NOMBO</span>
+            <span>Target: MoES Marine Debris</span>
             <span>640×640 px</span>
           </div>
         </div>

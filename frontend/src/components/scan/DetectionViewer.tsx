@@ -19,6 +19,9 @@ import {
   Boxes,
   AlertTriangle,
   Layers,
+  ShieldCheck,
+  FileSpreadsheet,
+  CheckCircle2,
 } from 'lucide-react';
 import { PredictionResponse, Detection } from '../../types';
 import { Badge } from '../common/Badge';
@@ -56,6 +59,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   const anomalyCount = visibleDetections.filter((d) => d.type === 'seafloor_anomaly').length;
   const milcoCount = visibleDetections.filter((d) => d.type === 'MILCO').length;
   const nomboCount = visibleDetections.filter((d) => d.type === 'NOMBO').length;
+  const suppressedCount = scan.false_positives_suppressed || 0;
 
   const handleZoomIn = () => setZoomLevel((z) => Math.min(z + 0.25, 3));
   const handleZoomOut = () => setZoomLevel((z) => Math.max(z - 0.25, 0.75));
@@ -94,7 +98,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   return (
     <div className="space-y-6">
       {/* 1. Top Metrics Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div className="p-4 rounded-2xl glass-panel flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/30 text-cyan-400">
             <Crosshair className="w-5 h-5" />
@@ -171,13 +175,28 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           </>
         )}
 
+        {/* Noise Suppressed Metric */}
+        <div className="p-4 rounded-2xl glass-panel border-emerald-500/30 flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-400">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-[10px] font-mono font-semibold uppercase text-emerald-400">
+              Noise Suppressed
+            </p>
+            <p className="text-2xl font-extrabold text-emerald-400 font-mono">
+              {suppressedCount}
+            </p>
+          </div>
+        </div>
+
         <div className="p-4 rounded-2xl glass-panel flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300">
             <Clock className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
             <p className="text-[10px] font-mono font-semibold uppercase text-slate-400">
-              Inference Latency
+              Latency
             </p>
             <p className="text-2xl font-extrabold text-slate-100 font-mono">
               {scan.inference_ms.toFixed(1)}{' '}
@@ -239,150 +258,130 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               >
                 1%
               </button>
-              {scan.highest_confidence > 0 && scan.highest_confidence < activeThreshold && (
-                <button
-                  onClick={handleAutoTune}
-                  className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 font-bold flex items-center gap-1 hover:bg-cyan-500/20 transition-all"
-                  title="Tune cutoff to inspect highest candidate"
-                >
-                  <Sparkles className="w-3 h-3" />
-                  Inspect ({(scan.highest_confidence * 100).toFixed(1)}%)
-                </button>
-              )}
             </div>
           </div>
 
+          {/* View Toggles & Zoom */}
           <div className="flex items-center gap-2">
-            {/* Toggle Bounding Boxes */}
             <button
               onClick={() => setShowBoxes(!showBoxes)}
-              className={`px-3 py-1 rounded-xl text-xs font-mono flex items-center gap-1.5 border transition-all ${
+              className={`p-1.5 rounded-lg border text-xs font-mono flex items-center gap-1 transition-colors ${
                 showBoxes
-                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold'
+                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
                   : 'bg-slate-900 text-slate-400 border-slate-800'
               }`}
+              title="Toggle bounding boxes"
             >
               {showBoxes ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
               <span>Boxes</span>
             </button>
 
-            {/* Toggle Labels */}
             <button
               onClick={() => setShowLabels(!showLabels)}
-              className={`px-3 py-1 rounded-xl text-xs font-mono flex items-center gap-1.5 border transition-all ${
+              className={`p-1.5 rounded-lg border text-xs font-mono flex items-center gap-1 transition-colors ${
                 showLabels
-                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold'
+                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
                   : 'bg-slate-900 text-slate-400 border-slate-800'
               }`}
+              title="Toggle labels"
             >
               <Tag className="w-3.5 h-3.5" />
               <span>Labels</span>
             </button>
 
-            {/* Zoom Controls */}
-            <div className="flex items-center rounded-xl bg-slate-950 border border-slate-800 p-0.5">
-              <button
-                onClick={handleZoomOut}
-                className="p-1.5 text-slate-400 hover:text-slate-200"
-                title="Zoom Out"
-              >
-                <ZoomOut className="w-3.5 h-3.5" />
-              </button>
-              <span className="text-[11px] font-mono px-2 text-slate-300 font-bold">
-                {(zoomLevel * 100).toFixed(0)}%
-              </span>
-              <button
-                onClick={handleZoomIn}
-                className="p-1.5 text-slate-400 hover:text-slate-200"
-                title="Zoom In"
-              >
-                <ZoomIn className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={handleResetZoom}
-                className="p-1.5 text-slate-400 hover:text-slate-200 border-l border-slate-800"
-                title="Reset Zoom"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-              </button>
-            </div>
+            <div className="h-4 w-px bg-slate-800 mx-1" />
+
+            <button
+              onClick={handleZoomIn}
+              className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleZoomOut}
+              className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleResetZoom}
+              className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300"
+              title="Reset View"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
 
-        {/* Scalable Image & SVG Box Overlay Viewport */}
-        <div className="relative min-h-[440px] max-h-[640px] bg-[#050811] overflow-auto flex items-center justify-center p-6">
+        {/* Viewport Canvas with Scaled SVG Overlay */}
+        <div className="relative overflow-auto max-h-[580px] bg-[#02050E] flex items-center justify-center p-4 select-none">
           <div
-            className="relative inline-block transition-transform duration-150 origin-center"
-            style={{ transform: `scale(${zoomLevel})` }}
+            style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center' }}
+            className="relative transition-transform duration-150 inline-block shadow-2xl rounded-xl overflow-hidden border border-slate-800"
           >
-            {/* Real Sonar Image */}
             <img
               src={previewUrl}
-              alt="Sonar inspection canvas"
-              className="max-w-full h-auto block select-none rounded-2xl border border-slate-800 shadow-2xl"
-              style={{ maxHeight: '560px' }}
+              alt="Analyzed side-scan sonar swath"
+              className="max-h-[520px] w-auto object-contain block pointer-events-none"
             />
 
-            {/* Accurate SVG Bounding Box Layer */}
+            {/* SVG Bounding Box Layer */}
             {showBoxes && (
               <svg
-                className="absolute inset-0 w-full h-full pointer-events-none"
                 viewBox={`0 0 ${scan.image_width} ${scan.image_height}`}
+                className="absolute inset-0 w-full h-full pointer-events-auto"
                 preserveAspectRatio="none"
               >
                 {visibleDetections.map((det) => {
+                  const b = det.bbox;
                   const isSelected = selectedDetId === det.id;
                   const strokeColor = getColorForClass(det.type);
-                  const fillColor = `${strokeColor}33`;
-                  const { x1, y1, x2, y2 } = det.bbox;
-                  const boxWidth = x2 - x1;
-                  const boxHeight = y2 - y1;
 
                   return (
                     <g
                       key={det.id}
-                      className="cursor-pointer pointer-events-auto"
                       onClick={() => setSelectedDetId(det.id)}
+                      className="cursor-pointer group"
                     >
                       {/* Bounding Box Rectangle */}
                       <rect
-                        x={x1}
-                        y={y1}
-                        width={boxWidth}
-                        height={boxHeight}
-                        fill={isSelected ? `${strokeColor}66` : fillColor}
+                        x={b.x1}
+                        y={b.y1}
+                        width={Math.max(1, b.x2 - b.x1)}
+                        height={Math.max(1, b.y2 - b.y1)}
+                        fill={strokeColor}
+                        fillOpacity={isSelected ? 0.35 : 0.15}
                         stroke={strokeColor}
                         strokeWidth={isSelected ? 3.5 : 2}
                         strokeDasharray={isSelected ? '4 2' : 'none'}
-                        rx={3}
+                        className="transition-all"
                       />
 
-                      {/* Corner Reticles */}
-                      <circle cx={x1} cy={y1} r={3.5} fill={strokeColor} />
-                      <circle cx={x2} cy={y1} r={3.5} fill={strokeColor} />
-                      <circle cx={x1} cy={y2} r={3.5} fill={strokeColor} />
-                      <circle cx={x2} cy={y2} r={3.5} fill={strokeColor} />
-
-                      {/* Label */}
+                      {/* Pill Label */}
                       {showLabels && (
-                        <g transform={`translate(${x1}, ${Math.max(16, y1 - 6)})`}>
+                        <g>
                           <rect
-                            x={0}
-                            y={-14}
-                            width={det.type.length * 7 + 42}
-                            height={16}
-                            fill={strokeColor}
-                            rx={3}
+                            x={b.x1}
+                            y={Math.max(0, b.y1 - 22)}
+                            width={Math.max(90, (det.type.length + 6) * 7.5)}
+                            height={20}
+                            fill="#070D1B"
+                            fillOpacity={0.92}
+                            stroke={strokeColor}
+                            strokeWidth={1}
+                            rx={4}
                           />
                           <text
-                            x={5}
-                            y={-2}
-                            fill="#FFFFFF"
-                            fontSize="10"
-                            fontFamily="JetBrains Mono, monospace"
+                            x={b.x1 + 6}
+                            y={Math.max(0, b.y1 - 8)}
+                            fill={strokeColor}
+                            fontSize="11"
+                            fontFamily="monospace"
                             fontWeight="bold"
                           >
-                            {det.type.replace('_', ' ')} {(det.confidence * 100).toFixed(0)}%
+                            {det.type} {(det.confidence * 100).toFixed(0)}%
                           </text>
                         </g>
                       )}
@@ -393,9 +392,29 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
             )}
           </div>
         </div>
+
+        {/* Status Strip */}
+        <div className="p-3 bg-[#060B18] border-t border-slate-800 flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 gap-3">
+          <div className="flex items-center gap-4">
+            <span>Dimensions: {scan.image_width} × {scan.image_height} px</span>
+            <span>Active Targets: <strong className="text-cyan-300">{visibleDetections.length}</strong></span>
+            {scan.location && scan.location.latitude && (
+              <span className="text-emerald-400 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                Geotag: {scan.location.latitude.toFixed(4)}°N, {scan.location.longitude?.toFixed(4)}°E
+                {scan.geotag_source && ` (${scan.geotag_source})`}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-700">
+              Noise Filter: {scan.noise_filtering_applied ? 'Active' : 'Disabled'}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* 3. Detection Inventory Table or Low-Confidence State */}
+      {/* 3. Acoustic Contact Register Table */}
       <div className="p-6 rounded-3xl glass-panel space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
@@ -408,7 +427,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Click any target row to inspect coordinates on the swath
+              Click any target row to inspect coordinates and noise filter verification
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -475,7 +494,8 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                   <th className="py-3 px-3">Target ID</th>
                   <th className="py-3 px-3">Classification</th>
                   <th className="py-3 px-3">Confidence</th>
-                  <th className="py-3 px-3">Bounding Box [X1, Y1, X2, Y2]</th>
+                  <th className="py-3 px-3">Bounding Box</th>
+                  <th className="py-3 px-3">Noise Filter Diagnostic</th>
                   <th className="py-3 px-3">MoES Priority</th>
                 </tr>
               </thead>
@@ -510,6 +530,12 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                       <td className="py-3 px-3 text-slate-400 text-[11px]">
                         [{det.bbox.x1.toFixed(0)}, {det.bbox.y1.toFixed(0)},{' '}
                         {det.bbox.x2.toFixed(0)}, {det.bbox.y2.toFixed(0)}]
+                      </td>
+                      <td className="py-3 px-3 text-emerald-400 text-[11px]">
+                        <span className="flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                          {det.noise_filter_reason || 'Passed acoustic verification'}
+                        </span>
                       </td>
                       <td className="py-3 px-3">
                         {isGhostNet ? (

@@ -25,6 +25,24 @@ except ImportError:
     ORT_AVAILABLE = False
 
 
+def resolve_model_path(filename: str) -> Path:
+    """Finds an ONNX model file robustly across CWD, backend directory, and project root."""
+    backend_root = Path(__file__).resolve().parent.parent.parent
+    project_root = backend_root.parent
+
+    candidates = [
+        backend_root / "models" / filename,
+        project_root / "backend" / "models" / filename,
+        Path.cwd() / "backend" / "models" / filename,
+        Path.cwd() / "models" / filename,
+        Path(filename),
+    ]
+    for candidate in candidates:
+        if candidate.exists() and candidate.is_file():
+            return candidate.resolve()
+    return (backend_root / "models" / filename).resolve()
+
+
 class SonarInferenceService:
     """
     Production ONNX Runtime Inference Engine.
@@ -34,45 +52,62 @@ class SonarInferenceService:
 
     def __init__(self):
         self.input_size = 640
-        self.v2_model_path = Path("backend/models/marine_sonar_v2.onnx")
-        self.baseline_model_path = Path("backend/models/best.onnx")
-        
-        # Default to V2 if available, else fallback to baseline
+        self.v2_model_path = resolve_model_path("marine_sonar_v2.onnx")
+        self.baseline_model_path = resolve_model_path("best.onnx")
+
+        # Default to V2 (SIH Marine Debris) if available, else fallback to baseline
         if self.v2_model_path.exists() and self.v2_model_path.is_file():
             self.active_path = self.v2_model_path
             self.model_version = "v2"
             self.model_name = "YOLOv8n-SIH-Marine-Debris-V2"
-        else:
+        elif self.baseline_model_path.exists() and self.baseline_model_path.is_file():
             self.active_path = self.baseline_model_path
             self.model_version = "baseline"
             self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO"
+        else:
+            self.active_path = self.v2_model_path
+            self.model_version = "v2"
+            self.model_name = "YOLOv8n-SIH-Marine-Debris-V2"
 
         self.session: Optional[Any] = None
         self.input_name: Optional[str] = None
-        self.classes: Dict[int, str] = {}
+        self.classes: Dict[int, str] = {
+            0: "ghost_net_aldfg",
+            1: "anthropogenic_debris",
+            2: "pipeline_hazard",
+            3: "seafloor_anomaly",
+        }
         self._load_session(self.active_path)
 
     def _load_session(self, path: Path) -> bool:
         if not ORT_AVAILABLE:
             return False
-        if path.exists() and path.is_file():
-            try:
-                opts = ort.SessionOptions()
-                opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-                self.session = ort.InferenceSession(
-                    str(path),
-                    sess_options=opts,
-                    providers=["CPUExecutionProvider"],
-                )
-                self.input_name = self.session.get_inputs()[0].name
-                self.active_path = path
-                self._extract_metadata()
-                return True
-            except Exception:
+        
+        # If path does not exist, try re-resolving in case working directory changed
+        if not (path.exists() and path.is_file()):
+            resolved = resolve_model_path(path.name)
+            if resolved.exists() and resolved.is_file():
+                path = resolved
+            else:
                 self.session = None
                 return False
-        self.session = None
-        return False
+
+        try:
+            opts = ort.SessionOptions()
+            opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            self.session = ort.InferenceSession(
+                str(path),
+                sess_options=opts,
+                providers=["CPUExecutionProvider"],
+            )
+            self.input_name = self.session.get_inputs()[0].name
+            self.active_path = path
+            self._extract_metadata()
+            return True
+        except Exception as e:
+            print(f"[ERROR] Failed to load ONNX model at '{path}': {e}")
+            self.session = None
+            return False
 
     def _extract_metadata(self):
         """Dynamically extracts class names and task metadata from the loaded ONNX model."""
@@ -96,14 +131,20 @@ class SonarInferenceService:
 
     def switch_model(self, version: str) -> bool:
         """Allows dynamic switching between SIH V2 and Baseline model."""
-        if version == "baseline" and self.baseline_model_path.exists():
-            self.model_version = "baseline"
-            self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO"
-            return self._load_session(self.baseline_model_path)
-        elif self.v2_model_path.exists():
-            self.model_version = "v2"
-            self.model_name = "YOLOv8n-SIH-Marine-Debris-V2"
-            return self._load_session(self.v2_model_path)
+        if version == "baseline":
+            target = resolve_model_path("best.onnx")
+            if target.exists() and target.is_file():
+                self.model_version = "baseline"
+                self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO"
+                self.baseline_model_path = target
+                return self._load_session(target)
+        else:
+            target = resolve_model_path("marine_sonar_v2.onnx")
+            if target.exists() and target.is_file():
+                self.model_version = "v2"
+                self.model_name = "YOLOv8n-SIH-Marine-Debris-V2"
+                self.v2_model_path = target
+                return self._load_session(target)
         return False
 
     def is_model_loaded(self) -> bool:
@@ -113,9 +154,9 @@ class SonarInferenceService:
 
     def get_available_models(self) -> List[str]:
         models = []
-        if self.v2_model_path.exists():
+        if resolve_model_path("marine_sonar_v2.onnx").exists():
             models.append("marine_sonar_v2")
-        if self.baseline_model_path.exists():
+        if resolve_model_path("best.onnx").exists():
             models.append("baseline")
         return models
 

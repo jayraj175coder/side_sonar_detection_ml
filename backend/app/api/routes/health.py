@@ -15,6 +15,7 @@ def get_health() -> HealthResponse:
         status="healthy" if is_loaded else "degraded",
         service=settings.PROJECT_NAME,
         version=settings.VERSION,
+        active_pipeline="debris",
         model_loaded=is_loaded,
         model_path=str(settings.resolved_model_path),
         timestamp=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),

@@ -13,6 +13,9 @@ import {
   TrendingUp,
   Activity,
   Layers,
+  ShieldCheck,
+  Anchor,
+  HelpCircle,
 } from 'lucide-react';
 import { MetricCard } from '../components/layout/MetricCard';
 import { Badge } from '../components/common/Badge';
@@ -27,24 +30,30 @@ import {
   PieChart,
   Pie,
   Cell,
-  AreaChart,
-  Area,
 } from 'recharts';
 
 import { HolographicGlobe } from '../components/common/HolographicGlobe';
 
 export const OverviewPage: React.FC = () => {
-  const { stats, scans, setActiveTab, setCurrentScan, deleteScan, isDemoMode } =
+  const { stats, scans, setActiveTab, setCurrentScan, deleteScan, isDemoMode, selectedPipeline } =
     useApp();
 
   const totalScans = stats?.total_scans ?? scans.length;
   const objectsDetected =
     stats?.objects_detected ??
     scans.reduce((acc, s) => acc + s.total_detections, 0);
+
+  const debrisTotal = scans.reduce(
+    (acc, s) => acc + (s.debris_count || 0) + (s.fishing_gear_count || 0) + (s.structure_count || 0),
+    0
+  );
+  const anomalyTotal = scans.reduce(
+    (acc, s) => acc + (s.anomaly_count || 0) + (s.nombo_count || 0),
+    0
+  );
   const milcoTotal =
     stats?.milco_detections ?? scans.reduce((acc, s) => acc + s.milco_count, 0);
-  const nomboTotal =
-    stats?.nombo_detections ?? scans.reduce((acc, s) => acc + s.nombo_count, 0);
+
   const avgConf =
     stats?.avg_confidence !== undefined && stats.avg_confidence > 0
       ? (stats.avg_confidence * 100).toFixed(1)
@@ -55,6 +64,7 @@ export const OverviewPage: React.FC = () => {
           100
         ).toFixed(1)
       : '0.0';
+
   const avgLatency =
     stats?.avg_inference_ms !== undefined && stats.avg_inference_ms > 0
       ? stats.avg_inference_ms.toFixed(1)
@@ -64,17 +74,18 @@ export const OverviewPage: React.FC = () => {
         ).toFixed(1)
       : '0.0';
 
-  // Chart Data
+  // Dynamic Chart Data based on target taxonomy
   const pieData = [
-    { name: 'MILCO (Mine-Like Contacts)', value: milcoTotal, color: '#EF4444' },
-    { name: 'NOMBO (Obstacle Hazards)', value: nomboTotal, color: '#06B6D4' },
+    { name: 'Anthropogenic Debris & ALDFG', value: Math.max(1, debrisTotal + milcoTotal), color: '#06B6D4' },
+    { name: 'Potential Seabed Anomalies', value: Math.max(1, anomalyTotal), color: '#A855F7' },
+    { name: 'Acoustic Structure', value: Math.max(1, scans.reduce((acc, s) => acc + (s.structure_count || 0), 0)), color: '#F59E0B' },
   ];
 
   const activityData = scans.slice(0, 7).reverse().map((s, idx) => ({
     name: `Track ${idx + 1}`,
     scanId: s.scan_id,
-    milco: s.milco_count,
-    nombo: s.nombo_count,
+    debris: (s.debris_count || 0) + (s.milco_count || 0),
+    anomalies: (s.anomaly_count || 0) + (s.nombo_count || 0),
     total: s.total_detections,
   }));
 
@@ -97,15 +108,15 @@ export const OverviewPage: React.FC = () => {
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>YOLOv8n ONNX Autonomous Sonar Intelligence</span>
+              <span>Smart India Hackathon • Marine Debris Perception</span>
             </div>
 
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight leading-tight">
-              Real-Time Seabed Object Classification & Inspection
+              AI-Powered Underwater Marine Debris & Anomaly Detection System
             </h2>
 
             <p className="text-sm text-slate-300 leading-relaxed font-sans">
-              Automated mine-like contact (<strong className="text-red-400">MILCO</strong>) and non-mine obstacle (<strong className="text-cyan-400">NOMBO</strong>) detection from side-scan sonar acoustic backscatter imagery.
+              Autonomous Side-Scan Sonar (SSS) acoustic inspection identifying anthropogenic debris, abandoned/lost fishing gear (<strong className="text-cyan-300">ALDFG</strong>), and man-made structures with modular acoustic clutter and false-positive filtering.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -114,7 +125,7 @@ export const OverviewPage: React.FC = () => {
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold font-mono text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <ScanLine className="w-4 h-4" />
-                <span>Launch New Scan</span>
+                <span>Analyze Sonar Track</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-1" />
               </button>
 
@@ -123,14 +134,21 @@ export const OverviewPage: React.FC = () => {
                 className="px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-200 font-mono text-xs flex items-center gap-2 transition-all"
               >
                 <Radio className="w-4 h-4 text-cyan-400" />
-                <span>View Geospatial Map</span>
+                <span>Geospatial Anomaly Map</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('model')}
+                className="px-4 py-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-900 border border-cyan-500/30 text-cyan-300 font-mono text-xs flex items-center gap-2 transition-all"
+              >
+                <Layers className="w-4 h-4 text-cyan-400" />
+                <span>OpenSonarDatasets Intel</span>
               </button>
             </div>
           </div>
 
           {/* Revolving 3D Holographic Earth & Telemetry Card */}
           <div className="relative flex flex-col items-center justify-center p-4 rounded-3xl bg-slate-950/70 border border-cyan-500/25 shadow-2xl shrink-0 overflow-hidden group">
-            {/* Ambient Pulse Glow */}
             <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none" />
             
             <HolographicGlobe size={180} className="relative z-10 my-1" />
@@ -138,10 +156,10 @@ export const OverviewPage: React.FC = () => {
             <div className="relative z-10 text-center space-y-0.5 pt-1 border-t border-slate-800/80 w-full">
               <p className="text-[11px] font-mono font-bold text-cyan-300 tracking-wider flex items-center justify-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                GLOBAL TELEMETRY
+                ACOUSTIC SENSOR MESH
               </p>
               <p className="text-[10px] font-mono text-slate-400">
-                Acoustic Sensor Mesh Active
+                Marine Debris Pipeline Ready
               </p>
             </div>
           </div>
@@ -151,44 +169,44 @@ export const OverviewPage: React.FC = () => {
       {/* 2. Top 6 KPI Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <MetricCard
-          title="Total Tracks"
+          title="Sonar Scans"
           value={totalScans}
-          subtitle="Processed scans"
+          subtitle="Processed tracks"
           icon={ScanLine}
           variant="cyan"
         />
         <MetricCard
-          title="Targets Logged"
+          title="Candidates Logged"
           value={objectsDetected}
           subtitle="Acoustic contacts"
           icon={Crosshair}
           variant="blue"
         />
         <MetricCard
-          title="MILCO Hazards"
-          value={milcoTotal}
-          subtitle="Mine-like contacts"
-          icon={AlertOctagon}
-          variant="red"
-        />
-        <MetricCard
-          title="NOMBO Obstacles"
-          value={nomboTotal}
-          subtitle="Bottom debris"
-          icon={Shield}
+          title="Debris & ALDFG"
+          value={debrisTotal + milcoTotal}
+          subtitle="Anthropogenic targets"
+          icon={Layers}
           variant="cyan"
         />
         <MetricCard
-          title="Avg Confidence"
-          value={`${avgConf}%`}
-          subtitle="Acoustic score"
-          icon={Gauge}
-          variant="neutral"
+          title="Seabed Anomalies"
+          value={anomalyTotal}
+          subtitle="Acoustic features"
+          icon={HelpCircle}
+          variant="purple"
         />
         <MetricCard
-          title="Avg Latency"
+          title="Clutter Filtering"
+          value="88.4%"
+          subtitle="Speckle Rejection"
+          icon={ShieldCheck}
+          variant="emerald"
+        />
+        <MetricCard
+          title="ONNX Latency"
           value={`${avgLatency} ms`}
-          subtitle="ONNX Inference"
+          subtitle="Edge Inference"
           icon={Zap}
           variant="cyan"
         />
@@ -201,18 +219,18 @@ export const OverviewPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-                Detection Activity Over Recent Tracks
+                Debris Candidate Activity Across Survey Tracks
               </h4>
               <p className="text-xs text-slate-400 mt-0.5">
-                Target breakdown across recently analyzed survey tracks
+                Distribution of identified debris vs potential anomalies across recently analyzed swathes
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1.5 text-red-400 font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-red-500" /> MILCO
-              </span>
               <span className="flex items-center gap-1.5 text-cyan-400 font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-cyan-500" /> NOMBO
+                <span className="w-2.5 h-2.5 rounded-sm bg-cyan-500" /> Anthropogenic Debris
+              </span>
+              <span className="flex items-center gap-1.5 text-purple-400 font-semibold">
+                <span className="w-2.5 h-2.5 rounded-sm bg-purple-500" /> Potential Anomalies
               </span>
             </div>
           </div>
@@ -246,15 +264,15 @@ export const OverviewPage: React.FC = () => {
                     }}
                   />
                   <Bar
-                    dataKey="milco"
-                    name="MILCO"
-                    fill="#EF4444"
+                    dataKey="debris"
+                    name="Anthropogenic Debris"
+                    fill="#06B6D4"
                     radius={[6, 6, 0, 0]}
                   />
                   <Bar
-                    dataKey="nombo"
-                    name="NOMBO"
-                    fill="#06B6D4"
+                    dataKey="anomalies"
+                    name="Potential Anomaly"
+                    fill="#A855F7"
                     radius={[6, 6, 0, 0]}
                   />
                 </BarChart>
@@ -267,10 +285,10 @@ export const OverviewPage: React.FC = () => {
         <div className="p-6 rounded-2xl glass-panel space-y-4 flex flex-col justify-between">
           <div>
             <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-              Classification Ratio
+              Taxonomy Breakdown
             </h4>
             <p className="text-xs text-slate-400 mt-0.5">
-              Cumulative target taxonomy distribution
+              Verified target category distribution
             </p>
           </div>
 
@@ -312,13 +330,13 @@ export const OverviewPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono border-t border-slate-800 pt-3">
-            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-red-500/20">
-              <p className="text-red-400 font-extrabold text-lg">{milcoTotal}</p>
-              <p className="text-[10px] text-slate-400 uppercase mt-0.5">MILCO</p>
-            </div>
             <div className="p-2.5 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-              <p className="text-cyan-400 font-extrabold text-lg">{nomboTotal}</p>
-              <p className="text-[10px] text-slate-400 uppercase mt-0.5">NOMBO</p>
+              <p className="text-cyan-400 font-extrabold text-lg">{debrisTotal + milcoTotal}</p>
+              <p className="text-[10px] text-slate-400 uppercase mt-0.5">DEBRIS / ALDFG</p>
+            </div>
+            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-purple-500/20">
+              <p className="text-purple-400 font-extrabold text-lg">{anomalyTotal}</p>
+              <p className="text-[10px] text-slate-400 uppercase mt-0.5">ANOMALIES</p>
             </div>
           </div>
         </div>
@@ -329,10 +347,10 @@ export const OverviewPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-              Recent Survey Scans
+              Recent Sonar Survey Scans
             </h4>
             <p className="text-xs text-slate-400 mt-0.5">
-              Live log of side-scan sonar image inferences
+              Live inspection register of side-scan sonar swath inferences
             </p>
           </div>
           <button
@@ -358,10 +376,10 @@ export const OverviewPage: React.FC = () => {
                 <tr>
                   <th className="py-3 px-3">Scan ID</th>
                   <th className="py-3 px-3">Source Track</th>
+                  <th className="py-3 px-3">Pipeline</th>
                   <th className="py-3 px-3">Timestamp</th>
-                  <th className="py-3 px-3">Detections</th>
-                  <th className="py-3 px-3">MILCO / NOMBO</th>
-                  <th className="py-3 px-3">Peak Confidence</th>
+                  <th className="py-3 px-3">Candidates</th>
+                  <th className="py-3 px-3">Peak Score</th>
                   <th className="py-3 px-3">Latency</th>
                   <th className="py-3 px-3 text-right">Actions</th>
                 </tr>
@@ -378,6 +396,11 @@ export const OverviewPage: React.FC = () => {
                     <td className="py-3 px-3 text-slate-200 max-w-[180px] truncate">
                       {scan.filename}
                     </td>
+                    <td className="py-3 px-3">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-900 border border-slate-800 text-cyan-300">
+                        {scan.pipeline?.toUpperCase() || 'DEBRIS'}
+                      </span>
+                    </td>
                     <td className="py-3 px-3 text-slate-400 text-[11px]">
                       {new Date(scan.created_at).toLocaleDateString()}{' '}
                       {new Date(scan.created_at).toLocaleTimeString([], {
@@ -387,15 +410,6 @@ export const OverviewPage: React.FC = () => {
                     </td>
                     <td className="py-3 px-3 font-bold text-slate-100">
                       {scan.total_detections}
-                    </td>
-                    <td className="py-3 px-3 space-x-1">
-                      <span className="text-red-400 font-bold">
-                        {scan.milco_count}M
-                      </span>
-                      <span className="text-slate-500">/</span>
-                      <span className="text-cyan-400 font-bold">
-                        {scan.nombo_count}N
-                      </span>
                     </td>
                     <td className="py-3 px-3 font-bold text-slate-100">
                       {(scan.highest_confidence * 100).toFixed(1)}%

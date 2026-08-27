@@ -14,6 +14,8 @@ interface AppContextType {
   setActiveTab: (tab: TabType) => void;
   isDemoMode: boolean;
   setIsDemoMode: (enabled: boolean) => void;
+  selectedPipeline: 'debris' | 'baseline';
+  setSelectedPipeline: (pipeline: 'debris' | 'baseline') => void;
   currentScan: PredictionResponse | null;
   setCurrentScan: (scan: PredictionResponse | null) => void;
   scans: PredictionResponse[];
@@ -36,6 +38,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
+  const [selectedPipeline, setSelectedPipeline] = useState<'debris' | 'baseline'>('debris');
   const [currentScan, setCurrentScan] = useState<PredictionResponse | null>(null);
   const [scans, setScans] = useState<PredictionResponse[]>([]);
   const [stats, setStats] = useState<StatsResponse | null>(null);
@@ -144,6 +147,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
         setActiveTab,
         isDemoMode,
         setIsDemoMode,
+        selectedPipeline,
+        setSelectedPipeline,
         currentScan,
         setCurrentScan,
         scans,

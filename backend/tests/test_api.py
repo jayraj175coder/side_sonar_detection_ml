@@ -31,14 +31,20 @@ def test_model_info_endpoint():
     response = client.get("/api/model")
     assert response.status_code == 200
     data = response.json()
-    assert "MILCO" in data["classes"]
-    assert "NOMBO" in data["classes"]
-    assert data["image_size"] == 640
-    assert "validation_metrics" in data
-    metrics = data["validation_metrics"]
-    assert metrics["precision"] == 0.718
-    assert metrics["recall"] == 0.669
-    assert metrics["map50"] == 0.712
+    assert "classes" in data
+    assert "baseline_metrics" in data
+    assert "debris_metrics" in data
+    assert data["baseline_metrics"]["precision"] == 0.718
+    assert data["debris_metrics"]["precision"] == 0.742
+
+
+def test_datasets_catalog_endpoint():
+    response = client.get("/api/datasets")
+    assert response.status_code == 200
+    data = response.json()
+    assert "datasets" in data
+    assert "sss_crab_pot_debris" in data["datasets"]
+    assert "ghost_net_research_status" in data
 
 
 def test_scans_and_stats_empty():
@@ -58,8 +64,7 @@ def test_predict_empty_file():
     assert "empty" in response.json()["detail"].lower()
 
 
-def test_live_onnx_inference():
-    # Test real ONNX inference on a synthetic sonar image
+def test_live_onnx_inference_debris_pipeline():
     img = Image.new("RGB", (640, 480), color=(20, 30, 40))
     buf = io.BytesIO()
     img.save(buf, format="PNG")
@@ -68,23 +73,46 @@ def test_live_onnx_inference():
     response = client.post(
         "/api/predict",
         files={"file": ("live_sonar_scan.png", buf.getvalue(), "image/png")},
-        data={"confidence": "0.15", "latitude": "17.6868", "longitude": "83.2185"},
+        data={
+            "confidence": "0.05",
+            "latitude": "17.6868",
+            "longitude": "83.2185",
+            "pipeline": "debris",
+        },
     )
     assert response.status_code == 200
     data = response.json()
     assert "scan_id" in data
     assert data["filename"] == "live_sonar_scan.png"
-    assert data["image_width"] == 640
-    assert data["image_height"] == 480
-    assert data["inference_ms"] > 0
-    assert "detections" in data
+    assert data["pipeline"] == "debris"
+    assert "clutter_filtered_count" in data
     assert data["location"]["latitude"] == 17.6868
     assert data["location"]["longitude"] == 83.2185
 
 
-def test_scan_repository_workflow():
+def test_live_onnx_inference_baseline_pipeline():
+    img = Image.new("RGB", (640, 480), color=(20, 30, 40))
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+
+    response = client.post(
+        "/api/predict",
+        files={"file": ("live_baseline_scan.png", buf.getvalue(), "image/png")},
+        data={
+            "confidence": "0.15",
+            "pipeline": "baseline",
+        },
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "scan_id" in data
+    assert data["pipeline"] == "baseline"
+
+
+def test_scan_repository_and_report_workflow():
     sample_scan = PredictionResponse(
-        scan_id="SCAN-TEST1234",
+        scan_id="SCAN-TEST-DEBRIS-01",
         filename="test_acoustic.png",
         image_width=800,
         image_height=600,
@@ -92,24 +120,22 @@ def test_scan_repository_workflow():
         detections=[
             Detection(
                 id="det_1",
-                type="MILCO",
+                type="anthropogenic_debris",
                 confidence=0.89,
                 bbox=BoundingBox(x1=100, y1=150, x2=250, y2=300),
-            ),
-            Detection(
-                id="det_2",
-                type="NOMBO",
-                confidence=0.74,
-                bbox=BoundingBox(x1=400, y1=200, x2=550, y2=350),
+                confidence_tier="HIGH",
+                is_anomaly=False,
             ),
         ],
         location=Location(latitude=17.6868, longitude=83.2185),
-        created_at="2026-08-26T12:00:00Z",
+        created_at="2026-08-27T12:00:00Z",
         confidence_threshold=0.25,
-        total_detections=2,
-        milco_count=1,
-        nombo_count=1,
+        total_detections=1,
+        debris_count=1,
         highest_confidence=0.89,
+        pipeline="debris",
+        clutter_filtered_count=2,
+        verification_status="ai_candidate",
         status="completed",
     )
 
@@ -117,18 +143,19 @@ def test_scan_repository_workflow():
     scan_repository.save(sample_scan)
 
     # Get
-    fetched = scan_repository.get("SCAN-TEST1234")
+    fetched = scan_repository.get("SCAN-TEST-DEBRIS-01")
     assert fetched is not None
     assert fetched.filename == "test_acoustic.png"
-    assert fetched.milco_count == 1
 
     # Report
-    report_res = client.get("/api/scans/SCAN-TEST1234/report")
+    report_res = client.get("/api/scans/SCAN-TEST-DEBRIS-01/report")
     assert report_res.status_code == 200
     report_data = report_res.json()
-    assert "MILCO" in report_data["analyst_summary"]
+    assert "analyst_summary" in report_data
+    assert "disclaimer" in report_data
+    assert "clutter_filtering_summary" in report_data
 
     # Delete
-    del_res = client.delete("/api/scans/SCAN-TEST1234")
+    del_res = client.delete("/api/scans/SCAN-TEST-DEBRIS-01")
     assert del_res.status_code == 200
-    assert scan_repository.get("SCAN-TEST1234") is None
+    assert scan_repository.get("SCAN-TEST-DEBRIS-01") is None

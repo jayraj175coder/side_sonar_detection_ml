@@ -4,6 +4,7 @@ import {
   PredictionResponse,
   ReportResponse,
   StatsResponse,
+  DatasetCatalogResponse,
 } from '../types';
 
 const API_BASE_URL = (
@@ -68,11 +69,16 @@ class ApiClient {
     return this.request<ModelInfo>('/api/model');
   }
 
+  async getDatasets(): Promise<DatasetCatalogResponse> {
+    return this.request<DatasetCatalogResponse>('/api/datasets');
+  }
+
   async predict(
     file: File,
     confidence?: number,
     latitude?: number,
-    longitude?: number
+    longitude?: number,
+    pipeline: string = 'debris'
   ): Promise<PredictionResponse> {
     const formData = new FormData();
     formData.append('file', file);
@@ -86,6 +92,7 @@ class ApiClient {
     if (longitude !== undefined && longitude !== null) {
       formData.append('longitude', longitude.toString());
     }
+    formData.append('pipeline', pipeline);
 
     const response = await fetch(`${this.baseUrl}/api/predict`, {
       method: 'POST',

@@ -13,11 +13,11 @@ import {
   AlertOctagon,
   Shield,
   Layers,
-  ArrowRight,
-  RefreshCw,
-  Sliders,
   Sparkles,
   Info,
+  ShieldCheck,
+  HelpCircle,
+  Activity,
 } from 'lucide-react';
 import { PredictionResponse, Detection } from '../../types';
 import { Badge } from '../common/Badge';
@@ -47,6 +47,13 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
     (d) => d.confidence >= activeThreshold
   );
 
+  const isDebrisPipeline = scan.pipeline === 'debris';
+
+  const debrisCount = visibleDetections.filter((d) => d.type === 'anthropogenic_debris').length;
+  const fishingGearCount = visibleDetections.filter((d) => d.type === 'derelict_fishing_gear').length;
+  const structureCount = visibleDetections.filter((d) => d.type === 'anthropogenic_structure').length;
+  const anomalyCount = visibleDetections.filter((d) => d.type === 'potential_anomaly' || d.is_anomaly).length;
+
   const milcoCount = visibleDetections.filter((d) => d.type === 'MILCO').length;
   const nomboCount = visibleDetections.filter((d) => d.type === 'NOMBO').length;
 
@@ -55,8 +62,10 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   const handleResetZoom = () => setZoomLevel(1);
 
   const handleAutoTune = () => {
-    // If highest confidence is > 0, set threshold to slightly below it or 0.05
-    const target = Math.max(0.01, Math.min(0.25, scan.highest_confidence > 0 ? scan.highest_confidence - 0.005 : 0.05));
+    const target = Math.max(
+      0.01,
+      Math.min(0.25, scan.highest_confidence > 0 ? scan.highest_confidence - 0.005 : 0.05)
+    );
     setActiveThreshold(parseFloat(target.toFixed(2)));
   };
 
@@ -72,6 +81,14 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
     downloadAnchor.remove();
   };
 
+  const getColorForClass = (type: string, isAnomaly?: boolean) => {
+    if (isAnomaly || type === 'potential_anomaly') return '#A855F7'; // Purple
+    if (type === 'derelict_fishing_gear' || type === 'MILCO') return '#EF4444'; // Red
+    if (type === 'anthropogenic_debris' || type === 'NOMBO') return '#06B6D4'; // Cyan
+    if (type === 'anthropogenic_structure') return '#F59E0B'; // Amber
+    return '#38BDF8';
+  };
+
   return (
     <div className="space-y-6">
       {/* 1. Top Metrics Grid */}
@@ -82,7 +99,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           </div>
           <div>
             <p className="text-[10px] font-mono font-semibold uppercase text-slate-400">
-              Targets Identified
+              AI-Detected Candidates
             </p>
             <p className="text-2xl font-extrabold text-slate-100 font-mono">
               {visibleDetections.length}
@@ -90,33 +107,67 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl glass-panel border-red-500/30 flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400">
-            <AlertOctagon className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[10px] font-mono font-semibold uppercase text-red-400">
-              MILCO Mine Contacts
-            </p>
-            <p className="text-2xl font-extrabold text-red-400 font-mono">
-              {milcoCount}
-            </p>
-          </div>
-        </div>
+        {isDebrisPipeline ? (
+          <>
+            <div className="p-4 rounded-2xl glass-panel border-cyan-500/30 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">
+                <Layers className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-semibold uppercase text-cyan-400">
+                  Debris & Fishing Gear
+                </p>
+                <p className="text-2xl font-extrabold text-cyan-400 font-mono">
+                  {debrisCount + fishingGearCount}
+                </p>
+              </div>
+            </div>
 
-        <div className="p-4 rounded-2xl glass-panel border-cyan-500/30 flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">
-            <Shield className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[10px] font-mono font-semibold uppercase text-cyan-400">
-              NOMBO Obstacles
-            </p>
-            <p className="text-2xl font-extrabold text-cyan-400 font-mono">
-              {nomboCount}
-            </p>
-          </div>
-        </div>
+            <div className="p-4 rounded-2xl glass-panel border-purple-500/30 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-purple-950/60 border border-purple-500/40 text-purple-400">
+                <HelpCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-semibold uppercase text-purple-400">
+                  Potential Anomalies
+                </p>
+                <p className="text-2xl font-extrabold text-purple-400 font-mono">
+                  {anomalyCount + structureCount}
+                </p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="p-4 rounded-2xl glass-panel border-red-500/30 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400">
+                <AlertOctagon className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-semibold uppercase text-red-400">
+                  MILCO Mine Contacts
+                </p>
+                <p className="text-2xl font-extrabold text-red-400 font-mono">
+                  {milcoCount}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl glass-panel border-cyan-500/30 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">
+                <Shield className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-semibold uppercase text-cyan-400">
+                  NOMBO Obstacles
+                </p>
+                <p className="text-2xl font-extrabold text-cyan-400 font-mono">
+                  {nomboCount}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="p-4 rounded-2xl glass-panel flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300">
@@ -200,6 +251,14 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Clutter Filtering indicator */}
+            {scan.clutter_filtered_count !== undefined && scan.clutter_filtered_count > 0 && (
+              <span className="hidden lg:inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-950/50 px-2 py-1 rounded-lg border border-emerald-500/30">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                {scan.clutter_filtered_count} Clutter Filtered
+              </span>
+            )}
+
             {/* Toggle Bounding Boxes */}
             <button
               onClick={() => setShowBoxes(!showBoxes)}
@@ -279,14 +338,13 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               >
                 {visibleDetections.map((det) => {
                   const isSelected = selectedDetId === det.id;
-                  const isMilco = det.type === 'MILCO';
-                  const strokeColor = isMilco ? '#EF4444' : '#06B6D4';
-                  const fillColor = isMilco
-                    ? 'rgba(239, 68, 68, 0.2)'
-                    : 'rgba(6, 182, 212, 0.2)';
+                  const strokeColor = getColorForClass(det.type, det.is_anomaly);
+                  const fillColor = `${strokeColor}33`; // 20% opacity hex
                   const { x1, y1, x2, y2 } = det.bbox;
                   const boxWidth = x2 - x1;
                   const boxHeight = y2 - y1;
+
+                  const tier = det.confidence_tier || (det.confidence >= 0.7 ? 'HIGH' : det.confidence >= 0.35 ? 'MED' : 'ANOM');
 
                   return (
                     <g
@@ -300,7 +358,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                         y={y1}
                         width={boxWidth}
                         height={boxHeight}
-                        fill={isSelected ? (isMilco ? 'rgba(239, 68, 68, 0.4)' : 'rgba(6, 182, 212, 0.4)') : fillColor}
+                        fill={isSelected ? `${strokeColor}66` : fillColor}
                         stroke={strokeColor}
                         strokeWidth={isSelected ? 3.5 : 2}
                         strokeDasharray={isSelected ? '4 2' : 'none'}
@@ -319,7 +377,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                           <rect
                             x={0}
                             y={-14}
-                            width={isMilco ? 100 : 108}
+                            width={Math.max(110, det.type.length * 8 + 45)}
                             height={16}
                             fill={strokeColor}
                             rx={3}
@@ -332,7 +390,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                             fontFamily="JetBrains Mono, monospace"
                             fontWeight="bold"
                           >
-                            {det.type} {(det.confidence * 100).toFixed(0)}%
+                            {det.type.replace(/_/g, ' ')} [{(det.confidence * 100).toFixed(0)}%]
                           </text>
                         </g>
                       )}
@@ -345,15 +403,20 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
         </div>
       </div>
 
-      {/* 3. Detection Inventory Table or Low-Confidence Diagnostic Guidance */}
+      {/* 3. Detection Inventory Table */}
       <div className="p-6 rounded-3xl glass-panel space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-              Identified Target Register
-            </h4>
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
+                Candidate Anomaly Register
+              </h4>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-cyan-950/60 text-cyan-300 border border-cyan-500/30">
+                Pipeline: {scan.pipeline?.toUpperCase() || 'DEBRIS'}
+              </span>
+            </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Click any target row to isolate bounding box coordinates
+              Click any candidate row to isolate bounding box coordinates on the acoustic swath
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -369,7 +432,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-bold text-xs font-mono flex items-center gap-1.5 transition-all shadow-md active:scale-95"
             >
               <FileText className="w-3.5 h-3.5" />
-              <span>Generate Full Report</span>
+              <span>Inspection Report</span>
             </button>
           </div>
         </div>
@@ -380,7 +443,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               <Info className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
               <div className="space-y-2 flex-1">
                 <p className="text-xs font-mono font-bold text-slate-200">
-                  0 Contacts Exceeded Current Cutoff ({(activeThreshold * 100).toFixed(0)}%)
+                  0 Candidates Exceeded Current Cutoff ({(activeThreshold * 100).toFixed(0)}%)
                 </p>
                 <p className="text-xs text-slate-400 leading-relaxed font-sans">
                   The model did not find any contacts above the <strong className="text-cyan-300">{(activeThreshold * 100).toFixed(0)}%</strong> threshold.
@@ -415,14 +478,16 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                 <tr>
                   <th className="py-3 px-3">Target ID</th>
                   <th className="py-3 px-3">Classification</th>
-                  <th className="py-3 px-3">Confidence</th>
-                  <th className="py-3 px-3">Pixel Bounding Box [X1, Y1, X2, Y2]</th>
-                  <th className="py-3 px-3">Assessment</th>
+                  <th className="py-3 px-3">Confidence Tier</th>
+                  <th className="py-3 px-3">Bounding Box [X1, Y1, X2, Y2]</th>
+                  <th className="py-3 px-3">Verification Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
                 {visibleDetections.map((det) => {
                   const isSelected = selectedDetId === det.id;
+                  const tier = det.confidence_tier || (det.confidence >= 0.7 ? 'HIGH' : det.confidence >= 0.35 ? 'MEDIUM' : 'POTENTIAL_ANOMALY');
+
                   return (
                     <tr
                       key={det.id}
@@ -436,27 +501,31 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                       </td>
                       <td className="py-3 px-3">
                         <Badge
-                          type={det.type as any}
+                          type={det.type}
                           label={det.type}
                           size="sm"
                         />
                       </td>
-                      <td className="py-3 px-3 font-bold text-slate-100">
-                        {(det.confidence * 100).toFixed(1)}%
+                      <td className="py-3 px-3">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                          tier === 'HIGH'
+                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                            : tier === 'MEDIUM'
+                            ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
+                            : 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
+                        }`}>
+                          {tier} ({(det.confidence * 100).toFixed(1)}%)
+                        </span>
                       </td>
                       <td className="py-3 px-3 text-slate-400 text-[11px]">
                         [{det.bbox.x1.toFixed(0)}, {det.bbox.y1.toFixed(0)},{' '}
                         {det.bbox.x2.toFixed(0)}, {det.bbox.y2.toFixed(0)}]
                       </td>
                       <td className="py-3 px-3">
-                        {det.type === 'MILCO' ? (
-                          <span className="text-red-400 font-bold flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />
-                            CRITICAL CONTACT
-                          </span>
-                        ) : (
-                          <span className="text-cyan-400 font-medium">OBSTACLE HAZARD</span>
-                        )}
+                        <span className="text-amber-400/90 text-[11px] font-medium flex items-center gap-1">
+                          <Activity className="w-3 h-3 animate-pulse" />
+                          AI-DETECTED CANDIDATE
+                        </span>
                       </td>
                     </tr>
                   );
@@ -465,6 +534,14 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
             </table>
           </div>
         )}
+
+        {/* Scientific Notice Banner */}
+        <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-[11px] text-slate-400 flex items-start gap-2.5">
+          <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+          <p className="leading-relaxed">
+            <strong className="text-slate-300 font-mono">Operational Notice:</strong> Detections generated represent AI-assisted acoustic candidates. In-situ confirmation of marine debris, ghost nets, or seabed hazards requires ROV, diver ground-truth, or multi-angle sonar passes.
+          </p>
+        </div>
 
         <div className="pt-2 flex justify-between items-center text-xs text-slate-400">
           <button

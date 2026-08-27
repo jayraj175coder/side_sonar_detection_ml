@@ -8,6 +8,8 @@ import {
   Menu,
   Server,
   Zap,
+  Layers,
+  Trash2,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -26,10 +28,11 @@ export const Header: React.FC<HeaderProps> = ({
     isBackendConnected,
     isDemoMode,
     setIsDemoMode,
+    selectedPipeline,
+    setSelectedPipeline,
     refreshData,
     isLoading,
     currentScan,
-    stats,
   } = useApp();
 
   return (
@@ -46,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
         <div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <h1 className="text-base md:text-xl font-extrabold text-slate-100 tracking-tight">
               {title}
             </h1>
@@ -65,7 +68,34 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Action Controls & Mode Switcher */}
-      <div className="flex items-center gap-2.5 sm:gap-3.5">
+      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+        {/* Pipeline Selector */}
+        <div className="hidden lg:flex items-center rounded-xl bg-slate-950/80 border border-slate-800 p-1 text-[11px] font-mono">
+          <button
+            onClick={() => setSelectedPipeline('debris')}
+            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+              selectedPipeline === 'debris'
+                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+            title="SIH Marine Debris & Underwater Anomaly Pipeline with Clutter Filtering"
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>SIH Debris AI</span>
+          </button>
+          <button
+            onClick={() => setSelectedPipeline('baseline')}
+            className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
+              selectedPipeline === 'baseline'
+                ? 'bg-red-500/20 text-red-300 border border-red-500/40 font-bold shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+            title="Baseline Sonar Anomaly Pipeline (MILCO / NOMBO)"
+          >
+            <span>MILCO Baseline</span>
+          </button>
+        </div>
+
         {/* Demo Mode Toggle */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/70 border border-slate-800 shadow-inner">
           <span className="text-xs font-mono text-slate-300 flex items-center gap-1.5">

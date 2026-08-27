@@ -12,6 +12,8 @@ import {
   Radio,
   Sliders,
   Sparkles,
+  Layers,
+  Info,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Badge } from '../components/common/Badge';
@@ -55,7 +57,6 @@ export const ReportsPage: React.FC = () => {
     );
   }
 
-  const isCritical = activeScan.milco_count > 0;
   const hasGeo =
     activeScan.location.latitude !== null && activeScan.location.longitude !== null;
 
@@ -113,10 +114,10 @@ export const ReportsPage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-extrabold font-mono tracking-wider text-slate-100 print:text-black">
-                  SONARX ACOUSTIC INSPECTION BRIEFING
+                  MARINE DEBRIS & ANOMALY INSPECTION BRIEFING
                 </h2>
                 <p className="text-xs text-slate-400 print:text-gray-600 font-mono mt-0.5">
-                  Autonomous YOLOv8n Maritime Sonar Target Classification Intelligence
+                  AI-Assisted Side-Scan Sonar Acoustic Backscatter Perception
                 </p>
               </div>
             </div>
@@ -130,15 +131,9 @@ export const ReportsPage: React.FC = () => {
               Generated: {new Date().toUTCString()}
             </p>
             <div className="pt-1">
-              {isCritical ? (
-                <span className="px-2.5 py-1 rounded-md bg-red-500/20 text-red-400 border border-red-500/40 text-[10px] font-bold">
-                  HAZARD: MILCO IDENTIFIED
-                </span>
-              ) : (
-                <span className="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-bold">
-                  SURVEY CLEAR / ROUTINE
-                </span>
-              )}
+              <span className="px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold">
+                AI-DETECTED CANDIDATE • REQUIRES VERIFICATION
+              </span>
             </div>
           </div>
         </div>
@@ -149,31 +144,31 @@ export const ReportsPage: React.FC = () => {
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
               Source Scan
             </p>
-            <p className="font-bold text-slate-100 print:text-black mt-0.5 truncate">
+            <p className="font-bold text-slate-100 print:text-black truncate mt-0.5">
               {activeScan.filename}
             </p>
           </div>
           <div>
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
-              Survey Coordinates
+              Pipeline Mode
+            </p>
+            <p className="font-bold text-cyan-300 print:text-blue-600 mt-0.5 uppercase">
+              {activeScan.pipeline || 'DEBRIS'}
+            </p>
+          </div>
+          <div>
+            <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
+              Coordinates (WGS84)
             </p>
             <p className="font-bold text-slate-100 print:text-black mt-0.5">
               {hasGeo
                 ? `${activeScan.location.latitude?.toFixed(4)}°N, ${activeScan.location.longitude?.toFixed(4)}°E`
-                : 'Ungeolocated track'}
+                : 'Location unavailable'}
             </p>
           </div>
           <div>
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
-              Model Engine
-            </p>
-            <p className="font-bold text-cyan-400 print:text-blue-600 mt-0.5">
-              YOLOv8n ONNX (640px)
-            </p>
-          </div>
-          <div>
-            <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
-              Inference Latency
+              Inference / Filter Latency
             </p>
             <p className="font-bold text-slate-100 print:text-black mt-0.5">
               {activeScan.inference_ms.toFixed(1)} ms
@@ -181,107 +176,82 @@ export const ReportsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Target Classification Breakdown Cards */}
-        <div className="grid grid-cols-3 gap-4 text-xs font-mono">
-          <div className="p-4 rounded-2xl bg-[#0C1427] print:bg-gray-50 border border-slate-800 print:border-gray-300">
-            <p className="text-slate-400 print:text-gray-600 text-[11px] uppercase font-semibold">
-              Total Target Contacts
-            </p>
-            <p className="text-2xl font-extrabold text-slate-100 print:text-black mt-1">
-              {activeScan.total_detections}
-            </p>
-          </div>
-          <div className="p-4 rounded-2xl bg-red-950/20 print:bg-red-50 border border-red-500/30 print:border-red-300">
-            <p className="text-red-400 print:text-red-700 text-[11px] uppercase font-bold">
-              MILCO Mine Contacts
-            </p>
-            <p className="text-2xl font-extrabold text-red-400 print:text-red-700 mt-1">
-              {activeScan.milco_count}
-            </p>
-          </div>
-          <div className="p-4 rounded-2xl bg-cyan-950/20 print:bg-blue-50 border border-cyan-500/30 print:border-blue-300">
-            <p className="text-cyan-400 print:text-blue-700 text-[11px] uppercase font-bold">
-              NOMBO Obstacles
-            </p>
-            <p className="text-2xl font-extrabold text-cyan-400 print:text-blue-700 mt-1">
-              {activeScan.nombo_count}
-            </p>
-          </div>
-        </div>
-
-        {/* Analyst Narrative Section */}
-        <div className="p-5 rounded-2xl bg-[#080E1C] print:bg-gray-50 border border-slate-800 print:border-gray-300 space-y-2">
-          <h4 className="text-xs font-bold font-mono text-cyan-300 print:text-blue-700 uppercase tracking-wider">
-            Automated Intelligence Summary
-          </h4>
+        {/* Executive Analyst Assessment */}
+        <div className="space-y-2 p-5 rounded-2xl bg-cyan-950/20 border border-cyan-500/20 print:border-gray-300 print:bg-gray-50">
+          <h3 className="text-xs font-bold font-mono text-cyan-300 print:text-blue-800 uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5" />
+            Executive Acoustic Analysis
+          </h3>
           <p className="text-xs text-slate-300 print:text-gray-800 leading-relaxed font-sans">
-            {activeScan.total_detections === 0
-              ? `Side-scan acoustic survey '${activeScan.filename}' was analyzed with the calibrated YOLOv8n ONNX model at confidence threshold ${activeScan.confidence_threshold.toFixed(2)}. No seabed contacts exceeding threshold were identified. The acoustic track indicates an unobstructed sea bottom.`
-              : `Deep learning analysis on '${activeScan.filename}' identified ${activeScan.total_detections} acoustic seafloor targets. Detection classification: ${activeScan.milco_count} Mine-Like Contact(s) (MILCO) and ${activeScan.nombo_count} Non-Mine Bottom Obstacle(s) (NOMBO). Peak contact confidence recorded at ${(activeScan.highest_confidence * 100).toFixed(1)}%. Model inference took ${activeScan.inference_ms.toFixed(1)} ms.`}
+            AI-assisted acoustic analysis of swath '{activeScan.filename}' identified {activeScan.total_detections} potential contact candidate(s) above confidence threshold {activeScan.confidence_threshold.toFixed(2)}.
+            {activeScan.clutter_filtered_count !== undefined && activeScan.clutter_filtered_count > 0 ? (
+              <> Acoustic clutter filtering rejected {activeScan.clutter_filtered_count} background sediment/speckle artifact(s).</>
+            ) : null}
+            {' '}Peak candidate confidence score is {(activeScan.highest_confidence * 100).toFixed(1)}%.
           </p>
         </div>
 
-        {/* Contact Coordinates Detail Table */}
-        <div className="space-y-2">
-          <h4 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-400 print:text-gray-700">
-            Acoustic Target Register
-          </h4>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono border border-slate-800 print:border-gray-300 rounded-xl overflow-hidden">
-              <thead className="bg-[#080E1C] print:bg-gray-100 text-slate-400 print:text-gray-700 uppercase tracking-wider border-b border-slate-800 print:border-gray-300">
-                <tr>
-                  <th className="py-2.5 px-3">Item #</th>
-                  <th className="py-2.5 px-3">Target ID</th>
-                  <th className="py-2.5 px-3">Classification</th>
-                  <th className="py-2.5 px-3">Confidence Score</th>
-                  <th className="py-2.5 px-3">Pixel Bounding Box [X1, Y1, X2, Y2]</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60 print:divide-gray-200">
-                {activeScan.detections.length === 0 ? (
+        {/* Detailed Detections Table */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold font-mono text-slate-300 print:text-gray-800 uppercase tracking-wider">
+            Target Anomaly Register
+          </h3>
+          {activeScan.detections.length === 0 ? (
+            <div className="p-4 rounded-xl bg-slate-950/60 print:bg-gray-100 text-center text-xs font-mono text-slate-400 print:text-gray-600">
+              No contacts exceeded the {activeScan.confidence_threshold.toFixed(2)} confidence threshold.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-mono border border-slate-800 print:border-gray-300">
+                <thead className="bg-[#080E1C]/90 print:bg-gray-200 text-slate-400 print:text-gray-700 border-b border-slate-800 print:border-gray-300">
                   <tr>
-                    <td colSpan={5} className="py-4 text-center text-slate-400 print:text-gray-500">
-                      No contacts logged in this inspection track.
-                    </td>
+                    <th className="py-2.5 px-3">Target ID</th>
+                    <th className="py-2.5 px-3">Classification</th>
+                    <th className="py-2.5 px-3">Confidence Tier</th>
+                    <th className="py-2.5 px-3">Bounding Box [X1, Y1, X2, Y2]</th>
+                    <th className="py-2.5 px-3">Assessment</th>
                   </tr>
-                ) : (
-                  activeScan.detections.map((d, index) => (
-                    <tr key={d.id} className="text-slate-300 print:text-black">
-                      <td className="py-2.5 px-3 text-slate-400 print:text-gray-500">
-                        {index + 1}
+                </thead>
+                <tbody className="divide-y divide-slate-800/60 print:divide-gray-200">
+                  {activeScan.detections.map((det) => (
+                    <tr key={det.id} className="text-slate-300 print:text-gray-800">
+                      <td className="py-2 px-3 font-semibold">{det.id}</td>
+                      <td className="py-2 px-3">
+                        <Badge type={det.type} label={det.type} size="sm" />
                       </td>
-                      <td className="py-2.5 px-3 font-semibold text-cyan-300 print:text-blue-700">
-                        {d.id}
+                      <td className="py-2 px-3 font-bold">
+                        {(det.confidence * 100).toFixed(1)}% ({det.confidence_tier || 'MEDIUM'})
                       </td>
-                      <td className="py-2.5 px-3 font-bold">
-                        <span
-                          className={
-                            d.type === 'MILCO'
-                              ? 'text-red-400 print:text-red-700'
-                              : 'text-cyan-400 print:text-blue-700'
-                          }
-                        >
-                          {d.type}
-                        </span>
+                      <td className="py-2 px-3 text-[11px] text-slate-400 print:text-gray-600">
+                        [{det.bbox.x1.toFixed(0)}, {det.bbox.y1.toFixed(0)},{' '}
+                        {det.bbox.x2.toFixed(0)}, {det.bbox.y2.toFixed(0)}]
                       </td>
-                      <td className="py-2.5 px-3 font-bold">
-                        {(d.confidence * 100).toFixed(1)}%
-                      </td>
-                      <td className="py-2.5 px-3 text-slate-400 print:text-gray-600 text-[11px]">
-                        [{d.bbox.x1.toFixed(0)}, {d.bbox.y1.toFixed(0)}, {d.bbox.x2.toFixed(0)}, {d.bbox.y2.toFixed(0)}]
+                      <td className="py-2 px-3 text-[11px] font-bold text-amber-400 print:text-amber-700">
+                        AI CANDIDATE
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
-        {/* Sign-off footer */}
-        <div className="pt-4 border-t border-slate-800 print:border-gray-300 flex justify-between items-center text-[10px] font-mono text-slate-400 print:text-gray-500">
-          <span>SONARX System ID: SNX-ENC-NODE-01 (Visakhapatnam Operations)</span>
-          <span>Verified Maritime Inspection Briefing</span>
+        {/* Mandatory Scientific Disclaimer Banner */}
+        <div className="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs text-slate-400 print:text-gray-600 space-y-1 font-sans">
+          <div className="flex items-center gap-2 text-slate-300 font-mono font-bold">
+            <Info className="w-4 h-4 text-cyan-400" />
+            <span>CONFIDENTIALITY & SCIENTIFIC NOTICE</span>
+          </div>
+          <p className="leading-relaxed text-[11px]">
+            Detections generated by this system represent AI-detected acoustic candidates derived from side-scan sonar backscatter. Final confirmation of marine debris, ghost nets, or navigational seabed hazards requires ground-truth validation via ROV, diver inspection, or multi-angle acoustic surveys.
+          </p>
+        </div>
+
+        {/* Document Footer */}
+        <div className="border-t border-slate-800 pt-4 flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-400 print:text-gray-500">
+          <span>SONARX Marine Debris Intelligence Platform</span>
+          <span>System ID: SNX-SIH-NODE-01</span>
         </div>
       </div>
     </div>

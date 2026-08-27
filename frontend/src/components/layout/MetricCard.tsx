@@ -6,7 +6,7 @@ interface MetricCardProps {
   value: string | number;
   subtitle?: string;
   icon: LucideIcon;
-  variant?: 'cyan' | 'red' | 'blue' | 'neutral';
+  variant?: 'cyan' | 'red' | 'blue' | 'purple' | 'emerald' | 'neutral';
   trend?: string;
 }
 
@@ -22,6 +22,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     cyan: 'border-cyan-500/20 hover:border-cyan-500/50 text-cyan-400',
     red: 'border-red-500/20 hover:border-red-500/50 text-red-400',
     blue: 'border-blue-500/20 hover:border-blue-500/50 text-blue-400',
+    purple: 'border-purple-500/20 hover:border-purple-500/50 text-purple-400',
+    emerald: 'border-emerald-500/20 hover:border-emerald-500/50 text-emerald-400',
     neutral: 'border-slate-800 hover:border-slate-700 text-slate-400',
   };
 
@@ -29,6 +31,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     cyan: 'from-cyan-950/30 via-transparent to-transparent',
     red: 'from-red-950/30 via-transparent to-transparent',
     blue: 'from-blue-950/30 via-transparent to-transparent',
+    purple: 'from-purple-950/30 via-transparent to-transparent',
+    emerald: 'from-emerald-950/30 via-transparent to-transparent',
     neutral: 'from-slate-900/30 via-transparent to-transparent',
   };
 
@@ -36,6 +40,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
     cyan: 'bg-cyan-950/60 border-cyan-500/30 text-cyan-400 shadow-cyan-950/50',
     red: 'bg-red-950/60 border-red-500/30 text-red-400 shadow-red-950/50',
     blue: 'bg-blue-950/60 border-blue-500/30 text-blue-400 shadow-blue-950/50',
+    purple: 'bg-purple-950/60 border-purple-500/30 text-purple-400 shadow-purple-950/50',
+    emerald: 'bg-emerald-950/60 border-emerald-500/30 text-emerald-400 shadow-emerald-950/50',
     neutral: 'bg-slate-900 border-slate-800 text-slate-400',
   };
 

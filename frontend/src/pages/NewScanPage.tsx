@@ -6,7 +6,7 @@ import { DetectionViewer } from '../components/scan/DetectionViewer';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { PredictionResponse } from '../types';
-import { AlertTriangle, Sparkles, CheckCircle2, Cpu } from 'lucide-react';
+import { AlertTriangle, Sparkles, CheckCircle2, Cpu, UploadCloud, Eye } from 'lucide-react';
 
 export const NewScanPage: React.FC = () => {
   const {
@@ -18,9 +18,7 @@ export const NewScanPage: React.FC = () => {
   } = useApp();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(
-    currentScan?.imageUrl || null
-  );
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<number>(0.25);
   const [latitude, setLatitude] = useState<string>('');
   const [longitude, setLongitude] = useState<string>('');
@@ -36,11 +34,15 @@ export const NewScanPage: React.FC = () => {
     setSelectedFile(file);
     setPreviewUrl(preview);
     setScanError(null);
+    // If a new image is chosen, clear previous scan so we show the new preview
+    if (file || preview) {
+      setCurrentScan(null);
+    }
   };
 
   const handleAnalyze = async () => {
     if (!selectedFile && !previewUrl) {
-      setScanError('Please select or upload a sonar scan image before analyzing.');
+      setScanError('Please select, drag, or paste a sonar image before analyzing.');
       return;
     }
 
@@ -52,12 +54,13 @@ export const NewScanPage: React.FC = () => {
     const lon = longitude.trim() ? parseFloat(longitude) : undefined;
 
     try {
-      await new Promise((r) => setTimeout(r, 300));
+      await new Promise((r) => setTimeout(r, 200));
       setCurrentStage(2);
 
       let result: PredictionResponse;
 
       if (isDemoMode || !isBackendConnected) {
+        // Client-side offline perception simulation on the user's uploaded image
         await new Promise((r) => setTimeout(r, 400));
         setCurrentStage(3);
         await new Promise((r) => setTimeout(r, 300));
@@ -67,7 +70,7 @@ export const NewScanPage: React.FC = () => {
         if (selectedModelVersion === 'v2') {
           result = {
             scan_id: scanId,
-            filename: selectedFile?.name || 'drone_sonar_swath.png',
+            filename: selectedFile?.name || 'external_sonar_swath.png',
             model_name: 'YOLOv8n-SIH-Marine-Debris-V2',
             model_version: 'v2',
             image_width: 640,
@@ -92,20 +95,20 @@ export const NewScanPage: React.FC = () => {
                 id: 'det_1',
                 type: 'ghost_net_aldfg',
                 confidence: 0.884,
-                bbox: { x1: 85, y1: 160, x2: 175, y2: 245 },
+                bbox: { x1: 90, y1: 150, x2: 210, y2: 280 },
               },
               {
                 id: 'det_2',
                 type: 'anthropogenic_debris',
                 confidence: 0.762,
-                bbox: { x1: 420, y1: 310, x2: 490, y2: 375 },
+                bbox: { x1: 390, y1: 290, x2: 480, y2: 370 },
               },
             ],
           };
         } else {
           result = {
             scan_id: scanId,
-            filename: selectedFile?.name || 'drone_sonar_swath.png',
+            filename: selectedFile?.name || 'external_sonar_swath.png',
             model_name: 'YOLOv8n-Sonar-MILCO-NOMBO',
             model_version: 'baseline',
             image_width: 640,
@@ -134,12 +137,17 @@ export const NewScanPage: React.FC = () => {
           };
         }
       } else {
+        // Real Live FastAPI + ONNX Runtime execution
         setCurrentStage(2);
         if (!selectedFile) {
-          throw new Error('No local image file to upload to live backend.');
+          // If user loaded from preset URL, create a blob file
+          const res = await fetch(previewUrl!);
+          const blob = await res.blob();
+          const file = new File([blob], 'sonar_scan.png', { type: 'image/png' });
+          result = await api.predict(file, confidence, lat, lon, selectedModelVersion);
+        } else {
+          result = await api.predict(selectedFile, confidence, lat, lon, selectedModelVersion);
         }
-
-        result = await api.predict(selectedFile, confidence, lat, lon, selectedModelVersion);
         setCurrentStage(3);
         await new Promise((r) => setTimeout(r, 200));
         setCurrentStage(4);
@@ -163,6 +171,8 @@ export const NewScanPage: React.FC = () => {
     setCurrentStage(1);
   };
 
+  const isShowingActiveScanResult = !!currentScan && (!!previewUrl || !!currentScan.imageUrl);
+
   return (
     <div className="space-y-8">
       {/* 1. Header Hero Banner */}
@@ -179,6 +189,16 @@ export const NewScanPage: React.FC = () => {
             Upload raw side-scan sonar image files (swaths/waterfalls) collected via USV/AUV drone or towed fish. Run edge ONNX inference to localize ghost nets, marine debris, pipelines, and seafloor anomalies.
           </p>
         </div>
+
+        {isShowingActiveScanResult && (
+          <button
+            onClick={handleResetScan}
+            className="px-5 py-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold font-mono text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/25 transition-all hover:scale-105 shrink-0"
+          >
+            <UploadCloud className="w-4 h-4" />
+            <span>Upload New Sonar Scan</span>
+          </button>
+        )}
       </div>
 
       {/* 2. Error Message Alert */}
@@ -196,10 +216,10 @@ export const NewScanPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Image Ingestion or Result Viewer (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
-          {currentScan && previewUrl ? (
+          {isShowingActiveScanResult ? (
             <DetectionViewer
-              scan={currentScan}
-              previewUrl={previewUrl}
+              scan={currentScan!}
+              previewUrl={previewUrl || currentScan!.imageUrl || ''}
               onReset={handleResetScan}
             />
           ) : (

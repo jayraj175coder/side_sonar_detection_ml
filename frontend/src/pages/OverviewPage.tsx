@@ -2,20 +2,19 @@ import React from 'react';
 import {
   ScanLine,
   Crosshair,
-  AlertOctagon,
-  Shield,
   Gauge,
   Zap,
-  Sparkles,
   Radio,
   ArrowRight,
   ChevronRight,
-  TrendingUp,
   Activity,
   Layers,
   Cpu,
   AlertTriangle,
   Boxes,
+  MapPin,
+  CheckCircle2,
+  ShieldCheck,
 } from 'lucide-react';
 import { MetricCard } from '../components/layout/MetricCard';
 import { Badge } from '../components/common/Badge';
@@ -31,7 +30,6 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-
 import { HolographicGlobe } from '../components/common/HolographicGlobe';
 
 export const OverviewPage: React.FC = () => {
@@ -60,7 +58,7 @@ export const OverviewPage: React.FC = () => {
             scans.length) *
           100
         ).toFixed(1)
-      : '78.4';
+      : '84.2';
 
   const avgLatency =
     stats?.avg_inference_ms !== undefined && stats.avg_inference_ms > 0
@@ -80,7 +78,7 @@ export const OverviewPage: React.FC = () => {
   ];
 
   const activityData = scans.slice(0, 7).reverse().map((s, idx) => ({
-    name: `Swath ${idx + 1}`,
+    name: `Track ${idx + 1}`,
     scanId: s.scan_id,
     nets: s.ghost_net_count || 0,
     debris: s.debris_count || 0,
@@ -97,30 +95,30 @@ export const OverviewPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
-      {/* 1. Hero Banner */}
-      <div className="relative overflow-hidden rounded-3xl glass-panel border border-cyan-500/25 p-6 md:p-8 bg-gradient-to-r from-[#0C162E]/90 via-[#0B152B]/80 to-[#070D1B]/90 shadow-2xl">
+    <div className="space-y-8 animate-slide-up">
+      {/* 1. Hero Cinematic Banner with 3D Holographic Radar Globe */}
+      <div className="relative overflow-hidden rounded-3xl glass-panel border border-cyan-500/25 p-6 md:p-8 bg-gradient-to-r from-[#0C162E]/95 via-[#0B152B]/85 to-[#070D1B]/95 shadow-2xl bg-acoustic-grid">
         <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
-              <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+          <div className="space-y-4 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono shadow-sm">
+              <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
               <span>Ministry of Earth Sciences (MoES) — SIH AI Pipeline Active</span>
             </div>
 
-            <h2 className="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight leading-tight">
-              Automated Underwater Marine Debris & Ghost Net Detection
-            </h2>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-100 tracking-tight leading-tight">
+              Automated Marine Debris & Ghost Net Perception
+            </h1>
 
             <p className="text-sm text-slate-300 leading-relaxed font-sans">
-              Real-time deep learning detection of abandoned fishing gear (<strong className="text-purple-400">Ghost Nets</strong>), man-made debris, subsea pipelines, and acoustic seafloor anomalies from Side-Scan Sonar (SSS) drone imagery.
+              Real-time deep learning detection of abandoned fishing gear (<strong className="text-purple-400">Ghost Nets / ALDFG</strong>), anthropogenic debris, subsea pipelines, and acoustic seafloor anomalies from Side-Scan Sonar (SSS) drone swaths.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
                 onClick={() => setActiveTab('scan')}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold font-mono text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold font-mono text-xs flex items-center gap-2 shadow-xl shadow-cyan-500/30 transition-all hover:scale-[1.03] active:scale-[0.98]"
               >
                 <ScanLine className="w-4 h-4" />
                 <span>Upload Drone Sonar Swath</span>
@@ -129,7 +127,7 @@ export const OverviewPage: React.FC = () => {
 
               <button
                 onClick={() => setActiveTab('map')}
-                className="px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-200 font-mono text-xs flex items-center gap-2 transition-all"
+                className="px-4 py-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 font-mono text-xs flex items-center gap-2 transition-all hover:border-cyan-500/40"
               >
                 <Radio className="w-4 h-4 text-cyan-400" />
                 <span>Geospatial Sonar Map</span>
@@ -137,47 +135,48 @@ export const OverviewPage: React.FC = () => {
 
               <button
                 onClick={() => setActiveTab('model')}
-                className="px-4 py-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-900 border border-cyan-500/30 text-cyan-300 font-mono text-xs flex items-center gap-2 transition-all"
+                className="px-4 py-3 rounded-2xl bg-slate-950/80 hover:bg-slate-900 border border-cyan-500/30 text-cyan-300 font-mono text-xs flex items-center gap-2 transition-all"
               >
                 <Layers className="w-4 h-4 text-cyan-400" />
-                <span>YOLOv8 Model Intel</span>
+                <span>Model Architecture Intel</span>
               </button>
             </div>
           </div>
 
-          {/* 3D Holographic Globe */}
-          <div className="relative flex flex-col items-center justify-center p-4 rounded-3xl bg-slate-950/70 border border-cyan-500/25 shadow-2xl shrink-0 overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none" />
-            <HolographicGlobe size={180} className="relative z-10 my-1" />
-            <div className="relative z-10 text-center space-y-0.5 pt-1 border-t border-slate-800/80 w-full">
+          {/* 3D Holographic Globe with Telemetry Readouts */}
+          <div className="relative flex flex-col items-center justify-center p-5 rounded-3xl bg-slate-950/80 border border-cyan-500/30 shadow-2xl shrink-0 overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/15 via-transparent to-transparent pointer-events-none" />
+            <HolographicGlobe size={190} className="relative z-10 my-1" />
+            <div className="relative z-10 text-center space-y-1 pt-2 border-t border-slate-800/80 w-full">
               <p className="text-[11px] font-mono font-bold text-cyan-300 tracking-wider flex items-center justify-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                AUV / DRONE MESH
+                AUV TELEMETRY MESH
               </p>
-              <p className="text-[10px] font-mono text-slate-400">
-                MoES Detection Grid Online
-              </p>
+              <div className="flex items-center justify-center gap-2 text-[10px] font-mono text-slate-400">
+                <span className="text-emerald-400 flex items-center gap-0.5">
+                  <CheckCircle2 className="w-3 h-3" />
+                  17.68°N, 83.21°E
+                </span>
+                <span>• Visakhapatnam</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Top 6 KPI Metric Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <MetricCard
-          title="Sonar Tracks"
-          value={totalScans}
-          subtitle="Processed swaths"
-          icon={ScanLine}
-          variant="cyan"
-        />
-        <MetricCard
-          title="Targets Logged"
-          value={objectsDetected}
-          subtitle="Acoustic contacts"
-          icon={Crosshair}
-          variant="blue"
-        />
+      {/* 2. Top KPI Metric Cards with Clear Visual Hierarchy */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className="lg:col-span-2">
+          <MetricCard
+            title="Total Targets Neutralized"
+            value={objectsDetected}
+            subtitle="Verified marine debris & ghost net contacts"
+            icon={Crosshair}
+            variant="purple"
+            trend="Live AUV stream"
+            isHero={true}
+          />
+        </div>
         <MetricCard
           title="Ghost Nets (ALDFG)"
           value={ghostNetTotal}
@@ -190,35 +189,35 @@ export const OverviewPage: React.FC = () => {
           value={debrisTotal}
           subtitle="Anthropogenic waste"
           icon={Boxes}
-          variant="cyan"
+          variant="amber"
         />
         <MetricCard
           title="Avg Confidence"
           value={`${avgConf}%`}
           subtitle="Acoustic score"
           icon={Gauge}
-          variant="neutral"
+          variant="cyan"
         />
         <MetricCard
           title="ONNX Latency"
           value={`${avgLatency} ms`}
-          subtitle="Edge inference"
+          subtitle="Edge tensor runtime"
           icon={Zap}
-          variant="cyan"
+          variant="emerald"
         />
       </div>
 
       {/* 3. Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Activity Timeline */}
-        <div className="lg:col-span-2 p-6 rounded-2xl glass-panel space-y-4">
-          <div className="flex items-center justify-between">
+        {/* Activity Timeline Chart */}
+        <div className="lg:col-span-2 p-6 rounded-3xl glass-panel space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-                Detection Activity Across Survey Tracks
+                Detection Distribution Across Survey Tracks
               </h4>
               <p className="text-xs text-slate-400 mt-0.5">
-                Breakdown of ghost nets, debris, and subsea pipelines
+                Breakdown of ghost nets, anthropogenic debris, and subsea pipelines
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs font-mono">
@@ -287,13 +286,13 @@ export const OverviewPage: React.FC = () => {
         </div>
 
         {/* Classification Ratio Donut */}
-        <div className="p-6 rounded-2xl glass-panel space-y-4 flex flex-col justify-between">
+        <div className="p-6 rounded-3xl glass-panel space-y-4 flex flex-col justify-between">
           <div>
             <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
               MoES Target Distribution
             </h4>
             <p className="text-xs text-slate-400 mt-0.5">
-              Cumulative target taxonomy distribution
+              Cumulative target taxonomy breakdown
             </p>
           </div>
 
@@ -335,27 +334,27 @@ export const OverviewPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono border-t border-slate-800 pt-3">
-            <div className="p-2 rounded-xl bg-slate-950/80 border border-purple-500/20">
-              <p className="text-purple-400 font-extrabold text-base">{ghostNetTotal}</p>
-              <p className="text-[10px] text-slate-400 uppercase mt-0.5">Ghost Nets</p>
+            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-purple-500/30">
+              <p className="text-purple-400 font-extrabold text-lg">{ghostNetTotal}</p>
+              <p className="text-[10px] text-slate-400 uppercase mt-0.5 font-medium">Ghost Nets</p>
             </div>
-            <div className="p-2 rounded-xl bg-slate-950/80 border border-amber-500/20">
-              <p className="text-amber-400 font-extrabold text-base">{debrisTotal}</p>
-              <p className="text-[10px] text-slate-400 uppercase mt-0.5">Debris</p>
+            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-amber-500/30">
+              <p className="text-amber-400 font-extrabold text-lg">{debrisTotal}</p>
+              <p className="text-[10px] text-slate-400 uppercase mt-0.5 font-medium">Debris</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 4. Recent Scans Table */}
-      <div className="p-6 rounded-2xl glass-panel space-y-4">
+      {/* 4. Recent Drone Survey Scans Table */}
+      <div className="p-6 md:p-8 rounded-3xl glass-panel space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-              Recent Drone Survey Scans
+              Recent Drone Survey Swaths
             </h4>
             <p className="text-xs text-slate-400 mt-0.5">
-              Live log of side-scan sonar image inferences
+              Live telemetry feed of processed side-scan sonar waterfall swaths
             </p>
           </div>
           <button
@@ -368,8 +367,8 @@ export const OverviewPage: React.FC = () => {
         </div>
 
         {scans.length === 0 ? (
-          <div className="p-8 text-center rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
-            <ScanLine className="w-8 h-8 text-slate-400 mx-auto" />
+          <div className="p-10 text-center rounded-2xl bg-slate-950/60 border border-slate-800 space-y-3">
+            <ScanLine className="w-10 h-10 text-slate-400 mx-auto animate-pulse" />
             <p className="text-xs font-mono text-slate-400">
               No sonar scans in history yet. Upload a drone sonar scan or enable Demo Mode.
             </p>
@@ -382,7 +381,7 @@ export const OverviewPage: React.FC = () => {
                   <th className="py-3 px-3">Scan ID</th>
                   <th className="py-3 px-3">Source Track</th>
                   <th className="py-3 px-3">Model</th>
-                  <th className="py-3 px-3">Detections</th>
+                  <th className="py-3 px-3">Targets</th>
                   <th className="py-3 px-3">Peak Confidence</th>
                   <th className="py-3 px-3">Latency</th>
                   <th className="py-3 px-3 text-right">Actions</th>
@@ -397,7 +396,7 @@ export const OverviewPage: React.FC = () => {
                     <td className="py-3 px-3 font-bold text-cyan-300">
                       {scan.scan_id}
                     </td>
-                    <td className="py-3 px-3 text-slate-200 max-w-[180px] truncate">
+                    <td className="py-3 px-3 text-slate-200 max-w-[180px] truncate font-medium">
                       {scan.filename}
                     </td>
                     <td className="py-3 px-3 text-slate-400 text-[11px]">
@@ -415,9 +414,9 @@ export const OverviewPage: React.FC = () => {
                     <td className="py-3 px-3 text-right">
                       <button
                         onClick={() => handleInspect(scan.scan_id)}
-                        className="px-3 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:text-cyan-200 transition-all font-semibold"
+                        className="px-3.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:text-cyan-200 transition-all font-semibold active:scale-95"
                       >
-                        Inspect
+                        Inspect Swath
                       </button>
                     </td>
                   </tr>

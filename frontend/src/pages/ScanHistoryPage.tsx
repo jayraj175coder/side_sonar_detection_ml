@@ -10,6 +10,10 @@ import {
   ScanLine,
   ChevronRight,
   ArrowUpDown,
+  AlertTriangle,
+  Boxes,
+  Layers,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Badge } from '../components/common/Badge';
@@ -18,7 +22,7 @@ import { PredictionResponse } from '../types';
 export const ScanHistoryPage: React.FC = () => {
   const { scans, setCurrentScan, setActiveTab, deleteScan } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterClass, setFilterClass] = useState<'ALL' | 'MILCO' | 'NOMBO'>('ALL');
+  const [filterClass, setFilterClass] = useState<'ALL' | 'GHOST_NET' | 'DEBRIS' | 'PIPELINE'>('ALL');
   const [sortBy, setSortBy] = useState<'date' | 'detections' | 'confidence'>('date');
 
   const filteredScans = useMemo(() => {
@@ -30,8 +34,9 @@ export const ScanHistoryPage: React.FC = () => {
 
         if (!matchesSearch) return false;
 
-        if (filterClass === 'MILCO' && scan.milco_count === 0) return false;
-        if (filterClass === 'NOMBO' && scan.nombo_count === 0) return false;
+        if (filterClass === 'GHOST_NET' && (scan.ghost_net_count || 0) === 0) return false;
+        if (filterClass === 'DEBRIS' && (scan.debris_count || 0) === 0) return false;
+        if (filterClass === 'PIPELINE' && (scan.pipeline_count || 0) === 0) return false;
 
         return true;
       })
@@ -60,9 +65,9 @@ export const ScanHistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-slide-up">
       {/* 1. Top Search & Filter Bar */}
-      <div className="p-4 rounded-2xl glass-panel flex flex-wrap items-center justify-between gap-4">
+      <div className="p-4 rounded-3xl glass-panel flex flex-wrap items-center justify-between gap-4">
         {/* Search Input */}
         <div className="relative flex-1 min-w-[240px]">
           <Search className="w-4 h-4 text-cyan-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -76,7 +81,7 @@ export const ScanHistoryPage: React.FC = () => {
         </div>
 
         {/* Filter Badges */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <div className="flex rounded-xl bg-slate-950/80 border border-slate-800 p-0.5 text-xs font-mono">
             <button
               onClick={() => setFilterClass('ALL')}
@@ -86,27 +91,40 @@ export const ScanHistoryPage: React.FC = () => {
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              All
+              All ({scans.length})
             </button>
             <button
-              onClick={() => setFilterClass('MILCO')}
-              className={`px-3 py-1 rounded-lg transition-all ${
-                filterClass === 'MILCO'
-                  ? 'bg-red-500/20 text-red-300 font-bold border border-red-500/30'
-                  : 'text-slate-400 hover:text-slate-200'
+              onClick={() => setFilterClass('GHOST_NET')}
+              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all ${
+                filterClass === 'GHOST_NET'
+                  ? 'bg-purple-950/80 text-purple-300 font-bold border border-purple-500/40'
+                  : 'text-slate-400 hover:text-purple-300'
               }`}
             >
-              MILCO Only
+              <AlertTriangle className="w-3 h-3 text-purple-400" />
+              <span>Ghost Nets</span>
             </button>
             <button
-              onClick={() => setFilterClass('NOMBO')}
-              className={`px-3 py-1 rounded-lg transition-all ${
-                filterClass === 'NOMBO'
-                  ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30'
-                  : 'text-slate-400 hover:text-slate-200'
+              onClick={() => setFilterClass('DEBRIS')}
+              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all ${
+                filterClass === 'DEBRIS'
+                  ? 'bg-amber-950/80 text-amber-300 font-bold border border-amber-500/40'
+                  : 'text-slate-400 hover:text-amber-300'
               }`}
             >
-              NOMBO Only
+              <Boxes className="w-3 h-3 text-amber-400" />
+              <span>Debris</span>
+            </button>
+            <button
+              onClick={() => setFilterClass('PIPELINE')}
+              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all ${
+                filterClass === 'PIPELINE'
+                  ? 'bg-blue-950/80 text-blue-300 font-bold border border-blue-500/40'
+                  : 'text-slate-400 hover:text-blue-300'
+              }`}
+            >
+              <Layers className="w-3 h-3 text-blue-400" />
+              <span>Pipelines</span>
             </button>
           </div>
 
@@ -116,9 +134,9 @@ export const ScanHistoryPage: React.FC = () => {
             onChange={(e: any) => setSortBy(e.target.value)}
             className="px-3 py-2 text-xs font-mono rounded-xl bg-slate-950/80 border border-slate-800 text-slate-300 focus:outline-none focus:border-cyan-400"
           >
-            <option value="date">Sort: Newest</option>
-            <option value="detections">Sort: Detections</option>
-            <option value="confidence">Sort: Peak Conf</option>
+            <option value="date">Sort: Newest First</option>
+            <option value="detections">Sort: Highest Targets</option>
+            <option value="confidence">Sort: Peak Confidence</option>
           </select>
         </div>
       </div>
@@ -126,8 +144,8 @@ export const ScanHistoryPage: React.FC = () => {
       {/* 2. Main Scans Table */}
       <div className="rounded-3xl glass-panel overflow-hidden shadow-2xl">
         {filteredScans.length === 0 ? (
-          <div className="p-12 text-center space-y-4">
-            <History className="w-12 h-12 text-slate-400 mx-auto" />
+          <div className="p-14 text-center space-y-4">
+            <History className="w-12 h-12 text-slate-400 mx-auto animate-pulse" />
             <div>
               <p className="text-base font-extrabold text-slate-200 font-mono">
                 No Scan Records Found
@@ -153,7 +171,7 @@ export const ScanHistoryPage: React.FC = () => {
                   <th className="py-3.5 px-4">Source Track</th>
                   <th className="py-3.5 px-4">Date & Time</th>
                   <th className="py-3.5 px-4">Targets</th>
-                  <th className="py-3.5 px-4">MILCO / NOMBO</th>
+                  <th className="py-3.5 px-4">Target Breakdown</th>
                   <th className="py-3.5 px-4">Peak Confidence</th>
                   <th className="py-3.5 px-4">Geolocation</th>
                   <th className="py-3.5 px-4">Status</th>
@@ -174,7 +192,7 @@ export const ScanHistoryPage: React.FC = () => {
                       <td className="py-3.5 px-4 font-bold text-cyan-300">
                         {scan.scan_id}
                       </td>
-                      <td className="py-3.5 px-4 font-medium text-slate-200 max-w-[200px] truncate">
+                      <td className="py-3.5 px-4 font-medium text-slate-200 max-w-[180px] truncate">
                         {scan.filename}
                       </td>
                       <td className="py-3.5 px-4 text-slate-400 text-[11px]">
@@ -187,13 +205,29 @@ export const ScanHistoryPage: React.FC = () => {
                       <td className="py-3.5 px-4 font-extrabold text-slate-100">
                         {scan.total_detections}
                       </td>
-                      <td className="py-3.5 px-4 space-x-1.5">
-                        <span className="px-2 py-0.5 rounded-md bg-red-500/10 border border-red-500/30 text-red-400 font-bold">
-                          {scan.milco_count} MILCO
-                        </span>
-                        <span className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold">
-                          {scan.nombo_count} NOMBO
-                        </span>
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {(scan.ghost_net_count || 0) > 0 && (
+                            <span className="px-2 py-0.5 rounded-md bg-purple-950/80 border border-purple-500/30 text-purple-300 font-bold text-[10px]">
+                              {scan.ghost_net_count} Net
+                            </span>
+                          )}
+                          {(scan.debris_count || 0) > 0 && (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/30 text-amber-300 font-bold text-[10px]">
+                              {scan.debris_count} Debris
+                            </span>
+                          )}
+                          {(scan.pipeline_count || 0) > 0 && (
+                            <span className="px-2 py-0.5 rounded-md bg-blue-950/80 border border-blue-500/30 text-blue-300 font-bold text-[10px]">
+                              {scan.pipeline_count} Pipe
+                            </span>
+                          )}
+                          {(scan.milco_count || 0) > 0 && (
+                            <span className="px-2 py-0.5 rounded-md bg-red-950/80 border border-red-500/30 text-red-300 font-bold text-[10px]">
+                              {scan.milco_count} MILCO
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3.5 px-4 font-bold text-slate-100">
                         {(scan.highest_confidence * 100).toFixed(1)}%
@@ -204,17 +238,20 @@ export const ScanHistoryPage: React.FC = () => {
                             <MapPin className="w-3 h-3" />
                             {scan.location.latitude?.toFixed(2)}°,{' '}
                             {scan.location.longitude?.toFixed(2)}°
+                            {scan.geotag_source === 'ping_log' && (
+                              <span className="text-[9px] px-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                                LOG
+                              </span>
+                            )}
                           </span>
                         ) : (
                           <span className="text-slate-400">Unavailable</span>
                         )}
                       </td>
                       <td className="py-3.5 px-4">
-                        <Badge
-                          type="STATUS"
-                          label={scan.status}
-                          size="sm"
-                        />
+                        <span className="px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
+                          COMPLETED
+                        </span>
                       </td>
                       <td className="py-3.5 px-4 text-right space-x-2">
                         <button

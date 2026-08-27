@@ -20,8 +20,8 @@ import {
   AlertTriangle,
   Layers,
   ShieldCheck,
-  FileSpreadsheet,
   CheckCircle2,
+  Maximize2,
 } from 'lucide-react';
 import { PredictionResponse, Detection } from '../../types';
 import { Badge } from '../common/Badge';
@@ -45,6 +45,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   const [activeThreshold, setActiveThreshold] = useState<number>(
     scan.confidence_threshold || 0.25
   );
+  const [hoveredDetId, setHoveredDetId] = useState<string | null>(null);
   const [selectedDetId, setSelectedDetId] = useState<string | null>(null);
 
   const visibleDetections = scan.detections.filter(
@@ -96,7 +97,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-slide-up">
       {/* 1. Top Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div className="p-4 rounded-2xl glass-panel flex items-center gap-3">
@@ -207,9 +208,9 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
       </div>
 
       {/* 2. Interactive Inspection Canvas */}
-      <div className="rounded-3xl glass-panel overflow-hidden shadow-2xl border border-cyan-500/20">
+      <div className="rounded-3xl glass-panel overflow-hidden shadow-2xl border border-cyan-500/25">
         {/* Canvas Toolbar */}
-        <div className="p-3.5 bg-[#080F22]/90 backdrop-blur border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div className="p-3.5 bg-[#080F22]/95 backdrop-blur border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
           {/* Dynamic Confidence Slider & Presets */}
           <div className="flex items-center gap-2.5 flex-wrap">
             <span className="text-xs font-mono text-slate-400">Model Cutoff:</span>
@@ -327,7 +328,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               className="max-h-[520px] w-auto object-contain block pointer-events-none"
             />
 
-            {/* SVG Bounding Box Layer */}
+            {/* SVG Bounding Box Layer with Animated Staggered Draw-In */}
             {showBoxes && (
               <svg
                 viewBox={`0 0 ${scan.image_width} ${scan.image_height}`}
@@ -336,13 +337,15 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               >
                 {visibleDetections.map((det) => {
                   const b = det.bbox;
-                  const isSelected = selectedDetId === det.id;
+                  const isSelected = selectedDetId === det.id || hoveredDetId === det.id;
                   const strokeColor = getColorForClass(det.type);
 
                   return (
                     <g
                       key={det.id}
                       onClick={() => setSelectedDetId(det.id)}
+                      onMouseEnter={() => setHoveredDetId(det.id)}
+                      onMouseLeave={() => setHoveredDetId(null)}
                       className="cursor-pointer group"
                     >
                       {/* Bounding Box Rectangle */}
@@ -356,7 +359,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                         stroke={strokeColor}
                         strokeWidth={isSelected ? 3.5 : 2}
                         strokeDasharray={isSelected ? '4 2' : 'none'}
-                        className="transition-all"
+                        className="transition-all animate-box-draw"
                       />
 
                       {/* Pill Label */}
@@ -395,7 +398,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
 
         {/* Status Strip */}
         <div className="p-3 bg-[#060B18] border-t border-slate-800 flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 gap-3">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <span>Dimensions: {scan.image_width} × {scan.image_height} px</span>
             <span>Active Targets: <strong className="text-cyan-300">{visibleDetections.length}</strong></span>
             {scan.location && scan.location.latitude && (
@@ -427,7 +430,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Click any target row to inspect coordinates and noise filter verification
+              Hover or click any target row to highlight on the swath canvas
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -501,7 +504,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               </thead>
               <tbody className="divide-y divide-slate-800/60">
                 {visibleDetections.map((det) => {
-                  const isSelected = selectedDetId === det.id;
+                  const isSelected = selectedDetId === det.id || hoveredDetId === det.id;
                   const isGhostNet = det.type === 'ghost_net_aldfg';
                   const isDebris = det.type === 'anthropogenic_debris';
                   const isPipeline = det.type === 'pipeline_hazard';
@@ -510,8 +513,10 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                     <tr
                       key={det.id}
                       onClick={() => setSelectedDetId(det.id)}
-                      className={`hover:bg-cyan-950/20 cursor-pointer transition-colors ${
-                        isSelected ? 'bg-cyan-950/40 text-cyan-200' : 'text-slate-300'
+                      onMouseEnter={() => setHoveredDetId(det.id)}
+                      onMouseLeave={() => setHoveredDetId(null)}
+                      className={`hover:bg-cyan-950/30 cursor-pointer transition-colors ${
+                        isSelected ? 'bg-cyan-950/50 text-cyan-200 ring-1 ring-cyan-500/30' : 'text-slate-300'
                       }`}
                     >
                       <td className="py-3 px-3 text-slate-400 font-semibold">
@@ -524,8 +529,18 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                           size="sm"
                         />
                       </td>
-                      <td className="py-3 px-3 font-bold text-slate-100">
-                        {(det.confidence * 100).toFixed(1)}%
+                      <td className="py-3 px-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-12 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div
+                              className="bg-cyan-400 h-full rounded-full"
+                              style={{ width: `${det.confidence * 100}%` }}
+                            />
+                          </div>
+                          <span className="font-bold text-slate-100">
+                            {(det.confidence * 100).toFixed(1)}%
+                          </span>
+                        </div>
                       </td>
                       <td className="py-3 px-3 text-slate-400 text-[11px]">
                         [{det.bbox.x1.toFixed(0)}, {det.bbox.y1.toFixed(0)},{' '}

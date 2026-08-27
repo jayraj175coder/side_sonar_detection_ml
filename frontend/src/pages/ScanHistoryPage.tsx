@@ -213,7 +213,6 @@ export const ScanHistoryPage: React.FC = () => {
                         <Badge
                           type="STATUS"
                           label={scan.status}
-                          variant="success"
                           size="sm"
                         />
                       </td>

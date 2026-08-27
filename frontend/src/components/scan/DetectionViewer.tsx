@@ -16,6 +16,9 @@ import {
   Info,
   Activity,
   Cpu,
+  Boxes,
+  AlertTriangle,
+  Layers,
 } from 'lucide-react';
 import { PredictionResponse, Detection } from '../../types';
 import { Badge } from '../common/Badge';
@@ -45,6 +48,12 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
     (d) => d.confidence >= activeThreshold
   );
 
+  const isV2 = scan.model_version === 'v2' || scan.model_name?.includes('Marine-Debris');
+
+  const ghostNetCount = visibleDetections.filter((d) => d.type === 'ghost_net_aldfg').length;
+  const debrisCount = visibleDetections.filter((d) => d.type === 'anthropogenic_debris').length;
+  const pipelineCount = visibleDetections.filter((d) => d.type === 'pipeline_hazard').length;
+  const anomalyCount = visibleDetections.filter((d) => d.type === 'seafloor_anomaly').length;
   const milcoCount = visibleDetections.filter((d) => d.type === 'MILCO').length;
   const nomboCount = visibleDetections.filter((d) => d.type === 'NOMBO').length;
 
@@ -73,6 +82,10 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   };
 
   const getColorForClass = (type: string) => {
+    if (type === 'ghost_net_aldfg') return '#A855F7'; // Purple
+    if (type === 'anthropogenic_debris') return '#F59E0B'; // Amber
+    if (type === 'pipeline_hazard') return '#3B82F6'; // Blue
+    if (type === 'seafloor_anomaly') return '#06B6D4'; // Cyan
     if (type === 'MILCO') return '#EF4444'; // Red
     if (type === 'NOMBO') return '#06B6D4'; // Cyan
     return '#38BDF8';
@@ -96,33 +109,67 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl glass-panel border-red-500/30 flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400">
-            <AlertOctagon className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[10px] font-mono font-semibold uppercase text-red-400">
-              MILCO Mine Contacts
-            </p>
-            <p className="text-2xl font-extrabold text-red-400 font-mono">
-              {milcoCount}
-            </p>
-          </div>
-        </div>
+        {isV2 ? (
+          <>
+            <div className="p-4 rounded-2xl glass-panel border-purple-500/30 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-purple-950/60 border border-purple-500/40 text-purple-400">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-semibold uppercase text-purple-400">
+                  Ghost Nets (ALDFG)
+                </p>
+                <p className="text-2xl font-extrabold text-purple-400 font-mono">
+                  {ghostNetCount}
+                </p>
+              </div>
+            </div>
 
-        <div className="p-4 rounded-2xl glass-panel border-cyan-500/30 flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">
-            <Shield className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[10px] font-mono font-semibold uppercase text-cyan-400">
-              NOMBO Obstacles
-            </p>
-            <p className="text-2xl font-extrabold text-cyan-400 font-mono">
-              {nomboCount}
-            </p>
-          </div>
-        </div>
+            <div className="p-4 rounded-2xl glass-panel border-amber-500/30 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-950/60 border border-amber-500/40 text-amber-400">
+                <Boxes className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-semibold uppercase text-amber-400">
+                  Marine Debris
+                </p>
+                <p className="text-2xl font-extrabold text-amber-400 font-mono">
+                  {debrisCount}
+                </p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="p-4 rounded-2xl glass-panel border-red-500/30 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400">
+                <AlertOctagon className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-semibold uppercase text-red-400">
+                  MILCO Contacts
+                </p>
+                <p className="text-2xl font-extrabold text-red-400 font-mono">
+                  {milcoCount}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl glass-panel border-cyan-500/30 flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-400">
+                <Shield className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-mono font-semibold uppercase text-cyan-400">
+                  NOMBO Obstacles
+                </p>
+                <p className="text-2xl font-extrabold text-cyan-400 font-mono">
+                  {nomboCount}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="p-4 rounded-2xl glass-panel flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300">
@@ -173,14 +220,14 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                 25%
               </button>
               <button
-                onClick={() => setActiveThreshold(0.05)}
+                onClick={() => setActiveThreshold(0.08)}
                 className={`px-2 py-0.5 rounded-md border transition-all ${
-                  activeThreshold === 0.05
+                  activeThreshold === 0.08
                     ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold'
                     : 'bg-slate-950 text-slate-400 border-slate-800'
                 }`}
               >
-                5%
+                8%
               </button>
               <button
                 onClick={() => setActiveThreshold(0.01)}
@@ -192,7 +239,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               >
                 1%
               </button>
-              {scan.highest_confidence > 0 && scan.highest_confidence < 0.25 && (
+              {scan.highest_confidence > 0 && scan.highest_confidence < activeThreshold && (
                 <button
                   onClick={handleAutoTune}
                   className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 font-bold flex items-center gap-1 hover:bg-cyan-500/20 transition-all"
@@ -322,7 +369,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                           <rect
                             x={0}
                             y={-14}
-                            width={det.type.length * 8 + 45}
+                            width={det.type.length * 7 + 42}
                             height={16}
                             fill={strokeColor}
                             rx={3}
@@ -335,7 +382,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                             fontFamily="JetBrains Mono, monospace"
                             fontWeight="bold"
                           >
-                            {det.type} {(det.confidence * 100).toFixed(0)}%
+                            {det.type.replace('_', ' ')} {(det.confidence * 100).toFixed(0)}%
                           </text>
                         </g>
                       )}
@@ -357,7 +404,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                 Acoustic Contact Register
               </h4>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-950 text-cyan-300 border border-slate-800">
-                Model: {scan.model_name || 'YOLOv8n-MILCO-NOMBO'}
+                Model: {scan.model_name || 'YOLOv8n-SIH-Marine-Debris-V2'}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -391,9 +438,9 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                   No model detections above {(activeThreshold * 100).toFixed(0)}% confidence.
                 </p>
                 <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                  The current baseline model (<strong className="text-cyan-300 font-mono">YOLOv8n MILCO/NOMBO</strong>) was trained on mine-countermeasure contacts and bottom obstacles.
+                  The model (<strong className="text-cyan-300 font-mono">{scan.model_name}</strong>) evaluated this swath.
                   {scan.highest_confidence > 0 ? (
-                    <> Highest model confidence detected in this scan is <strong className="text-amber-400 font-mono">{(scan.highest_confidence * 100).toFixed(1)}%</strong> (Potential low-confidence acoustic anomaly).</>
+                    <> Highest model confidence detected in this scan is <strong className="text-amber-400 font-mono">{(scan.highest_confidence * 100).toFixed(1)}%</strong> (Potential low-confidence anomaly).</>
                   ) : (
                     <> No candidate anomalies detected across the swath.</>
                   )}
@@ -427,15 +474,17 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                 <tr>
                   <th className="py-3 px-3">Target ID</th>
                   <th className="py-3 px-3">Classification</th>
-                  <th className="py-3 px-3">Model Confidence</th>
+                  <th className="py-3 px-3">Confidence</th>
                   <th className="py-3 px-3">Bounding Box [X1, Y1, X2, Y2]</th>
-                  <th className="py-3 px-3">Assessment</th>
+                  <th className="py-3 px-3">MoES Priority</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
                 {visibleDetections.map((det) => {
                   const isSelected = selectedDetId === det.id;
-                  const isMilco = det.type === 'MILCO';
+                  const isGhostNet = det.type === 'ghost_net_aldfg';
+                  const isDebris = det.type === 'anthropogenic_debris';
+                  const isPipeline = det.type === 'pipeline_hazard';
 
                   return (
                     <tr
@@ -463,13 +512,17 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                         {det.bbox.x2.toFixed(0)}, {det.bbox.y2.toFixed(0)}]
                       </td>
                       <td className="py-3 px-3">
-                        {isMilco ? (
-                          <span className="text-red-400 font-bold flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />
-                            CRITICAL CONTACT (MILCO)
+                        {isGhostNet ? (
+                          <span className="text-purple-400 font-bold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping" />
+                            CRITICAL ALDFG THREAT
                           </span>
+                        ) : isDebris ? (
+                          <span className="text-amber-400 font-medium">ANTHROPOGENIC DEBRIS</span>
+                        ) : isPipeline ? (
+                          <span className="text-blue-400 font-medium">SUBSEA INFRASTRUCTURE</span>
                         ) : (
-                          <span className="text-cyan-400 font-medium">BOTTOM OBSTACLE (NOMBO)</span>
+                          <span className="text-cyan-400 font-medium">SEAFLOOR ANOMALY</span>
                         )}
                       </td>
                     </tr>

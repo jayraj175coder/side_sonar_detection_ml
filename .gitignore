@@ -54,4 +54,9 @@ pnpm-debug.log*
 Thumbs.db
 *.swp
 
-# Note: backend/models/best.onnx is allowed for direct repository model loading
+# Training Artifacts
+runs/
+dataset_sih_v2/
+*.pt
+
+# Note: backend/models/best.onnx and marine_sonar_v2.onnx are tracked for live model deployment

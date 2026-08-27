@@ -77,7 +77,8 @@ class ApiClient {
     file: File,
     confidence?: number,
     latitude?: number,
-    longitude?: number
+    longitude?: number,
+    modelVersion: string = 'v2'
   ): Promise<PredictionResponse> {
     const formData = new FormData();
     formData.append('file', file);
@@ -91,6 +92,7 @@ class ApiClient {
     if (longitude !== undefined && longitude !== null) {
       formData.append('longitude', longitude.toString());
     }
+    formData.append('model_version', modelVersion);
 
     const response = await fetch(`${this.baseUrl}/api/predict`, {
       method: 'POST',

@@ -10,6 +10,7 @@ import {
   Zap,
   Cpu,
   Layers,
+  ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -34,6 +35,8 @@ export const Header: React.FC<HeaderProps> = ({
     modelInfo,
   } = useApp();
 
+  const isV2 = modelInfo?.version === 'v2' || modelInfo?.name?.includes('Marine-Debris');
+
   return (
     <header className="h-16 md:h-20 bg-[#070D1B]/80 backdrop-blur-2xl border-b border-cyan-500/10 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 shadow-md">
       {/* Title & Mobile Toggle */}
@@ -54,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
             </h1>
             {currentScan && (
               <span className="hidden sm:inline-flex text-[11px] font-mono px-2 py-0.5 rounded-md bg-cyan-950/60 text-cyan-300 border border-cyan-500/30">
-                Active: {currentScan.scan_id}
+                Scan: {currentScan.scan_id}
               </span>
             )}
           </div>
@@ -72,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-cyan-500/30 shadow-inner">
           <Cpu className="w-3.5 h-3.5 text-cyan-400" />
           <span className="text-xs font-mono text-cyan-300 font-bold">
-            {modelInfo?.name ? 'YOLOv8n — MILCO/NOMBO Baseline' : 'YOLOv8n — MILCO/NOMBO Baseline'}
+            {isV2 ? 'YOLOv8n — SIH Marine Debris V2 (MoES)' : 'YOLOv8n — MILCO/NOMBO Baseline'}
           </span>
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
         </div>

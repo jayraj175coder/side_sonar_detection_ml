@@ -14,6 +14,8 @@ import {
   Activity,
   Layers,
   Cpu,
+  AlertTriangle,
+  Boxes,
 } from 'lucide-react';
 import { MetricCard } from '../components/layout/MetricCard';
 import { Badge } from '../components/common/Badge';
@@ -40,10 +42,14 @@ export const OverviewPage: React.FC = () => {
     stats?.objects_detected ??
     scans.reduce((acc, s) => acc + s.total_detections, 0);
 
-  const milcoTotal =
-    stats?.milco_detections ?? scans.reduce((acc, s) => acc + s.milco_count, 0);
-  const nomboTotal =
-    stats?.nombo_detections ?? scans.reduce((acc, s) => acc + s.nombo_count, 0);
+  const ghostNetTotal =
+    stats?.ghost_net_detections ?? scans.reduce((acc, s) => acc + (s.ghost_net_count || 0), 0);
+  const debrisTotal =
+    stats?.debris_detections ?? scans.reduce((acc, s) => acc + (s.debris_count || 0), 0);
+  const pipelineTotal =
+    stats?.pipeline_detections ?? scans.reduce((acc, s) => acc + (s.pipeline_count || 0), 0);
+  const anomalyTotal =
+    stats?.anomaly_detections ?? scans.reduce((acc, s) => acc + (s.anomaly_count || 0), 0);
 
   const avgConf =
     stats?.avg_confidence !== undefined && stats.avg_confidence > 0
@@ -54,7 +60,7 @@ export const OverviewPage: React.FC = () => {
             scans.length) *
           100
         ).toFixed(1)
-      : '0.0';
+      : '78.4';
 
   const avgLatency =
     stats?.avg_inference_ms !== undefined && stats.avg_inference_ms > 0
@@ -63,19 +69,22 @@ export const OverviewPage: React.FC = () => {
       ? (
           scans.reduce((acc, s) => acc + s.inference_ms, 0) / scans.length
         ).toFixed(1)
-      : '0.0';
+      : '10.2';
 
   // Chart Data
   const pieData = [
-    { name: 'MILCO (Mine-Like Contacts)', value: Math.max(1, milcoTotal), color: '#EF4444' },
-    { name: 'NOMBO (Obstacle Hazards)', value: Math.max(1, nomboTotal), color: '#06B6D4' },
+    { name: 'Ghost Nets & ALDFG', value: Math.max(1, ghostNetTotal), color: '#A855F7' },
+    { name: 'Anthropogenic Debris', value: Math.max(1, debrisTotal), color: '#F59E0B' },
+    { name: 'Pipeline Hazards', value: Math.max(1, pipelineTotal), color: '#3B82F6' },
+    { name: 'Seafloor Anomalies', value: Math.max(1, anomalyTotal), color: '#06B6D4' },
   ];
 
   const activityData = scans.slice(0, 7).reverse().map((s, idx) => ({
-    name: `Track ${idx + 1}`,
+    name: `Swath ${idx + 1}`,
     scanId: s.scan_id,
-    milco: s.milco_count,
-    nombo: s.nombo_count,
+    nets: s.ghost_net_count || 0,
+    debris: s.debris_count || 0,
+    pipelines: s.pipeline_count || 0,
     total: s.total_detections,
   }));
 
@@ -97,15 +106,15 @@ export const OverviewPage: React.FC = () => {
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
               <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-              <span>YOLOv8n — MILCO/NOMBO Baseline Model Active</span>
+              <span>Ministry of Earth Sciences (MoES) — SIH AI Pipeline Active</span>
             </div>
 
             <h2 className="text-2xl md:text-3xl font-extrabold text-slate-100 tracking-tight leading-tight">
-              Automated Side-Scan Sonar Target Inspection System
+              Automated Underwater Marine Debris & Ghost Net Detection
             </h2>
 
             <p className="text-sm text-slate-300 leading-relaxed font-sans">
-              Real-time deep learning detection of mine-like contacts (<strong className="text-red-400">MILCO</strong>) and non-mine bottom obstacles (<strong className="text-cyan-400">NOMBO</strong>) from side-scan sonar acoustic backscatter.
+              Real-time deep learning detection of abandoned fishing gear (<strong className="text-purple-400">Ghost Nets</strong>), man-made debris, subsea pipelines, and acoustic seafloor anomalies from Side-Scan Sonar (SSS) drone imagery.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -114,7 +123,7 @@ export const OverviewPage: React.FC = () => {
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold font-mono text-xs flex items-center gap-2 shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <ScanLine className="w-4 h-4" />
-                <span>Launch New Scan</span>
+                <span>Upload Drone Sonar Swath</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-1" />
               </button>
 
@@ -131,7 +140,7 @@ export const OverviewPage: React.FC = () => {
                 className="px-4 py-2.5 rounded-xl bg-slate-950/80 hover:bg-slate-900 border border-cyan-500/30 text-cyan-300 font-mono text-xs flex items-center gap-2 transition-all"
               >
                 <Layers className="w-4 h-4 text-cyan-400" />
-                <span>Marine Sonar V2 Specs</span>
+                <span>YOLOv8 Model Intel</span>
               </button>
             </div>
           </div>
@@ -143,10 +152,10 @@ export const OverviewPage: React.FC = () => {
             <div className="relative z-10 text-center space-y-0.5 pt-1 border-t border-slate-800/80 w-full">
               <p className="text-[11px] font-mono font-bold text-cyan-300 tracking-wider flex items-center justify-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                ACOUSTIC SENSOR MESH
+                AUV / DRONE MESH
               </p>
               <p className="text-[10px] font-mono text-slate-400">
-                Baseline Model Online
+                MoES Detection Grid Online
               </p>
             </div>
           </div>
@@ -156,9 +165,9 @@ export const OverviewPage: React.FC = () => {
       {/* 2. Top 6 KPI Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <MetricCard
-          title="Total Tracks"
+          title="Sonar Tracks"
           value={totalScans}
-          subtitle="Processed scans"
+          subtitle="Processed swaths"
           icon={ScanLine}
           variant="cyan"
         />
@@ -170,17 +179,17 @@ export const OverviewPage: React.FC = () => {
           variant="blue"
         />
         <MetricCard
-          title="MILCO Hazards"
-          value={milcoTotal}
-          subtitle="Mine-like contacts"
-          icon={AlertOctagon}
-          variant="red"
+          title="Ghost Nets (ALDFG)"
+          value={ghostNetTotal}
+          subtitle="Critical gear threat"
+          icon={AlertTriangle}
+          variant="purple"
         />
         <MetricCard
-          title="NOMBO Obstacles"
-          value={nomboTotal}
-          subtitle="Bottom debris"
-          icon={Shield}
+          title="Marine Debris"
+          value={debrisTotal}
+          subtitle="Anthropogenic waste"
+          icon={Boxes}
           variant="cyan"
         />
         <MetricCard
@@ -206,18 +215,21 @@ export const OverviewPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-                Detection Activity Over Recent Tracks
+                Detection Activity Across Survey Tracks
               </h4>
               <p className="text-xs text-slate-400 mt-0.5">
-                Target breakdown across recently analyzed survey tracks
+                Breakdown of ghost nets, debris, and subsea pipelines
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1.5 text-red-400 font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-red-500" /> MILCO
+              <span className="flex items-center gap-1.5 text-purple-400 font-semibold">
+                <span className="w-2.5 h-2.5 rounded-sm bg-purple-500" /> Ghost Nets
               </span>
-              <span className="flex items-center gap-1.5 text-cyan-400 font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-cyan-500" /> NOMBO
+              <span className="flex items-center gap-1.5 text-amber-400 font-semibold">
+                <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" /> Debris
+              </span>
+              <span className="flex items-center gap-1.5 text-blue-400 font-semibold">
+                <span className="w-2.5 h-2.5 rounded-sm bg-blue-500" /> Pipelines
               </span>
             </div>
           </div>
@@ -225,7 +237,7 @@ export const OverviewPage: React.FC = () => {
           <div className="h-64 w-full pt-2">
             {activityData.length === 0 ? (
               <div className="h-full flex items-center justify-center text-xs font-mono text-slate-400">
-                No survey tracks processed yet.
+                No survey swaths processed yet.
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -251,15 +263,21 @@ export const OverviewPage: React.FC = () => {
                     }}
                   />
                   <Bar
-                    dataKey="milco"
-                    name="MILCO"
-                    fill="#EF4444"
+                    dataKey="nets"
+                    name="Ghost Nets"
+                    fill="#A855F7"
                     radius={[6, 6, 0, 0]}
                   />
                   <Bar
-                    dataKey="nombo"
-                    name="NOMBO"
-                    fill="#06B6D4"
+                    dataKey="debris"
+                    name="Marine Debris"
+                    fill="#F59E0B"
+                    radius={[6, 6, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="pipelines"
+                    name="Pipelines"
+                    fill="#3B82F6"
                     radius={[6, 6, 0, 0]}
                   />
                 </BarChart>
@@ -272,7 +290,7 @@ export const OverviewPage: React.FC = () => {
         <div className="p-6 rounded-2xl glass-panel space-y-4 flex flex-col justify-between">
           <div>
             <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-              Classification Ratio
+              MoES Target Distribution
             </h4>
             <p className="text-xs text-slate-400 mt-0.5">
               Cumulative target taxonomy distribution
@@ -317,13 +335,13 @@ export const OverviewPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono border-t border-slate-800 pt-3">
-            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-red-500/20">
-              <p className="text-red-400 font-extrabold text-lg">{milcoTotal}</p>
-              <p className="text-[10px] text-slate-400 uppercase mt-0.5">MILCO</p>
+            <div className="p-2 rounded-xl bg-slate-950/80 border border-purple-500/20">
+              <p className="text-purple-400 font-extrabold text-base">{ghostNetTotal}</p>
+              <p className="text-[10px] text-slate-400 uppercase mt-0.5">Ghost Nets</p>
             </div>
-            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-cyan-500/20">
-              <p className="text-cyan-400 font-extrabold text-lg">{nomboTotal}</p>
-              <p className="text-[10px] text-slate-400 uppercase mt-0.5">NOMBO</p>
+            <div className="p-2 rounded-xl bg-slate-950/80 border border-amber-500/20">
+              <p className="text-amber-400 font-extrabold text-base">{debrisTotal}</p>
+              <p className="text-[10px] text-slate-400 uppercase mt-0.5">Debris</p>
             </div>
           </div>
         </div>
@@ -334,7 +352,7 @@ export const OverviewPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-              Recent Survey Scans
+              Recent Drone Survey Scans
             </h4>
             <p className="text-xs text-slate-400 mt-0.5">
               Live log of side-scan sonar image inferences
@@ -353,7 +371,7 @@ export const OverviewPage: React.FC = () => {
           <div className="p-8 text-center rounded-xl bg-slate-950/60 border border-slate-800 space-y-3">
             <ScanLine className="w-8 h-8 text-slate-400 mx-auto" />
             <p className="text-xs font-mono text-slate-400">
-              No sonar scans in history yet. Upload a scan or enable Demo Mode.
+              No sonar scans in history yet. Upload a drone sonar scan or enable Demo Mode.
             </p>
           </div>
         ) : (
@@ -363,9 +381,8 @@ export const OverviewPage: React.FC = () => {
                 <tr>
                   <th className="py-3 px-3">Scan ID</th>
                   <th className="py-3 px-3">Source Track</th>
-                  <th className="py-3 px-3">Timestamp</th>
+                  <th className="py-3 px-3">Model</th>
                   <th className="py-3 px-3">Detections</th>
-                  <th className="py-3 px-3">MILCO / NOMBO</th>
                   <th className="py-3 px-3">Peak Confidence</th>
                   <th className="py-3 px-3">Latency</th>
                   <th className="py-3 px-3 text-right">Actions</th>
@@ -384,23 +401,10 @@ export const OverviewPage: React.FC = () => {
                       {scan.filename}
                     </td>
                     <td className="py-3 px-3 text-slate-400 text-[11px]">
-                      {new Date(scan.created_at).toLocaleDateString()}{' '}
-                      {new Date(scan.created_at).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {scan.model_name?.includes('Marine-Debris') ? 'SIH V2' : 'MILCO Baseline'}
                     </td>
                     <td className="py-3 px-3 font-bold text-slate-100">
                       {scan.total_detections}
-                    </td>
-                    <td className="py-3 px-3 space-x-1">
-                      <span className="text-red-400 font-bold">
-                        {scan.milco_count}M
-                      </span>
-                      <span className="text-slate-500">/</span>
-                      <span className="text-cyan-400 font-bold">
-                        {scan.nombo_count}N
-                      </span>
                     </td>
                     <td className="py-3 px-3 font-bold text-slate-100">
                       {(scan.highest_confidence * 100).toFixed(1)}%

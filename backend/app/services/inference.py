@@ -28,33 +28,44 @@ except ImportError:
 class SonarInferenceService:
     """
     Production ONNX Runtime Inference Engine.
-    Executes real deep-learning inference using trained YOLOv8n ONNX model.
-    Dynamically extracts classes from ONNX metadata without label fabrication.
+    Executes real deep-learning inference using trained YOLOv8n ONNX models.
+    Supports SIH Marine Debris V2 and Baseline models dynamically.
     """
 
-    def __init__(self, model_path: Optional[Path] = None):
-        self.model_path = model_path or settings.resolved_model_path
-        self.input_size = settings.INPUT_SIZE
+    def __init__(self):
+        self.input_size = 640
+        self.v2_model_path = Path("backend/models/marine_sonar_v2.onnx")
+        self.baseline_model_path = Path("backend/models/best.onnx")
+        
+        # Default to V2 if available, else fallback to baseline
+        if self.v2_model_path.exists() and self.v2_model_path.is_file():
+            self.active_path = self.v2_model_path
+            self.model_version = "v2"
+            self.model_name = "YOLOv8n-SIH-Marine-Debris-V2"
+        else:
+            self.active_path = self.baseline_model_path
+            self.model_version = "baseline"
+            self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO"
+
         self.session: Optional[Any] = None
         self.input_name: Optional[str] = None
-        self.classes: Dict[int, str] = {1: "MILCO", 2: "NOMBO"}
-        self.model_version = "baseline"
-        self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO"
-        self._load_session_if_available()
+        self.classes: Dict[int, str] = {}
+        self._load_session(self.active_path)
 
-    def _load_session_if_available(self) -> bool:
+    def _load_session(self, path: Path) -> bool:
         if not ORT_AVAILABLE:
             return False
-        if self.model_path.exists() and self.model_path.is_file():
+        if path.exists() and path.is_file():
             try:
                 opts = ort.SessionOptions()
                 opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
                 self.session = ort.InferenceSession(
-                    str(self.model_path),
+                    str(path),
                     sess_options=opts,
                     providers=["CPUExecutionProvider"],
                 )
                 self.input_name = self.session.get_inputs()[0].name
+                self.active_path = path
                 self._extract_metadata()
                 return True
             except Exception:
@@ -73,24 +84,40 @@ class SonarInferenceService:
             if "names" in custom_props:
                 raw_names = custom_props["names"]
                 parsed_names = ast.literal_eval(raw_names)
-                # Filter to valid named classes (e.g. {1: 'MILCO', 2: 'NOMBO'})
                 valid_classes = {}
                 for k, v in parsed_names.items():
-                    if str(v) not in ["0", ""]:
-                        valid_classes[int(k)] = str(v)
+                    class_name = str(v).strip()
+                    if class_name not in ["0", ""]:
+                        valid_classes[int(k)] = class_name
                 if valid_classes:
                     self.classes = valid_classes
         except Exception:
             pass
 
+    def switch_model(self, version: str) -> bool:
+        """Allows dynamic switching between SIH V2 and Baseline model."""
+        if version == "baseline" and self.baseline_model_path.exists():
+            self.model_version = "baseline"
+            self.model_name = "YOLOv8n-Sonar-MILCO-NOMBO"
+            return self._load_session(self.baseline_model_path)
+        elif self.v2_model_path.exists():
+            self.model_version = "v2"
+            self.model_name = "YOLOv8n-SIH-Marine-Debris-V2"
+            return self._load_session(self.v2_model_path)
+        return False
+
     def is_model_loaded(self) -> bool:
         if self.session is None:
-            return self._load_session_if_available()
+            return self._load_session(self.active_path)
         return True
 
-    def is_v2_installed(self) -> bool:
-        v2_path = self.model_path.parent / "marine_sonar_v2.onnx"
-        return v2_path.exists() and v2_path.is_file()
+    def get_available_models(self) -> List[str]:
+        models = []
+        if self.v2_model_path.exists():
+            models.append("marine_sonar_v2")
+        if self.baseline_model_path.exists():
+            models.append("baseline")
+        return models
 
     def get_model_info(self) -> ModelInfo:
         return ModelInfo(
@@ -100,15 +127,14 @@ class SonarInferenceService:
             classes=list(self.classes.values()),
             input_size=self.input_size,
             model_loaded=self.is_model_loaded(),
-            model_path=str(self.model_path),
-            is_v2_available=self.is_v2_installed(),
+            model_path=str(self.active_path),
+            available_models=self.get_available_models(),
             metrics=ValidationMetrics(),
         )
 
     def _preprocess_image(
         self, image: Image.Image
     ) -> Tuple[np.ndarray, float, float, float, int, int]:
-        """Letterboxes the PIL Image to 640x640 preserving aspect ratio."""
         orig_w, orig_h = image.size
         target_size = self.input_size
 
@@ -179,10 +205,6 @@ class SonarInferenceService:
         orig_h: int,
         confidence_threshold: float,
     ) -> Tuple[List[Detection], float]:
-        """
-        Parses YOLOv8 output tensor [1, 4 + num_classes, 8400].
-        Evaluates exact model classes (MILCO, NOMBO) without label fabrication.
-        """
         output = np.squeeze(output_tensor, axis=0)
         if output.shape[0] < output.shape[1]:
             output = np.transpose(output, (1, 0))
@@ -235,7 +257,7 @@ class SonarInferenceService:
         detections = []
         for idx_num, idx in enumerate(keep_indices, start=1):
             class_idx = int(classes_np[idx])
-            class_name = self.classes.get(class_idx, "MILCO")
+            class_name = self.classes.get(class_idx, "target")
             conf_score = round(float(scores_np[idx]), 3)
             tier = "HIGH" if conf_score >= 0.70 else "MEDIUM" if conf_score >= 0.35 else "LOW"
 
@@ -264,12 +286,16 @@ class SonarInferenceService:
         confidence_threshold: Optional[float] = None,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
+        model_version: Optional[str] = None,
     ) -> PredictionResponse:
         """Executes real ONNX inference on image bytes with user-supplied threshold."""
+        if model_version and model_version != self.model_version:
+            self.switch_model(model_version)
+
         if not self.is_model_loaded():
             raise FileNotFoundError(
-                f"Trained ONNX model is missing at '{self.model_path}'. "
-                "Place 'best.onnx' in 'backend/models/' to enable live ML inference."
+                f"Trained ONNX model is missing at '{self.active_path}'. "
+                "Place 'marine_sonar_v2.onnx' or 'best.onnx' in 'backend/models/'."
             )
 
         threshold = (
@@ -314,8 +340,13 @@ class SonarInferenceService:
 
         elapsed_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
 
-        milco_count = sum(1 for d in detections if d.type == "MILCO")
-        nombo_count = sum(1 for d in detections if d.type == "NOMBO")
+        ghost_net_cnt = sum(1 for d in detections if d.type == "ghost_net_aldfg")
+        debris_cnt = sum(1 for d in detections if d.type == "anthropogenic_debris")
+        pipeline_cnt = sum(1 for d in detections if d.type == "pipeline_hazard")
+        anomaly_cnt = sum(1 for d in detections if d.type == "seafloor_anomaly")
+        milco_cnt = sum(1 for d in detections if d.type == "MILCO")
+        nombo_cnt = sum(1 for d in detections if d.type == "NOMBO")
+
         highest_conf = (
             max((d.confidence for d in detections), default=peak_conf)
             if detections
@@ -338,8 +369,12 @@ class SonarInferenceService:
             created_at=created_at,
             confidence_threshold=threshold,
             total_detections=len(detections),
-            milco_count=milco_count,
-            nombo_count=nombo_count,
+            ghost_net_count=ghost_net_cnt,
+            debris_count=debris_cnt,
+            pipeline_count=pipeline_cnt,
+            anomaly_count=anomaly_cnt,
+            milco_count=milco_cnt,
+            nombo_count=nombo_cnt,
             highest_confidence=highest_conf,
             status="completed",
         )

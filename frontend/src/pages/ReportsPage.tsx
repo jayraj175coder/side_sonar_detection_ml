@@ -14,6 +14,7 @@ import {
   Sparkles,
   Layers,
   Info,
+  Boxes,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Badge } from '../components/common/Badge';
@@ -59,6 +60,7 @@ export const ReportsPage: React.FC = () => {
 
   const hasGeo =
     activeScan.location.latitude !== null && activeScan.location.longitude !== null;
+  const isV2 = activeScan.model_version === 'v2' || activeScan.model_name?.includes('Marine-Debris');
 
   return (
     <div className="space-y-6">
@@ -114,10 +116,10 @@ export const ReportsPage: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-xl md:text-2xl font-extrabold font-mono tracking-wider text-slate-100 print:text-black">
-                  SONARX ACOUSTIC INSPECTION BRIEFING
+                  MINISTRY OF EARTH SCIENCES (MoES) — SIH INSPECTION BRIEFING
                 </h2>
                 <p className="text-xs text-slate-400 print:text-gray-600 font-mono mt-0.5">
-                  Autonomous YOLOv8n Maritime Sonar Target Classification
+                  Automated Underwater Marine Debris, Ghost Net & Anomaly Detection System
                 </p>
               </div>
             </div>
@@ -131,8 +133,8 @@ export const ReportsPage: React.FC = () => {
               Generated: {new Date().toUTCString()}
             </p>
             <div className="pt-1">
-              <span className="px-2.5 py-1 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-[10px] font-bold">
-                BASELINE MODEL EVALUATION
+              <span className="px-2.5 py-1 rounded-md bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[10px] font-bold">
+                {isV2 ? 'SIH MARINE DEBRIS AI EVALUATION' : 'BASELINE SONAR EVALUATION'}
               </span>
             </div>
           </div>
@@ -142,7 +144,7 @@ export const ReportsPage: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono p-4 rounded-2xl bg-slate-950/80 print:bg-gray-100 border border-slate-800 print:border-gray-300">
           <div>
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
-              Source Track
+              Source Swath
             </p>
             <p className="font-bold text-slate-100 print:text-black truncate mt-0.5">
               {activeScan.filename}
@@ -150,15 +152,15 @@ export const ReportsPage: React.FC = () => {
           </div>
           <div>
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
-              Active Model
+              Perception Model
             </p>
             <p className="font-bold text-cyan-300 print:text-blue-600 mt-0.5">
-              {activeScan.model_name || 'YOLOv8n-MILCO-NOMBO'}
+              {activeScan.model_name || 'YOLOv8n-SIH-Marine-Debris-V2'}
             </p>
           </div>
           <div>
             <p className="text-slate-400 print:text-gray-600 text-[10px] uppercase">
-              Coordinates (WGS84)
+              Drone Coordinates (WGS84)
             </p>
             <p className="font-bold text-slate-100 print:text-black mt-0.5">
               {hasGeo
@@ -185,11 +187,11 @@ export const ReportsPage: React.FC = () => {
           <p className="text-xs text-slate-300 print:text-gray-800 leading-relaxed font-sans">
             {activeScan.total_detections > 0 ? (
               <>
-                Acoustic analysis of swath '{activeScan.filename}' identified {activeScan.total_detections} target(s) ({activeScan.milco_count} MILCO, {activeScan.nombo_count} NOMBO) above confidence threshold {activeScan.confidence_threshold.toFixed(2)}. Peak target confidence is {(activeScan.highest_confidence * 100).toFixed(1)}%.
+                Autonomous acoustic inspection of '{activeScan.filename}' identified {activeScan.total_detections} target contact(s) above confidence cutoff {activeScan.confidence_threshold.toFixed(2)}. Peak target confidence: {(activeScan.highest_confidence * 100).toFixed(1)}%.
               </>
             ) : (
               <>
-                Acoustic analysis of swath '{activeScan.filename}' at confidence cutoff {activeScan.confidence_threshold.toFixed(2)} returned 0 detections. Highest model confidence detected: {(activeScan.highest_confidence * 100).toFixed(1)}% (Potential low-confidence anomaly).
+                Acoustic analysis of '{activeScan.filename}' at confidence cutoff {activeScan.confidence_threshold.toFixed(2)} returned 0 detections above threshold. Peak model confidence: {(activeScan.highest_confidence * 100).toFixed(1)}% (Potential low-confidence anomaly).
               </>
             )}
           </p>
@@ -211,9 +213,9 @@ export const ReportsPage: React.FC = () => {
                   <tr>
                     <th className="py-2.5 px-3">Target ID</th>
                     <th className="py-2.5 px-3">Classification</th>
-                    <th className="py-2.5 px-3">Model Confidence</th>
+                    <th className="py-2.5 px-3">Confidence</th>
                     <th className="py-2.5 px-3">Bounding Box [X1, Y1, X2, Y2]</th>
-                    <th className="py-2.5 px-3">Assessment</th>
+                    <th className="py-2.5 px-3">Priority Level</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 print:divide-gray-200">
@@ -231,7 +233,7 @@ export const ReportsPage: React.FC = () => {
                         {det.bbox.x2.toFixed(0)}, {det.bbox.y2.toFixed(0)}]
                       </td>
                       <td className="py-2 px-3 text-[11px] font-bold text-cyan-400 print:text-blue-700">
-                        {det.type === 'MILCO' ? 'MINE CONTACT' : 'BOTTOM OBSTACLE'}
+                        {det.type === 'ghost_net_aldfg' ? 'CRITICAL GHOST NET' : det.type === 'anthropogenic_debris' ? 'MARINE DEBRIS' : det.type === 'pipeline_hazard' ? 'PIPELINE HAZARD' : 'ANOMALY'}
                       </td>
                     </tr>
                   ))}
@@ -248,14 +250,14 @@ export const ReportsPage: React.FC = () => {
             <span>CONFIDENTIALITY & SCIENTIFIC NOTICE</span>
           </div>
           <p className="leading-relaxed text-[11px]">
-            Detections are generated by the YOLOv8n MILCO/NOMBO baseline model. The Marine Sonar V2 pipeline is under active development to add dedicated pipeline, ALDFG, and shipwreck detection classes. Ground-truth field verification is required for all candidate contacts.
+            Generated by the AI-Powered Automated Underwater Marine Debris and Anomaly Detection System (Smart India Hackathon 2026 - Ministry of Earth Sciences). Ground-truth ROV/diver verification recommended for confirmed contact retrieval.
           </p>
         </div>
 
         {/* Document Footer */}
         <div className="border-t border-slate-800 pt-4 flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-400 print:text-gray-500">
-          <span>SONARX Target Inspection Platform</span>
-          <span>System ID: SNX-ENC-NODE-01</span>
+          <span>SONARX Marine Perception Platform</span>
+          <span>MoES Node: SNX-IND-NODE-01</span>
         </div>
       </div>
     </div>

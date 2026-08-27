@@ -26,10 +26,11 @@ import { useApp } from '../../context/AppContext';
 
 // Custom Tactical Pin Icons
 const createPinIcon = (scan: PredictionResponse, isSelected: boolean) => {
-  const isMilco = scan.milco_count > 0;
-  const primaryColor = isMilco ? '#EF4444' : '#06B6D4';
-  const glowColor = isMilco ? 'rgba(239, 68, 68, 0.4)' : 'rgba(6, 182, 212, 0.4)';
-  const pulseClass = isMilco ? 'animate-ping' : '';
+  const isGhostNet = (scan.ghost_net_count || 0) > 0;
+  const isMilco = (scan.milco_count || 0) > 0;
+  const primaryColor = isGhostNet ? '#A855F7' : isMilco ? '#EF4444' : '#06B6D4';
+  const glowColor = isGhostNet ? 'rgba(168, 85, 247, 0.4)' : isMilco ? 'rgba(239, 68, 68, 0.4)' : 'rgba(6, 182, 212, 0.4)';
+  const pulseClass = isGhostNet || isMilco ? 'animate-ping' : '';
   const scale = isSelected ? 1.25 : 1.0;
 
   const html = `
@@ -312,10 +313,12 @@ export const SonarMap: React.FC = () => {
                   <span className="font-mono text-sm font-bold text-cyan-300">
                     {selectedScan.scan_id}
                   </span>
-                  {selectedScan.milco_count > 0 ? (
+                  {(selectedScan.ghost_net_count || 0) > 0 ? (
+                    <Badge type="ghost_net_aldfg" label="GHOST NET" size="sm" />
+                  ) : (selectedScan.milco_count || 0) > 0 ? (
                     <Badge type="MILCO" label="MILCO DETECTED" size="sm" />
                   ) : (
-                    <Badge type="NOMBO" label="NOMBO CONTACTS" size="sm" />
+                    <Badge type="anthropogenic_debris" label="MARINE DEBRIS" size="sm" />
                   )}
                 </div>
                 <p className="text-xs text-slate-400 font-mono mt-0.5 truncate max-w-[280px]">

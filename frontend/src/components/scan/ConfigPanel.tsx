@@ -1,5 +1,5 @@
-import React from 'react';
-import { Sliders, MapPin, Cpu, Play, Navigation, Sparkles, Layers, Info } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sliders, MapPin, Cpu, Play, Navigation, Sparkles, Layers, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
 interface ConfigPanelProps {
@@ -9,6 +9,8 @@ interface ConfigPanelProps {
   setLatitude: (val: string) => void;
   longitude: string;
   setLongitude: (val: string) => void;
+  selectedModelVersion?: 'v2' | 'baseline';
+  setSelectedModelVersion?: (v: 'v2' | 'baseline') => void;
   onAnalyze: () => void;
   isAnalyzing: boolean;
   hasFile: boolean;
@@ -21,6 +23,8 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   setLatitude,
   longitude,
   setLongitude,
+  selectedModelVersion = 'v2',
+  setSelectedModelVersion,
   onAnalyze,
   isAnalyzing,
   hasFile,
@@ -32,7 +36,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
     setLongitude(lon.toString());
   };
 
-  const modelClasses = modelInfo?.classes?.length ? modelInfo.classes.join(', ') : 'MILCO, NOMBO';
+  const isV2 = selectedModelVersion === 'v2';
 
   return (
     <div className="space-y-5 p-6 rounded-3xl glass-panel">
@@ -47,28 +51,67 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         </span>
       </div>
 
-      {/* Model Spec Badge Box */}
-      <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2.5">
-        <div className="flex items-center justify-between text-xs font-mono">
+      {/* Model Selection Track Cards */}
+      <div className="space-y-2">
+        <label className="text-xs font-mono font-bold text-slate-300 flex items-center justify-between">
+          <span>AI Model Track</span>
+          <span className="text-[10px] text-cyan-400">MoES / SIH 2026</span>
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setSelectedModelVersion && setSelectedModelVersion('v2')}
+            className={`p-3 rounded-2xl border text-left transition-all ${
+              isV2
+                ? 'bg-cyan-950/60 border-cyan-500/60 text-cyan-200 shadow-md ring-1 ring-cyan-500/30'
+                : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:border-slate-700'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold font-mono text-cyan-300">SIH Marine Debris V2</span>
+              {isV2 && <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />}
+            </div>
+            <p className="text-[10px] text-slate-400 font-mono leading-tight">
+              Ghost Nets, ALDFG, Debris, Pipelines
+            </p>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSelectedModelVersion && setSelectedModelVersion('baseline')}
+            className={`p-3 rounded-2xl border text-left transition-all ${
+              !isV2
+                ? 'bg-red-950/60 border-red-500/60 text-red-200 shadow-md ring-1 ring-red-500/30'
+                : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:border-slate-700'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold font-mono text-red-300">MILCO Baseline</span>
+              {!isV2 && <CheckCircle2 className="w-3.5 h-3.5 text-red-400" />}
+            </div>
+            <p className="text-[10px] text-slate-400 font-mono leading-tight">
+              Mine Contacts & Bottom Obstacles
+            </p>
+          </button>
+        </div>
+      </div>
+
+      {/* Model Spec Box */}
+      <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800/80 space-y-2 text-xs font-mono">
+        <div className="flex items-center justify-between">
           <span className="text-slate-400 flex items-center gap-1.5">
             <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-            Loaded Model
+            Active Architecture
           </span>
           <span className="text-cyan-300 font-bold">
-            {modelInfo?.name || 'YOLOv8n — MILCO/NOMBO Baseline'}
+            {isV2 ? 'YOLOv8n-SIH-Marine-Debris-V2' : 'YOLOv8n-Sonar-MILCO-NOMBO'}
           </span>
         </div>
-        <div className="flex items-center justify-between text-xs font-mono text-slate-400">
-          <span>Input Resolution</span>
-          <span className="text-slate-200">640 × 640 px (RGB)</span>
-        </div>
-        <div className="flex items-center justify-between text-xs font-mono text-slate-400">
+        <div className="flex items-center justify-between text-slate-400">
           <span>Trained Classes</span>
-          <span className="text-slate-200 font-semibold">{modelClasses}</span>
-        </div>
-        <div className="pt-1.5 border-t border-slate-800/60 text-[11px] font-mono text-slate-400 flex items-center justify-between">
-          <span>SIH Marine Sonar V2:</span>
-          <span className="text-amber-400 font-semibold">In Development / Not Installed</span>
+          <span className="text-slate-200 font-semibold truncate max-w-[200px]">
+            {isV2 ? 'ghost_net, debris, pipeline, anomaly' : 'MILCO, NOMBO'}
+          </span>
         </div>
       </div>
 
@@ -111,15 +154,15 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setConfidence(0.05)}
+            onClick={() => setConfidence(0.08)}
             className={`px-2 py-0.5 rounded-md border transition-all ${
-              confidence === 0.05
+              confidence === 0.08
                 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold'
                 : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
             }`}
-            title="Inspect low-confidence acoustic candidates"
+            title="Inspect diffuse acoustic candidates"
           >
-            Sensitive (5%)
+            Ghost Net (8%)
           </button>
           <button
             type="button"
@@ -129,7 +172,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
                 ? 'bg-red-500/20 text-red-300 border-red-500/40 font-bold'
                 : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
             }`}
-            title="Maximum recall sweep"
+            title="Deep Swath Scan"
           >
             Deep Scan (1%)
           </button>
@@ -141,7 +184,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
         <div className="flex items-center justify-between text-xs font-mono">
           <span className="text-slate-300 font-medium flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-            Survey Coordinates (Optional)
+            Drone / Survey Coordinates
           </span>
           <span className="text-[10px] text-slate-400">WGS84</span>
         </div>
@@ -176,7 +219,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
 
         {/* Preset Chips */}
         <div className="flex items-center gap-1.5 text-[10px] font-mono flex-wrap">
-          <span className="text-slate-400">Naval Ranges:</span>
+          <span className="text-slate-400">Indian Waters:</span>
           <button
             type="button"
             onClick={() => handleApplyPresetCoords(17.6868, 83.2185)}
@@ -223,7 +266,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           ) : (
             <>
               <Play className="w-4 h-4 fill-current" />
-              <span>Analyze Sonar</span>
+              <span>Analyze Sonar Imagery</span>
             </>
           )}
         </button>

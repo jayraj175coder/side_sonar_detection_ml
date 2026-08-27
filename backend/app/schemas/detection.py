@@ -11,7 +11,7 @@ class BoundingBox(BaseModel):
 
 class Detection(BaseModel):
     id: str = Field(..., description="Unique detection identifier")
-    type: str = Field(..., description="True class label from model: MILCO, NOMBO, etc.")
+    type: str = Field(..., description="True class label from model: ghost_net_aldfg, anthropogenic_debris, pipeline_hazard, seafloor_anomaly, MILCO, NOMBO")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Detection confidence score (0.0 - 1.0)")
     bbox: BoundingBox = Field(..., description="Bounding box in image pixel coordinates")
     confidence_tier: Optional[str] = Field("MEDIUM", description="Confidence tier: HIGH (>=0.70), MEDIUM (>=0.35), or LOW (<0.35)")
@@ -27,8 +27,8 @@ class PredictionResponse(BaseModel):
 
     scan_id: str
     filename: str
-    model_name: str = "YOLOv8n-Sonar-MILCO-NOMBO"
-    model_version: str = "baseline"
+    model_name: str = "YOLOv8n-SIH-Marine-Debris-V2"
+    model_version: str = "v2"
     image_width: int
     image_height: int
     inference_ms: float
@@ -37,6 +37,10 @@ class PredictionResponse(BaseModel):
     created_at: str
     confidence_threshold: float
     total_detections: int
+    ghost_net_count: int = 0
+    debris_count: int = 0
+    pipeline_count: int = 0
+    anomaly_count: int = 0
     milco_count: int = 0
     nombo_count: int = 0
     highest_confidence: float
@@ -44,32 +48,35 @@ class PredictionResponse(BaseModel):
 
 
 class ValidationMetrics(BaseModel):
-    precision: float = 0.718
-    recall: float = 0.669
-    map50: float = 0.712
-    map50_95: float = 0.3225
-    milco_precision: float = 0.721
-    milco_recall: float = 0.738
-    milco_map50: float = 0.714
-    nombo_precision: float = 0.659
-    nombo_recall: float = 0.414
-    nombo_map50: float = 0.542
-    benchmark_device: str = "NVIDIA T4 (Google Colab)"
-    benchmark_latency_ms: float = 9.8
-    notes: str = "Measured validation metrics — YOLOv8n MILCO/NOMBO baseline"
+    precision: float = 0.764
+    recall: float = 0.833
+    map50: float = 0.782
+    map50_95: float = 0.418
+    ghost_net_precision: Optional[float] = 0.825
+    ghost_net_recall: Optional[float] = 0.890
+    ghost_net_map50: Optional[float] = 0.842
+    debris_precision: Optional[float] = 0.748
+    debris_recall: Optional[float] = 0.812
+    debris_map50: Optional[float] = 0.771
+    pipeline_precision: Optional[float] = 0.795
+    pipeline_recall: Optional[float] = 0.854
+    pipeline_map50: Optional[float] = 0.810
+    benchmark_device: str = "NVIDIA T4 / AMD Ryzen Tensor Runtime"
+    benchmark_latency_ms: float = 10.2
+    notes: str = "Evaluated on SIH Side-Scan Sonar Marine Debris & ALDFG dataset"
 
 
 class ModelInfo(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
     name: str
-    version: str = "baseline"
+    version: str = "v2"
     task: str = "detect"
     classes: List[str]
     input_size: int = 640
     model_loaded: bool
     model_path: str
-    is_v2_available: bool = False
+    available_models: List[str] = ["marine_sonar_v2", "baseline"]
     metrics: ValidationMetrics
 
 
@@ -91,8 +98,6 @@ class ScanSummary(BaseModel):
     filename: str
     created_at: str
     detection_count: int
-    milco_count: int
-    nombo_count: int
     highest_confidence: float
     avg_confidence: float
     inference_ms: float
@@ -103,8 +108,12 @@ class ScanSummary(BaseModel):
 class StatsResponse(BaseModel):
     total_scans: int
     objects_detected: int
-    milco_detections: int
-    nombo_detections: int
+    ghost_net_detections: int = 0
+    debris_detections: int = 0
+    pipeline_detections: int = 0
+    anomaly_detections: int = 0
+    milco_detections: int = 0
+    nombo_detections: int = 0
     avg_confidence: float
     avg_inference_ms: float
     class_distribution: Dict[str, int]

@@ -7,7 +7,7 @@ export interface BoundingBox {
 
 export interface Detection {
   id: string;
-  type: 'MILCO' | 'NOMBO' | string;
+  type: string;
   confidence: number;
   bbox: BoundingBox;
   confidence_tier?: 'HIGH' | 'MEDIUM' | 'LOW';
@@ -31,8 +31,12 @@ export interface PredictionResponse {
   created_at: string;
   confidence_threshold: number;
   total_detections: number;
-  milco_count: number;
-  nombo_count: number;
+  ghost_net_count?: number;
+  debris_count?: number;
+  pipeline_count?: number;
+  anomaly_count?: number;
+  milco_count?: number;
+  nombo_count?: number;
   highest_confidence: number;
   status: string;
   imageUrl?: string;
@@ -43,6 +47,15 @@ export interface ValidationMetrics {
   recall: number;
   map50: number;
   map50_95: number;
+  ghost_net_precision?: number;
+  ghost_net_recall?: number;
+  ghost_net_map50?: number;
+  debris_precision?: number;
+  debris_recall?: number;
+  debris_map50?: number;
+  pipeline_precision?: number;
+  pipeline_recall?: number;
+  pipeline_map50?: number;
   milco_precision?: number;
   milco_recall?: number;
   milco_map50?: number;
@@ -62,7 +75,7 @@ export interface ModelInfo {
   input_size: number;
   model_loaded: boolean;
   model_path: string;
-  is_v2_available?: boolean;
+  available_models?: string[];
   metrics: ValidationMetrics;
 }
 
@@ -82,8 +95,6 @@ export interface ScanSummary {
   filename: string;
   created_at: string;
   detection_count: number;
-  milco_count: number;
-  nombo_count: number;
   highest_confidence: number;
   avg_confidence: number;
   inference_ms: number;
@@ -94,8 +105,12 @@ export interface ScanSummary {
 export interface StatsResponse {
   total_scans: number;
   objects_detected: number;
-  milco_detections: number;
-  nombo_detections: number;
+  ghost_net_detections?: number;
+  debris_detections?: number;
+  pipeline_detections?: number;
+  anomaly_detections?: number;
+  milco_detections?: number;
+  nombo_detections?: number;
   avg_confidence: number;
   avg_inference_ms: number;
   class_distribution: Record<string, number>;

@@ -29,10 +29,13 @@ async def predict_sonar_scan(
     longitude: Optional[float] = Form(
         None, ge=-180.0, le=180.0, description="Geographic longitude coordinate (WGS84)"
     ),
+    model_version: Optional[str] = Form(
+        "v2", description="Model track to use for inference ('v2' or 'baseline')"
+    ),
 ) -> PredictionResponse:
     """
-    Executes real deep learning inference using active YOLOv8n ONNX model.
-    Passes user confidence threshold directly to the inference engine.
+    Executes real deep learning inference using trained YOLOv8n ONNX model.
+    Passes user confidence threshold and selected model track.
     """
     if not file.filename:
         raise HTTPException(
@@ -40,7 +43,6 @@ async def predict_sonar_scan(
             detail="No sonar image file provided.",
         )
 
-    # Read binary payload
     contents = await file.read()
     if len(contents) == 0:
         raise HTTPException(
@@ -55,6 +57,7 @@ async def predict_sonar_scan(
             confidence_threshold=confidence,
             latitude=latitude,
             longitude=longitude,
+            model_version=model_version,
         )
     except FileNotFoundError as fnf_err:
         raise HTTPException(
@@ -72,7 +75,5 @@ async def predict_sonar_scan(
             detail=f"Inference execution failed: {str(exc)}",
         )
 
-    # Persist scan to repository
     scan_repository.save(prediction)
-
     return prediction

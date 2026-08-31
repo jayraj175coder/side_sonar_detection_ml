@@ -31,6 +31,7 @@ import {
   Cell,
 } from 'recharts';
 import { HolographicGlobe } from '../components/common/HolographicGlobe';
+import { MarineDriveVisualization } from '../components/common/MarineDriveVisualization';
 
 export const OverviewPage: React.FC = () => {
   const { stats, scans, setActiveTab, setCurrentScan, modelInfo } = useApp();
@@ -207,7 +208,10 @@ export const OverviewPage: React.FC = () => {
         />
       </div>
 
-      {/* 3. Visual Charts Grid */}
+      {/* 3. Marine Drive — Side-Scan Sonar Pipeline Visualization */}
+      <MarineDriveVisualization />
+
+      {/* 4. Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Activity Timeline Chart */}
         <div className="lg:col-span-2 p-6 rounded-3xl glass-panel space-y-4">
@@ -346,7 +350,7 @@ export const OverviewPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Recent Drone Survey Scans Table */}
+      {/* 5. Recent Drone Survey Scans Table */}
       <div className="p-6 md:p-8 rounded-3xl glass-panel space-y-4">
         <div className="flex items-center justify-between">
           <div>

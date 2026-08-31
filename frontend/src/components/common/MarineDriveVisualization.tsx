@@ -195,10 +195,8 @@ const WaterfallStrip: React.FC = () => {
     canvas.width = W;
     canvas.height = H;
 
-    // Pre-fill rows
-    rowsRef.current = Array.from({ length: H }, () => generateRow(W));
-
     let t = 0;
+    // Declare ANOMALY_POSITIONS BEFORE generateRow so the closure can access it
     const ANOMALY_POSITIONS = [Math.floor(W * 0.25), Math.floor(W * 0.6), Math.floor(W * 0.78)];
 
     function generateRow(width: number): number[] {
@@ -221,6 +219,9 @@ const WaterfallStrip: React.FC = () => {
         return Math.min(255, val);
       });
     }
+
+    // Pre-fill rows (now safe — ANOMALY_POSITIONS is already declared)
+    rowsRef.current = Array.from({ length: H }, () => generateRow(W));
 
     const draw = () => {
       // Shift image down by 1 pixel

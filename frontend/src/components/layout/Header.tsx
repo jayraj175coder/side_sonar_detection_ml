@@ -16,13 +16,10 @@ import {
   Volume2,
   VolumeX,
   Code2,
-  Key,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { ApiExplorerModal } from '../common/ApiExplorerModal';
-import { ApiKeyModal } from '../common/ApiKeyModal';
 import { sonarAudio } from '../../utils/sonarAudio';
-import { apiClient } from '../../services/api';
 
 interface HeaderProps {
   title: string;
@@ -48,9 +45,7 @@ export const Header: React.FC<HeaderProps> = ({
   } = useApp();
 
   const [isApiModalOpen, setIsApiModalOpen] = useState<boolean>(false);
-  const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(sonarAudio.isMuted);
-  const [hasCustomApiKey, setHasCustomApiKey] = useState<boolean>(!!apiClient.getApiKey());
 
   const handleToggleAudio = () => {
     const muted = sonarAudio.toggleMute();
@@ -59,13 +54,13 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="h-16 md:h-18 bg-[#080B11]/90 backdrop-blur-2xl border-b border-[#1B2330] px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 shadow-xl font-mono select-none">
+      <header className="h-16 md:h-18 bg-[#060D17]/95 backdrop-blur-2xl border-b border-[#152438] px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 shadow-xl font-mono select-none">
         {/* Title & Mobile / Desktop Toggle */}
         <div className="flex items-center gap-3">
           {/* Desktop Sidebar Toggle Button */}
           <button
             onClick={toggleSidebar}
-            className="hidden md:flex p-2 rounded-xl bg-[#10151D] border border-[#1B2330] text-[#7C8AA0] hover:text-[#4CD9E8] hover:border-[#4CD9E8]/40 transition-all active:scale-95 shadow-md"
+            className="hidden md:flex p-2 rounded-xl bg-[#0A1322] border border-[#152438] text-[#7C8AA0] hover:text-[#4CD9E8] hover:border-[#4CD9E8]/40 transition-all active:scale-95 shadow-md cursor-pointer"
             title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar to left'}
           >
             {isSidebarCollapsed ? (
@@ -78,7 +73,7 @@ export const Header: React.FC<HeaderProps> = ({
           {onToggleMobileMenu && (
             <button
               onClick={onToggleMobileMenu}
-              className="md:hidden p-2 rounded-xl bg-[#10151D] border border-[#1B2330] text-[#EAEFF5] hover:text-[#4CD9E8]"
+              className="md:hidden p-2 rounded-xl bg-[#0A1322] border border-[#152438] text-[#EAEFF5] hover:text-[#4CD9E8] cursor-pointer"
               title="Open Menu"
             >
               <Menu className="w-5 h-5" />
@@ -91,7 +86,7 @@ export const Header: React.FC<HeaderProps> = ({
                 {title}
               </h1>
               {currentScan && (
-                <span className="hidden sm:inline-flex text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#4CD9E8]/10 text-[#4CD9E8] border border-[#4CD9E8]/30">
+                <span className="hidden sm:inline-flex text-[9px] font-mono px-2 py-0.5 rounded-md bg-[#4CD9E8]/10 text-[#4CD9E8] border border-[#4CD9E8]/30">
                   Scan: {currentScan.scan_id}
                 </span>
               )}
@@ -104,10 +99,10 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Action Controls & Sexy Telemetry Badges */}
+        {/* Action Controls & Telemetry Badges */}
         <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-xs">
           {/* 1. MoES Drone Perception Status Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#10151D] border border-[#3FD98A]/30 text-[#EAEFF5] text-[9px] font-bold shadow-md">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0A1322] border border-[#3FD98A]/30 text-[#EAEFF5] text-[9px] font-bold shadow-md">
             <span className="w-2 h-2 rounded-full bg-[#3FD98A] animate-pulse" />
             <span className="text-[#3FD98A]">MoES AUV ENGINE</span>
             <span className="text-[#7C8AA0] hidden md:inline">· AUTO-LABEL ON</span>
@@ -116,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* 2. Interactive REST API Explorer Button */}
           <button
             onClick={() => setIsApiModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#10151D] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] text-[9px] font-bold transition-all shadow-md group cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0A1322] border border-[#152438] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] text-[9px] font-bold transition-all shadow-md group cursor-pointer"
             title="Open Interactive REST API Explorer"
           >
             <Code2 className="w-3.5 h-3.5 text-[#4CD9E8] group-hover:animate-pulse" />
@@ -127,10 +122,10 @@ export const Header: React.FC<HeaderProps> = ({
           {/* 3. Audio Sonar Ping Feedback Toggle */}
           <button
             onClick={handleToggleAudio}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[9px] font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[9px] font-bold transition-all cursor-pointer ${
               !isAudioMuted
                 ? 'bg-[#4CD9E8]/15 border-[#4CD9E8]/40 text-[#4CD9E8] shadow-[0_0_10px_rgba(76,217,232,0.2)]'
-                : 'bg-[#10151D] border-[#1B2330] text-[#7C8AA0] hover:text-[#EAEFF5]'
+                : 'bg-[#0A1322] border-[#152438] text-[#7C8AA0] hover:text-[#EAEFF5]'
             }`}
             title="Toggle Subsea Sonar Acoustic Feedback Sound"
           >
@@ -139,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           {/* 4. Backend Connection Status Badge */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#10151D] border border-[#1B2330] shadow-md">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0A1322] border border-[#152438] shadow-md">
             <span
               className={`w-2 h-2 rounded-full ${
                 isBackendConnected
@@ -156,7 +151,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={refreshData}
             disabled={isLoading}
-            className="p-2 rounded-xl bg-[#10151D] border border-[#1B2330] hover:border-[#4CD9E8]/40 text-[#7C8AA0] hover:text-[#4CD9E8] transition-all shadow-md cursor-pointer disabled:opacity-50"
+            className="p-2 rounded-xl bg-[#0A1322] border border-[#152438] hover:border-[#4CD9E8]/40 text-[#7C8AA0] hover:text-[#4CD9E8] transition-all shadow-md cursor-pointer disabled:opacity-50"
             title="Refresh Telemetry"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#4CD9E8]' : ''}`} />
@@ -168,13 +163,6 @@ export const Header: React.FC<HeaderProps> = ({
       <ApiExplorerModal
         isOpen={isApiModalOpen}
         onClose={() => setIsApiModalOpen(false)}
-      />
-
-      {/* API Key & Access Credentials Modal */}
-      <ApiKeyModal
-        isOpen={isKeyModalOpen}
-        onClose={() => setIsKeyModalOpen(false)}
-        onKeyUpdated={(hasKey) => setHasCustomApiKey(hasKey)}
       />
     </>
   );

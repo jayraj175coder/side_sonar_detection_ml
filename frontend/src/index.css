@@ -3,21 +3,42 @@
 
 @layer base {
   :root {
+    /* Role-based Mission Console Surface Tokens */
+    --surface-console: #03070B;
+    --surface-panel: #081118;
+    --surface-inset: #0C171E;
+    --surface-panel-border: #16303B;
+    --surface-panel-border-glow: rgba(50, 230, 209, 0.35);
+
+    /* Acoustic Signals & Telemetry */
+    --signal-primary: #32E6D1;     /* Primary sonar acoustic return phosphor */
+    --signal-secondary: #29B6F6;   /* Hydrographic telemetry & USBL fix */
+    --signal-muted: #66848D;       /* Instrument metadata / scale ticks */
+    --signal-text: #E4F2F5;        /* High-contrast telemetry readout */
+
+    /* Mission Status Tokens (Open MCT / Control Room Standard) */
+    --status-nominal: #65D391;     /* Nominal operation */
+    --status-caution: #FFB547;     /* Degraded / Moderate uncertainty */
+    --status-critical: #FF5D5D;    /* Critical threat / High alert */
+
+    /* Contact Uncertainty Tokens */
+    --contact-confidence-high: #65D391;
+    --contact-confidence-med: #FFB547;
+    --contact-confidence-low: #FF5D5D;
+
+    /* Legacy Backward-Compatibility Variables */
     --bg-abyss: #03070B;
     --bg-surface: #081118;
     --bg-surface-2: #0C171E;
     --border-subsea: #16303B;
     --border-subsea-glow: rgba(50, 230, 209, 0.4);
-    
     --text-primary: #E4F2F5;
     --text-muted: #66848D;
-    
     --sonar-cyan: #32E6D1;
     --acoustic-blue: #29B6F6;
     --warning: #FFB547;
     --critical: #FF5D5D;
     --success: #65D391;
-    
     --accent-cyan: #32E6D1;
     --accent-teal: #14B8A6;
     --accent-amber: #FFB547;

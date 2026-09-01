@@ -21,6 +21,48 @@ export const MISSION_DATA: MissionData = {
   pingRate: 10,
   totalPings: 80829,
   sonarModel: 'EdgeTech 4200-FS',
+  tracklines: [
+    {
+      id: 'LINE-01',
+      name: 'North Pass · West Swath',
+      code: 'TRK-01',
+      heading: 178,
+      pingsRange: '0001–2100',
+      lengthKm: 9.8,
+      status: 'complete',
+      targetIds: ['SX-T01', 'SX-T06', 'SX-T13', 'SX-T17'],
+    },
+    {
+      id: 'LINE-02',
+      name: 'Central Shipping Channel Pass',
+      code: 'TRK-02',
+      heading: 178,
+      pingsRange: '2101–4500',
+      lengthKm: 10.4,
+      status: 'surveying',
+      targetIds: ['SX-T07', 'SX-T02', 'SX-T04', 'SX-T12'],
+    },
+    {
+      id: 'LINE-03',
+      name: 'South Shoal & Reef Edge',
+      code: 'TRK-03',
+      heading: 358,
+      pingsRange: '4501–6800',
+      lengthKm: 9.6,
+      status: 'nominal',
+      targetIds: ['SX-T03', 'SX-T05', 'SX-T09', 'SX-T10'],
+    },
+    {
+      id: 'LINE-04',
+      name: 'East Deep Trench Return',
+      code: 'TRK-04',
+      heading: 178,
+      pingsRange: '6801–8800',
+      lengthKm: 8.9,
+      status: 'nominal',
+      targetIds: ['SX-T08', 'SX-T11', 'SX-T14', 'SX-T15', 'SX-T16'],
+    },
+  ],
   /**
    * Vessel track waypoints [lat, lon, timeSeconds]
    * 12 waypoints forming a lawnmower survey pattern

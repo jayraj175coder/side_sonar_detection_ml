@@ -158,9 +158,10 @@ export interface DatasetCatalogResponse {
 
 export type TabType = 'overview' | 'scan' | 'history' | 'map' | 'reports' | 'model' | 'mission' | 'sonar' | 'analytics';
 
-/* ─── Mission Intelligence Types ─────────────────────────── */
+/* ─── Mission Intelligence & Hydrographic Types ─────────────────────────── */
 
 export type RiskLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+export type UncertaintyRating = 'LOW AMBIGUITY' | 'MODERATE UNCERTAINTY' | 'HIGH UNCERTAINTY';
 
 export interface TargetEvidence {
   objectShape: number;
@@ -171,21 +172,42 @@ export interface TargetEvidence {
   backscatterPattern: number;
 }
 
+export interface Trackline {
+  id: string;
+  name: string;
+  code: string;
+  heading: number;
+  pingsRange: string;
+  lengthKm: number;
+  status: 'nominal' | 'degraded' | 'surveying' | 'complete';
+  targetIds: string[];
+}
+
 export interface MissionTarget {
   id: string;
+  tracklineId: string;
   class: string;
   classCode: string;
   confidence: number;
+  confidenceInterval: [number, number]; // e.g. [0.91, 0.97]
+  uncertaintyRating: UncertaintyRating;
+  targetStrengthDb: number;
+  operatorCaveat: string;
+  uncertaintyNotes: string[];
   depth: number;
   length: number;
   width: number;
+  estimatedHeight: number;
   shadowLength: number;
   orientation: number;
   slantRange: number;
+  acrossTrackMeters: number; // Negative = Port, Positive = Starboard
+  bearingDeg: number;
   lat: number;
   lon: number;
   risk: RiskLevel;
   pingTime: number;
+  pingNumber: number;
   color: string;
   evidence: TargetEvidence;
   detectionEvidence: string[];
@@ -220,6 +242,7 @@ export interface MissionData {
   pingRate: number;
   totalPings: number;
   sonarModel: string;
+  tracklines: Trackline[];
   track: TrackPoint[];
   polygon: [number, number][];
 }

@@ -1,460 +1,465 @@
-import React, { useState, useMemo, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import React, { useState, useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, Polygon, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import {
-  MapPin,
-  Crosshair,
-  AlertTriangle,
-  Boxes,
+  Compass,
+  Radio,
   Layers,
   Search,
   Filter,
-  Plus,
-  Minus,
-  Maximize2,
   Navigation,
-  X,
-  Eye,
-  Sliders,
-  Sparkles,
-  ArrowRight,
-  Globe2,
   ShieldCheck,
-  Radio,
+  AlertTriangle,
+  Anchor,
+  Ship,
+  Eye,
+  Crosshair,
+  Maximize2,
+  X,
+  ExternalLink,
+  ChevronRight,
+  Activity,
+  Zap,
 } from 'lucide-react';
-import { PredictionResponse } from '../../types';
-import { Badge } from '../common/Badge';
+import {
+  INDIA_MARITIME_SECTORS,
+  HYDROGRAPHIC_VESSELS,
+  INDIA_EEZ_POLYGON,
+  IndiaMaritimeSector,
+  HydrographicVessel,
+} from '../../data/indiaMapData';
 import { useApp } from '../../context/AppContext';
 
-// Custom Tactical Pin Icons for MoES Targets
-const createPinIcon = (scan: PredictionResponse, isSelected: boolean) => {
-  const isGhostNet = (scan.ghost_net_count || 0) > 0;
-  const isDebris = (scan.debris_count || 0) > 0;
-  const isPipeline = (scan.pipeline_count || 0) > 0;
-  const isMilco = (scan.milco_count || 0) > 0;
+// Custom Tactical Pin for Indian Maritime Sectors
+const createSectorPin = (sector: IndiaMaritimeSector, isSelected: boolean) => {
+  const isCritical = sector.status === 'HIGH ALERT' || sector.criticalThreats >= 4;
+  const isSelectedStyle = isSelected ? 'transform: scale(1.25); z-index: 99;' : '';
 
-  let primaryColor = '#06B6D4'; // Cyan default
-  let glowColor = 'rgba(6, 182, 212, 0.4)';
-  let pillText = `${scan.total_detections}T`;
-  let pulse = false;
-
-  if (isGhostNet) {
-    primaryColor = '#A855F7';
-    glowColor = 'rgba(168, 85, 247, 0.5)';
-    pillText = `${scan.ghost_net_count} Net`;
-    pulse = true;
-  } else if (isDebris) {
-    primaryColor = '#F59E0B';
-    glowColor = 'rgba(245, 158, 11, 0.5)';
-    pillText = `${scan.debris_count} Deb`;
-    pulse = true;
-  } else if (isPipeline) {
-    primaryColor = '#3B82F6';
-    glowColor = 'rgba(59, 130, 246, 0.5)';
-    pillText = `${scan.pipeline_count} Pipe`;
-  } else if (isMilco) {
-    primaryColor = '#EF4444';
-    glowColor = 'rgba(239, 68, 68, 0.5)';
-    pillText = `${scan.milco_count} Mil`;
-    pulse = true;
-  }
-
-  const scale = isSelected ? 1.3 : 1.0;
-  const pulseClass = pulse ? 'animate-ping' : '';
+  const pinColor = isCritical ? '#F04438' : sector.status === 'ACTIVE SURVEY' ? '#4CD9E8' : '#3FD98A';
+  const glowColor = isCritical ? 'rgba(240, 68, 56, 0.45)' : 'rgba(76, 217, 232, 0.45)';
 
   const html = `
-    <div style="position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transform: scale(${scale}); transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
-      <!-- Outer Sonar Pulse Wave -->
-      <div style="position: absolute; width: 38px; height: 38px; border-radius: 50%; background-color: ${primaryColor}; opacity: 0.25;" class="${pulseClass}"></div>
+    <div style="position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; ${isSelectedStyle} transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+      <!-- Radar Pulse Wave -->
+      <div style="position: absolute; width: 42px; height: 42px; border-radius: 50%; background: ${pinColor}; opacity: 0.25;" class="animate-ping"></div>
       
       <!-- Middle Tactical Ring -->
-      <div style="position: absolute; width: 24px; height: 24px; border-radius: 50%; background: #050B1A; border: 2px solid ${primaryColor}; box-shadow: 0 0 14px ${glowColor};"></div>
+      <div style="position: absolute; width: 28px; height: 28px; border-radius: 50%; background: #080B11; border: 2px solid ${pinColor}; box-shadow: 0 0 16px ${glowColor};"></div>
       
       <!-- Inner Core Dot -->
-      <div style="width: 8px; height: 8px; border-radius: 50%; background-color: ${primaryColor};"></div>
+      <div style="width: 10px; height: 10px; border-radius: 50%; background: ${pinColor};"></div>
 
-      <!-- Badge Pill -->
-      <div style="position: absolute; bottom: -8px; padding: 1px 5px; border-radius: 6px; background: #030712; border: 1px solid ${primaryColor}; font-size: 8px; font-family: monospace; font-weight: bold; color: ${primaryColor}; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.8);">
-        ${pillText}
+      <!-- Sector Code Pill -->
+      <div style="position: absolute; bottom: -10px; padding: 2px 6px; border-radius: 6px; background: #080B11; border: 1px solid ${pinColor}; font-size: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 900; color: ${pinColor}; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.9);">
+        ${sector.id.replace('SEC-', '')} · ${sector.contactsLogged}C
       </div>
     </div>
   `;
 
   return L.divIcon({
-    className: 'custom-pin-marker',
+    className: 'custom-sector-marker',
     html,
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
   });
 };
 
-// Helper Map Controller for Pan/Zoom & Custom Controls
-const MapController: React.FC<{
-  scans: PredictionResponse[];
-  selectedScan: PredictionResponse | null;
-}> = ({ scans, selectedScan }) => {
+// Custom Icon for Active Hydrographic Vessels
+const createVesselPin = (vessel: HydrographicVessel, isSelected: boolean) => {
+  const html = `
+    <div style="position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transform: rotate(${vessel.headingDeg}deg);">
+      <div style="width: 24px; height: 24px; border-radius: 6px; background: #080B11; border: 2px solid #29B6F6; box-shadow: 0 0 14px rgba(41, 182, 246, 0.6); display: flex; align-items: center; justify-content: center;">
+        <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 10px solid #29B6F6;"></div>
+      </div>
+      <div style="position: absolute; bottom: -14px; padding: 1px 4px; border-radius: 4px; background: #080B11; border: 1px solid #29B6F6; font-size: 7px; font-family: monospace; font-weight: bold; color: #29B6F6; white-space: nowrap;">
+        ${vessel.pennant}
+      </div>
+    </div>
+  `;
+
+  return L.divIcon({
+    className: 'custom-vessel-marker',
+    html,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+  });
+};
+
+// Map Pan Controller Component
+const MapFlyTo: React.FC<{ coords: [number, number]; zoom: number }> = ({ coords, zoom }) => {
   const map = useMap();
-
   React.useEffect(() => {
-    if (selectedScan?.location.latitude && selectedScan?.location.longitude) {
-      map.flyTo(
-        [selectedScan.location.latitude, selectedScan.location.longitude],
-        11,
-        { duration: 1.2 }
-      );
-    }
-  }, [selectedScan, map]);
-
-  return null;
-};
-
-// Map click detector to dismiss bottom card when clicking empty space
-const MapClickDetector: React.FC<{ onMapClick: () => void }> = ({ onMapClick }) => {
-  useMapEvents({
-    click: () => onMapClick(),
-  });
+    map.flyTo(coords, zoom, { duration: 1.5 });
+  }, [coords, zoom, map]);
   return null;
 };
 
 export const SonarMap: React.FC = () => {
-  const { scans, setCurrentScan, setActiveTab } = useApp();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [classFilter, setClassFilter] = useState<'ALL' | 'GHOST_NET' | 'DEBRIS' | 'PIPELINE'>('ALL');
-  const [minConfidence, setMinConfidence] = useState<number>(0.0);
-  const [selectedScan, setSelectedScan] = useState<PredictionResponse | null>(null);
-  const mapRef = useRef<L.Map | null>(null);
+  const { setActiveTab } = useApp();
 
-  const defaultCenter: [number, number] = [17.6868, 83.2185]; // Visakhapatnam Coastal Survey Range
+  const [selectedSector, setSelectedSector] = useState<IndiaMaritimeSector | null>(INDIA_MARITIME_SECTORS[0]);
+  const [selectedVessel, setSelectedVessel] = useState<HydrographicVessel | null>(null);
+  const [activeRegionFilter, setActiveRegionFilter] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Filter geolocated scans
-  const geolocatedScans = useMemo(() => {
-    return scans.filter(
-      (s) =>
-        s.location.latitude !== null &&
-        s.location.longitude !== null &&
-        !isNaN(s.location.latitude) &&
-        !isNaN(s.location.longitude)
-    );
-  }, [scans]);
+  // Layer Toggles
+  const [showEEZ, setShowEEZ] = useState<boolean>(true);
+  const [showVessels, setShowVessels] = useState<boolean>(true);
+  const [showSectors, setShowSectors] = useState<boolean>(true);
 
-  const filteredScans = useMemo(() => {
-    return geolocatedScans.filter((scan) => {
-      // 1. Search Query Match
-      const matchesSearch =
-        scan.filename.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        scan.scan_id.toLowerCase().includes(searchTerm.toLowerCase());
+  // Map View Coordinates
+  const [mapCenter, setMapCenter] = useState<[number, number]>([14.8, 79.5]);
+  const [mapZoom, setMapZoom] = useState<number>(5);
 
-      // 2. Class Type Match
-      let matchesClass = true;
-      if (classFilter === 'GHOST_NET') {
-        matchesClass = (scan.ghost_net_count || 0) > 0;
-      } else if (classFilter === 'DEBRIS') {
-        matchesClass = (scan.debris_count || 0) > 0;
-      } else if (classFilter === 'PIPELINE') {
-        matchesClass = (scan.pipeline_count || 0) > 0;
-      }
-
-      // 3. Confidence Match
-      const matchesConfidence = scan.highest_confidence >= minConfidence;
-
-      return matchesSearch && matchesClass && matchesConfidence;
+  // Region filtering
+  const filteredSectors = useMemo(() => {
+    return INDIA_MARITIME_SECTORS.filter((sector) => {
+      const matchRegion = activeRegionFilter === 'ALL' || sector.region === activeRegionFilter;
+      const matchQuery =
+        sector.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        sector.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        sector.primaryClass.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchRegion && matchQuery;
     });
-  }, [geolocatedScans, searchTerm, classFilter, minConfidence]);
+  }, [activeRegionFilter, searchQuery]);
 
-  const handleZoomIn = () => {
-    if (mapRef.current) mapRef.current.zoomIn();
+  // Quick Sector Jump
+  const handleJumpToSector = (sector: IndiaMaritimeSector) => {
+    setSelectedSector(sector);
+    setSelectedVessel(null);
+    setMapCenter([sector.lat, sector.lon]);
+    setMapZoom(7);
   };
 
-  const handleZoomOut = () => {
-    if (mapRef.current) mapRef.current.zoomOut();
+  const handleJumpToVessel = (vessel: HydrographicVessel) => {
+    setSelectedVessel(vessel);
+    setSelectedSector(null);
+    setMapCenter([vessel.lat, vessel.lon]);
+    setMapZoom(8);
   };
 
-  const handleResetView = () => {
-    if (mapRef.current) {
-      mapRef.current.flyTo(defaultCenter, 9, { duration: 1.0 });
-      setSelectedScan(null);
-    }
-  };
-
-  const handleRecenterDemoArea = () => {
-    if (mapRef.current) {
-      mapRef.current.flyTo(defaultCenter, 10, { duration: 1.2 });
-    }
-  };
-
-  const handleSelectMarker = (scan: PredictionResponse) => {
-    setSelectedScan(scan);
-  };
-
-  const handleInspectInStudio = (scan: PredictionResponse) => {
-    setCurrentScan(scan);
-    setActiveTab('scan');
+  const handleResetIndiaView = () => {
+    setSelectedSector(null);
+    setSelectedVessel(null);
+    setMapCenter([14.8, 79.5]);
+    setMapZoom(5);
   };
 
   return (
-    <div className="relative w-full h-[calc(100vh-140px)] min-h-[600px] rounded-3xl overflow-hidden glass-panel border border-cyan-500/25 shadow-2xl flex flex-col">
-      {/* 1. Floating Top Glassmorphism Filter Header */}
-      <div className="absolute top-4 left-4 right-4 z-[1000] flex flex-wrap items-center justify-between gap-3 pointer-events-none">
-        {/* Left Filter Bar */}
-        <div className="flex flex-wrap items-center gap-2.5 pointer-events-auto bg-[#070D1F]/90 backdrop-blur-xl p-2.5 rounded-2xl border border-cyan-500/25 shadow-2xl">
-          {/* Search Input */}
-          <div className="relative flex items-center">
-            <Search className="w-3.5 h-3.5 text-cyan-400 absolute left-3 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search scan ID or track..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 pr-3 py-1.5 text-xs font-mono rounded-xl bg-slate-950/80 border border-slate-800 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 w-44 sm:w-56"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="absolute right-2 text-slate-400 hover:text-slate-200"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-
-          <div className="h-4 w-px bg-slate-800 mx-0.5" />
-
-          {/* Classification Filters */}
-          <div className="flex items-center gap-1 text-[11px] font-mono">
-            <button
-              onClick={() => setClassFilter('ALL')}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
-                classFilter === 'ALL'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              All ({geolocatedScans.length})
-            </button>
-            <button
-              onClick={() => setClassFilter('GHOST_NET')}
-              className={`px-2.5 py-1 rounded-lg flex items-center gap-1 transition-all ${
-                classFilter === 'GHOST_NET'
-                  ? 'bg-purple-950/80 text-purple-300 border border-purple-500/50 font-bold'
-                  : 'text-slate-400 hover:text-purple-300'
-              }`}
-            >
-              <AlertTriangle className="w-3 h-3 text-purple-400" />
-              <span>Ghost Nets</span>
-            </button>
-            <button
-              onClick={() => setClassFilter('DEBRIS')}
-              className={`px-2.5 py-1 rounded-lg flex items-center gap-1 transition-all ${
-                classFilter === 'DEBRIS'
-                  ? 'bg-amber-950/80 text-amber-300 border border-amber-500/50 font-bold'
-                  : 'text-slate-400 hover:text-amber-300'
-              }`}
-            >
-              <Boxes className="w-3 h-3 text-amber-400" />
-              <span>Debris</span>
-            </button>
-            <button
-              onClick={() => setClassFilter('PIPELINE')}
-              className={`px-2.5 py-1 rounded-lg flex items-center gap-1 transition-all ${
-                classFilter === 'PIPELINE'
-                  ? 'bg-blue-950/80 text-blue-300 border border-blue-500/50 font-bold'
-                  : 'text-slate-400 hover:text-blue-300'
-              }`}
-            >
-              <Layers className="w-3 h-3 text-blue-400" />
-              <span>Pipelines</span>
-            </button>
-          </div>
-
-          <div className="h-4 w-px bg-slate-800 mx-0.5" />
-
-          {/* Confidence Slider */}
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-            <span>Min:</span>
-            <input
-              type="range"
-              min="0.0"
-              max="0.9"
-              step="0.05"
-              value={minConfidence}
-              onChange={(e) => setMinConfidence(parseFloat(e.target.value))}
-              className="w-16 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
-            />
-            <span className="text-[10px] text-cyan-300 font-bold">
-              {(minConfidence * 100).toFixed(0)}%
-            </span>
-          </div>
-        </div>
-
-        {/* Right Status Badge */}
-        <div className="pointer-events-auto bg-[#070D1F]/90 backdrop-blur-xl px-3.5 py-2 rounded-2xl border border-cyan-500/25 shadow-2xl flex items-center gap-2 text-xs font-mono">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-slate-300 font-bold">MoES Indian Waters Grid</span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
-            {filteredScans.length} Swaths
-          </span>
-        </div>
-      </div>
-
-      {/* 2. Floating Custom Navigation Controls */}
-      <div className="absolute right-4 top-20 z-[1000] flex flex-col gap-1.5">
-        <button
-          onClick={handleZoomIn}
-          className="w-9 h-9 rounded-lg bg-[#080F20]/85 backdrop-blur-xl border border-cyan-500/25 text-slate-200 hover:text-cyan-300 hover:border-cyan-400 flex items-center justify-center transition-all shadow-lg active:scale-95"
-          title="Zoom In"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-        <button
-          onClick={handleZoomOut}
-          className="w-9 h-9 rounded-lg bg-[#080F20]/85 backdrop-blur-xl border border-cyan-500/25 text-slate-200 hover:text-cyan-300 hover:border-cyan-400 flex items-center justify-center transition-all shadow-lg active:scale-95"
-          title="Zoom Out"
-        >
-          <Minus className="w-4 h-4" />
-        </button>
-        <button
-          onClick={handleResetView}
-          className="w-9 h-9 rounded-lg bg-[#080F20]/85 backdrop-blur-xl border border-cyan-500/25 text-slate-200 hover:text-cyan-300 hover:border-cyan-400 flex items-center justify-center transition-all shadow-lg active:scale-95"
-          title="Reset Map Bounds"
-        >
-          <Maximize2 className="w-4 h-4" />
-        </button>
-        <button
-          onClick={handleRecenterDemoArea}
-          className="w-9 h-9 rounded-lg bg-[#080F20]/85 backdrop-blur-xl border border-cyan-500/25 text-slate-200 hover:text-cyan-300 hover:border-cyan-400 flex items-center justify-center transition-all shadow-lg active:scale-95"
-          title="Center Visakhapatnam Range"
-        >
-          <Navigation className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* 3. Interactive Map Legend Overlay */}
-      <div className="absolute left-4 bottom-4 z-[1000] bg-[#070D1F]/90 backdrop-blur-xl p-3 rounded-2xl border border-cyan-500/25 text-[11px] font-mono shadow-2xl space-y-1.5 pointer-events-auto">
-        <p className="text-slate-400 font-bold uppercase text-[9px] tracking-wider">Acoustic Contact Legend</p>
+    <div className="flex flex-col h-[750px] bg-[#080B11] border border-[#1B2330] rounded-2xl overflow-hidden select-none font-mono text-xs shadow-2xl relative">
+      {/* 1. Sexy Cyber-Naval Header Banner */}
+      <div className="px-4 py-3 bg-[#10151D] border-b border-[#1B2330] flex flex-wrap items-center justify-between gap-3 shrink-0 z-10">
         <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1 text-purple-400 font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-sm" /> Ghost Net (ALDFG)
-          </span>
-          <span className="flex items-center gap-1 text-amber-400 font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" /> Marine Debris
-          </span>
-          <span className="flex items-center gap-1 text-blue-400 font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm" /> Pipeline
-          </span>
+          <div className="w-9 h-9 rounded-xl bg-[#4CD9E8]/15 border border-[#4CD9E8]/30 flex items-center justify-center text-[#4CD9E8] shadow-[0_0_15px_rgba(76,217,232,0.25)]">
+            <Compass className="w-5 h-5 animate-pulse" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-black text-[#EAEFF5] tracking-widest uppercase">
+                INDIA MARITIME OPERATIONS & EEZ THEATRE
+              </h2>
+              <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-[#3FD98A]/10 text-[#3FD98A] border border-[#3FD98A]/30">
+                2.37M KM² EEZ MONITORED
+              </span>
+            </div>
+            <p className="text-[9px] text-[#7C8AA0]">
+              National Hydrographic Office (NHO) & MoES Multi-Beam Side-Scan Sonar Telemetry
+            </p>
+          </div>
+        </div>
+
+        {/* Quick Region Filter Tabs */}
+        <div className="flex items-center gap-1 bg-[#080B11] p-1 rounded-xl border border-[#1B2330]">
+          {[
+            { id: 'ALL', label: '🇮🇳 ALL EEZ' },
+            { id: 'Arabian Sea', label: '🌊 ARABIAN SEA' },
+            { id: 'Bay of Bengal', label: '⚓ BAY OF BENGAL' },
+            { id: 'Indian Ocean', label: '🐠 GULF OF MANNAR' },
+            { id: 'Andaman Sea', label: '🏝️ ANDAMAN' },
+            { id: 'Lakshadweep Sea', label: '🌴 LAKSHADWEEP' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveRegionFilter(tab.id);
+                if (tab.id === 'ALL') handleResetIndiaView();
+              }}
+              className={`px-2.5 py-1 rounded-lg text-[8px] font-black transition-all ${
+                activeRegionFilter === tab.id
+                  ? 'bg-[#4CD9E8]/20 text-[#4CD9E8] border border-[#4CD9E8]/50 shadow-[0_0_10px_rgba(76,217,232,0.2)]'
+                  : 'text-[#7C8AA0] hover:text-[#EAEFF5]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* 4. Leaflet Map Container */}
-      <div className="flex-1 w-full h-full relative">
-        <MapContainer
-          center={defaultCenter}
-          zoom={9}
-          ref={mapRef}
-          className="w-full h-full"
-          scrollWheelZoom={true}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+      {/* 2. Main Viewport: Left Map (with HUD overlays) + Right Sector Telemetry Drawer */}
+      <div className="flex-1 flex min-h-0 relative overflow-hidden">
+        {/* Leaflet Dark Map */}
+        <div className="flex-1 h-full relative z-0">
+          <MapContainer
+            center={mapCenter}
+            zoom={mapZoom}
+            className="w-full h-full"
+            zoomControl={false}
+          >
+            <MapFlyTo coords={mapCenter} zoom={mapZoom} />
 
-          <MapController scans={filteredScans} selectedScan={selectedScan} />
-          <MapClickDetector onMapClick={() => setSelectedScan(null)} />
+            {/* High-Contrast Dark Subsea Carto Tile Layer */}
+            <TileLayer
+              attribution='&copy; <a href="https://carto.com/">CARTO</a> & Indian National Hydrographic Office'
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            />
 
-          {/* Interactive Custom Markers */}
-          {filteredScans.map((scan) => {
-            const isSelected = selectedScan?.scan_id === scan.scan_id;
-            return (
-              <Marker
-                key={scan.scan_id}
-                position={[scan.location.latitude!, scan.location.longitude!]}
-                icon={createPinIcon(scan, isSelected)}
-                eventHandlers={{
-                  click: () => handleSelectMarker(scan),
+            {/* India Exclusive Economic Zone (EEZ) Boundary Polygon */}
+            {showEEZ && (
+              <Polygon
+                positions={INDIA_EEZ_POLYGON}
+                pathOptions={{
+                  color: '#4CD9E8',
+                  weight: 1.5,
+                  dashArray: '6, 6',
+                  fillColor: '#4CD9E8',
+                  fillOpacity: 0.04,
                 }}
               />
-            );
-          })}
-        </MapContainer>
-      </div>
+            )}
 
-      {/* 5. Floating Slide-Up Detail Bottom Sheet */}
-      {selectedScan && (
-        <div className="absolute bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-[1000] p-5 rounded-2xl glass-panel border border-cyan-400/50 shadow-2xl bg-[#091124]/95 animate-slide-up">
-          <div className="flex items-start justify-between border-b border-slate-800 pb-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="text-sm font-bold font-mono text-cyan-300">
-                  {selectedScan.scan_id}
-                </h4>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
-                  {selectedScan.model_name?.includes('Marine-Debris') ? 'SIH V2' : 'Legacy Baseline'}
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 font-mono mt-0.5 truncate max-w-[240px]">
-                {selectedScan.filename}
-              </p>
+            {/* Hydrographic Survey Sectors */}
+            {showSectors &&
+              filteredSectors.map((sector) => (
+                <Marker
+                  key={sector.id}
+                  position={[sector.lat, sector.lon]}
+                  icon={createSectorPin(sector, selectedSector?.id === sector.id)}
+                  eventHandlers={{
+                    click: () => handleJumpToSector(sector),
+                  }}
+                />
+              ))}
+
+            {/* Active Research Vessels */}
+            {showVessels &&
+              HYDROGRAPHIC_VESSELS.map((vessel) => (
+                <Marker
+                  key={vessel.id}
+                  position={[vessel.lat, vessel.lon]}
+                  icon={createVesselPin(vessel, selectedVessel?.id === vessel.id)}
+                  eventHandlers={{
+                    click: () => handleJumpToVessel(vessel),
+                  }}
+                />
+              ))}
+          </MapContainer>
+
+          {/* Floating Sexy Map Control HUD */}
+          <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+            {/* Search Input */}
+            <div className="relative flex items-center w-64">
+              <Search className="w-3.5 h-3.5 text-[#7C8AA0] absolute left-3 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search sector, port, or vessel..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-[#080B11]/90 border border-[#1B2330] rounded-xl pl-8 pr-3 py-1.5 text-[9px] text-[#EAEFF5] placeholder-[#7C8AA0] focus:outline-none focus:border-[#4CD9E8]/60 backdrop-blur-md shadow-xl"
+              />
             </div>
+
+            {/* Layer Filter Toggles */}
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-[#080B11]/90 border border-[#1B2330] backdrop-blur-md shadow-xl text-[8px]">
+              <button
+                onClick={() => setShowEEZ(!showEEZ)}
+                className={`px-2 py-1 rounded-lg font-bold transition-all ${
+                  showEEZ
+                    ? 'bg-[#4CD9E8]/20 text-[#4CD9E8] border border-[#4CD9E8]/40'
+                    : 'text-[#7C8AA0]'
+                }`}
+              >
+                EEZ BOUNDARY
+              </button>
+              <button
+                onClick={() => setShowSectors(!showSectors)}
+                className={`px-2 py-1 rounded-lg font-bold transition-all ${
+                  showSectors
+                    ? 'bg-[#4CD9E8]/20 text-[#4CD9E8] border border-[#4CD9E8]/40'
+                    : 'text-[#7C8AA0]'
+                }`}
+              >
+                8 SECTORS
+              </button>
+              <button
+                onClick={() => setShowVessels(!showVessels)}
+                className={`px-2 py-1 rounded-lg font-bold transition-all ${
+                  showVessels
+                    ? 'bg-[#29B6F6]/20 text-[#29B6F6] border border-[#29B6F6]/40'
+                    : 'text-[#7C8AA0]'
+                }`}
+              >
+                4 VESSELS
+              </button>
+            </div>
+          </div>
+
+          {/* Floating Map Reset Button */}
+          <div className="absolute bottom-3 left-3 z-10">
             <button
-              onClick={() => setSelectedScan(null)}
-              className="text-slate-400 hover:text-slate-100 p-1 rounded-lg hover:bg-slate-800"
+              onClick={handleResetIndiaView}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#080B11]/90 border border-[#1B2330] hover:border-[#4CD9E8] text-[#4CD9E8] text-[9px] font-bold backdrop-blur-md shadow-xl transition-all"
             >
-              <X className="w-4 h-4" />
+              <Maximize2 className="w-3 h-3" />
+              <span>RESET INDIA OVERVIEW</span>
             </button>
           </div>
+        </div>
 
-          <div className="py-3 space-y-2.5 text-xs font-mono">
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-400">GPS Coordinates:</span>
-              <span className="text-slate-100 font-bold">
-                {selectedScan.location.latitude?.toFixed(4)}°N,{' '}
-                {selectedScan.location.longitude?.toFixed(4)}°E
-              </span>
-            </div>
+        {/* Right Side: Tactical Sector & Vessel Intelligence Drawer */}
+        <div className="w-80 md:w-96 bg-[#10151D] border-l border-[#1B2330] flex flex-col overflow-y-auto z-10 shadow-2xl p-3.5 space-y-3 shrink-0">
+          {selectedSector && (
+            <>
+              {/* Sector Header */}
+              <div className="p-3.5 rounded-xl bg-[#080B11] border border-[#1B2330] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-[#4CD9E8]/15 text-[#4CD9E8] border border-[#4CD9E8]/30">
+                    {selectedSector.id}
+                  </span>
+                  <span
+                    className={`text-[8px] font-black px-2 py-0.5 rounded border ${
+                      selectedSector.status === 'HIGH ALERT'
+                        ? 'bg-[#F04438]/15 text-[#F04438] border-[#F04438]/40'
+                        : selectedSector.status === 'ACTIVE SURVEY'
+                        ? 'bg-[#4CD9E8]/15 text-[#4CD9E8] border-[#4CD9E8]/40'
+                        : 'bg-[#3FD98A]/15 text-[#3FD98A] border-[#3FD98A]/40'
+                    }`}
+                  >
+                    {selectedSector.status}
+                  </span>
+                </div>
 
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-400">Total Targets:</span>
-              <span className="text-cyan-300 font-bold text-sm">
-                {selectedScan.total_detections}
-              </span>
-            </div>
+                <h3 className="text-sm font-black text-[#EAEFF5] leading-snug">
+                  {selectedSector.name}
+                </h3>
+                <p className="text-[9px] text-[#7C8AA0]">
+                  {selectedSector.subName} · {selectedSector.fleetCommand}
+                </p>
 
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-400">Peak Confidence:</span>
-              <span className="text-emerald-400 font-bold">
-                {(selectedScan.highest_confidence * 100).toFixed(1)}%
-              </span>
-            </div>
+                {/* Telemetry Metrics Grid */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#1B2330] text-[9px]">
+                  <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
+                    <span className="text-[7px] text-[#7C8AA0] uppercase block">BATHYMETRY DEPTH</span>
+                    <strong className="text-[#29B6F6] font-bold">{selectedSector.depthRangeM}</strong>
+                  </div>
+                  <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
+                    <span className="text-[7px] text-[#7C8AA0] uppercase block">TOTAL CONTACTS</span>
+                    <strong className="text-[#4CD9E8] font-bold">{selectedSector.contactsLogged} Cataloged</strong>
+                  </div>
+                  <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
+                    <span className="text-[7px] text-[#7C8AA0] uppercase block">HIGH-RISK THREATS</span>
+                    <strong className="text-[#F04438] font-bold">{selectedSector.criticalThreats} Critical</strong>
+                  </div>
+                  <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
+                    <span className="text-[7px] text-[#7C8AA0] uppercase block">ASSIGNED VESSEL</span>
+                    <strong className="text-[#EAEFF5] font-bold">{selectedSector.assignedVessel}</strong>
+                  </div>
+                </div>
+              </div>
 
-            {/* Target Breakdown Badges */}
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {(selectedScan.ghost_net_count || 0) > 0 && (
-                <span className="px-2 py-0.5 rounded-md bg-purple-950/80 border border-purple-500/40 text-purple-300 text-[10px]">
-                  {selectedScan.ghost_net_count} Ghost Nets
+              {/* Sector Environmental & Hydrographic Findings */}
+              <div className="p-3.5 rounded-xl bg-[#080B11] border border-[#1B2330] space-y-1.5 text-[9px]">
+                <span className="text-[8px] font-bold text-[#7C8AA0] uppercase tracking-wider block">
+                  SURVEY INTELLIGENCE & THREAT SUMMARY
                 </span>
-              )}
-              {(selectedScan.debris_count || 0) > 0 && (
-                <span className="px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[10px]">
-                  {selectedScan.debris_count} Marine Debris
+                <p className="text-[#EAEFF5] leading-relaxed">
+                  {selectedSector.description}
+                </p>
+                <div className="pt-2 text-[8px] text-[#4CD9E8]">
+                  PRIMARY TARGET CLASS: <strong className="text-[#EAEFF5]">{selectedSector.primaryClass}</strong>
+                </div>
+              </div>
+
+              {/* Action: Jump to Flagship Mission Control / Sonar Viewer */}
+              <div className="space-y-2 pt-1">
+                <button
+                  onClick={() => setActiveTab('sonar')}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#4CD9E8] text-[#080B11] font-black text-xs hover:bg-[#29B6F6] transition-all shadow-[0_0_20px_rgba(76,217,232,0.3)] cursor-pointer active:scale-98"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>INSPECT IN SONAR STUDIO</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('mission')}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#161C26] border border-[#1B2330] hover:border-[#4CD9E8]/50 text-[#EAEFF5] font-bold text-xs transition-all cursor-pointer"
+                >
+                  <Crosshair className="w-4 h-4 text-[#4CD9E8]" />
+                  <span>OPEN MISSION CONTROL CONSOLE</span>
+                </button>
+              </div>
+            </>
+          )}
+
+          {selectedVessel && (
+            <div className="p-3.5 rounded-xl bg-[#080B11] border border-[#1B2330] space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-[#29B6F6]/15 text-[#29B6F6] border border-[#29B6F6]/30">
+                  {selectedVessel.pennant}
                 </span>
-              )}
-              {(selectedScan.pipeline_count || 0) > 0 && (
-                <span className="px-2 py-0.5 rounded-md bg-blue-950/80 border border-blue-500/40 text-blue-300 text-[10px]">
-                  {selectedScan.pipeline_count} Pipelines
-                </span>
-              )}
+                <span className="text-[8px] font-bold text-[#3FD98A]">● UNDERWAY SURVEY</span>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-black text-[#EAEFF5]">{selectedVessel.name}</h3>
+                <p className="text-[9px] text-[#7C8AA0]">{selectedVessel.type} · {selectedVessel.operator}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-[9px]">
+                <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
+                  <span className="text-[7px] text-[#7C8AA0] block uppercase">HEADING</span>
+                  <strong className="text-[#4CD9E8] font-bold">{selectedVessel.headingDeg}° TRUE</strong>
+                </div>
+                <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
+                  <span className="text-[7px] text-[#7C8AA0] block uppercase">SPEED</span>
+                  <strong className="text-[#EAEFF5] font-bold">{selectedVessel.speedKts} KTS</strong>
+                </div>
+                <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
+                  <span className="text-[7px] text-[#7C8AA0] block uppercase">SWATH WIDTH</span>
+                  <strong className="text-[#29B6F6] font-bold">{selectedVessel.swathWidthM} Meters</strong>
+                </div>
+                <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
+                  <span className="text-[7px] text-[#7C8AA0] block uppercase">SECTOR</span>
+                  <strong className="text-[#EAEFF5] font-bold">{selectedVessel.currentSector}</strong>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Quick List of All 8 Indian Sectors */}
+          <div className="pt-2 border-t border-[#1B2330] space-y-2">
+            <span className="text-[8px] font-bold text-[#7C8AA0] uppercase tracking-wider block">
+              ALL INDIAN SECTORS REGISTER
+            </span>
+            <div className="space-y-1 max-h-48 overflow-y-auto">
+              {INDIA_MARITIME_SECTORS.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => handleJumpToSector(s)}
+                  className={`w-full flex items-center justify-between p-2 rounded-lg border text-left transition-all ${
+                    selectedSector?.id === s.id
+                      ? 'bg-[#4CD9E8]/15 border-[#4CD9E8]/50 text-[#4CD9E8]'
+                      : 'bg-[#080B11] border-[#1B2330] text-[#7C8AA0] hover:border-[#4CD9E8]/30 hover:text-[#EAEFF5]'
+                  }`}
+                >
+                  <span className="text-[9px] font-bold truncate max-w-[170px]">{s.name}</span>
+                  <span className="text-[8px] font-mono text-[#EAEFF5]">{s.contactsLogged} Contacts</span>
+                </button>
+              ))}
             </div>
           </div>
-
-          <button
-            onClick={() => handleInspectInStudio(selectedScan)}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-bold text-xs font-mono flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>Inspect Swath in Studio</span>
-          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };

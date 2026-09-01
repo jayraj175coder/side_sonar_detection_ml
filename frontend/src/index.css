@@ -257,9 +257,77 @@
 .animate-eq-4 { animation: eq-bar 0.7s ease-in-out infinite 0.45s; }
 .animate-eq-5 { animation: eq-bar 0.9s ease-in-out infinite 0.2s; }
 
+/* Sexy Cyber-Naval Glassmorphism & Neon Glow Utilities */
+.sexy-glass-panel {
+  background: linear-gradient(135deg, rgba(16, 28, 48, 0.85) 0%, rgba(8, 14, 26, 0.92) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(76, 217, 232, 0.18);
+  box-shadow: 
+    0 12px 40px -5px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(76, 217, 232, 0.08),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.sexy-glass-card {
+  background: linear-gradient(135deg, rgba(16, 28, 48, 0.7) 0%, rgba(8, 14, 26, 0.8) 100%);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(76, 217, 232, 0.12);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sexy-glass-card:hover {
+  background: linear-gradient(135deg, rgba(22, 40, 68, 0.88) 0%, rgba(10, 20, 36, 0.95) 100%);
+  border-color: rgba(76, 217, 232, 0.5);
+  box-shadow: 
+    0 16px 45px -5px rgba(0, 0, 0, 0.85),
+    0 0 25px 0 rgba(76, 217, 232, 0.2),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.sexy-glow-cyan {
+  box-shadow: 0 0 25px rgba(76, 217, 232, 0.4);
+}
+
+.sexy-glow-purple {
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+}
+
+.sexy-glow-emerald {
+  box-shadow: 0 0 25px rgba(63, 217, 138, 0.4);
+}
+
+/* Rotating Conic Radar Sweep Beam */
+@keyframes radar-beam-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-radar-beam {
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(76, 217, 232, 0.35) 360deg);
+  animation: radar-beam-sweep 4s linear infinite;
+  transform-origin: center center;
+}
+
+/* Expanding Sonar Ping Ripples */
+@keyframes sonar-ripple {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+.animate-sonar-ripple {
+  animation: sonar-ripple 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+
 /* Custom Leaflet Dark Container & Marker Reset */
 .leaflet-container {
-  background: #030712 !important;
+  background: #080B11 !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   width: 100% !important;
   height: 100% !important;

@@ -3,61 +3,63 @@
 
 @layer base {
   :root {
-    /* Role-based Mission Console Surface Tokens */
-    --surface-console: #03070B;
-    --surface-panel: #081118;
-    --surface-inset: #0C171E;
-    --surface-panel-border: #16303B;
-    --surface-panel-border-glow: rgba(50, 230, 209, 0.35);
+    /* Role-based Mission Console Surface Tokens (Cold Naval Console) */
+    --surface-console: #080B11;
+    --surface-panel: #10151D;
+    --surface-panel-raised: #161C26;
+    --surface-border: #1B2330;
+    --surface-panel-border: #1B2330;
+    --surface-panel-border-glow: rgba(76, 217, 232, 0.35);
 
-    /* Acoustic Signals & Telemetry */
-    --signal-primary: #32E6D1;     /* Primary sonar acoustic return phosphor */
-    --signal-secondary: #29B6F6;   /* Hydrographic telemetry & USBL fix */
-    --signal-muted: #66848D;       /* Instrument metadata / scale ticks */
-    --signal-text: #E4F2F5;        /* High-contrast telemetry readout */
+    /* Single Signal Phosphor Identity (Cold Cyan #4CD9E8) */
+    --signal-primary: #4CD9E8;
+    --signal-primary-dim: rgba(76, 217, 232, 0.25);
+    --signal-secondary: #29B6F6;
+    --signal-muted: #7C8AA0;
+    --text-primary: #EAEFF5;
+    --text-secondary: #7C8AA0;
 
-    /* Mission Status Tokens (Open MCT / Control Room Standard) */
-    --status-nominal: #65D391;     /* Nominal operation */
-    --status-caution: #FFB547;     /* Degraded / Moderate uncertainty */
-    --status-critical: #FF5D5D;    /* Critical threat / High alert */
+    /* Mission Status Tokens (Restrained Control-Room Standard) */
+    --status-nominal: #3FD98A;     /* All-clear teal-green */
+    --status-caution: #F5A623;     /* Needs attention amber */
+    --status-critical: #F04438;    /* Urgent red */
 
     /* Contact Uncertainty Tokens */
-    --contact-confidence-high: #65D391;
-    --contact-confidence-med: #FFB547;
-    --contact-confidence-low: #FF5D5D;
+    --contact-confidence-high: #4CD9E8;
+    --contact-confidence-med: rgba(76, 217, 232, 0.65);
+    --contact-confidence-low: rgba(76, 217, 232, 0.3);
 
     /* Legacy Backward-Compatibility Variables */
-    --bg-abyss: #03070B;
-    --bg-surface: #081118;
-    --bg-surface-2: #0C171E;
-    --border-subsea: #16303B;
-    --border-subsea-glow: rgba(50, 230, 209, 0.4);
-    --text-primary: #E4F2F5;
-    --text-muted: #66848D;
-    --sonar-cyan: #32E6D1;
+    --bg-abyss: #080B11;
+    --bg-surface: #10151D;
+    --bg-surface-2: #161C26;
+    --border-subsea: #1B2330;
+    --border-subsea-glow: rgba(76, 217, 232, 0.35);
+    --text-muted: #7C8AA0;
+    --sonar-cyan: #4CD9E8;
     --acoustic-blue: #29B6F6;
-    --warning: #FFB547;
-    --critical: #FF5D5D;
-    --success: #65D391;
-    --accent-cyan: #32E6D1;
-    --accent-teal: #14B8A6;
-    --accent-amber: #FFB547;
+    --warning: #F5A623;
+    --critical: #F04438;
+    --success: #3FD98A;
+    --accent-cyan: #4CD9E8;
+    --accent-teal: #3FD98A;
+    --accent-amber: #F5A623;
     --accent-purple: #A855F7;
     --accent-blue: #29B6F6;
     
     /* Semantic Detection Colors */
     --color-ghost-net: #A855F7;
-    --color-debris: #FFB547;
+    --color-debris: #F5A623;
     --color-pipeline: #29B6F6;
-    --color-anomaly: #32E6D1;
-    --color-milco: #FF5D5D;
-    --color-nombo: #32E6D1;
+    --color-anomaly: #4CD9E8;
+    --color-milco: #F04438;
+    --color-nombo: #4CD9E8;
   }
 
   body {
-    background: radial-gradient(circle at 50% 0%, #0C171E 0%, #081118 40%, #03070B 100%);
-    background-color: #03070B;
-    color: #E4F2F5;
+    background: radial-gradient(circle at 50% 0%, #161C26 0%, #10151D 40%, #080B11 100%);
+    background-color: #080B11;
+    color: #EAEFF5;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;

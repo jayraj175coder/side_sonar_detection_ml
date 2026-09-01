@@ -1,8 +1,54 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import type { MissionStatus, PlaybackSpeed } from '../types';
 import { MISSION_TARGETS } from '../data/targets';
-import { MISSION_DURATION_SECONDS } from '../data/mission';
-import { PIPELINE_STAGES } from '../data/pipeline';
+import { MISSION_DURATION_SECONDS, MISSION_DATA } from '../data/mission';
+
+export interface DemoLogEntry {
+  timestamp: string;
+  stage: string;
+  message: string;
+  type: 'info' | 'contact' | 'nav' | 'complete';
+}
+
+export interface DemoStageInfo {
+  index: number;
+  title: string;
+  caption: string;
+  durationMs: number;
+}
+
+export const GUIDED_DEMO_STAGES: DemoStageInfo[] = [
+  {
+    index: 0,
+    title: 'DEPLOYING AUV',
+    caption: 'AUV-3 INS Sandhayak initializing towfish — Altitude locked at 8.4m AGL · 900 kHz transducer online',
+    durationMs: 3500,
+  },
+  {
+    index: 1,
+    title: 'SURVEY UNDERWAY',
+    caption: 'Survey line 2 of 4 — Swath width 75m · Speed 4.1 kts · Ping rate 10 Hz · Acoustic mosaic streaming live',
+    durationMs: 4500,
+  },
+  {
+    index: 2,
+    title: 'CONTACT DETECTED',
+    caption: 'Contact SX-T07 acquired on Trackline 2 — Range 18.4m Port · Bearing 284° · Ping index 6,200',
+    durationMs: 4500,
+  },
+  {
+    index: 3,
+    title: 'CONTACT CLASSIFIED',
+    caption: 'Contact analysis: 1.84m × 0.71m · Shadow 2.31m confirms 0.82m elevation · TS -12.8 dB · Moored mine geometry',
+    durationMs: 4500,
+  },
+  {
+    index: 4,
+    title: 'MISSION COMPLETE',
+    caption: 'Survey complete: 4 tracklines verified · 38.7 km surveyed · 12.84 km² mapped · 17 contacts logged',
+    durationMs: 4000,
+  },
+];
 
 interface MissionContextType {
   // Target selection (shared across all panels)
@@ -21,10 +67,6 @@ interface MissionContextType {
   playbackSpeed: PlaybackSpeed;
   setPlaybackSpeed: (s: PlaybackSpeed) => void;
 
-  // Active pipeline stage (-1 = none, 0-9 = stage index)
-  activePipelineStage: number;
-  completedPipelineStages: Set<number>;
-
   // Display toggles
   showTargets: boolean;
   setShowTargets: (v: boolean) => void;
@@ -35,11 +77,16 @@ interface MissionContextType {
   showSwath: boolean;
   setShowSwath: (v: boolean) => void;
 
-  // Demo sequence
+  // Guided Walkthrough Demo
   isDemoRunning: boolean;
-  demoStep: number;
-  demoMessage: string;
+  demoStage: number;
+  demoStageInfo: DemoStageInfo;
+  demoLog: DemoLogEntry[];
+  isDemoPaused: boolean;
   launchDemo: () => void;
+  pauseDemo: () => void;
+  resumeDemo: () => void;
+  skipDemo: () => void;
   resetMission: () => void;
 
   // Computed: targets visible at current playback time
@@ -57,159 +104,184 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [playbackTime, setPlaybackTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<PlaybackSpeed>(1);
-  const [activePipelineStage, setActivePipelineStage] = useState(-1);
-  const [completedPipelineStages, setCompletedPipelineStages] = useState<Set<number>>(new Set());
+
   const [showTargets, setShowTargets] = useState(true);
   const [showTrack, setShowTrack] = useState(true);
   const [showBathymetry, setShowBathymetry] = useState(true);
   const [showSwath, setShowSwath] = useState(true);
-  const [isDemoRunning, setIsDemoRunning] = useState(false);
-  const [demoStep, setDemoStep] = useState(0);
-  const [demoMessage, setDemoMessage] = useState('');
 
-  const demoTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Guided Demo Walkthrough State
+  const [isDemoRunning, setIsDemoRunning] = useState(false);
+  const [demoStage, setDemoStage] = useState(0);
+  const [isDemoPaused, setIsDemoPaused] = useState(false);
+  const [demoLog, setDemoLog] = useState<DemoLogEntry[]>([]);
+
+  const demoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stageStartTimeRef = useRef<number>(0);
+  const stageRemainingRef = useRef<number>(0);
+
+  const addLog = useCallback((stage: string, message: string, type: DemoLogEntry['type']) => {
+    const now = new Date();
+    const timeStr = now.toTimeString().split(' ')[0] + '.' + Math.floor(now.getMilliseconds() / 100);
+    setDemoLog((prev) => [{ timestamp: timeStr, stage, message, type }, ...prev.slice(0, 19)]);
+  }, []);
 
   const resetMission = useCallback(() => {
-    if (demoTimeoutRef.current) clearTimeout(demoTimeoutRef.current);
+    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
     setSelectedTargetId(null);
     setMissionStatus('idle');
     setPlaybackTime(0);
     setIsPlaying(false);
-    setActivePipelineStage(-1);
-    setCompletedPipelineStages(new Set());
     setIsDemoRunning(false);
-    setDemoStep(0);
-    setDemoMessage('');
+    setDemoStage(0);
+    setIsDemoPaused(false);
+    setDemoLog([]);
   }, []);
+
+  const executeStage = useCallback((stageIdx: number) => {
+    if (stageIdx >= GUIDED_DEMO_STAGES.length) {
+      // Demo completed
+      setMissionStatus('complete');
+      setIsDemoRunning(false);
+      setIsPlaying(true);
+      return;
+    }
+
+    setDemoStage(stageIdx);
+    const stage = GUIDED_DEMO_STAGES[stageIdx];
+    stageStartTimeRef.current = Date.now();
+    stageRemainingRef.current = stage.durationMs;
+
+    switch (stageIdx) {
+      case 0: // DEPLOYING
+        setMissionStatus('initializing');
+        setSelectedTargetId(null);
+        setPlaybackTime(0);
+        setIsPlaying(true);
+        addLog('NAV', 'INS Sandhayak deployed · Towfish subsea lock at 8.4m AGL', 'nav');
+        break;
+
+      case 1: // SURVEY UNDERWAY
+        setMissionStatus('running');
+        setPlaybackTime(1800);
+        setIsPlaying(true);
+        addLog('SURVEY', 'Trackline 2 active · Acoustic mosaic streaming at 10 Hz', 'info');
+        break;
+
+      case 2: // CONTACT DETECTED
+        setMissionStatus('running');
+        setSelectedTargetId('SX-T07');
+        setPlaybackTime(620);
+        setIsPlaying(false);
+        addLog('CONTACT', 'Contact SX-T07 detected at range 18.4m Port · Bearing 284°', 'contact');
+        break;
+
+      case 3: // CONTACT CLASSIFIED
+        setMissionStatus('running');
+        setSelectedTargetId('SX-T07');
+        addLog('CLASSIFY', 'Contact SX-T07 verified: 1.84m × 0.71m · TS -12.8 dB · Shadow confirms spherical body', 'contact');
+        break;
+
+      case 4: // MISSION COMPLETE
+        setMissionStatus('complete');
+        addLog('COMPLETE', 'Survey run complete · 38.7 km surveyed · 17 contacts logged in register', 'complete');
+        break;
+    }
+
+    demoTimerRef.current = setTimeout(() => {
+      executeStage(stageIdx + 1);
+    }, stage.durationMs);
+  }, [addLog]);
 
   const launchDemo = useCallback(() => {
     resetMission();
     setIsDemoRunning(true);
-    setMissionStatus('initializing');
+    setIsDemoPaused(false);
+    executeStage(0);
+  }, [resetMission, executeStage]);
 
-    const STEPS: { delay: number; message: string; action: () => void }[] = [
-      {
-        delay: 0,
-        message: 'MISSION INITIALIZING — SX-014',
-        action: () => { setDemoStep(0); setMissionStatus('initializing'); },
-      },
-      {
-        delay: 900,
-        message: 'SONAR DATA INGESTED — 2,048 PINGS',
-        action: () => {
-          setDemoStep(1);
-          setActivePipelineStage(0);
-          setCompletedPipelineStages(new Set([0]));
-        },
-      },
-      {
-        delay: 1800,
-        message: 'PREPROCESSING — NOISE REDUCTION COMPLETE',
-        action: () => {
-          setDemoStep(2);
-          setActivePipelineStage(2);
-          setCompletedPipelineStages(new Set([0, 1, 2]));
-          setMissionStatus('running');
-        },
-      },
-      {
-        delay: 2800,
-        message: 'AI DETECTION — YOLOV8N INFERENCE RUNNING',
-        action: () => {
-          setDemoStep(3);
-          setActivePipelineStage(4);
-          setCompletedPipelineStages(new Set([0, 1, 2, 3, 4]));
-          setPlaybackTime(1200);
-        },
-      },
-      {
-        delay: 3800,
-        message: '17 TARGETS FOUND — CLASSIFYING',
-        action: () => {
-          setDemoStep(4);
-          setActivePipelineStage(7);
-          setCompletedPipelineStages(new Set([0, 1, 2, 3, 4, 5, 6, 7]));
-          setPlaybackTime(3000);
-        },
-      },
-      {
-        delay: 4600,
-        message: '4 PRIORITY TARGETS — GEOREFERENCING',
-        action: () => {
-          setDemoStep(5);
-          setActivePipelineStage(8);
-          setCompletedPipelineStages(new Set([0, 1, 2, 3, 4, 5, 6, 7, 8]));
-          setPlaybackTime(5000);
-        },
-      },
-      {
-        delay: 5400,
-        message: 'TARGET SX-T07 SELECTED — HIGHEST CONFIDENCE',
-        action: () => {
-          setDemoStep(6);
-          setSelectedTargetId('SX-T07');
-          setPlaybackTime(620);
-        },
-      },
-      {
-        delay: 6400,
-        message: 'EVIDENCE ANALYSIS — SHADOW GEOMETRY MATCH',
-        action: () => {
-          setDemoStep(7);
-          setActivePipelineStage(9);
-          setCompletedPipelineStages(new Set([0,1,2,3,4,5,6,7,8,9]));
-        },
-      },
-      {
-        delay: 7400,
-        message: '3D TARGET LOCATION — RENDERING SEAFLOOR',
-        action: () => { setDemoStep(8); },
-      },
-      {
-        delay: 8400,
-        message: 'MISSION COMPLETE — REPORT READY',
-        action: () => {
-          setDemoStep(9);
-          setMissionStatus('complete');
-          setIsDemoRunning(false);
-          setIsPlaying(true);
-        },
-      },
-    ];
+  const pauseDemo = useCallback(() => {
+    if (!isDemoRunning || isDemoPaused) return;
+    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
+    const elapsed = Date.now() - stageStartTimeRef.current;
+    stageRemainingRef.current = Math.max(500, stageRemainingRef.current - elapsed);
+    setIsDemoPaused(true);
+    setIsPlaying(false);
+  }, [isDemoRunning, isDemoPaused]);
 
-    STEPS.forEach(({ delay, message, action }) => {
-      const t = setTimeout(() => {
-        setDemoMessage(message);
-        action();
-      }, delay);
-      demoTimeoutRef.current = t;
-    });
-  }, [resetMission]);
+  const resumeDemo = useCallback(() => {
+    if (!isDemoRunning || !isDemoPaused) return;
+    setIsDemoPaused(false);
+    setIsPlaying(true);
+    stageStartTimeRef.current = Date.now();
+    demoTimerRef.current = setTimeout(() => {
+      executeStage(demoStage + 1);
+    }, stageRemainingRef.current);
+  }, [isDemoRunning, isDemoPaused, demoStage, executeStage]);
 
-  // Targets visible at current playback time
-  const visibleTargetIds = MISSION_TARGETS
-    .filter((t) => t.pingTime <= playbackTime)
-    .map((t) => t.id);
+  const skipDemo = useCallback(() => {
+    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
+    setDemoStage(4);
+    setSelectedTargetId('SX-T07');
+    setPlaybackTime(620);
+    setMissionStatus('complete');
+    setIsDemoRunning(false);
+    setIsDemoPaused(false);
+    setIsPlaying(false);
+    addLog('COMPLETE', 'Jumped to mission summary · 17 contacts cataloged', 'complete');
+  }, [addLog]);
 
-  const missionProgress = Math.round((playbackTime / MISSION_DURATION_SECONDS) * 100);
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
+    };
+  }, []);
+
+  // Visible targets based on time
+  const visibleTargetIds = MISSION_TARGETS.filter((t) => t.pingTime <= playbackTime + 40).map(
+    (t) => t.id
+  );
+
+  const missionProgress = Math.min(100, Math.round((playbackTime / MISSION_DURATION_SECONDS) * 100));
+
+  const demoStageInfo = GUIDED_DEMO_STAGES[Math.min(demoStage, GUIDED_DEMO_STAGES.length - 1)];
 
   return (
-    <MissionContext.Provider value={{
-      selectedTargetId, setSelectedTargetId,
-      missionStatus, setMissionStatus,
-      playbackTime, setPlaybackTime,
-      isPlaying, setIsPlaying,
-      playbackSpeed, setPlaybackSpeed,
-      activePipelineStage, completedPipelineStages,
-      showTargets, setShowTargets,
-      showTrack, setShowTrack,
-      showBathymetry, setShowBathymetry,
-      showSwath, setShowSwath,
-      isDemoRunning, demoStep, demoMessage,
-      launchDemo, resetMission,
-      visibleTargetIds,
-      missionProgress,
-    }}>
+    <MissionContext.Provider
+      value={{
+        selectedTargetId,
+        setSelectedTargetId,
+        missionStatus,
+        setMissionStatus,
+        playbackTime,
+        setPlaybackTime,
+        isPlaying,
+        setIsPlaying,
+        playbackSpeed,
+        setPlaybackSpeed,
+        showTargets,
+        setShowTargets,
+        showTrack,
+        setShowTrack,
+        showBathymetry,
+        setShowBathymetry,
+        showSwath,
+        setShowSwath,
+        isDemoRunning,
+        demoStage,
+        demoStageInfo,
+        demoLog,
+        isDemoPaused,
+        launchDemo,
+        pauseDemo,
+        resumeDemo,
+        skipDemo,
+        resetMission,
+        visibleTargetIds,
+        missionProgress,
+      }}
+    >
       {children}
     </MissionContext.Provider>
   );
@@ -217,6 +289,6 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
 export const useMission = (): MissionContextType => {
   const ctx = useContext(MissionContext);
-  if (!ctx) throw new Error('useMission must be used inside MissionProvider');
+  if (!ctx) throw new Error('useMission must be used within MissionProvider');
   return ctx;
 };

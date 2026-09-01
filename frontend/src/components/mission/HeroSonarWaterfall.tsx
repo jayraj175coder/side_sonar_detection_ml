@@ -68,18 +68,18 @@ export const HeroSonarWaterfall: React.FC = () => {
       if (pal === 'amber') {
         // Sepia / Bronze amber phosphor
         const r = Math.floor(adjusted * 255);
-        const gVal = Math.floor(adjusted * 180);
-        const b = Math.floor(adjusted * 60);
+        const gVal = Math.floor(adjusted * 179);
+        const b = Math.floor(adjusted * 71);
         return `rgb(${r},${gVal},${b})`;
       } else if (pal === 'grayscale') {
         // High-contrast monochrome
         const v = Math.floor(adjusted * 255);
         return `rgb(${v},${v},${v})`;
       } else {
-        // Phosphor Marine Cyan (Default)
-        const r = Math.floor(adjusted * 60);
-        const gVal = Math.floor(adjusted * 230);
-        const b = Math.floor(adjusted * 220);
+        // Cold Phosphor Marine Cyan #4CD9E8 (Default)
+        const r = Math.floor(adjusted * 76);
+        const gVal = Math.floor(adjusted * 217);
+        const b = Math.floor(adjusted * 232);
         return `rgb(${r},${gVal},${b})`;
       }
     },
@@ -121,8 +121,8 @@ export const HeroSonarWaterfall: React.FC = () => {
 
       ctx.clearRect(0, 0, W, H);
 
-      // Deep console background
-      ctx.fillStyle = '#01050A';
+      // Deep console background (#080B11)
+      ctx.fillStyle = '#080B11';
       ctx.fillRect(0, 0, W, H);
 
       const cx = W / 2;
@@ -149,7 +149,7 @@ export const HeroSonarWaterfall: React.FC = () => {
 
           // 1. Nadir water column gap (acoustic travel time directly under towfish)
           if (absDist < nadirWidthPx / 2) {
-            ctx.fillStyle = 'rgb(1, 4, 8)';
+            ctx.fillStyle = 'rgb(4, 7, 12)';
             ctx.fillRect(x, y, 2, rowHeight);
             continue;
           }
@@ -195,7 +195,7 @@ export const HeroSonarWaterfall: React.FC = () => {
                 const shadowLengthPx = target.shadowLength * pxPerMeter * 1.5;
                 if (shadowStartDist > 0 && shadowStartDist < shadowLengthPx) {
                   const shadowFade = Math.abs(distX) < 16 ? 1 : 0.5;
-                  intensity = Math.min(intensity, 0.015 * shadowFade);
+                  intensity = Math.min(intensity, 0.012 * shadowFade);
                 }
               }
             }
@@ -213,14 +213,14 @@ export const HeroSonarWaterfall: React.FC = () => {
         cx + nadirWidthPx / 2,
         0
       );
-      nadirGrad.addColorStop(0, 'rgba(50, 230, 209, 0.25)');
-      nadirGrad.addColorStop(0.5, 'rgba(2, 8, 16, 0.95)');
-      nadirGrad.addColorStop(1, 'rgba(50, 230, 209, 0.25)');
+      nadirGrad.addColorStop(0, 'rgba(76, 217, 232, 0.25)');
+      nadirGrad.addColorStop(0.5, 'rgba(4, 7, 12, 0.95)');
+      nadirGrad.addColorStop(1, 'rgba(76, 217, 232, 0.25)');
       ctx.fillStyle = nadirGrad;
       ctx.fillRect(cx - nadirWidthPx / 2, 0, nadirWidthPx, H);
 
       // Nadir Centerline tick
-      ctx.strokeStyle = 'rgba(50, 230, 209, 0.3)';
+      ctx.strokeStyle = 'rgba(76, 217, 232, 0.3)';
       ctx.lineWidth = 1;
       ctx.setLineDash([4, 6]);
       ctx.beginPath();
@@ -250,15 +250,14 @@ export const HeroSonarWaterfall: React.FC = () => {
           const pulse = 0.7 + 0.3 * Math.sin(frameCount * 0.08);
 
           ctx.save();
-          ctx.strokeStyle = target.color;
+          ctx.strokeStyle = isSelected ? '#4CD9E8' : 'rgba(76, 217, 232, 0.7)';
           ctx.lineWidth = isSelected ? 2 : 1;
           ctx.globalAlpha = isSelected ? 1 : pulse * 0.85;
 
           if (isSelected) {
-            ctx.shadowColor = target.color;
+            ctx.shadowColor = '#4CD9E8';
             ctx.shadowBlur = 10;
             // Crosshairs extending across swath
-            ctx.strokeStyle = target.color;
             ctx.setLineDash([2, 4]);
             ctx.beginPath();
             ctx.moveTo(0, targetY);
@@ -271,9 +270,9 @@ export const HeroSonarWaterfall: React.FC = () => {
           ctx.strokeRect(targetX - boxW / 2, targetY - boxH / 2, boxW, boxH);
 
           // Caliper tag
-          ctx.fillStyle = '#03070B';
+          ctx.fillStyle = '#080B11';
           ctx.fillRect(targetX - boxW / 2, targetY - boxH / 2 - 14, 52, 13);
-          ctx.fillStyle = target.color;
+          ctx.fillStyle = isSelected ? '#4CD9E8' : '#EAEFF5';
           ctx.font = 'bold 8px JetBrains Mono, monospace';
           ctx.fillText(
             `${target.id} ${(target.confidence * 100).toFixed(0)}%`,
@@ -287,9 +286,9 @@ export const HeroSonarWaterfall: React.FC = () => {
 
       // Draw Horizontal Across-Track Scale Range Ticks
       if (ticks) {
-        ctx.fillStyle = '#03070B';
+        ctx.fillStyle = '#080B11';
         ctx.fillRect(0, H - 24, W, 24);
-        ctx.strokeStyle = '#16303B';
+        ctx.strokeStyle = '#1B2330';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(0, H - 24);
@@ -305,7 +304,7 @@ export const HeroSonarWaterfall: React.FC = () => {
             rx = cx + (nadirWidthPx / 2 + m * pxPerMeter);
           }
 
-          ctx.fillStyle = 'rgba(102, 132, 141, 0.7)';
+          ctx.fillStyle = 'rgba(124, 138, 160, 0.7)';
           ctx.fillRect(rx, H - 24, 1, 6);
           ctx.font = '9px JetBrains Mono, monospace';
           ctx.textAlign = 'center';
@@ -318,12 +317,12 @@ export const HeroSonarWaterfall: React.FC = () => {
 
         // Port / Starboard labels
         ctx.textAlign = 'left';
-        ctx.fillStyle = '#32E6D1';
+        ctx.fillStyle = '#4CD9E8';
         ctx.font = 'bold 9px JetBrains Mono, monospace';
         ctx.fillText('◀ PORT SWATH (37.5m)', 12, H - 8);
 
         ctx.textAlign = 'right';
-        ctx.fillStyle = '#32E6D1';
+        ctx.fillStyle = '#4CD9E8';
         ctx.fillText('STARBOARD SWATH (37.5m) ▶', W - 12, H - 8);
       }
 
@@ -413,23 +412,23 @@ export const HeroSonarWaterfall: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col h-full bg-[#01050A] overflow-hidden select-none font-mono">
+    <div className="relative flex flex-col h-full bg-[#080B11] overflow-hidden select-none font-mono">
       {/* Top Sonar Toolbar */}
-      <div className="flex items-center justify-between px-3.5 py-2 bg-[#081118] border-b border-[#16303B] shrink-0 z-10">
+      <div className="flex items-center justify-between px-3.5 py-2 bg-[#10151D] border-b border-[#1B2330] shrink-0 z-10">
         <div className="flex items-center gap-2">
-          <Activity className="w-3.5 h-3.5 text-[#32E6D1]" />
-          <span className="text-[10px] font-black text-[#E4F2F5] uppercase tracking-wider">
+          <Activity className="w-3.5 h-3.5 text-[#4CD9E8]" />
+          <span className="text-[10px] font-black text-[#EAEFF5] uppercase tracking-wider">
             SIDE-SCAN ACOUSTIC WATERFALL MOSAIC
           </span>
-          <span className="text-[9px] text-[#66848D]">
+          <span className="text-[9px] text-[#7C8AA0]">
             · 900 kHz · 75m Swath · TVG Active
           </span>
         </div>
 
         {/* Sonar Control Calibrators */}
-        <div className="flex items-center gap-3 text-[9px] text-[#66848D]">
+        <div className="flex items-center gap-3 text-[9px] text-[#7C8AA0]">
           {/* Gain slider */}
-          <div className="flex items-center gap-1.5 bg-[#0C171E] px-2 py-1 rounded-lg border border-[#16303B]">
+          <div className="flex items-center gap-1.5 bg-[#161C26] px-2 py-1 rounded-lg border border-[#1B2330]">
             <span>GAIN</span>
             <input
               type="range"
@@ -438,15 +437,15 @@ export const HeroSonarWaterfall: React.FC = () => {
               step={0.1}
               value={gain}
               onChange={(e) => setGain(Number(e.target.value))}
-              className="w-16 h-1 accent-[#32E6D1] cursor-pointer"
+              className="w-16 h-1 accent-[#4CD9E8] cursor-pointer"
             />
-            <span className="text-[#32E6D1] font-bold w-7">
+            <span className="text-[#4CD9E8] font-bold w-7">
               {gain.toFixed(1)}×
             </span>
           </div>
 
           {/* Contrast slider */}
-          <div className="flex items-center gap-1.5 bg-[#0C171E] px-2 py-1 rounded-lg border border-[#16303B]">
+          <div className="flex items-center gap-1.5 bg-[#161C26] px-2 py-1 rounded-lg border border-[#1B2330]">
             <span>CONTRAST</span>
             <input
               type="range"
@@ -455,23 +454,23 @@ export const HeroSonarWaterfall: React.FC = () => {
               step={0.1}
               value={contrast}
               onChange={(e) => setContrast(Number(e.target.value))}
-              className="w-16 h-1 accent-[#32E6D1] cursor-pointer"
+              className="w-16 h-1 accent-[#4CD9E8] cursor-pointer"
             />
-            <span className="text-[#32E6D1] font-bold w-7">
+            <span className="text-[#4CD9E8] font-bold w-7">
               {contrast.toFixed(1)}×
             </span>
           </div>
 
           {/* Palette Switcher */}
-          <div className="flex items-center rounded-lg border border-[#16303B] overflow-hidden">
+          <div className="flex items-center rounded-lg border border-[#1B2330] overflow-hidden">
             {(['cyan', 'amber', 'grayscale'] as PaletteType[]).map((p) => (
               <button
                 key={p}
                 onClick={() => setPalette(p)}
                 className={`px-2 py-1 text-[8px] font-bold uppercase transition-colors ${
                   palette === p
-                    ? 'bg-[#32E6D1]/20 text-[#32E6D1]'
-                    : 'bg-[#0C171E] text-[#66848D] hover:text-[#E4F2F5]'
+                    ? 'bg-[#4CD9E8]/20 text-[#4CD9E8]'
+                    : 'bg-[#161C26] text-[#7C8AA0] hover:text-[#EAEFF5]'
                 }`}
               >
                 {p}
@@ -484,8 +483,8 @@ export const HeroSonarWaterfall: React.FC = () => {
             onClick={() => setShowOverlays(!showOverlays)}
             className={`p-1.5 rounded-lg border transition-colors ${
               showOverlays
-                ? 'bg-[#32E6D1]/15 border-[#32E6D1]/40 text-[#32E6D1]'
-                : 'bg-[#0C171E] border-[#16303B] text-[#66848D]'
+                ? 'bg-[#4CD9E8]/15 border-[#4CD9E8]/40 text-[#4CD9E8]'
+                : 'bg-[#161C26] border-[#1B2330] text-[#7C8AA0]'
             }`}
             title="Toggle Contact Bounding Overlays"
           >
@@ -508,12 +507,12 @@ export const HeroSonarWaterfall: React.FC = () => {
 
         {/* Hover Coordinate HUD */}
         {isHovering && hoverCoord && (
-          <div className="absolute top-2 left-2 z-20 px-2.5 py-1.5 rounded-lg bg-[#03070B]/90 border border-[#16303B] text-[9px] text-[#66848D] flex items-center gap-3">
+          <div className="absolute top-2 left-2 z-20 px-2.5 py-1.5 rounded-lg bg-[#080B11]/90 border border-[#1B2330] text-[9px] text-[#7C8AA0] flex items-center gap-3">
             <span>
-              ACROSS: <strong className="text-[#32E6D1]">{hoverCoord.rangeM > 0 ? `+${hoverCoord.rangeM}m STBD` : `${hoverCoord.rangeM}m PORT`}</strong>
+              ACROSS: <strong className="text-[#4CD9E8]">{hoverCoord.rangeM > 0 ? `+${hoverCoord.rangeM}m STBD` : `${hoverCoord.rangeM}m PORT`}</strong>
             </span>
             <span>
-              PING: <strong className="text-[#E4F2F5]">{hoverCoord.ping.toLocaleString()}</strong>
+              PING: <strong className="text-[#EAEFF5]">{hoverCoord.ping.toLocaleString()}</strong>
             </span>
             <span className="text-[#29B6F6]">TVG: ACTIVE</span>
           </div>
@@ -521,13 +520,13 @@ export const HeroSonarWaterfall: React.FC = () => {
 
         {/* Selected Contact Status Tag */}
         {selectedTargetId && (
-          <div className="absolute top-2 right-2 z-20 px-3 py-1.5 rounded-lg bg-[#03070B]/95 border border-[#32E6D1]/40 text-[9px] flex items-center gap-2 shadow-xl">
-            <span className="w-2 h-2 rounded-full bg-[#32E6D1] animate-ping" />
-            <span className="text-[#66848D]">LOCKED:</span>
-            <strong className="text-[#32E6D1]">{selectedTargetId}</strong>
+          <div className="absolute top-2 right-2 z-20 px-3 py-1.5 rounded-lg bg-[#080B11]/95 border border-[#4CD9E8]/40 text-[9px] flex items-center gap-2 shadow-xl">
+            <span className="w-2 h-2 rounded-full bg-[#4CD9E8] animate-ping" />
+            <span className="text-[#7C8AA0]">LOCKED:</span>
+            <strong className="text-[#4CD9E8]">{selectedTargetId}</strong>
             <button
               onClick={() => setSelectedTargetId(null)}
-              className="text-[#66848D] hover:text-[#FF5D5D] ml-1 font-bold"
+              className="text-[#7C8AA0] hover:text-[#F04438] ml-1 font-bold"
             >
               ✕
             </button>

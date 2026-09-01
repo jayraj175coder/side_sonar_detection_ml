@@ -53,12 +53,12 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
   );
 
   return (
-    <div className="flex flex-col h-full bg-[#081118] border-r border-[#16303B] overflow-hidden select-none font-mono">
+    <div className="flex flex-col h-full bg-[#10151D] border-r border-[#1B2330] overflow-hidden select-none font-mono">
       {/* Header */}
-      <div className="px-3.5 py-2.5 border-b border-[#16303B] bg-[#03070B]/80 flex items-center justify-between shrink-0">
+      <div className="px-3.5 py-2.5 border-b border-[#1B2330] bg-[#080B11] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <FolderTree className="w-3.5 h-3.5 text-[#32E6D1]" />
-          <span className="text-[10px] font-black text-[#E4F2F5] uppercase tracking-widest">
+          <FolderTree className="w-3.5 h-3.5 text-[#4CD9E8]" />
+          <span className="text-[10px] font-black text-[#EAEFF5] uppercase tracking-widest">
             SURVEY HIERARCHY
           </span>
         </div>
@@ -66,7 +66,7 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
           <button
             onClick={onCollapse}
             title="Collapse tree to left"
-            className="p-1 rounded bg-[#0C171E] border border-[#16303B] hover:border-[#32E6D1]/40 text-[#66848D] hover:text-[#32E6D1] transition-colors"
+            className="p-1 rounded bg-[#161C26] border border-[#1B2330] hover:border-[#4CD9E8]/40 text-[#7C8AA0] hover:text-[#4CD9E8] transition-colors"
           >
             <ChevronRight className="w-3.5 h-3.5 rotate-180" />
           </button>
@@ -74,15 +74,15 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
       </div>
 
       {/* Filter / Search Bar */}
-      <div className="p-2 border-b border-[#16303B]/60 bg-[#060D14]/70 shrink-0">
+      <div className="p-2 border-b border-[#1B2330]/60 bg-[#080B11]/70 shrink-0">
         <div className="relative flex items-center">
-          <Search className="w-3 h-3 text-[#66848D] absolute left-2.5 pointer-events-none" />
+          <Search className="w-3 h-3 text-[#7C8AA0] absolute left-2.5 pointer-events-none" />
           <input
             type="text"
             placeholder="Filter line or contact..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#03070B] border border-[#16303B] rounded-lg pl-7 pr-2 py-1 text-[9px] text-[#E4F2F5] placeholder-[#66848D] focus:outline-none focus:border-[#32E6D1]/50"
+            className="w-full bg-[#080B11] border border-[#1B2330] rounded-lg pl-7 pr-2 py-1 text-[9px] text-[#EAEFF5] placeholder-[#7C8AA0] focus:outline-none focus:border-[#4CD9E8]/50"
           />
         </div>
       </div>
@@ -93,27 +93,27 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
         <div className="space-y-1">
           <div
             onClick={() => toggleNode('mission')}
-            className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-[#0C171E] border border-[#16303B] hover:border-[#32E6D1]/40 cursor-pointer transition-all"
+            className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-[#161C26] border border-[#1B2330] hover:border-[#4CD9E8]/40 cursor-pointer transition-all"
           >
             <div className="flex items-center gap-1.5 min-w-0">
               {expandedNodes['mission'] ? (
-                <ChevronDown className="w-3 h-3 text-[#32E6D1] shrink-0" />
+                <ChevronDown className="w-3 h-3 text-[#4CD9E8] shrink-0" />
               ) : (
-                <ChevronRight className="w-3 h-3 text-[#66848D] shrink-0" />
+                <ChevronRight className="w-3 h-3 text-[#7C8AA0] shrink-0" />
               )}
-              <Radio className="w-3 h-3 text-[#32E6D1] shrink-0 animate-pulse" />
-              <span className="text-[10px] font-bold text-[#E4F2F5] truncate">
+              <Radio className="w-3 h-3 text-[#4CD9E8] shrink-0 animate-pulse" />
+              <span className="text-[10px] font-bold text-[#EAEFF5] truncate">
                 {MISSION_DATA.id} · {MISSION_DATA.name}
               </span>
             </div>
-            <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#32E6D1]/10 text-[#32E6D1] border border-[#32E6D1]/30 shrink-0">
+            <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#4CD9E8]/10 text-[#4CD9E8] border border-[#4CD9E8]/30 shrink-0">
               4 LINES
             </span>
           </div>
 
           {/* Tracklines Sub-Tree */}
           {expandedNodes['mission'] && (
-            <div className="pl-3 space-y-1.5 border-l border-[#16303B]/60 ml-2 mt-1">
+            <div className="pl-3 space-y-1.5 border-l border-[#1B2330]/60 ml-2 mt-1">
               {MISSION_DATA.tracklines.map((line) => {
                 const lineTargets = filteredTargets.filter((t) =>
                   line.targetIds.includes(t.id)
@@ -127,42 +127,41 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
                       onClick={() => toggleNode(line.id)}
                       className={`flex items-center justify-between px-2 py-1.5 rounded-lg border text-left cursor-pointer transition-all ${
                         isLineOpen
-                          ? 'bg-[#0A141E] border-[#16303B] text-[#E4F2F5]'
-                          : 'bg-[#03070B] border-[#16303B]/60 text-[#66848D] hover:border-[#32E6D1]/30'
+                          ? 'bg-[#161C26] border-[#1B2330] text-[#EAEFF5]'
+                          : 'bg-[#080B11] border-[#1B2330]/60 text-[#7C8AA0] hover:border-[#4CD9E8]/30'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 min-w-0">
                         {isLineOpen ? (
                           <ChevronDown className="w-3 h-3 text-[#29B6F6] shrink-0" />
                         ) : (
-                          <ChevronRight className="w-3 h-3 text-[#66848D] shrink-0" />
+                          <ChevronRight className="w-3 h-3 text-[#7C8AA0] shrink-0" />
                         )}
                         <Compass className="w-3 h-3 text-[#29B6F6] shrink-0" />
                         <div className="min-w-0">
-                          <p className="text-[9px] font-bold text-[#E4F2F5] truncate">
+                          <p className="text-[9px] font-bold text-[#EAEFF5] truncate">
                             {line.id}
                           </p>
-                          <p className="text-[8px] text-[#66848D] truncate">
+                          <p className="text-[8px] text-[#7C8AA0] truncate">
                             HDG {line.heading}° · {line.lengthKm} km
                           </p>
                         </div>
                       </div>
-                      <span className="text-[8px] px-1 rounded bg-[#16303B] text-[#66848D] shrink-0">
+                      <span className="text-[8px] px-1 rounded bg-[#1B2330] text-[#7C8AA0] shrink-0">
                         {lineTargets.length}
                       </span>
                     </div>
 
                     {/* Contacts Node List */}
                     {isLineOpen && (
-                      <div className="pl-2.5 space-y-1 border-l border-[#16303B]/50 ml-2 mt-0.5">
+                      <div className="pl-2.5 space-y-1 border-l border-[#1B2330]/50 ml-2 mt-0.5">
                         {lineTargets.length === 0 ? (
-                          <p className="text-[8px] text-[#66848D] py-1 italic">
+                          <p className="text-[8px] text-[#7C8AA0] py-1 italic">
                             No contacts on this pass
                           </p>
                         ) : (
                           lineTargets.map((target) => {
                             const isSelected = selectedTargetId === target.id;
-                            const isVisible = visibleTargetIds.includes(target.id);
 
                             return (
                               <button
@@ -170,24 +169,24 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
                                 onClick={() => handleSelectTarget(target)}
                                 className={`w-full flex items-center justify-between p-1.5 rounded-lg border text-left transition-all ${
                                   isSelected
-                                    ? 'bg-[#32E6D1]/15 border-[#32E6D1]/50 shadow-[0_0_10px_rgba(50,230,209,0.15)] text-[#32E6D1]'
-                                    : 'bg-[#03070B]/70 border-[#16303B]/60 text-[#E4F2F5] hover:border-[#32E6D1]/40'
+                                    ? 'bg-[#4CD9E8]/15 border-[#4CD9E8]/50 shadow-[0_0_10px_rgba(76,217,232,0.15)] text-[#4CD9E8]'
+                                    : 'bg-[#080B11]/70 border-[#1B2330]/60 text-[#EAEFF5] hover:border-[#4CD9E8]/40'
                                 }`}
                               >
                                 <div className="min-w-0 pr-1">
                                   <div className="flex items-center gap-1.5">
                                     <div
                                       className="w-1.5 h-1.5 rounded-full shrink-0"
-                                      style={{ background: target.color }}
+                                      style={{ background: isSelected ? '#4CD9E8' : '#7C8AA0' }}
                                     />
                                     <span className="text-[9px] font-black truncate">
                                       {target.id}
                                     </span>
-                                    <span className="text-[8px] px-1 rounded bg-[#0C171E] border border-[#16303B] text-[#66848D]">
+                                    <span className="text-[8px] px-1 rounded bg-[#161C26] border border-[#1B2330] text-[#7C8AA0]">
                                       {target.classCode}
                                     </span>
                                   </div>
-                                  <div className="flex items-center gap-1 text-[8px] text-[#66848D] mt-0.5">
+                                  <div className="flex items-center gap-1 text-[8px] text-[#7C8AA0] mt-0.5">
                                     <span>
                                       {target.acrossTrackMeters < 0
                                         ? `${Math.abs(target.acrossTrackMeters)}m P`
@@ -199,20 +198,17 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
                                 </div>
 
                                 <div className="text-right shrink-0">
-                                  <span
-                                    className="text-[9px] font-black"
-                                    style={{ color: target.color }}
-                                  >
+                                  <span className="text-[9px] font-bold text-[#4CD9E8]">
                                     {(target.confidence * 100).toFixed(0)}%
                                   </span>
                                   <p
                                     className={`text-[7px] uppercase font-bold ${
                                       target.uncertaintyRating === 'LOW AMBIGUITY'
-                                        ? 'text-[#65D391]'
+                                        ? 'text-[#3FD98A]'
                                         : target.uncertaintyRating ===
                                           'MODERATE UNCERTAINTY'
-                                        ? 'text-[#FFB547]'
-                                        : 'text-[#FF5D5D]'
+                                        ? 'text-[#F5A623]'
+                                        : 'text-[#F04438]'
                                     }`}
                                   >
                                     {target.uncertaintyRating.split(' ')[0]}
@@ -233,22 +229,22 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
       </div>
 
       {/* Footer Stats summary */}
-      <div className="p-2.5 border-t border-[#16303B] bg-[#03070B]/80 text-[8px] text-[#66848D] space-y-1 shrink-0">
+      <div className="p-2.5 border-t border-[#1B2330] bg-[#080B11] text-[8px] text-[#7C8AA0] space-y-1 shrink-0">
         <div className="flex items-center justify-between">
           <span>CONTACTS LOGGED:</span>
-          <span className="font-bold text-[#E4F2F5]">
+          <span className="font-bold text-[#EAEFF5]">
             {MISSION_TARGETS.length} TOTAL
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span>HIGH AMBIGUITY:</span>
-          <span className="font-bold text-[#FFB547]">
+          <span>AMBIGUOUS CONTACTS:</span>
+          <span className="font-bold text-[#F5A623]">
             {
               MISSION_TARGETS.filter(
                 (t) => t.uncertaintyRating === 'HIGH UNCERTAINTY'
               ).length
             }{' '}
-            CONTACTS
+            FLAGGED
           </span>
         </div>
       </div>

@@ -98,7 +98,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!isDemoMode) {
         api
           .checkHealth()
-          .then((h) => {
+          .then((h: any) => {
             setApiHealth(h);
             setIsBackendConnected(true);
           })

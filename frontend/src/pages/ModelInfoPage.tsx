@@ -29,8 +29,8 @@ export const ModelInfoPage: React.FC = () => {
 
   useEffect(() => {
     api.getDatasets()
-      .then((data) => setDatasetCatalog(data))
-      .catch((err) => console.warn('Could not fetch datasets catalog:', err));
+      .then((data: any) => setDatasetCatalog(data))
+      .catch((err: any) => console.warn('Could not fetch datasets catalog:', err));
   }, []);
 
   return (

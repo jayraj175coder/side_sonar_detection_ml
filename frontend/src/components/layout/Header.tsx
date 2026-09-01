@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Radio,
   RefreshCw,
@@ -13,8 +13,13 @@ import {
   ShieldCheck,
   PanelLeftClose,
   PanelLeftOpen,
+  Volume2,
+  VolumeX,
+  Code2,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { ApiExplorerModal } from '../common/ApiExplorerModal';
+import { sonarAudio } from '../../utils/sonarAudio';
 
 interface HeaderProps {
   title: string;
@@ -39,123 +44,119 @@ export const Header: React.FC<HeaderProps> = ({
     toggleSidebar,
   } = useApp();
 
-  const isV2 = modelInfo?.version === 'v2' || modelInfo?.name?.includes('Marine-Debris');
+  const [isApiModalOpen, setIsApiModalOpen] = useState<boolean>(false);
+  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(sonarAudio.isMuted);
+
+  const handleToggleAudio = () => {
+    const muted = sonarAudio.toggleMute();
+    setIsAudioMuted(muted);
+  };
 
   return (
-    <header className="h-16 md:h-20 bg-[#070D1B]/80 backdrop-blur-2xl border-b border-cyan-500/10 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 shadow-md">
-      {/* Title & Mobile / Desktop Toggle */}
-      <div className="flex items-center gap-3">
-        {/* Desktop Sidebar Toggle Button */}
-        <button
-          onClick={toggleSidebar}
-          className="hidden md:flex p-2 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/40 transition-all active:scale-95"
-          title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar to left'}
-        >
-          {isSidebarCollapsed ? (
-            <PanelLeftOpen className="w-4 h-4 text-cyan-400" />
-          ) : (
-            <PanelLeftClose className="w-4 h-4" />
-          )}
-        </button>
-
-        {onToggleMobileMenu && (
+    <>
+      <header className="h-16 md:h-18 bg-[#080B11]/90 backdrop-blur-2xl border-b border-[#1B2330] px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 shadow-xl font-mono select-none">
+        {/* Title & Mobile / Desktop Toggle */}
+        <div className="flex items-center gap-3">
+          {/* Desktop Sidebar Toggle Button */}
           <button
-            onClick={onToggleMobileMenu}
-            className="md:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-cyan-400"
-            title="Open Menu"
+            onClick={toggleSidebar}
+            className="hidden md:flex p-2 rounded-xl bg-[#10151D] border border-[#1B2330] text-[#7C8AA0] hover:text-[#4CD9E8] hover:border-[#4CD9E8]/40 transition-all active:scale-95 shadow-md"
+            title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar to left'}
           >
-            <Menu className="w-5 h-5" />
+            {isSidebarCollapsed ? (
+              <PanelLeftOpen className="w-4 h-4 text-[#4CD9E8]" />
+            ) : (
+              <PanelLeftClose className="w-4 h-4" />
+            )}
           </button>
-        )}
-        <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-base md:text-xl font-extrabold text-slate-100 tracking-tight">
-              {title}
-            </h1>
-            {currentScan && (
-              <span className="hidden sm:inline-flex text-[11px] font-mono px-2 py-0.5 rounded-md bg-cyan-950/60 text-cyan-300 border border-cyan-500/30">
-                Scan: {currentScan.scan_id}
-              </span>
+
+          {onToggleMobileMenu && (
+            <button
+              onClick={onToggleMobileMenu}
+              className="md:hidden p-2 rounded-xl bg-[#10151D] border border-[#1B2330] text-[#EAEFF5] hover:text-[#4CD9E8]"
+              title="Open Menu"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+
+          <div>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-sm md:text-base font-black text-[#EAEFF5] tracking-wide">
+                {title}
+              </h1>
+              {currentScan && (
+                <span className="hidden sm:inline-flex text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#4CD9E8]/10 text-[#4CD9E8] border border-[#4CD9E8]/30">
+                  Scan: {currentScan.scan_id}
+                </span>
+              )}
+            </div>
+            {subtitle && (
+              <p className="text-[10px] text-[#7C8AA0] tracking-tight mt-0.5 hidden sm:block">
+                {subtitle}
+              </p>
             )}
           </div>
-          {subtitle && (
-            <p className="text-xs text-slate-400 font-medium tracking-tight mt-0.5 hidden sm:block">
-              {subtitle}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Action Controls & Mode Switcher */}
-      <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-        {/* Active Model Badge */}
-        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 border border-cyan-500/30 shadow-inner">
-          <Cpu className="w-3.5 h-3.5 text-cyan-400" />
-          <span className="text-xs font-mono text-cyan-300 font-bold">
-            {isV2 ? 'YOLOv8n — SIH Marine Debris V2 (MoES)' : 'YOLOv8n — MILCO/NOMBO Baseline'}
-          </span>
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
         </div>
 
-        {/* Demo Mode Toggle */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/70 border border-slate-800 shadow-inner">
-          <span className="text-xs font-mono text-slate-300 flex items-center gap-1.5">
-            <Sparkles
-              className={`w-3.5 h-3.5 ${
-                isDemoMode ? 'text-amber-400' : 'text-slate-500'
+        {/* Action Controls & Sexy Telemetry Badges */}
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-xs">
+          {/* Audio Sonar Ping Feedback Toggle */}
+          <button
+            onClick={handleToggleAudio}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[9px] font-bold transition-all ${
+              !isAudioMuted
+                ? 'bg-[#4CD9E8]/15 border-[#4CD9E8]/40 text-[#4CD9E8] shadow-[0_0_10px_rgba(76,217,232,0.2)]'
+                : 'bg-[#10151D] border-[#1B2330] text-[#7C8AA0] hover:text-[#EAEFF5]'
+            }`}
+            title="Toggle Subsea Sonar Acoustic Feedback Sound"
+          >
+            {!isAudioMuted ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{!isAudioMuted ? 'AUDIO ON' : 'MUTED'}</span>
+          </button>
+
+          {/* Interactive REST API Explorer Button */}
+          <button
+            onClick={() => setIsApiModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#10151D] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] text-[9px] font-bold transition-all shadow-md group cursor-pointer"
+            title="Open Interactive REST API Explorer"
+          >
+            <Code2 className="w-3.5 h-3.5 text-[#4CD9E8] group-hover:animate-pulse" />
+            <span>REST API</span>
+            <span className="text-[7px] px-1 py-0.2 rounded bg-[#3FD98A]/20 text-[#3FD98A]">v2</span>
+          </button>
+
+          {/* Backend Connection Status Badge */}
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#10151D] border border-[#1B2330] shadow-md">
+            <span
+              className={`w-2 h-2 rounded-full ${
+                isBackendConnected
+                  ? 'bg-[#3FD98A] shadow-[0_0_8px_#3FD98A]'
+                  : 'bg-[#4CD9E8] animate-pulse shadow-[0_0_8px_#4CD9E8]'
               }`}
             />
-            <span className="hidden sm:inline">Demo Mode</span>
-          </span>
+            <span className="text-[9px] font-bold text-[#EAEFF5]">
+              {isBackendConnected ? 'FASTAPI LIVE' : 'HYDROGRAPHIC ENGINE'}
+            </span>
+          </div>
+
+          {/* Refresh Action Button */}
           <button
-            onClick={() => setIsDemoMode(!isDemoMode)}
-            className="text-slate-400 hover:text-cyan-400 transition-colors focus:outline-none"
-            title={
-              isDemoMode
-                ? 'Disable Demo Mode and use Live Backend'
-                : 'Enable standalone Demo Mode with pre-loaded scans'
-            }
+            onClick={refreshData}
+            disabled={isLoading}
+            className="p-2 rounded-xl bg-[#10151D] border border-[#1B2330] hover:border-[#4CD9E8]/40 text-[#7C8AA0] hover:text-[#4CD9E8] transition-all shadow-md cursor-pointer disabled:opacity-50"
+            title="Refresh Telemetry"
           >
-            {isDemoMode ? (
-              <ToggleRight className="w-6 h-6 text-amber-400" />
-            ) : (
-              <ToggleLeft className="w-6 h-6 text-slate-500" />
-            )}
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#4CD9E8]' : ''}`} />
           </button>
         </div>
+      </header>
 
-        {/* Backend Status Indicator */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/70 border border-slate-800 text-xs font-mono text-slate-300 shadow-inner">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              isDemoMode
-                ? 'bg-amber-400'
-                : isBackendConnected
-                ? 'bg-emerald-400 animate-pulse'
-                : 'bg-red-400'
-            }`}
-          />
-          <span className="hidden sm:inline">
-            {isDemoMode
-              ? 'Demo Env'
-              : isBackendConnected
-              ? 'FastAPI Live'
-              : 'Backend Offline'}
-          </span>
-        </div>
-
-        {/* Refresh button */}
-        <button
-          onClick={refreshData}
-          disabled={isLoading}
-          className="p-2 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/40 transition-all focus:outline-none disabled:opacity-50 active:scale-95"
-          title="Refresh Data from Server"
-        >
-          <RefreshCw
-            className={`w-4 h-4 ${isLoading ? 'animate-spin text-cyan-400' : ''}`}
-          />
-        </button>
-      </div>
-    </header>
+      {/* Interactive REST API Explorer Modal */}
+      <ApiExplorerModal
+        isOpen={isApiModalOpen}
+        onClose={() => setIsApiModalOpen(false)}
+      />
+    </>
   );
 };

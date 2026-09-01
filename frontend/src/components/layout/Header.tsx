@@ -16,10 +16,13 @@ import {
   Volume2,
   VolumeX,
   Code2,
+  Key,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { ApiExplorerModal } from '../common/ApiExplorerModal';
+import { ApiKeyModal } from '../common/ApiKeyModal';
 import { sonarAudio } from '../../utils/sonarAudio';
+import { apiClient } from '../../services/api';
 
 interface HeaderProps {
   title: string;
@@ -45,7 +48,9 @@ export const Header: React.FC<HeaderProps> = ({
   } = useApp();
 
   const [isApiModalOpen, setIsApiModalOpen] = useState<boolean>(false);
+  const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(sonarAudio.isMuted);
+  const [hasCustomApiKey, setHasCustomApiKey] = useState<boolean>(!!apiClient.getApiKey());
 
   const handleToggleAudio = () => {
     const muted = sonarAudio.toggleMute();
@@ -101,7 +106,31 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action Controls & Sexy Telemetry Badges */}
         <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-xs">
-          {/* Audio Sonar Ping Feedback Toggle */}
+          {/* 1. API Key Access Badge / Trigger (Answers "API key required?" question immediately) */}
+          <button
+            onClick={() => setIsKeyModalOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#10151D] border border-[#3FD98A]/30 hover:border-[#3FD98A] text-[#EAEFF5] text-[9px] font-bold transition-all shadow-md group cursor-pointer"
+            title="Configure API Key / Access Mode"
+          >
+            <Key className="w-3.5 h-3.5 text-[#3FD98A]" />
+            <span className="hidden md:inline">API:</span>
+            <span className="text-[#3FD98A]">
+              {hasCustomApiKey ? 'CUSTOM KEY' : 'NO KEY REQ'}
+            </span>
+          </button>
+
+          {/* 2. Interactive REST API Explorer Button */}
+          <button
+            onClick={() => setIsApiModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#10151D] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] text-[9px] font-bold transition-all shadow-md group cursor-pointer"
+            title="Open Interactive REST API Explorer"
+          >
+            <Code2 className="w-3.5 h-3.5 text-[#4CD9E8] group-hover:animate-pulse" />
+            <span>REST API</span>
+            <span className="text-[7px] px-1 py-0.2 rounded bg-[#3FD98A]/20 text-[#3FD98A]">v2</span>
+          </button>
+
+          {/* 3. Audio Sonar Ping Feedback Toggle */}
           <button
             onClick={handleToggleAudio}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[9px] font-bold transition-all ${
@@ -115,18 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="hidden sm:inline">{!isAudioMuted ? 'AUDIO ON' : 'MUTED'}</span>
           </button>
 
-          {/* Interactive REST API Explorer Button */}
-          <button
-            onClick={() => setIsApiModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#10151D] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] text-[9px] font-bold transition-all shadow-md group cursor-pointer"
-            title="Open Interactive REST API Explorer"
-          >
-            <Code2 className="w-3.5 h-3.5 text-[#4CD9E8] group-hover:animate-pulse" />
-            <span>REST API</span>
-            <span className="text-[7px] px-1 py-0.2 rounded bg-[#3FD98A]/20 text-[#3FD98A]">v2</span>
-          </button>
-
-          {/* Backend Connection Status Badge */}
+          {/* 4. Backend Connection Status Badge */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#10151D] border border-[#1B2330] shadow-md">
             <span
               className={`w-2 h-2 rounded-full ${
@@ -140,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
-          {/* Refresh Action Button */}
+          {/* 5. Refresh Action Button */}
           <button
             onClick={refreshData}
             disabled={isLoading}
@@ -156,6 +174,13 @@ export const Header: React.FC<HeaderProps> = ({
       <ApiExplorerModal
         isOpen={isApiModalOpen}
         onClose={() => setIsApiModalOpen(false)}
+      />
+
+      {/* API Key & Access Credentials Modal */}
+      <ApiKeyModal
+        isOpen={isKeyModalOpen}
+        onClose={() => setIsKeyModalOpen(false)}
+        onKeyUpdated={(hasKey) => setHasCustomApiKey(hasKey)}
       />
     </>
   );

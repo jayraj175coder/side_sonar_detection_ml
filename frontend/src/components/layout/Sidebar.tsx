@@ -287,13 +287,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   </span>
                 )}
               </div>
+              {/* API Access Status Badge */}
+              <div className="flex items-center justify-between p-2 rounded-xl bg-[#080B11] border border-[#3FD98A]/30 text-[10px] font-mono">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#3FD98A] animate-pulse" />
+                  <span className="text-[#3FD98A] font-bold">Public Demo</span>
+                </div>
+                <span className="text-[9px] text-[#7C8AA0]">No Key Req</span>
+              </div>
             </>
           ) : (
             <div className="flex flex-col items-center gap-2 py-1">
               <button
                 onClick={toggleSidebar}
-                title="System Online · Click to expand"
-                className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"
+                title="System Online · No API Key Required · Click to expand"
+                className="w-3 h-3 rounded-full bg-[#3FD98A] animate-pulse"
               />
             </div>
           )}

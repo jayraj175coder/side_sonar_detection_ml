@@ -136,17 +136,42 @@ class ApiClient {
     return this.baseUrl;
   }
 
+  getApiKey(): string {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('sonarx_api_key') || '';
+    }
+    return '';
+  }
+
+  setApiKey(key: string): void {
+    if (typeof window !== 'undefined') {
+      if (key.trim()) {
+        localStorage.setItem('sonarx_api_key', key.trim());
+      } else {
+        localStorage.removeItem('sonarx_api_key');
+      }
+    }
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
+    const apiKey = this.getApiKey();
+    const headers: Record<string, string> = {
+      ...(options.headers as Record<string, string>),
+    };
+
+    if (apiKey) {
+      headers['Authorization'] = `Bearer ${apiKey}`;
+      headers['X-API-Key'] = apiKey;
+    }
+
     try {
       const response = await fetch(url, {
         ...options,
-        headers: {
-          ...options.headers,
-        },
+        headers,
       });
 
       if (!response.ok) {

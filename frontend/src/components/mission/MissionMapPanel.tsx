@@ -265,7 +265,7 @@ export const MissionMapPanel: React.FC = () => {
 
           {/* Classified Contact Markers */}
           {showTargets &&
-            MISSION_TARGETS.filter((t) => visibleTargetIds.includes(t.id)).map((target) => (
+            activeTargets.filter((t) => visibleTargetIds.includes(t.id)).map((target) => (
               <Marker
                 key={target.id}
                 position={[target.lat, target.lon]}

@@ -70,7 +70,7 @@ export const GuidedWalkthroughBar: React.FC = () => {
                   className="w-1.5 h-1.5 rounded-full"
                   style={{ background: scen.badgeColor }}
                 />
-                <span>{scen.name.split('—')[0].trim()}</span>
+                <span>{scen.name}</span>
               </button>
             ))}
           </div>

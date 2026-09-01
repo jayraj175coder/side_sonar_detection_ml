@@ -32,6 +32,7 @@ export const HeroSonarWaterfall: React.FC = () => {
     playbackSpeed,
     focusedPanel,
     setFocusedPanel,
+    activeTargets,
   } = useMission();
 
   const [gain, setGain] = useState<number>(1.2);
@@ -51,6 +52,7 @@ export const HeroSonarWaterfall: React.FC = () => {
     palette,
     showOverlays,
     showRangeTicks,
+    activeTargets,
   });
 
   stateRef.current = {
@@ -61,6 +63,7 @@ export const HeroSonarWaterfall: React.FC = () => {
     palette,
     showOverlays,
     showRangeTicks,
+    activeTargets,
   };
 
   // Convert normalized intensity (0..1) to palette RGB
@@ -232,9 +235,13 @@ export const HeroSonarWaterfall: React.FC = () => {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Draw Targets Overlay (Bounding Boxes, Calipers & Labels)
+      // Draw Targets Overlay (Bounding Boxes, Calipers & Debris Class Auto-Labels)
       if (overlays) {
-        MISSION_TARGETS.forEach((target) => {
+        const targetList = stateRef.current.activeTargets && stateRef.current.activeTargets.length > 0
+          ? stateRef.current.activeTargets
+          : MISSION_TARGETS;
+
+        targetList.forEach((target) => {
           const isSelected = selId === target.id;
           const isStarboard = target.acrossTrackMeters > 0;
           const targetDistPx =
@@ -247,19 +254,72 @@ export const HeroSonarWaterfall: React.FC = () => {
             return;
 
           const targetY = H - (pingAgeSeconds / secondsPerRow) * rowHeight;
-          const boxW = Math.max(34, target.length * pxPerMeter * 2);
-          const boxH = Math.max(24, target.width * pxPerMeter * 2);
+          const boxW = Math.max(38, target.length * pxPerMeter * 1.8);
+          const boxH = Math.max(26, target.width * pxPerMeter * 1.8);
 
-          const pulse = 0.7 + 0.3 * Math.sin(frameCount * 0.08);
+          // Class-specific color & styling
+          const isDebris = target.classCode === 'NET' || target.class.toLowerCase().includes('debris');
+          const isPipe = target.classCode === 'PIP' || target.class.toLowerCase().includes('pipeline');
+          const isMine = target.classCode === 'MLO' || target.class.toLowerCase().includes('mine');
+          const isWreck = target.classCode === 'WRK' || target.class.toLowerCase().includes('wreck');
+
+          const classColor = isDebris
+            ? '#A855F7'
+            : isPipe
+            ? '#29B6F6'
+            : isMine
+            ? '#F04438'
+            : isWreck
+            ? '#F5A623'
+            : target.color || '#4CD9E8';
+
+          const pulse = 0.75 + 0.25 * Math.sin(frameCount * 0.08);
 
           ctx.save();
-          ctx.strokeStyle = isSelected ? '#4CD9E8' : 'rgba(76, 217, 232, 0.7)';
+
+          // 1. Render Procedural Synthetic Acoustic Echo on the Mosaic
+          if (isPipe) {
+            // Continuous linear trace
+            ctx.fillStyle = classColor;
+            ctx.shadowColor = classColor;
+            ctx.shadowBlur = 8;
+            ctx.fillRect(targetX - boxW / 2, targetY - 2, boxW, 4);
+            // Parallel shadow
+            ctx.fillStyle = 'rgba(4, 7, 12, 0.9)';
+            ctx.fillRect(targetX - boxW / 2, isStarboard ? targetY + 4 : targetY - 10, boxW, 6);
+          } else if (isDebris) {
+            // Diffuse irregular net bundle
+            ctx.fillStyle = classColor;
+            ctx.shadowColor = classColor;
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            ctx.ellipse(targetX, targetY, boxW * 0.35, boxH * 0.3, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            // Soft porous shadow
+            ctx.fillStyle = 'rgba(4, 7, 12, 0.75)';
+            ctx.fillRect(isStarboard ? targetX + 12 : targetX - 24, targetY - 6, 14, 12);
+          } else {
+            // Discrete spherical/cylindrical ordnance or wreck
+            ctx.fillStyle = classColor;
+            ctx.shadowColor = classColor;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.ellipse(targetX, targetY, Math.max(5, boxW * 0.25), Math.max(4, boxH * 0.25), (target.orientation * Math.PI) / 180, 0, Math.PI * 2);
+            ctx.fill();
+            // Clean detached shadow
+            ctx.fillStyle = 'rgba(4, 7, 12, 0.95)';
+            const shLen = Math.max(16, target.shadowLength * 8);
+            ctx.fillRect(isStarboard ? targetX + 10 : targetX - 10 - shLen, targetY - 5, shLen, 10);
+          }
+
+          // 2. Bounding Box & Corner Reticles
+          ctx.strokeStyle = isSelected ? '#4CD9E8' : classColor;
           ctx.lineWidth = isSelected ? 2 : 1;
-          ctx.globalAlpha = isSelected ? 1 : pulse * 0.85;
+          ctx.globalAlpha = isSelected ? 1 : pulse * 0.9;
 
           if (isSelected) {
             ctx.shadowColor = '#4CD9E8';
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 12;
             // Crosshairs extending across swath
             ctx.setLineDash([2, 4]);
             ctx.beginPath();
@@ -272,16 +332,24 @@ export const HeroSonarWaterfall: React.FC = () => {
           // Target Bounding Box
           ctx.strokeRect(targetX - boxW / 2, targetY - boxH / 2, boxW, boxH);
 
-          // Caliper tag
+          // 3. Auto-Label Header Tag with Class & Confidence
+          const labelText = `${target.classCode || 'OBJ'}: ${target.class} ${(target.confidence * 100).toFixed(0)}%`;
+          const labelWidth = Math.max(80, labelText.length * 6 + 10);
+
           ctx.fillStyle = '#080B11';
-          ctx.fillRect(targetX - boxW / 2, targetY - boxH / 2 - 14, 52, 13);
-          ctx.fillStyle = isSelected ? '#4CD9E8' : '#EAEFF5';
+          ctx.fillRect(targetX - boxW / 2, targetY - boxH / 2 - 16, labelWidth, 15);
+          ctx.strokeStyle = classColor;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(targetX - boxW / 2, targetY - boxH / 2 - 16, labelWidth, 15);
+
+          ctx.fillStyle = classColor;
           ctx.font = 'bold 8px JetBrains Mono, monospace';
-          ctx.fillText(
-            `${target.id} ${(target.confidence * 100).toFixed(0)}%`,
-            targetX - boxW / 2 + 3,
-            targetY - boxH / 2 - 4
-          );
+          ctx.fillText(labelText, targetX - boxW / 2 + 4, targetY - boxH / 2 - 5);
+
+          // 4. Dimension Sub-Tag
+          ctx.fillStyle = '#7C8AA0';
+          ctx.font = '7px JetBrains Mono, monospace';
+          ctx.fillText(`${target.length}m × ${target.width}m`, targetX - boxW / 2, targetY + boxH / 2 + 10);
 
           ctx.restore();
         });
@@ -358,8 +426,11 @@ export const HeroSonarWaterfall: React.FC = () => {
     let nearestTargetId: string | null = null;
     let nearestTargetTime = 0;
     let shortestDist = Infinity;
+    const targetList = stateRef.current.activeTargets && stateRef.current.activeTargets.length > 0
+      ? stateRef.current.activeTargets
+      : MISSION_TARGETS;
 
-    MISSION_TARGETS.forEach((target) => {
+    targetList.forEach((target) => {
       const isStarboard = target.acrossTrackMeters > 0;
       const targetDistPx =
         nadirWidthPx / 2 + Math.abs(target.acrossTrackMeters) * pxPerMeter;

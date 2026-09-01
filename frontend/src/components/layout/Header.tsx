@@ -106,18 +106,12 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Action Controls & Sexy Telemetry Badges */}
         <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-xs">
-          {/* 1. API Key Access Badge / Trigger (Answers "API key required?" question immediately) */}
-          <button
-            onClick={() => setIsKeyModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#10151D] border border-[#3FD98A]/30 hover:border-[#3FD98A] text-[#EAEFF5] text-[9px] font-bold transition-all shadow-md group cursor-pointer"
-            title="Configure API Key / Access Mode"
-          >
-            <Key className="w-3.5 h-3.5 text-[#3FD98A]" />
-            <span className="hidden md:inline">API:</span>
-            <span className="text-[#3FD98A]">
-              {hasCustomApiKey ? 'CUSTOM KEY' : 'NO KEY REQ'}
-            </span>
-          </button>
+          {/* 1. MoES Drone Perception Status Badge */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#10151D] border border-[#3FD98A]/30 text-[#EAEFF5] text-[9px] font-bold shadow-md">
+            <span className="w-2 h-2 rounded-full bg-[#3FD98A] animate-pulse" />
+            <span className="text-[#3FD98A]">MoES AUV ENGINE</span>
+            <span className="text-[#7C8AA0] hidden md:inline">· AUTO-LABEL ON</span>
+          </div>
 
           {/* 2. Interactive REST API Explorer Button */}
           <button

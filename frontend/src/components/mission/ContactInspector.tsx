@@ -18,10 +18,10 @@ import { getTargetById, MISSION_TARGETS } from '../../data/targets';
 import type { MissionTarget } from '../../types';
 
 export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onCollapse }) => {
-  const { selectedTargetId, setSelectedTargetId, focusedPanel, setFocusedPanel } = useMission();
+  const { selectedTargetId, setSelectedTargetId, focusedPanel, setFocusedPanel, activeTargets } = useMission();
   const thumbnailCanvasRef = useRef<HTMLCanvasElement>(null);
 
-  const target = selectedTargetId ? getTargetById(selectedTargetId) : null;
+  const target = selectedTargetId ? (activeTargets.find(t => t.id === selectedTargetId) || getTargetById(selectedTargetId)) : null;
 
   // Render authentic high-resolution acoustic snippet thumbnail
   useEffect(() => {

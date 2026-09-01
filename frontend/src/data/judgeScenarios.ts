@@ -14,7 +14,7 @@ export interface JudgeScenario {
 export const JUDGE_SCENARIOS: JudgeScenario[] = [
   {
     id: 'debris',
-    name: 'Marine Debris & Ghost Net Clutter',
+    name: 'Ghost Net & Debris',
     category: 'Marine Debris (Natural / Clutter)',
     description: 'Irregular acoustic reflections from discarded monofilament nylon net and organic silt accumulation. Low confidence rating with ragged shadow boundary.',
     badgeColor: '#A855F7',
@@ -107,7 +107,7 @@ export const JUDGE_SCENARIOS: JudgeScenario[] = [
   },
   {
     id: 'ordnance',
-    name: 'Man-Made Object — Moored / Mine-Like',
+    name: 'Moored Ordnance (MLO)',
     category: 'Man-Made (Moored Object)',
     description: 'High-confidence spherical/cylindrical contact with intense specular highlight and clean 2.31m acoustic shadow confirming elevated naval ordnance geometry.',
     badgeColor: '#F04438',
@@ -163,7 +163,7 @@ export const JUDGE_SCENARIOS: JudgeScenario[] = [
   },
   {
     id: 'pipeline',
-    name: 'Man-Made Object — Pipeline & Cable Corridor',
+    name: 'Subsea Pipeline',
     category: 'Man-Made (Pipeline / Cable)',
     description: 'Continuous linear acoustic backscatter corridor with continuous parallel shadow. Distinct signature easily differentiated from point-source debris.',
     badgeColor: '#29B6F6',
@@ -219,7 +219,7 @@ export const JUDGE_SCENARIOS: JudgeScenario[] = [
   },
   {
     id: 'mixed',
-    name: 'Mixed Survey Line — Debris vs Man-Made',
+    name: 'Mixed Multi-Debris Survey',
     category: 'Mixed Multi-Target Survey',
     description: 'Survey line containing natural debris, an industrial pipeline, and a moored contact together, demonstrating clear differentiation across target classes in a single pass.',
     badgeColor: '#3FD98A',

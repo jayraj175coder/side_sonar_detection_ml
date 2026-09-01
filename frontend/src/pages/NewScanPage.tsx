@@ -6,7 +6,19 @@ import { DetectionViewer } from '../components/scan/DetectionViewer';
 import { useApp } from '../context/AppContext';
 import { apiClient } from '../services/api';
 import { PredictionResponse } from '../types';
-import { AlertTriangle, Sparkles, CheckCircle2, Cpu, UploadCloud, Eye, Zap, Radio } from 'lucide-react';
+import {
+  AlertTriangle,
+  Sparkles,
+  CheckCircle2,
+  Cpu,
+  UploadCloud,
+  Eye,
+  Zap,
+  Radio,
+  Database,
+  Info,
+  ListOrdered,
+} from 'lucide-react';
 import { sonarAudio } from '../utils/sonarAudio';
 
 // Curated Quick-Load Sonar Sample Scans for Evaluators / Judges
@@ -63,6 +75,7 @@ export const NewScanPage: React.FC = () => {
   } = useApp();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [batchFiles, setBatchFiles] = useState<File[]>([]);
   const [selectedPingLogFile, setSelectedPingLogFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [confidence, setConfidence] = useState<number>(0.25);
@@ -86,6 +99,10 @@ export const NewScanPage: React.FC = () => {
     }
   };
 
+  const handleBatchFilesSelected = (files: File[]) => {
+    setBatchFiles(files);
+  };
+
   const handlePingLogSelected = (file: File | null) => {
     setSelectedPingLogFile(file);
   };
@@ -102,10 +119,10 @@ export const NewScanPage: React.FC = () => {
     canvas.height = 480;
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      ctx.fillStyle = '#080B11';
+      ctx.fillStyle = '#03070E';
       ctx.fillRect(0, 0, 640, 480);
       // Nadir
-      ctx.fillStyle = '#04070C';
+      ctx.fillStyle = '#020408';
       ctx.fillRect(300, 0, 40, 480);
       // Speckle
       for (let x = 0; x < 640; x += 4) {
@@ -124,7 +141,7 @@ export const NewScanPage: React.FC = () => {
       ctx.ellipse(200, 220, 30, 20, 0.4, 0, Math.PI * 2);
       ctx.fill();
       // Shadow
-      ctx.fillStyle = '#04070C';
+      ctx.fillStyle = '#020408';
       ctx.fillRect(230, 210, 50, 20);
 
       const dataUrl = canvas.toDataURL('image/png');
@@ -178,76 +195,91 @@ export const NewScanPage: React.FC = () => {
           anomaly_count: 0,
           false_positives_suppressed: 1,
           noise_filtering_applied: noiseFilteringEnabled,
-          geotag_source: selectedPingLogFile ? 'ping_log' : (lat ? 'manual' : 'default'),
-          highest_confidence: 0.942,
-          status: 'completed',
+          geotag_source: selectedPingLogFile ? 'ping_log' : lat && lon ? 'manual' : 'none',
+          highest_confidence: 0.948,
+          status: 'COMPLETED',
+          imageUrl: previewUrl || '',
           location: {
-            latitude: lat ?? 18.9184,
-            longitude: lon ?? 72.8241,
-            heading: 178.0,
+            latitude: lat || 17.6868,
+            longitude: lon || 83.2185,
+            heading: 124,
           },
           detections: [
             {
               id: 'DET-01',
-              box: { x1: 175, y1: 180, x2: 245, y2: 260 },
-              confidence: 0.942,
-              class_name: 'Ghost Net',
-              class_id: 0,
-              area: 5600,
-              color: '#A855F7',
+              type: 'ghost_net_aldfg',
+              confidence: 0.948,
+              confidence_tier: 'HIGH',
+              noise_filter_passed: true,
+              bbox: {
+                x1: 140,
+                y1: 110,
+                x2: 240,
+                y2: 220,
+              },
             },
             {
               id: 'DET-02',
-              box: { x1: 420, y1: 290, x2: 510, y2: 360 },
-              confidence: 0.884,
-              class_name: 'Debris',
-              class_id: 1,
-              area: 6300,
-              color: '#F5A623',
+              type: 'anthropogenic_debris',
+              confidence: 0.812,
+              confidence_tier: 'MEDIUM',
+              noise_filter_passed: true,
+              bbox: {
+                x1: 340,
+                y1: 260,
+                x2: 430,
+                y2: 340,
+              },
             },
           ],
-        } as any;
+        };
       } else {
-        result = await apiClient.predict(
+        // Call FastAPI Backend
+        setCurrentStage(2);
+        const data = await apiClient.predict(
           selectedFile!,
           confidence,
           lat,
           lon,
-          selectedModelVersion
+          selectedModelVersion,
+          noiseFilteringEnabled,
+          selectedPingLogFile || undefined
         );
+        setCurrentStage(4);
+        result = data;
       }
 
       sonarAudio.playLockBeep();
       setCurrentScan(result);
-      await refreshData();
+      refreshData();
     } catch (err: any) {
-      setScanError(err.message || 'An error occurred during inference.');
+      console.error('Inference error:', err);
+      setScanError(err.message || 'Error occurred during sonar inference.');
     } finally {
       setIsAnalyzing(false);
     }
   };
 
   const handleResetScan = () => {
-    setSelectedFile(null);
-    setSelectedPingLogFile(null);
-    setPreviewUrl(null);
     setCurrentScan(null);
+    setSelectedFile(null);
+    setBatchFiles([]);
+    setPreviewUrl(null);
     setScanError(null);
-    setCurrentStage(1);
   };
 
-  const isShowingActiveScanResult = !!currentScan && (!!previewUrl || !!currentScan.imageUrl);
+  const isShowingActiveScanResult = !!currentScan;
 
   return (
     <div className="space-y-6 select-none font-mono">
       {/* 1. Header Hero Banner */}
-      <div className="p-5 md:p-6 rounded-2xl sexy-glass-panel border border-[#4CD9E8]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+      <div className="p-5 md:p-6 rounded-2xl glass-panel border border-[#152438] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
         <div className="space-y-1.5 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#4CD9E8]/10 border border-[#4CD9E8]/30 text-[#4CD9E8] text-[9px]">
             <Cpu className="w-3.5 h-3.5" />
             <span>Ministry of Earth Sciences (MoES) SSS Perception Pipeline</span>
           </div>
-          <h2 className="text-xl md:text-2xl font-black text-[#EAEFF5] tracking-tight">
+          <h2 className="text-xl md:text-2xl font-black text-[#EAEFF5] tracking-tight font-sans">
             Marine Debris & Sonar Anomaly Inspector
           </h2>
           <p className="text-xs text-[#7C8AA0] font-sans leading-relaxed">
@@ -258,12 +290,25 @@ export const NewScanPage: React.FC = () => {
         {isShowingActiveScanResult && (
           <button
             onClick={handleResetScan}
-            className="px-4 py-2.5 rounded-xl bg-[#4CD9E8] hover:bg-[#29B6F6] text-[#080B11] font-black text-xs flex items-center gap-2 shadow-lg shadow-[#4CD9E8]/25 transition-all active:scale-95 shrink-0 cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-[#4CD9E8] hover:bg-[#29B6F6] text-[#03070E] font-black text-xs flex items-center gap-2 shadow-lg shadow-[#4CD9E8]/25 transition-all active:scale-95 shrink-0 cursor-pointer"
           >
             <UploadCloud className="w-4 h-4" />
-            <span>Upload New Scan</span>
+            <span>Upload New Swath</span>
           </button>
         )}
+      </div>
+
+      {/* SIH GAP 5 — Honest Data Source & Provenance Disclosure Badge */}
+      <div className="p-3 rounded-xl bg-[#060D17] border border-[#152438] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[9px] text-[#7C8AA0]">
+        <div className="flex items-center gap-2">
+          <Database className="w-3.5 h-3.5 text-[#3FD98A] shrink-0" />
+          <span>
+            <strong className="text-[#3FD98A]">DATA PROVENANCE:</strong> 900 kHz SSS dual-frequency acoustic backscatter & OpenSonarDatasets survey logs (Gulf of Kutch, Gulf of Mannar, Mumbai High Basin, Visakhapatnam, Palk Strait).
+          </span>
+        </div>
+        <span className="text-[8px] px-2 py-0.5 rounded bg-[#0A1322] border border-[#152438] text-[#4CD9E8] font-bold">
+          MOES SIH 2026 SPEC
+        </span>
       </div>
 
       {/* 2. Pre-Loaded Curated Sample Sonar Scans (For Judges / Instant Testing) */}
@@ -339,6 +384,8 @@ export const NewScanPage: React.FC = () => {
               selectedFile={selectedFile}
               onPingLogSelected={handlePingLogSelected}
               selectedPingLogFile={selectedPingLogFile}
+              onBatchFilesSelected={handleBatchFilesSelected}
+              batchFiles={batchFiles}
             />
           )}
 

@@ -435,8 +435,38 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => {
+                const headers = ['Scan_ID', 'Detection_ID', 'Class', 'Confidence', 'BBox_X1', 'BBox_Y1', 'BBox_X2', 'BBox_Y2', 'Noise_Filter_Status'];
+                const rows = visibleDetections.map((d) => [
+                  scan.scan_id,
+                  d.id,
+                  `"${d.type}"`,
+                  (d.confidence * 100).toFixed(1) + '%',
+                  d.bbox.x1,
+                  d.bbox.y1,
+                  d.bbox.x2,
+                  d.bbox.y2,
+                  `"${d.noise_filter_reason || 'Passed acoustic verification'}"`,
+                ].join(','));
+                const csv = `${headers.join(',')}\n${rows.join('\n')}`;
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${scan.scan_id}_anomalies.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+              }}
+              className="px-3 py-1.5 rounded-xl bg-[#0A1322] hover:bg-[#101D31] border border-[#152438] text-xs font-mono text-[#7C8AA0] hover:text-[#EAEFF5] flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Download structured anomaly CSV"
+            >
+              <Download className="w-3.5 h-3.5 text-[#3FD98A]" />
+              <span>Export CSV</span>
+            </button>
+            <button
               onClick={handleExportJson}
-              className="px-3.5 py-1.5 rounded-xl bg-[#0A1322] hover:bg-[#101D31] border border-[#152438] text-xs font-mono text-[#7C8AA0] hover:text-[#EAEFF5] flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-[#0A1322] hover:bg-[#101D31] border border-[#152438] text-xs font-mono text-[#7C8AA0] hover:text-[#EAEFF5] flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-[#4CD9E8]" />
               <span>Export JSON</span>

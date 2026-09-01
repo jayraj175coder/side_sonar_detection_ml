@@ -232,17 +232,21 @@ class ApiClient {
   async predict(
     file: File,
     confidence: number = 0.75,
-    latitude: number = 18.9184,
-    longitude: number = 72.8241,
-    modelVersion: string = 'v2'
+    latitude?: number,
+    longitude?: number,
+    modelVersion: string = 'v2',
+    noiseFiltering: boolean = true,
+    pingLogFile?: File
   ): Promise<PredictionResponse> {
     try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('confidence', confidence.toString());
-      formData.append('latitude', latitude.toString());
-      formData.append('longitude', longitude.toString());
+      if (latitude !== undefined) formData.append('latitude', latitude.toString());
+      if (longitude !== undefined) formData.append('longitude', longitude.toString());
       formData.append('model_version', modelVersion);
+      formData.append('noise_filtering', noiseFiltering.toString());
+      if (pingLogFile) formData.append('ping_log', pingLogFile);
       return await this.request<PredictionResponse>('/api/predict', {
         method: 'POST',
         body: formData,

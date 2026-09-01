@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
-import type { MissionStatus, PlaybackSpeed } from '../types';
-import { MISSION_TARGETS } from '../data/targets';
+import type { MissionStatus, PlaybackSpeed, MissionTarget } from '../types';
+import { MISSION_TARGETS, getTargetById } from '../data/targets';
 import { MISSION_DURATION_SECONDS, MISSION_DATA } from '../data/mission';
+import { JUDGE_SCENARIOS, JudgeScenario } from '../data/judgeScenarios';
+import { sonarAudio } from '../utils/sonarAudio';
 
 export interface DemoLogEntry {
   timestamp: string;
@@ -27,40 +29,40 @@ export const GUIDED_DEMO_STAGES: DemoStageInfo[] = [
   {
     index: 1,
     title: 'SURVEY UNDERWAY',
-    caption: 'Survey line 2 of 4 — Swath width 75m · Speed 4.1 kts · Ping rate 10 Hz · Acoustic mosaic streaming live',
+    caption: 'Survey line active — Swath width 75m · Speed 4.1 kts · Ping rate 10 Hz · Acoustic mosaic streaming live',
     durationMs: 4500,
   },
   {
     index: 2,
     title: 'CONTACT DETECTED',
-    caption: 'Contact SX-T07 acquired on Trackline 2 — Range 18.4m Port · Bearing 284° · Ping index 6,200',
+    caption: 'Acoustic anomaly acquired on Trackline 2 — Range 18.4m Port · Bearing 284° · Specular echo confirmed',
     durationMs: 4500,
   },
   {
     index: 3,
     title: 'CONTACT CLASSIFIED',
-    caption: 'Contact analysis: 1.84m × 0.71m · Shadow 2.31m confirms 0.82m elevation · TS -12.8 dB · Moored mine geometry',
+    caption: 'Contact analysis: 1.84m × 0.71m · Shadow 2.31m confirms 0.82m elevation · TS -12.8 dB · System classification locked',
     durationMs: 4500,
   },
   {
     index: 4,
     title: 'MISSION COMPLETE',
-    caption: 'Survey complete: 4 tracklines verified · 38.7 km surveyed · 12.84 km² mapped · 17 contacts logged',
+    caption: 'Survey complete: Tracklines verified · 38.7 km surveyed · 12.84 km² mapped · Contacts logged to hydrographic register',
     durationMs: 4000,
   },
 ];
 
+export type FocusedPanelType = 'waterfall' | 'inspector' | 'map' | 'seabed' | 'signals' | 'tree' | null;
+
 interface MissionContextType {
-  // Target selection (shared across all panels)
+  // Target selection
   selectedTargetId: string | null;
   setSelectedTargetId: (id: string | null) => void;
 
-  // Mission status
+  // Mission status & playback
   missionStatus: MissionStatus;
   setMissionStatus: (s: MissionStatus) => void;
-
-  // Playback
-  playbackTime: number;        // 0 → MISSION_DURATION_SECONDS
+  playbackTime: number;
   setPlaybackTime: React.Dispatch<React.SetStateAction<number>>;
   isPlaying: boolean;
   setIsPlaying: (v: boolean) => void;
@@ -77,7 +79,21 @@ interface MissionContextType {
   showSwath: boolean;
   setShowSwath: (v: boolean) => void;
 
-  // Guided Walkthrough Demo
+  // Judge Mode & Scenario Selection (Feature 1)
+  isJudgeMode: boolean;
+  setIsJudgeMode: (v: boolean) => void;
+  activeScenarioId: string;
+  currentScenario: JudgeScenario;
+  selectScenario: (scenarioId: string) => void;
+  isAutoAdvance: boolean;
+  setIsAutoAdvance: (v: boolean) => void;
+
+  // Manual Step Controls (Feature 1)
+  manualNextStage: () => void;
+  manualPrevStage: () => void;
+  setStageDirectly: (stageIndex: number) => void;
+
+  // Walkthrough state
   isDemoRunning: boolean;
   demoStage: number;
   demoStageInfo: DemoStageInfo;
@@ -89,17 +105,24 @@ interface MissionContextType {
   skipDemo: () => void;
   resetMission: () => void;
 
-  // Computed: targets visible at current playback time
-  visibleTargetIds: string[];
+  // Expandable Panels / Focus Mode (Feature 3)
+  focusedPanel: FocusedPanelType;
+  setFocusedPanel: (panel: FocusedPanelType) => void;
 
-  // Mission progress (0-100)
+  // Custom Upload & Classify Contacts (Feature 2)
+  customTargets: MissionTarget[];
+  addCustomTarget: (target: MissionTarget) => void;
+
+  // Computed & Active Targets
+  activeTargets: MissionTarget[];
+  visibleTargetIds: string[];
   missionProgress: number;
 }
 
 const MissionContext = createContext<MissionContextType | undefined>(undefined);
 
 export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedTargetId, setSelectedTargetId] = useState<string | null>(null);
+  const [selectedTargetId, setSelectedTargetId] = useState<string | null>('SX-T07');
   const [missionStatus, setMissionStatus] = useState<MissionStatus>('idle');
   const [playbackTime, setPlaybackTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -110,142 +133,180 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [showBathymetry, setShowBathymetry] = useState(true);
   const [showSwath, setShowSwath] = useState(true);
 
-  // Guided Demo Walkthrough State
-  const [isDemoRunning, setIsDemoRunning] = useState(false);
-  const [demoStage, setDemoStage] = useState(0);
-  const [isDemoPaused, setIsDemoPaused] = useState(false);
+  // Judge Mode & Preset Scenarios
+  const [isJudgeMode, setIsJudgeMode] = useState<boolean>(true);
+  const [activeScenarioId, setActiveScenarioId] = useState<string>('mixed');
+  const [isAutoAdvance, setIsAutoAdvance] = useState<boolean>(false); // Manual step by default in Judge Mode
+
+  // Panel Focus State
+  const [focusedPanel, setFocusedPanel] = useState<FocusedPanelType>(null);
+
+  // Custom Classified Targets
+  const [customTargets, setCustomTargets] = useState<MissionTarget[]>([]);
+
+  // Guided Walkthrough State
+  const [isDemoRunning, setIsDemoRunning] = useState(true);
+  const [demoStage, setDemoStage] = useState(3); // Start in classified state so judges immediately see data
+  const [isDemoPaused, setIsDemoPaused] = useState(true);
   const [demoLog, setDemoLog] = useState<DemoLogEntry[]>([]);
 
   const demoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const stageStartTimeRef = useRef<number>(0);
-  const stageRemainingRef = useRef<number>(0);
+  const currentScenario = JUDGE_SCENARIOS.find((s) => s.id === activeScenarioId) || JUDGE_SCENARIOS[3];
 
-  const addLog = useCallback((stage: string, message: string, type: DemoLogEntry['type']) => {
-    const now = new Date();
-    const timeStr = now.toTimeString().split(' ')[0] + '.' + Math.floor(now.getMilliseconds() / 100);
-    setDemoLog((prev) => [{ timestamp: timeStr, stage, message, type }, ...prev.slice(0, 19)]);
+  // Active targets list combining default, scenario-seeded, and custom-uploaded targets
+  const activeTargets = React.useMemo(() => {
+    const base = currentScenario.targets.length > 0 ? currentScenario.targets : MISSION_TARGETS;
+    return [...base, ...customTargets];
+  }, [currentScenario, customTargets]);
+
+  const addCustomTarget = useCallback((target: MissionTarget) => {
+    setCustomTargets((prev) => [target, ...prev.filter((t) => t.id !== target.id)]);
+    setSelectedTargetId(target.id);
   }, []);
 
-  const resetMission = useCallback(() => {
-    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
-    setSelectedTargetId(null);
-    setMissionStatus('idle');
-    setPlaybackTime(0);
-    setIsPlaying(false);
-    setIsDemoRunning(false);
-    setDemoStage(0);
-    setIsDemoPaused(false);
-    setDemoLog([]);
+  const selectScenario = useCallback((scenarioId: string) => {
+    sonarAudio.playLockBeep();
+    setActiveScenarioId(scenarioId);
+    const scen = JUDGE_SCENARIOS.find((s) => s.id === scenarioId) || JUDGE_SCENARIOS[0];
+    setSelectedTargetId(scen.primaryContactId);
+    setDemoStage(3);
+    setPlaybackTime(580);
+    setMissionStatus('surveying');
   }, []);
 
-  const executeStage = useCallback((stageIdx: number) => {
-    if (stageIdx >= GUIDED_DEMO_STAGES.length) {
-      // Demo completed
-      setMissionStatus('complete');
-      setIsDemoRunning(false);
+  const executeStageActions = useCallback((stageIndex: number, scenario: JudgeScenario) => {
+    const stageCaption = scenario.stageNotes[stageIndex] || GUIDED_DEMO_STAGES[stageIndex]?.caption || '';
+    const now = new Date().toLocaleTimeString('en-GB');
+
+    if (stageIndex === 0) {
+      setMissionStatus('launching');
+      setPlaybackTime(0);
+      setSelectedTargetId(null);
+      setIsPlaying(false);
+      sonarAudio.playDepthPulse();
+    } else if (stageIndex === 1) {
+      setMissionStatus('surveying');
+      setPlaybackTime(320);
+      setSelectedTargetId(null);
       setIsPlaying(true);
+      sonarAudio.playSonarPing(0.9);
+    } else if (stageIndex === 2) {
+      setMissionStatus('contact_detected');
+      setPlaybackTime(580);
+      setSelectedTargetId(scenario.primaryContactId);
+      setIsPlaying(false);
+      sonarAudio.playLockBeep();
+    } else if (stageIndex === 3) {
+      setMissionStatus('contact_classified');
+      setPlaybackTime(620);
+      setSelectedTargetId(scenario.primaryContactId);
+      setIsPlaying(false);
+      sonarAudio.playSonarPing(1.2);
+    } else if (stageIndex === 4) {
+      setMissionStatus('completed');
+      setPlaybackTime(MISSION_DURATION_SECONDS);
+      setSelectedTargetId(scenario.primaryContactId);
+      setIsPlaying(false);
+      sonarAudio.playLockBeep();
+    }
+
+    setDemoLog((prev) => [
+      {
+        timestamp: now,
+        stage: GUIDED_DEMO_STAGES[stageIndex]?.title || `STAGE ${stageIndex + 1}`,
+        message: stageCaption,
+        type: stageIndex === 2 ? 'contact' : stageIndex === 4 ? 'complete' : 'info',
+      },
+      ...prev.slice(0, 19),
+    ]);
+  }, []);
+
+  const setStageDirectly = useCallback((stageIndex: number) => {
+    if (stageIndex < 0 || stageIndex >= GUIDED_DEMO_STAGES.length) return;
+    setDemoStage(stageIndex);
+    executeStageActions(stageIndex, currentScenario);
+  }, [currentScenario, executeStageActions]);
+
+  const manualNextStage = useCallback(() => {
+    const next = Math.min(GUIDED_DEMO_STAGES.length - 1, demoStage + 1);
+    setStageDirectly(next);
+  }, [demoStage, setStageDirectly]);
+
+  const manualPrevStage = useCallback(() => {
+    const prev = Math.max(0, demoStage - 1);
+    setStageDirectly(prev);
+  }, [demoStage, setStageDirectly]);
+
+  // Auto-advance timer (only active when isAutoAdvance is true)
+  useEffect(() => {
+    if (!isDemoRunning || isDemoPaused || !isAutoAdvance) {
+      if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
       return;
     }
 
-    setDemoStage(stageIdx);
-    const stage = GUIDED_DEMO_STAGES[stageIdx];
-    stageStartTimeRef.current = Date.now();
-    stageRemainingRef.current = stage.durationMs;
-
-    switch (stageIdx) {
-      case 0: // DEPLOYING
-        setMissionStatus('initializing');
-        setSelectedTargetId(null);
-        setPlaybackTime(0);
-        setIsPlaying(true);
-        addLog('NAV', 'INS Sandhayak deployed · Towfish subsea lock at 8.4m AGL', 'nav');
-        break;
-
-      case 1: // SURVEY UNDERWAY
-        setMissionStatus('running');
-        setPlaybackTime(1800);
-        setIsPlaying(true);
-        addLog('SURVEY', 'Trackline 2 active · Acoustic mosaic streaming at 10 Hz', 'info');
-        break;
-
-      case 2: // CONTACT DETECTED
-        setMissionStatus('running');
-        setSelectedTargetId('SX-T07');
-        setPlaybackTime(620);
-        setIsPlaying(false);
-        addLog('CONTACT', 'Contact SX-T07 detected at range 18.4m Port · Bearing 284°', 'contact');
-        break;
-
-      case 3: // CONTACT CLASSIFIED
-        setMissionStatus('running');
-        setSelectedTargetId('SX-T07');
-        addLog('CLASSIFY', 'Contact SX-T07 verified: 1.84m × 0.71m · TS -12.8 dB · Shadow confirms spherical body', 'contact');
-        break;
-
-      case 4: // MISSION COMPLETE
-        setMissionStatus('complete');
-        addLog('COMPLETE', 'Survey run complete · 38.7 km surveyed · 17 contacts logged in register', 'complete');
-        break;
-    }
+    const currentStageInfo = GUIDED_DEMO_STAGES[demoStage];
+    if (!currentStageInfo) return;
 
     demoTimerRef.current = setTimeout(() => {
-      executeStage(stageIdx + 1);
-    }, stage.durationMs);
-  }, [addLog]);
+      if (demoStage < GUIDED_DEMO_STAGES.length - 1) {
+        setDemoStage((prev) => {
+          const next = prev + 1;
+          executeStageActions(next, currentScenario);
+          return next;
+        });
+      } else {
+        setIsDemoPaused(true);
+      }
+    }, currentStageInfo.durationMs);
 
-  const launchDemo = useCallback(() => {
-    resetMission();
-    setIsDemoRunning(true);
-    setIsDemoPaused(false);
-    executeStage(0);
-  }, [resetMission, executeStage]);
-
-  const pauseDemo = useCallback(() => {
-    if (!isDemoRunning || isDemoPaused) return;
-    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
-    const elapsed = Date.now() - stageStartTimeRef.current;
-    stageRemainingRef.current = Math.max(500, stageRemainingRef.current - elapsed);
-    setIsDemoPaused(true);
-    setIsPlaying(false);
-  }, [isDemoRunning, isDemoPaused]);
-
-  const resumeDemo = useCallback(() => {
-    if (!isDemoRunning || !isDemoPaused) return;
-    setIsDemoPaused(false);
-    setIsPlaying(true);
-    stageStartTimeRef.current = Date.now();
-    demoTimerRef.current = setTimeout(() => {
-      executeStage(demoStage + 1);
-    }, stageRemainingRef.current);
-  }, [isDemoRunning, isDemoPaused, demoStage, executeStage]);
-
-  const skipDemo = useCallback(() => {
-    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
-    setDemoStage(4);
-    setSelectedTargetId('SX-T07');
-    setPlaybackTime(620);
-    setMissionStatus('complete');
-    setIsDemoRunning(false);
-    setIsDemoPaused(false);
-    setIsPlaying(false);
-    addLog('COMPLETE', 'Jumped to mission summary · 17 contacts cataloged', 'complete');
-  }, [addLog]);
-
-  // Clean up timer on unmount
-  useEffect(() => {
     return () => {
       if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
     };
+  }, [isDemoRunning, isDemoPaused, isAutoAdvance, demoStage, currentScenario, executeStageActions]);
+
+  const launchDemo = useCallback(() => {
+    sonarAudio.playSonarPing();
+    setIsDemoRunning(true);
+    setDemoStage(0);
+    setIsDemoPaused(!isAutoAdvance);
+    setDemoLog([]);
+    executeStageActions(0, currentScenario);
+  }, [isAutoAdvance, currentScenario, executeStageActions]);
+
+  const pauseDemo = useCallback(() => {
+    setIsDemoPaused(true);
   }, []);
 
-  // Visible targets based on time
-  const visibleTargetIds = MISSION_TARGETS.filter((t) => t.pingTime <= playbackTime + 40).map(
-    (t) => t.id
-  );
+  const resumeDemo = useCallback(() => {
+    setIsDemoPaused(false);
+  }, []);
+
+  const skipDemo = useCallback(() => {
+    setStageDirectly(4);
+  }, [setStageDirectly]);
+
+  const resetMission = useCallback(() => {
+    setPlaybackTime(0);
+    setIsPlaying(false);
+    setSelectedTargetId(null);
+    setMissionStatus('idle');
+    setIsDemoRunning(false);
+    setDemoStage(0);
+  }, []);
+
+  // Compute visible target IDs
+  const visibleTargetIds = React.useMemo(() => {
+    if (demoStage >= 2) {
+      return activeTargets.map((t) => t.id);
+    }
+    return activeTargets
+      .filter((t) => (t.pingTime || 0) <= playbackTime || playbackTime === 0)
+      .map((t) => t.id);
+  }, [activeTargets, demoStage, playbackTime]);
 
   const missionProgress = Math.min(100, Math.round((playbackTime / MISSION_DURATION_SECONDS) * 100));
 
-  const demoStageInfo = GUIDED_DEMO_STAGES[Math.min(demoStage, GUIDED_DEMO_STAGES.length - 1)];
+  const demoStageInfo = GUIDED_DEMO_STAGES[demoStage] || GUIDED_DEMO_STAGES[0];
 
   return (
     <MissionContext.Provider
@@ -268,6 +329,16 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setShowBathymetry,
         showSwath,
         setShowSwath,
+        isJudgeMode,
+        setIsJudgeMode,
+        activeScenarioId,
+        currentScenario,
+        selectScenario,
+        isAutoAdvance,
+        setIsAutoAdvance,
+        manualNextStage,
+        manualPrevStage,
+        setStageDirectly,
         isDemoRunning,
         demoStage,
         demoStageInfo,
@@ -278,6 +349,11 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         resumeDemo,
         skipDemo,
         resetMission,
+        focusedPanel,
+        setFocusedPanel,
+        customTargets,
+        addCustomTarget,
+        activeTargets,
         visibleTargetIds,
         missionProgress,
       }}
@@ -288,7 +364,9 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 };
 
 export const useMission = (): MissionContextType => {
-  const ctx = useContext(MissionContext);
-  if (!ctx) throw new Error('useMission must be used within MissionProvider');
-  return ctx;
+  const context = useContext(MissionContext);
+  if (!context) {
+    throw new Error('useMission must be used within a MissionProvider');
+  }
+  return context;
 };

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import { useMission } from '../../context/MissionContext';
 import { MISSION_TARGETS } from '../../data/targets';
 import { interpolateVesselPosition } from '../../data/mission';
@@ -8,7 +9,7 @@ export const SeabedPanel: React.FC = () => {
   const animRef   = useRef<number>(0);
   const rotRef    = useRef({ rx: 0.4, ry: 0, dragging: false, lastX: 0, lastY: 0 });
   const stateRef  = useRef({ time: 0, selectedId: null as string | null, visibleIds: [] as string[] });
-  const { playbackTime, selectedTargetId, visibleTargetIds, showBathymetry } = useMission();
+  const { playbackTime, selectedTargetId, visibleTargetIds, showBathymetry, focusedPanel, setFocusedPanel } = useMission();
 
   stateRef.current = { time: playbackTime, selectedId: selectedTargetId, visibleIds: visibleTargetIds };
 
@@ -235,15 +236,26 @@ export const SeabedPanel: React.FC = () => {
   return (
     <div className="relative flex flex-col h-full bg-[#02070E] overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 bg-[#081118] border-b border-[#16303B] shrink-0">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-[#10151D] border-b border-[#1B2330] shrink-0">
         <div className="flex items-center gap-1.5">
-          <span className="text-[9px] font-mono font-black text-[#66848D] uppercase tracking-widest">3D Seafloor</span>
+          <span className="text-[9px] font-mono font-black text-[#EAEFF5] uppercase tracking-widest">3D Seafloor</span>
           <span className="text-[9px] font-mono text-[#29B6F6] ml-2">Drag to rotate</span>
         </div>
-        <div className="flex items-center gap-1 text-[8px] font-mono">
-          {['BATHYMETRY', 'TARGETS', 'TRACK'].map(l => (
-            <span key={l} className="px-1.5 py-0.5 rounded bg-[#0C171E] border border-[#16303B] text-[#66848D]">{l}</span>
+        <div className="flex items-center gap-1.5 text-[8px] font-mono">
+          {['BATHYMETRY', 'TARGETS'].map(l => (
+            <span key={l} className="px-1.5 py-0.5 rounded bg-[#161C26] border border-[#1B2330] text-[#7C8AA0]">{l}</span>
           ))}
+          <button
+            onClick={() => setFocusedPanel(focusedPanel === 'seabed' ? null : 'seabed')}
+            className={`p-1 rounded border transition-colors cursor-pointer ${
+              focusedPanel === 'seabed'
+                ? 'bg-[#4CD9E8]/20 border-[#4CD9E8] text-[#4CD9E8]'
+                : 'bg-[#161C26] border-[#1B2330] text-[#7C8AA0] hover:text-[#4CD9E8]'
+            }`}
+            title={focusedPanel === 'seabed' ? 'Exit Focus View' : 'Expand 3D Bathymetry to Full Focus'}
+          >
+            {focusedPanel === 'seabed' ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+          </button>
         </div>
       </div>
 

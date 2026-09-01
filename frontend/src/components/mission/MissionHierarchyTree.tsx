@@ -11,6 +11,8 @@ import {
   AlertTriangle,
   ShieldCheck,
   CheckCircle2,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { useMission } from '../../context/MissionContext';
 import { MISSION_DATA } from '../../data/mission';
@@ -24,6 +26,9 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
     setPlaybackTime,
     playbackTime,
     visibleTargetIds,
+    focusedPanel,
+    setFocusedPanel,
+    activeTargets,
   } = useMission();
 
   const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({
@@ -45,7 +50,7 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
     setPlaybackTime(target.pingTime);
   };
 
-  const filteredTargets = MISSION_TARGETS.filter(
+  const filteredTargets = activeTargets.filter(
     (t) =>
       t.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.class.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -62,15 +67,28 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
             SURVEY HIERARCHY
           </span>
         </div>
-        {onCollapse && (
+        <div className="flex items-center gap-1">
           <button
-            onClick={onCollapse}
-            title="Collapse tree to left"
-            className="p-1 rounded bg-[#161C26] border border-[#1B2330] hover:border-[#4CD9E8]/40 text-[#7C8AA0] hover:text-[#4CD9E8] transition-colors"
+            onClick={() => setFocusedPanel(focusedPanel === 'tree' ? null : 'tree')}
+            className={`p-1 rounded border transition-colors cursor-pointer ${
+              focusedPanel === 'tree'
+                ? 'bg-[#4CD9E8]/20 border-[#4CD9E8] text-[#4CD9E8]'
+                : 'bg-[#161C26] border-[#1B2330] text-[#7C8AA0] hover:text-[#4CD9E8]'
+            }`}
+            title={focusedPanel === 'tree' ? 'Exit Focus View' : 'Expand Tree to Full Focus'}
           >
-            <ChevronRight className="w-3.5 h-3.5 rotate-180" />
+            {focusedPanel === 'tree' ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
-        )}
+          {onCollapse && (
+            <button
+              onClick={onCollapse}
+              title="Collapse tree to left"
+              className="p-1 rounded bg-[#161C26] border border-[#1B2330] hover:border-[#4CD9E8]/40 text-[#7C8AA0] hover:text-[#4CD9E8] transition-colors cursor-pointer"
+            >
+              <ChevronRight className="w-3.5 h-3.5 rotate-180" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Filter / Search Bar */}

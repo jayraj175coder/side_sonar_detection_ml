@@ -9,6 +9,8 @@ import {
   Layers,
   Volume2,
   HardDrive,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { useMission } from '../../context/MissionContext';
 import { MISSION_DATA } from '../../data/mission';
@@ -32,7 +34,7 @@ const HYDROGRAPHIC_CHANNELS: HydrographicStage[] = [
 ];
 
 export const AcousticTelemetryPanel: React.FC = () => {
-  const { playbackTime, missionStatus } = useMission();
+  const { playbackTime, missionStatus, focusedPanel, setFocusedPanel } = useMission();
 
   return (
     <div className="flex flex-col h-full bg-[#10151D] border-r border-[#1B2330] overflow-y-auto select-none font-mono text-[9px]">
@@ -44,9 +46,22 @@ export const AcousticTelemetryPanel: React.FC = () => {
             HYDROGRAPHIC SIGNAL CHANNELS
           </span>
         </div>
-        <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#3FD98A]/10 text-[#3FD98A] border border-[#3FD98A]/30">
-          ALL CHANNELS NOMINAL
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#3FD98A]/10 text-[#3FD98A] border border-[#3FD98A]/30">
+            ALL NOMINAL
+          </span>
+          <button
+            onClick={() => setFocusedPanel(focusedPanel === 'signals' ? null : 'signals')}
+            className={`p-1 rounded border transition-colors cursor-pointer ${
+              focusedPanel === 'signals'
+                ? 'bg-[#4CD9E8]/20 border-[#4CD9E8] text-[#4CD9E8]'
+                : 'bg-[#161C26] border-[#1B2330] text-[#7C8AA0] hover:text-[#4CD9E8]'
+            }`}
+            title={focusedPanel === 'signals' ? 'Exit Focus View' : 'Expand Channels to Full Focus'}
+          >
+            {focusedPanel === 'signals' ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+          </button>
+        </div>
       </div>
 
       {/* Channels List */}

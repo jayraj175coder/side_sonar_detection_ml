@@ -9,6 +9,7 @@ import {
   Eye,
   Crosshair,
   Maximize2,
+  Minimize2,
   Sliders,
   Palette,
   Volume2,
@@ -29,6 +30,8 @@ export const HeroSonarWaterfall: React.FC = () => {
     setSelectedTargetId,
     isPlaying,
     playbackSpeed,
+    focusedPanel,
+    setFocusedPanel,
   } = useMission();
 
   const [gain, setGain] = useState<number>(1.2);
@@ -489,6 +492,19 @@ export const HeroSonarWaterfall: React.FC = () => {
             title="Toggle Contact Bounding Overlays"
           >
             <Crosshair className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Maximize / Focus Mode Button */}
+          <button
+            onClick={() => setFocusedPanel(focusedPanel === 'waterfall' ? null : 'waterfall')}
+            className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+              focusedPanel === 'waterfall'
+                ? 'bg-[#4CD9E8]/20 border-[#4CD9E8] text-[#4CD9E8]'
+                : 'bg-[#161C26] border-[#1B2330] text-[#7C8AA0] hover:text-[#4CD9E8]'
+            }`}
+            title={focusedPanel === 'waterfall' ? 'Exit Focus View' : 'Expand Waterfall to Full Focus'}
+          >
+            {focusedPanel === 'waterfall' ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>

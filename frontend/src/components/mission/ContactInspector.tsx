@@ -10,13 +10,15 @@ import {
   Layers,
   Zap,
   CheckCircle2,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { useMission } from '../../context/MissionContext';
 import { getTargetById, MISSION_TARGETS } from '../../data/targets';
 import type { MissionTarget } from '../../types';
 
 export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onCollapse }) => {
-  const { selectedTargetId, setSelectedTargetId } = useMission();
+  const { selectedTargetId, setSelectedTargetId, focusedPanel, setFocusedPanel } = useMission();
   const thumbnailCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const target = selectedTargetId ? getTargetById(selectedTargetId) : null;
@@ -184,11 +186,22 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
           >
             {target.risk}
           </span>
+          <button
+            onClick={() => setFocusedPanel(focusedPanel === 'inspector' ? null : 'inspector')}
+            className={`p-1 rounded border transition-colors cursor-pointer ${
+              focusedPanel === 'inspector'
+                ? 'bg-[#4CD9E8]/20 border-[#4CD9E8] text-[#4CD9E8]'
+                : 'bg-[#161C26] border-[#1B2330] text-[#7C8AA0] hover:text-[#4CD9E8]'
+            }`}
+            title={focusedPanel === 'inspector' ? 'Exit Focus View' : 'Expand Inspector to Full Focus'}
+          >
+            {focusedPanel === 'inspector' ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+          </button>
           {onCollapse && (
             <button
               onClick={onCollapse}
               title="Collapse panel"
-              className="p-1 rounded bg-[#161C26] border border-[#1B2330] hover:border-[#4CD9E8]/40 text-[#7C8AA0] hover:text-[#4CD9E8] transition-colors ml-1"
+              className="p-1 rounded bg-[#161C26] border border-[#1B2330] hover:border-[#4CD9E8]/40 text-[#7C8AA0] hover:text-[#4CD9E8] transition-colors ml-1 cursor-pointer"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>

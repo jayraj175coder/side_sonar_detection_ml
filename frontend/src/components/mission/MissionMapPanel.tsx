@@ -16,6 +16,7 @@ import {
   Radio,
   Crosshair,
   Maximize2,
+  Minimize2,
   Plus,
   Minus,
   Layers,
@@ -135,6 +136,9 @@ export const MissionMapPanel: React.FC = () => {
     showTargets,
     showTrack,
     visibleTargetIds,
+    focusedPanel,
+    setFocusedPanel,
+    activeTargets,
   } = useMission();
 
   const [mapCenter, setMapCenter] = useState<[number, number]>([18.921, 72.821]);
@@ -168,7 +172,17 @@ export const MissionMapPanel: React.FC = () => {
           <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#4CD9E8]/10 text-[#4CD9E8] border border-[#4CD9E8]/30 font-bold">
             {visibleTargetIds.length} TARGETS
           </span>
-          <span className="text-[#7C8AA0] text-[8px]">{MISSION_DATA.id}</span>
+          <button
+            onClick={() => setFocusedPanel(focusedPanel === 'map' ? null : 'map')}
+            className={`p-1 rounded border transition-colors cursor-pointer ${
+              focusedPanel === 'map'
+                ? 'bg-[#4CD9E8]/20 border-[#4CD9E8] text-[#4CD9E8]'
+                : 'bg-[#161C26] border-[#1B2330] text-[#7C8AA0] hover:text-[#4CD9E8]'
+            }`}
+            title={focusedPanel === 'map' ? 'Exit Focus View' : 'Expand Map to Full Focus'}
+          >
+            {focusedPanel === 'map' ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+          </button>
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Activity,
   Compass,
@@ -8,7 +8,6 @@ import {
   Sliders,
   Maximize2,
   ChevronRight,
-  ChevronLeft,
   Play,
   Pause,
   RotateCcw,
@@ -19,11 +18,14 @@ import {
   Info,
   ExternalLink,
   Download,
-  Share2,
   Ship,
   Wind,
   Waves,
   Sparkles,
+  CheckCircle2,
+  HelpCircle,
+  FileCode,
+  BookOpen,
 } from 'lucide-react';
 import {
   DEBRIS_INTELLIGENCE_SCENARIOS,
@@ -257,10 +259,10 @@ export const SonarViewerPage: React.FC = () => {
             ctx.strokeRect(sx - 35, sy - 20, 70, 40);
 
             ctx.fillStyle = '#060B0E';
-            ctx.fillRect(sx - 35, sy - 34, 110, 14);
+            ctx.fillRect(sx - 35, sy - 34, 130, 14);
             ctx.fillStyle = '#39B589';
             ctx.font = 'bold 8px "JetBrains Mono", monospace';
-            ctx.fillText('T0 SSS: GHOST NET', sx - 32, sy - 24);
+            ctx.fillText(`T0 SSS: ${activeScenario.debrisType.toUpperCase().slice(0, 16)}`, sx - 32, sy - 24);
           }
 
           // 9. Coordinate HUD Ticks
@@ -295,7 +297,7 @@ export const SonarViewerPage: React.FC = () => {
       className="flex flex-col h-[calc(100vh-4rem)] bg-[#04080B] text-[#86A89B] overflow-hidden select-none font-mono"
       style={{ fontFamily: "'JetBrains Mono', monospace" }}
     >
-      {/* 1. Slickline-Style Tactical Header Bar */}
+      {/* 1. Tactical Header Bar */}
       <div className="bg-[#080E12] border-b border-[#14231E] px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs shrink-0 z-20 shadow-md">
         <div className="flex items-center gap-3">
           <span className="font-black text-[#57FFA8] tracking-widest uppercase">
@@ -419,6 +421,7 @@ export const SonarViewerPage: React.FC = () => {
               CASE {activeScenario.scenarioCode}
             </span>
             <div className="space-y-0.5 text-[#4E7D6D]">
+              <div>DEBRIS: <span className="text-[#57FFA8]">{activeScenario.debrisType}</span></div>
               <div>SURFACE: <span className="text-[#86A89B]">{activeScenario.debrisAreaKm2} km²</span></div>
               <div>ALONG TRACK: <span className="text-[#86A89B]">{activeScenario.alongTrackKm} km</span></div>
               <div>CURRENT: <span className="text-[#86A89B]">{activeScenario.currentVelocityMs} m/s @ {activeScenario.dispersionAngleDeg}°</span></div>
@@ -431,93 +434,286 @@ export const SonarViewerPage: React.FC = () => {
             <div className="w-24 h-1 bg-[#2E7559] relative">
               <div className="absolute top-0 left-0 w-12 h-full bg-[#57FFA8]" />
             </div>
-            <span>WGS-84 BATHYMETRY</span>
+            <span>WGS-84 BATHYMETRY · {activeScenario.depthM}m DEPTH</span>
           </div>
         </div>
 
-        {/* RIGHT RAIL: Evidence Card & Candidate Intelligence */}
-        <div className="w-80 bg-[#060B0E] border-l border-[#14231E] flex flex-col justify-between shrink-0 p-3 overflow-y-auto text-[10px]">
-          <div>
-            {/* Header: 05 EVIDENCE */}
-            <div className="flex items-center justify-between border-b border-[#14231E] pb-2 mb-3">
-              <span className="font-black text-[#57FFA8] tracking-wider uppercase">
-                05 EVIDENCE // CANDIDATE
-              </span>
-              <span className="text-[9px] text-[#2E7559]">RANK 01/03</span>
-            </div>
-
-            {/* Candidate Title & Radar Bright Target Callout */}
-            <div className="mb-3">
-              <h3 className="text-sm font-black text-[#57FFA8] tracking-wide">
-                {activeCandidate.name}
-              </h3>
-              <p className="text-[9px] text-[#4E7D6D]">{activeCandidate.radarEchoCrossSection}</p>
-            </div>
-
-            {/* Score & Metadata Box */}
-            <div className="grid grid-cols-3 gap-2 bg-[#081217] p-2 rounded-lg border border-[#14231E] mb-3">
-              <div>
-                <span className="text-[8px] text-[#2E7559] uppercase block">SCORE</span>
-                <span className="text-base font-black text-[#57FFA8]">
-                  {activeCandidate.score.toFixed(3)}
+        {/* RIGHT RAIL: Dynamic Content Based on Active Step */}
+        <div className="w-84 bg-[#060B0E] border-l border-[#14231E] flex flex-col justify-between shrink-0 p-3 overflow-y-auto text-[10px]">
+          {/* STEP 01 DETECT */}
+          {activeStep === '01 DETECT' && (
+            <div>
+              <div className="flex items-center justify-between border-b border-[#14231E] pb-2 mb-3">
+                <span className="font-black text-[#57FFA8] tracking-wider uppercase">
+                  01 SONAR DETECTION // TENSOR
                 </span>
+                <span className="text-[9px] text-[#2E7559]">{activeScenario.sensorFrequencyKhz} kHz</span>
               </div>
-              <div className="col-span-2">
-                <span className="text-[8px] text-[#2E7559] uppercase block">ATTRIBUTION KIND</span>
-                <span className="text-[10px] font-bold text-[#86A89B] truncate block">
-                  {activeCandidate.kind}
-                </span>
-                <span className="text-[8px] text-[#4E7D6D]">WIN: {activeCandidate.originWindow}</span>
+              <div className="space-y-3">
+                <div className="bg-[#081217] p-2.5 rounded border border-[#14231E]">
+                  <span className="text-[8px] text-[#2E7559] uppercase block mb-1">CLASSIFIED RETURN</span>
+                  <div className="text-sm font-black text-[#57FFA8]">{activeScenario.debrisType}</div>
+                  <p className="text-[9px] text-[#7C8AA0] mt-1">High-frequency side-scan acoustic footprint verified by nadir altimeter lock.</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-[9px]">
+                  <div className="bg-[#081217] p-2 rounded border border-[#14231E]">
+                    <span className="text-[8px] text-[#2E7559] block">SWATH WIDTH</span>
+                    <span className="text-[#86A89B] font-bold">75m (-37.5 Port / +37.5 Stbd)</span>
+                  </div>
+                  <div className="bg-[#081217] p-2 rounded border border-[#14231E]">
+                    <span className="text-[8px] text-[#2E7559] block">SEABED DEPTH</span>
+                    <span className="text-[#86A89B] font-bold">{activeScenario.depthM} m AGL</span>
+                  </div>
+                </div>
+
+                <div className="border-t border-[#14231E] pt-2 text-[9px] text-[#86A89B]">
+                  <span className="text-[8px] text-[#2E7559] uppercase block mb-1">ACOUSTIC EVIDENCE</span>
+                  <ul className="space-y-1 list-disc pl-4 text-[#7C8AA0]">
+                    <li>Specular peak SNR: +18.2 dB above background limestone</li>
+                    <li>Shadow length: 2.31m detached corridor</li>
+                    <li>Calculated target elevation: 0.82m proudly off seafloor</li>
+                  </ul>
+                </div>
               </div>
             </div>
+          )}
 
-            {/* Candidate Number Pills (01, 02, 03...) */}
-            <div className="mb-4">
-              <span className="text-[8px] text-[#2E7559] uppercase block mb-1">
-                ATTRIBUTION CANDIDATES
-              </span>
-              <div className="flex items-center gap-1.5">
-                {activeScenario.candidates.map((c) => (
-                  <button
-                    key={c.id}
-                    onClick={() => setSelectedCandidateId(c.id)}
-                    className={`px-2 py-1 rounded text-[9px] font-bold transition-all cursor-pointer ${
-                      c.id === activeCandidate.id
-                        ? 'bg-[#57FFA8] text-[#04080B] font-black shadow-[0_0_8px_rgba(87,255,168,0.3)]'
-                        : 'bg-[#0A141A] text-[#4E7D6D] hover:text-[#86A89B] border border-[#14231E]'
+          {/* STEP 02 DRIFT */}
+          {activeStep === '02 DRIFT' && (
+            <div>
+              <div className="flex items-center justify-between border-b border-[#14231E] pb-2 mb-3">
+                <span className="font-black text-[#57FFA8] tracking-wider uppercase">
+                  02 LAGRANGIAN DRIFT // HINDCAST
+                </span>
+                <span className="text-[9px] text-[#57FFA8]">3,840 PARTICLES</span>
+              </div>
+              <div className="space-y-3">
+                <div className="bg-[#081217] p-2.5 rounded border border-[#14231E]">
+                  <span className="text-[8px] text-[#2E7559] uppercase block mb-1">CALCULATED ORIGIN COORDINATE</span>
+                  <div className="text-xs font-bold text-[#57FFA8]">
+                    {activeScenario.calculatedOrigin.lat.toFixed(3)}°N, {activeScenario.calculatedOrigin.lon.toFixed(3)}°E
+                  </div>
+                  <div className="text-[9px] text-[#4E7D6D] mt-0.5">
+                    Release Window: {activeScenario.calculatedOrigin.timeWindow} (±{activeScenario.calculatedOrigin.uncertaintyRadiusKm}km)
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 text-[9px]">
+                  <div className="flex justify-between bg-[#04080B] p-1.5 rounded border border-[#14231E]">
+                    <span className="text-[#2E7559]">OCEAN CURRENT:</span>
+                    <span className="text-[#86A89B] font-bold">{activeScenario.currentVelocityMs} m/s @ {activeScenario.dispersionAngleDeg}°</span>
+                  </div>
+                  <div className="flex justify-between bg-[#04080B] p-1.5 rounded border border-[#14231E]">
+                    <span className="text-[#2E7559]">WIND FORCING:</span>
+                    <span className="text-[#86A89B] font-bold">{activeScenario.windSpeedMs} m/s (α=0.03 factor)</span>
+                  </div>
+                  <div className="flex justify-between bg-[#04080B] p-1.5 rounded border border-[#14231E]">
+                    <span className="text-[#2E7559]">ENSEMBLE MEMBERS:</span>
+                    <span className="text-[#57FFA8] font-bold">12 Stochastic Runs</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 03 TRAFFIC */}
+          {activeStep === '03 TRAFFIC' && (
+            <div>
+              <div className="flex items-center justify-between border-b border-[#14231E] pb-2 mb-3">
+                <span className="font-black text-[#57FFA8] tracking-wider uppercase">
+                  03 AIS & RADAR TRAFFIC
+                </span>
+                <span className="text-[9px] text-[#2E7559]">{activeScenario.candidates.length} CANDIDATES</span>
+              </div>
+              <div className="space-y-2">
+                {activeScenario.candidates.map((cand) => (
+                  <div
+                    key={cand.id}
+                    onClick={() => setSelectedCandidateId(cand.id)}
+                    className={`p-2 rounded border cursor-pointer transition-all ${
+                      cand.id === activeCandidate.id
+                        ? 'bg-[#102B21] border-[#57FFA8]'
+                        : 'bg-[#081217] border-[#14231E] hover:border-[#2E7559]'
                     }`}
                   >
-                    {c.code}
-                  </button>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-[#57FFA8]">[{cand.code}] {cand.name}</span>
+                      <span className="text-[8px] text-[#2E7559]">{cand.speedKts} kts</span>
+                    </div>
+                    <div className="text-[8px] text-[#7C8AA0] mt-0.5">{cand.vesselType} · {cand.aisStatus}</div>
+                    <div className="text-[8px] text-[#4E7D6D] mt-1">CPA: {cand.closestPointOfApproachM}m @ {cand.timeOfClosestApproach}</div>
+                  </div>
                 ))}
               </div>
             </div>
+          )}
 
-            {/* Operator Notes & Spatial Intersection Evidence */}
-            <div className="border-t border-[#14231E] pt-3 mb-3">
-              <span className="text-[8px] text-[#2E7559] uppercase block mb-1">
-                TRACK VS FIELD SPATIAL INTERSECTION
-              </span>
-              <div className="bg-[#081217] p-2 rounded border border-[#14231E] text-[9px] text-[#86A89B] leading-relaxed">
-                {activeCandidate.operatorNotes}
+          {/* STEP 04 ATTRIBUTE */}
+          {activeStep === '04 ATTRIBUTE' && (
+            <div>
+              <div className="flex items-center justify-between border-b border-[#14231E] pb-2 mb-3">
+                <span className="font-black text-[#57FFA8] tracking-wider uppercase">
+                  04 ATTRIBUTION SCORE MATRIX
+                </span>
+                <span className="text-[9px] text-[#57FFA8]">S_TOTAL: {activeCandidate.score.toFixed(3)}</span>
+              </div>
+              <div className="space-y-3">
+                <div className="bg-[#081217] p-2.5 rounded border border-[#14231E]">
+                  <span className="text-[8px] text-[#2E7559] uppercase block mb-1">SCORE DECOMPOSITION ({activeCandidate.name})</span>
+                  <div className="space-y-1.5 mt-2 text-[9px]">
+                    <div>
+                      <div className="flex justify-between text-[8px] text-[#7C8AA0]">
+                        <span>S_DRIFT (Drift Alignment):</span>
+                        <span className="text-[#57FFA8] font-bold">{activeCandidate.scoreDecomposition.sDrift.toFixed(2)} (w=35%)</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[#04080B] rounded overflow-hidden mt-0.5">
+                        <div className="h-full bg-[#57FFA8]" style={{ width: `${activeCandidate.scoreDecomposition.sDrift * 100}%` }} />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[8px] text-[#7C8AA0]">
+                        <span>S_SPATIAL (CPA Proximity):</span>
+                        <span className="text-[#57FFA8] font-bold">{activeCandidate.scoreDecomposition.sSpatial.toFixed(2)} (w=25%)</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[#04080B] rounded overflow-hidden mt-0.5">
+                        <div className="h-full bg-[#57FFA8]" style={{ width: `${activeCandidate.scoreDecomposition.sSpatial * 100}%` }} />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[8px] text-[#7C8AA0]">
+                        <span>S_TEMPORAL (Time Window):</span>
+                        <span className="text-[#57FFA8] font-bold">{activeCandidate.scoreDecomposition.sTemporal.toFixed(2)} (w=20%)</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[#04080B] rounded overflow-hidden mt-0.5">
+                        <div className="h-full bg-[#57FFA8]" style={{ width: `${activeCandidate.scoreDecomposition.sTemporal * 100}%` }} />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[8px] text-[#7C8AA0]">
+                        <span>S_MANEUVER (Discard Pattern):</span>
+                        <span className="text-[#57FFA8] font-bold">{activeCandidate.scoreDecomposition.sManeuver.toFixed(2)} (w=20%)</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[#04080B] rounded overflow-hidden mt-0.5">
+                        <div className="h-full bg-[#57FFA8]" style={{ width: `${activeCandidate.scoreDecomposition.sManeuver * 100}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+          )}
 
-            {/* Vessel Metadata Breakdown */}
-            <div className="space-y-1 text-[8px] text-[#4E7D6D]">
-              <div>TYPE: <span className="text-[#86A89B]">{activeCandidate.vesselType}</span></div>
-              <div>CALLSIGN: <span className="text-[#86A89B]">{activeCandidate.callSign}</span></div>
-              <div>CPA: <span className="text-[#86A89B]">{activeCandidate.closestPointOfApproachM}m @ {activeCandidate.timeOfClosestApproach}</span></div>
-              <div>CONFIDENCE: <span className="text-[#57FFA8] font-bold">{activeCandidate.spatialIntersectionConfidence}%</span></div>
+          {/* STEP 05 EVIDENCE (Standard Default View) */}
+          {activeStep === '05 EVIDENCE' && (
+            <div>
+              {/* Header: 05 EVIDENCE */}
+              <div className="flex items-center justify-between border-b border-[#14231E] pb-2 mb-3">
+                <span className="font-black text-[#57FFA8] tracking-wider uppercase">
+                  05 EVIDENCE // CANDIDATE
+                </span>
+                <span className="text-[9px] text-[#2E7559]">RANK 01/03</span>
+              </div>
+
+              {/* Candidate Title & Radar Bright Target Callout */}
+              <div className="mb-3">
+                <h3 className="text-sm font-black text-[#57FFA8] tracking-wide">
+                  {activeCandidate.name}
+                </h3>
+                <p className="text-[9px] text-[#4E7D6D]">{activeCandidate.radarEchoCrossSection}</p>
+              </div>
+
+              {/* Score & Metadata Box */}
+              <div className="grid grid-cols-3 gap-2 bg-[#081217] p-2 rounded-lg border border-[#14231E] mb-3">
+                <div>
+                  <span className="text-[8px] text-[#2E7559] uppercase block">SCORE</span>
+                  <span className="text-base font-black text-[#57FFA8]">
+                    {activeCandidate.score.toFixed(3)}
+                  </span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-[8px] text-[#2E7559] uppercase block">ATTRIBUTION KIND</span>
+                  <span className="text-[10px] font-bold text-[#86A89B] truncate block">
+                    {activeCandidate.kind}
+                  </span>
+                  <span className="text-[8px] text-[#4E7D6D]">WIN: {activeCandidate.originWindow}</span>
+                </div>
+              </div>
+
+              {/* Candidate Number Pills (01, 02, 03...) */}
+              <div className="mb-4">
+                <span className="text-[8px] text-[#2E7559] uppercase block mb-1">
+                  ATTRIBUTION CANDIDATES
+                </span>
+                <div className="flex items-center gap-1.5">
+                  {activeScenario.candidates.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => setSelectedCandidateId(c.id)}
+                      className={`px-2 py-1 rounded text-[9px] font-bold transition-all cursor-pointer ${
+                        c.id === activeCandidate.id
+                          ? 'bg-[#57FFA8] text-[#04080B] font-black shadow-[0_0_8px_rgba(87,255,168,0.3)]'
+                          : 'bg-[#0A141A] text-[#4E7D6D] hover:text-[#86A89B] border border-[#14231E]'
+                      }`}
+                    >
+                      {c.code}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Operator Notes & Spatial Intersection Evidence */}
+              <div className="border-t border-[#14231E] pt-3 mb-3">
+                <span className="text-[8px] text-[#2E7559] uppercase block mb-1">
+                  TRACK VS FIELD SPATIAL INTERSECTION
+                </span>
+                <div className="bg-[#081217] p-2 rounded border border-[#14231E] text-[9px] text-[#86A89B] leading-relaxed">
+                  {activeCandidate.operatorNotes}
+                </div>
+              </div>
+
+              {/* Vessel Metadata Breakdown */}
+              <div className="space-y-1 text-[8px] text-[#4E7D6D]">
+                <div>TYPE: <span className="text-[#86A89B]">{activeCandidate.vesselType}</span></div>
+                <div>CALLSIGN: <span className="text-[#86A89B]">{activeCandidate.callSign}</span></div>
+                <div>CPA: <span className="text-[#86A89B]">{activeCandidate.closestPointOfApproachM}m @ {activeCandidate.timeOfClosestApproach}</span></div>
+                <div>CONFIDENCE: <span className="text-[#57FFA8] font-bold">{activeCandidate.spatialIntersectionConfidence}%</span></div>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Real-Time Terminal Event Log */}
+          {/* STEP 06 METHOD */}
+          {activeStep === '06 METHOD' && (
+            <div>
+              <div className="flex items-center justify-between border-b border-[#14231E] pb-2 mb-3">
+                <span className="font-black text-[#57FFA8] tracking-wider uppercase">
+                  06 SCIENTIFIC METHODOLOGY
+                </span>
+                <span className="text-[9px] text-[#2E7559]">ISO / MoES</span>
+              </div>
+              <div className="space-y-2.5 text-[8px] text-[#86A89B]">
+                <div className="bg-[#081217] p-2 rounded border border-[#14231E]">
+                  <span className="text-[#57FFA8] font-bold block mb-0.5">ACOUSTIC SHADOW TRIGONOMETRY</span>
+                  <code>H = (L_shadow × H_alt) / (R_slant + L_shadow)</code>
+                </div>
+                <div className="bg-[#081217] p-2 rounded border border-[#14231E]">
+                  <span className="text-[#57FFA8] font-bold block mb-0.5">BACKWARD EULER DRIFT</span>
+                  <code>x(t-Δt) = x(t) - Δt × (u_ocean + α·u_wind)</code>
+                </div>
+                <div className="bg-[#081217] p-2 rounded border border-[#14231E]">
+                  <span className="text-[#57FFA8] font-bold block mb-0.5">SCIENTIFIC CONSTRAINTS (C1–C12)</span>
+                  <p className="text-[#7C8AA0]">Scores are never stored without decomposed terms. Dark vessels are ranked with radar cross-sections.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Real-Time Terminal Event Log (Shared Footer) */}
           <div className="border-t border-[#14231E] pt-3">
             <span className="text-[8px] font-black text-[#2E7559] uppercase tracking-widest block mb-1.5">
               EVENT LOG
             </span>
-            <div className="bg-[#04080B] border border-[#14231E] rounded p-2 max-h-36 overflow-y-auto space-y-1 text-[8px]">
+            <div className="bg-[#04080B] border border-[#14231E] rounded p-2 max-h-32 overflow-y-auto space-y-1 text-[8px]">
               {activeScenario.eventLogs.map((log, idx) => (
                 <div key={idx} className="flex items-start gap-1.5">
                   <span className="text-[#2E7559] shrink-0">{log.time}</span>

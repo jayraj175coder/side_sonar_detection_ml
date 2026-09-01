@@ -268,11 +268,17 @@ export const MissionMapPanel: React.FC = () => {
             position={[vessel.lat, vessel.lon]}
             icon={createVesselMarker(vessel.heading)}
           />
+
+          {/* Custom Zoom Controls inside MapContainer context */}
+          <div className="leaflet-top leaflet-right" style={{ zIndex: 1000, margin: '8px' }}>
+            <div className="leaflet-control flex flex-col gap-1">
+              <CustomZoomControl />
+            </div>
+          </div>
         </MapContainer>
 
-        {/* Floating Sexy Map Controls */}
-        <div className="absolute top-2 right-2 z-[500] flex flex-col items-end gap-2">
-          <CustomZoomControl />
+        {/* Floating Re-center Button */}
+        <div className="absolute top-2 right-12 z-[500] flex flex-col items-end gap-2">
           <button
             onClick={handleCenterOnVessel}
             className="px-2 py-1 rounded bg-[#10151D]/90 border border-[#1B2330] hover:border-[#4CD9E8] text-[#4CD9E8] text-[8px] font-bold shadow-lg backdrop-blur-md transition-all flex items-center gap-1 cursor-pointer"

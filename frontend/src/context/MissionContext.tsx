@@ -2,53 +2,89 @@ import React, { createContext, useContext, useState, useCallback, useRef, useEff
 import type { MissionStatus, PlaybackSpeed, MissionTarget } from '../types';
 import { MISSION_TARGETS, getTargetById } from '../data/targets';
 import { MISSION_DURATION_SECONDS, MISSION_DATA } from '../data/mission';
-import { JUDGE_SCENARIOS, JudgeScenario } from '../data/judgeScenarios';
 import { sonarAudio } from '../utils/sonarAudio';
 
 export interface DemoLogEntry {
   timestamp: string;
   stage: string;
   message: string;
-  type: 'info' | 'contact' | 'nav' | 'complete';
+  type: 'info' | 'contact' | 'filter' | 'complete';
 }
 
 export interface DemoStageInfo {
   index: number;
+  stageCode: 'INGEST' | 'PREPROCESS' | 'DETECT' | 'FILTER' | 'CLASSIFY' | 'EVIDENCE' | 'GEOTAG' | 'REPORT';
   title: string;
   caption: string;
   durationMs: number;
+  funnel?: {
+    raw: number;
+    filtered: number;
+    valid: number;
+    highPriority: number;
+  };
 }
 
 export const GUIDED_DEMO_STAGES: DemoStageInfo[] = [
   {
     index: 0,
-    title: 'DEPLOYING AUV',
-    caption: 'AUV-3 INS Sandhayak initializing towfish — Altitude locked at 8.4m AGL · 900 kHz transducer online',
+    stageCode: 'INGEST',
+    title: 'SONAR INGESTION',
+    caption: 'Dual-frequency 900 kHz side-scan sonar acoustic stream loaded · 75m Swath · 8.4m AGL Altitude',
     durationMs: 3500,
   },
   {
     index: 1,
-    title: 'SURVEY UNDERWAY',
-    caption: 'Survey line active — Swath width 75m · Speed 4.1 kts · Ping rate 10 Hz · Acoustic mosaic streaming live',
-    durationMs: 4500,
+    stageCode: 'PREPROCESS',
+    title: 'NOISE REDUCTION & TVG',
+    caption: 'Time-Varied Gain (TVG) normalization applied · Speckle noise suppressed · Water column nadir isolated',
+    durationMs: 3500,
   },
   {
     index: 2,
-    title: 'CONTACT DETECTED',
-    caption: 'Acoustic anomaly acquired on Trackline 2 — Range 18.4m Port · Bearing 284° · Specular echo confirmed',
-    durationMs: 4500,
+    stageCode: 'DETECT',
+    title: 'AI CANDIDATE DETECTION',
+    caption: 'Deep ONNX perception engine running · 37 raw acoustic return candidates extracted from backscatter',
+    durationMs: 4000,
+    funnel: { raw: 37, filtered: 0, valid: 37, highPriority: 0 },
   },
   {
     index: 3,
-    title: 'CONTACT CLASSIFIED',
-    caption: 'Contact analysis: 1.84m × 0.71m · Shadow 2.31m confirms 0.82m elevation · TS -12.8 dB · System classification locked',
-    durationMs: 4500,
+    stageCode: 'FILTER',
+    title: 'NATURAL FORMATION FILTER',
+    caption: 'False-Positive Suppression: 20 natural rock formations and acoustic shadow artifacts filtered out',
+    durationMs: 4000,
+    funnel: { raw: 37, filtered: 20, valid: 17, highPriority: 4 },
   },
   {
     index: 4,
-    title: 'MISSION COMPLETE',
-    caption: 'Survey complete: Tracklines verified · 38.7 km surveyed · 12.84 km² mapped · Contacts logged to hydrographic register',
+    stageCode: 'CLASSIFY',
+    title: 'AI CLASSIFICATION',
+    caption: '17 valid anomalies classified · 4 High-Priority targets flagged (Ghost Nets, Trawl Gear, Debris, Pipeline)',
     durationMs: 4000,
+    funnel: { raw: 37, filtered: 20, valid: 17, highPriority: 4 },
+  },
+  {
+    index: 5,
+    stageCode: 'EVIDENCE',
+    title: 'HERO TARGET IDENTIFIED: GHOST NET',
+    caption: 'TARGET #07 identified as Ghost Net (ALDFG) with 94.7% confidence · Acoustic shadow length 2.31m',
+    durationMs: 4500,
+    funnel: { raw: 37, filtered: 20, valid: 17, highPriority: 4 },
+  },
+  {
+    index: 6,
+    stageCode: 'GEOTAG',
+    title: 'GEOTAGGING & 3D SEAFLOOR',
+    caption: 'Target geotagged at 18.9217° N, 72.8214° E (Depth 43.1m) · 3D Bathymetric mesh aligned',
+    durationMs: 4000,
+  },
+  {
+    index: 7,
+    stageCode: 'REPORT',
+    title: 'MISSION ANALYSIS COMPLETE',
+    caption: 'Mission MX-026 verified · 12.84 km² surveyed · Structured Marine Debris Report ready for download',
+    durationMs: 4500,
   },
 ];
 
@@ -58,6 +94,7 @@ interface MissionContextType {
   // Target selection
   selectedTargetId: string | null;
   setSelectedTargetId: (id: string | null) => void;
+  selectedTarget: MissionTarget | null;
 
   // Mission status & playback
   missionStatus: MissionStatus;
@@ -79,240 +116,262 @@ interface MissionContextType {
   showSwath: boolean;
   setShowSwath: (v: boolean) => void;
 
-  // Judge Mode & Scenario Selection (Feature 1)
+  // Judge Mode
   isJudgeMode: boolean;
   setIsJudgeMode: (v: boolean) => void;
-  activeScenarioId: string;
-  currentScenario: JudgeScenario;
-  selectScenario: (scenarioId: string) => void;
-  isAutoAdvance: boolean;
-  setIsAutoAdvance: (v: boolean) => void;
+  toggleJudgeMode: () => void;
 
-  // Manual Step Controls (Feature 1)
+  // Manual Step Controls
   manualNextStage: () => void;
   manualPrevStage: () => void;
   setStageDirectly: (stageIndex: number) => void;
 
-  // Walkthrough state
+  // Demo Walkthrough state
   isDemoRunning: boolean;
   demoStage: number;
   demoStageInfo: DemoStageInfo;
   demoLog: DemoLogEntry[];
+  startGuidedDemo: () => void;
+  pauseGuidedDemo: () => void;
+  resumeGuidedDemo: () => void;
+  resetGuidedDemo: () => void;
+
+  // Backwards compatibility aliases
   isDemoPaused: boolean;
-  launchDemo: () => void;
+  launchDemo: (scenarioId?: any) => void;
   pauseDemo: () => void;
   resumeDemo: () => void;
   skipDemo: () => void;
   resetMission: () => void;
-
-  // Expandable Panels / Focus Mode (Feature 3)
-  focusedPanel: FocusedPanelType;
-  setFocusedPanel: (panel: FocusedPanelType) => void;
-
-  // Custom Upload & Classify Contacts (Feature 2)
-  customTargets: MissionTarget[];
-  addCustomTarget: (target: MissionTarget) => void;
-
-  // Computed & Active Targets
-  activeTargets: MissionTarget[];
+  activeScenarioId: string;
+  selectScenario: (id: string) => void;
+  isAutoAdvance: boolean;
+  setIsAutoAdvance: (v: boolean) => void;
   visibleTargetIds: string[];
   missionProgress: number;
+  addCustomTarget: (target: Partial<MissionTarget>) => void;
+
+  // Layout focus
+  focusedPanel: FocusedPanelType;
+  setFocusedPanel: (p: FocusedPanelType) => void;
+
+  // Targets
+  activeTargets: MissionTarget[];
 }
 
 const MissionContext = createContext<MissionContextType | undefined>(undefined);
 
 export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedTargetId, setSelectedTargetId] = useState<string | null>('SX-T07');
-  const [missionStatus, setMissionStatus] = useState<MissionStatus>('idle');
-  const [playbackTime, setPlaybackTime] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  // Default selected target is the Hero: SX-T07 (Ghost Net 94.7%)
+  const [selectedTargetId, setSelectedTargetIdState] = useState<string | null>('SX-T07');
+  const [missionStatus, setMissionStatus] = useState<MissionStatus>('nominal');
+  const [playbackTime, setPlaybackTime] = useState<number>(620);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<PlaybackSpeed>(1);
 
-  const [showTargets, setShowTargets] = useState(true);
-  const [showTrack, setShowTrack] = useState(true);
-  const [showBathymetry, setShowBathymetry] = useState(true);
-  const [showSwath, setShowSwath] = useState(true);
+  // Display toggles
+  const [showTargets, setShowTargets] = useState<boolean>(true);
+  const [showTrack, setShowTrack] = useState<boolean>(true);
+  const [showBathymetry, setShowBathymetry] = useState<boolean>(true);
+  const [showSwath, setShowSwath] = useState<boolean>(true);
 
-  // Judge Mode & Preset Scenarios
-  const [isJudgeMode, setIsJudgeMode] = useState<boolean>(true);
-  const [activeScenarioId, setActiveScenarioId] = useState<string>('mixed');
-  const [isAutoAdvance, setIsAutoAdvance] = useState<boolean>(false); // Manual step by default in Judge Mode
+  // Judge Mode Toggle
+  const [isJudgeMode, setIsJudgeMode] = useState<boolean>(false);
 
-  // Panel Focus State
+  // Demo walkthrough state
+  const [isDemoRunning, setIsDemoRunning] = useState<boolean>(false);
+  const [demoStage, setDemoStage] = useState<number>(0);
+  const [demoLog, setDemoLog] = useState<DemoLogEntry[]>([]);
+  const demoTimerRef = useRef<any>(null);
+
+  const [targetsList, setTargetsList] = useState<MissionTarget[]>(MISSION_TARGETS);
+  const [isAutoAdvance, setIsAutoAdvance] = useState<boolean>(true);
+  const [activeScenarioId, setActiveScenarioId] = useState<string>('hero-ghost-net');
+
+  // Layout focus
   const [focusedPanel, setFocusedPanel] = useState<FocusedPanelType>(null);
 
-  // Custom Classified Targets
-  const [customTargets, setCustomTargets] = useState<MissionTarget[]>([]);
+  const selectedTarget = selectedTargetId
+    ? targetsList.find((t) => t.id === selectedTargetId) || targetsList[0]
+    : targetsList[0];
 
-  // Guided Walkthrough State
-  const [isDemoRunning, setIsDemoRunning] = useState(true);
-  const [demoStage, setDemoStage] = useState(3); // Start in classified state so judges immediately see data
-  const [isDemoPaused, setIsDemoPaused] = useState(true);
-  const [demoLog, setDemoLog] = useState<DemoLogEntry[]>([]);
-
-  const demoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const currentScenario = JUDGE_SCENARIOS.find((s) => s.id === activeScenarioId) || JUDGE_SCENARIOS[3];
-
-  // Active targets list combining default, scenario-seeded, and custom-uploaded targets
-  const activeTargets = React.useMemo(() => {
-    const base = currentScenario.targets.length > 0 ? currentScenario.targets : MISSION_TARGETS;
-    return [...base, ...customTargets];
-  }, [currentScenario, customTargets]);
-
-  const addCustomTarget = useCallback((target: MissionTarget) => {
-    setCustomTargets((prev) => [target, ...prev.filter((t) => t.id !== target.id)]);
-    setSelectedTargetId(target.id);
-  }, []);
-
-  const selectScenario = useCallback((scenarioId: string) => {
-    sonarAudio.playLockBeep();
-    setActiveScenarioId(scenarioId);
-    const scen = JUDGE_SCENARIOS.find((s) => s.id === scenarioId) || JUDGE_SCENARIOS[0];
-    setSelectedTargetId(scen.primaryContactId);
-    setDemoStage(3);
-    setPlaybackTime(580);
-    setMissionStatus('surveying');
-  }, []);
-
-  const executeStageActions = useCallback((stageIndex: number, scenario: JudgeScenario) => {
-    const stageCaption = scenario.stageNotes[stageIndex] || GUIDED_DEMO_STAGES[stageIndex]?.caption || '';
-    const now = new Date().toLocaleTimeString('en-GB');
-
-    if (stageIndex === 0) {
-      setMissionStatus('launching');
-      setPlaybackTime(0);
-      setSelectedTargetId(null);
-      setIsPlaying(false);
-      sonarAudio.playDepthPulse();
-    } else if (stageIndex === 1) {
-      setMissionStatus('surveying');
-      setPlaybackTime(320);
-      setSelectedTargetId(null);
-      setIsPlaying(true);
-      sonarAudio.playSonarPing(0.9);
-    } else if (stageIndex === 2) {
-      setMissionStatus('contact_detected');
-      setPlaybackTime(580);
-      setSelectedTargetId(scenario.primaryContactId);
-      setIsPlaying(false);
-      sonarAudio.playLockBeep();
-    } else if (stageIndex === 3) {
-      setMissionStatus('contact_classified');
-      setPlaybackTime(620);
-      setSelectedTargetId(scenario.primaryContactId);
-      setIsPlaying(false);
-      sonarAudio.playSonarPing(1.2);
-    } else if (stageIndex === 4) {
-      setMissionStatus('completed');
-      setPlaybackTime(MISSION_DURATION_SECONDS);
-      setSelectedTargetId(scenario.primaryContactId);
-      setIsPlaying(false);
-      sonarAudio.playLockBeep();
+  const setSelectedTargetId = useCallback((id: string | null) => {
+    setSelectedTargetIdState(id);
+    if (id) {
+      sonarAudio.playTargetBeep();
+      const target = targetsList.find((t) => t.id === id);
+      if (target) {
+        setPlaybackTime(target.pingTime);
+      }
     }
+  }, [targetsList]);
 
-    setDemoLog((prev) => [
-      {
-        timestamp: now,
-        stage: GUIDED_DEMO_STAGES[stageIndex]?.title || `STAGE ${stageIndex + 1}`,
-        message: stageCaption,
-        type: stageIndex === 2 ? 'contact' : stageIndex === 4 ? 'complete' : 'info',
-      },
-      ...prev.slice(0, 19),
-    ]);
+  const toggleJudgeMode = useCallback(() => {
+    setIsJudgeMode((prev) => !prev);
+    sonarAudio.playLockBeep();
   }, []);
 
-  const setStageDirectly = useCallback((stageIndex: number) => {
-    if (stageIndex < 0 || stageIndex >= GUIDED_DEMO_STAGES.length) return;
-    setDemoStage(stageIndex);
-    executeStageActions(stageIndex, currentScenario);
-  }, [currentScenario, executeStageActions]);
+  const demoStageInfo = GUIDED_DEMO_STAGES[demoStage] || GUIDED_DEMO_STAGES[0];
 
+  // Helper to add to demo log
+  const addLog = useCallback((stage: string, message: string, type: DemoLogEntry['type'] = 'info') => {
+    const now = new Date();
+    const timestamp = `${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}:${String(now.getUTCSeconds()).padStart(2, '0')}`;
+    setDemoLog((prev) => [...prev.slice(-49), { timestamp, stage, message, type }]);
+  }, []);
+
+  // Set Stage Directly
+  const setStageDirectly = useCallback((stageIndex: number) => {
+    const clamped = Math.max(0, Math.min(stageIndex, GUIDED_DEMO_STAGES.length - 1));
+    setDemoStage(clamped);
+
+    if (clamped === 0) {
+      setPlaybackTime(100);
+      setMissionStatus('deploying');
+      addLog('INGEST', 'Loading 900 kHz high-resolution side-scan sonar swath (75m swath)', 'info');
+    } else if (clamped === 1) {
+      setPlaybackTime(300);
+      setMissionStatus('surveying');
+      addLog('PREPROCESS', 'Time-Varied Gain (TVG) applied · Acoustic contrast normalized', 'info');
+    } else if (clamped === 2) {
+      setPlaybackTime(500);
+      addLog('DETECT', 'AI perception detected 37 candidate acoustic returns', 'info');
+    } else if (clamped === 3) {
+      setPlaybackTime(580);
+      addLog('FILTER', 'Suppression active: 20 natural rocks and shadow artifacts filtered', 'filter');
+    } else if (clamped === 4) {
+      setPlaybackTime(600);
+      addLog('CLASSIFY', '17 valid marine anomalies classified · 4 High Priority', 'info');
+    } else if (clamped === 5) {
+      setSelectedTargetIdState('SX-T07');
+      setPlaybackTime(620);
+      sonarAudio.playTargetBeep();
+      addLog('TARGET #07', 'Hero Target: Ghost Net (ALDFG) locked at 94.7% confidence', 'contact');
+    } else if (clamped === 6) {
+      setSelectedTargetIdState('SX-T07');
+      setPlaybackTime(620);
+      addLog('GEOTAG', 'Target geotagged at 18.9217° N, 72.8214° E (Depth 43.1m)', 'info');
+    } else if (clamped === 7) {
+      setMissionStatus('complete');
+      sonarAudio.playLockBeep();
+      addLog('COMPLETE', 'Mission MX-026 complete · Marine Debris Report ready for export', 'complete');
+    }
+  }, [addLog]);
+
+  // Step next / prev
   const manualNextStage = useCallback(() => {
-    const next = Math.min(GUIDED_DEMO_STAGES.length - 1, demoStage + 1);
-    setStageDirectly(next);
+    if (demoStage < GUIDED_DEMO_STAGES.length - 1) {
+      setStageDirectly(demoStage + 1);
+    }
   }, [demoStage, setStageDirectly]);
 
   const manualPrevStage = useCallback(() => {
-    const prev = Math.max(0, demoStage - 1);
-    setStageDirectly(prev);
+    if (demoStage > 0) {
+      setStageDirectly(demoStage - 1);
+    }
   }, [demoStage, setStageDirectly]);
 
-  // Auto-advance timer (only active when isAutoAdvance is true)
+  // Automatic Step Transition Timer
   useEffect(() => {
-    if (!isDemoRunning || isDemoPaused || !isAutoAdvance) {
+    if (!isDemoRunning) {
       if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
       return;
     }
 
-    const currentStageInfo = GUIDED_DEMO_STAGES[demoStage];
-    if (!currentStageInfo) return;
+    const currentInfo = GUIDED_DEMO_STAGES[demoStage];
+    if (!currentInfo) return;
 
     demoTimerRef.current = setTimeout(() => {
       if (demoStage < GUIDED_DEMO_STAGES.length - 1) {
-        setDemoStage((prev) => {
-          const next = prev + 1;
-          executeStageActions(next, currentScenario);
-          return next;
-        });
+        setStageDirectly(demoStage + 1);
       } else {
-        setIsDemoPaused(true);
+        setIsDemoRunning(false);
       }
-    }, currentStageInfo.durationMs);
+    }, currentInfo.durationMs);
 
     return () => {
       if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
     };
-  }, [isDemoRunning, isDemoPaused, isAutoAdvance, demoStage, currentScenario, executeStageActions]);
+  }, [isDemoRunning, demoStage, setStageDirectly]);
 
-  const launchDemo = useCallback(() => {
+  // Demo Control Handlers
+  const startGuidedDemo = useCallback(() => {
     sonarAudio.playSonarPing();
-    setIsDemoRunning(true);
-    setDemoStage(0);
-    setIsDemoPaused(!isAutoAdvance);
     setDemoLog([]);
-    executeStageActions(0, currentScenario);
-  }, [isAutoAdvance, currentScenario, executeStageActions]);
-
-  const pauseDemo = useCallback(() => {
-    setIsDemoPaused(true);
-  }, []);
-
-  const resumeDemo = useCallback(() => {
-    setIsDemoPaused(false);
-  }, []);
-
-  const skipDemo = useCallback(() => {
-    setStageDirectly(4);
+    setIsDemoRunning(true);
+    setStageDirectly(0);
   }, [setStageDirectly]);
 
-  const resetMission = useCallback(() => {
-    setPlaybackTime(0);
-    setIsPlaying(false);
-    setSelectedTargetId(null);
-    setMissionStatus('idle');
+  const pauseGuidedDemo = useCallback(() => {
     setIsDemoRunning(false);
-    setDemoStage(0);
+    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
   }, []);
 
-  // Compute visible target IDs
-  const visibleTargetIds = React.useMemo(() => {
-    if (demoStage >= 2) {
-      return activeTargets.map((t) => t.id);
-    }
-    return activeTargets
-      .filter((t) => (t.pingTime || 0) <= playbackTime || playbackTime === 0)
-      .map((t) => t.id);
-  }, [activeTargets, demoStage, playbackTime]);
+  const resumeGuidedDemo = useCallback(() => {
+    setIsDemoRunning(true);
+  }, []);
 
+  const resetGuidedDemo = useCallback(() => {
+    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
+    setIsDemoRunning(false);
+    setDemoStage(0);
+    setSelectedTargetIdState('SX-T07');
+    setPlaybackTime(620);
+    setMissionStatus('nominal');
+    setDemoLog([]);
+  }, []);
+
+  const addCustomTarget = useCallback((targetData: Partial<MissionTarget>) => {
+    const newTarget: MissionTarget = {
+      id: targetData.id || `SX-T${String(targetsList.length + 1).padStart(2, '0')}`,
+      tracklineId: targetData.tracklineId || 'LINE-02',
+      class: targetData.class || 'Custom Marine Debris',
+      classCode: targetData.classCode || 'DEBRIS',
+      confidence: targetData.confidence || 0.88,
+      confidenceInterval: [0.85, 0.92],
+      uncertaintyRating: 'HIGH CONFIDENCE',
+      targetStrengthDb: -12.4,
+      operatorCaveat: targetData.operatorCaveat || 'Custom classified target.',
+      uncertaintyNotes: ['Operator-uploaded custom anomaly detection'],
+      depth: targetData.depth || 43.1,
+      length: targetData.length || 6.5,
+      width: targetData.width || 2.4,
+      estimatedHeight: targetData.estimatedHeight || 0.8,
+      shadowLength: targetData.shadowLength || 2.2,
+      orientation: targetData.orientation || 90,
+      slantRange: targetData.slantRange || 25.0,
+      acrossTrackMeters: targetData.acrossTrackMeters || 12.0,
+      bearingDeg: targetData.bearingDeg || 75,
+      lat: targetData.lat || 18.9217,
+      lon: targetData.lon || 72.8214,
+      risk: targetData.risk || 'HIGH',
+      pingTime: targetData.pingTime || 620,
+      pingNumber: targetData.pingNumber || 6200,
+      color: targetData.color || '#32E6D1',
+      evidence: targetData.evidence || {
+        objectShape: 90,
+        acousticIntensity: 88,
+        shadowGeometry: 92,
+        seabedContrast: 86,
+        dimensionalSimilarity: 89,
+        backscatterPattern: 91,
+      },
+      detectionEvidence: targetData.detectionEvidence || ['Uploaded image return', 'AI classification confirmed'],
+    };
+
+    setTargetsList((prev) => [newTarget, ...prev]);
+    setSelectedTargetIdState(newTarget.id);
+  }, [targetsList.length]);
+
+  const visibleTargetIds = targetsList.map((t) => t.id);
   const missionProgress = Math.min(100, Math.round((playbackTime / MISSION_DURATION_SECONDS) * 100));
-
-  const demoStageInfo = GUIDED_DEMO_STAGES[demoStage] || GUIDED_DEMO_STAGES[0];
 
   return (
     <MissionContext.Provider
       value={{
         selectedTargetId,
         setSelectedTargetId,
+        selectedTarget,
         missionStatus,
         setMissionStatus,
         playbackTime,
@@ -331,11 +390,7 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setShowSwath,
         isJudgeMode,
         setIsJudgeMode,
-        activeScenarioId,
-        currentScenario,
-        selectScenario,
-        isAutoAdvance,
-        setIsAutoAdvance,
+        toggleJudgeMode,
         manualNextStage,
         manualPrevStage,
         setStageDirectly,
@@ -343,19 +398,27 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         demoStage,
         demoStageInfo,
         demoLog,
-        isDemoPaused,
-        launchDemo,
-        pauseDemo,
-        resumeDemo,
-        skipDemo,
-        resetMission,
-        focusedPanel,
-        setFocusedPanel,
-        customTargets,
-        addCustomTarget,
-        activeTargets,
+        startGuidedDemo,
+        pauseGuidedDemo,
+        resumeGuidedDemo,
+        resetGuidedDemo,
+        // Aliases
+        isDemoPaused: !isDemoRunning && demoStage > 0,
+        launchDemo: () => startGuidedDemo(),
+        pauseDemo: pauseGuidedDemo,
+        resumeDemo: resumeGuidedDemo,
+        skipDemo: manualNextStage,
+        resetMission: resetGuidedDemo,
+        activeScenarioId,
+        selectScenario: setActiveScenarioId,
+        isAutoAdvance,
+        setIsAutoAdvance,
         visibleTargetIds,
         missionProgress,
+        addCustomTarget,
+        focusedPanel,
+        setFocusedPanel,
+        activeTargets: targetsList,
       }}
     >
       {children}

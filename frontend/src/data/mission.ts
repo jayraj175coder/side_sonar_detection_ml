@@ -1,76 +1,75 @@
 import type { MissionData } from '../types';
 
-/** Mission SX-014 — Arabian Sea Survey */
+/** Mission MX-026 — Marine Debris & Seabed Survey (MoES SIH 2026) */
 export const MISSION_DATA: MissionData = {
-  id: 'SX-014',
-  name: 'Arabian Sea Survey',
-  region: 'Arabian Sea — Mumbai Sector',
-  vessel: 'INS SANDHAYAK AUV-3',
-  operator: 'NHO — National Hydrographic Office',
+  id: 'MX-026',
+  name: 'Marine Debris Survey MX-026',
+  region: 'Coastal Seabed Survey — Arabian Sea Sector',
+  vessel: 'MoES Hydrographic Autonomous Vehicle AUV-3',
+  operator: 'Ministry of Earth Sciences (MoES)',
   status: 'complete',
   startTime: '2026-08-31T04:18:00Z',
   endTime: '2026-08-31T06:32:32Z',
   duration: '02:14:32',
   surveyedArea: 12.84,
   trackLength: 38.7,
-  avgDepth: 46.3,
-  coveragePercent: 87,
+  avgDepth: 43.1,
+  coveragePercent: 94,
   frequency: '900 kHz',
   swathWidth: 75,
   altimeter: 8.4,
   pingRate: 10,
   totalPings: 80829,
-  sonarModel: 'EdgeTech 4200-FS',
+  sonarModel: 'High-Resolution Dual-Frequency SSS (900/450 kHz)',
   tracklines: [
     {
       id: 'LINE-01',
-      name: 'North Pass · West Swath',
+      name: 'North Swath · Inshore Pass',
       code: 'TRK-01',
       heading: 178,
       pingsRange: '0001–2100',
       lengthKm: 9.8,
       status: 'complete',
-      targetIds: ['SX-T01', 'SX-T06', 'SX-T13', 'SX-T17'],
+      targetIds: ['SX-T01', 'SX-T04', 'SX-T13', 'SX-T17'],
     },
     {
       id: 'LINE-02',
-      name: 'Central Shipping Channel Pass',
+      name: 'Central Corridor · Hero Debris Swath',
       code: 'TRK-02',
       heading: 178,
       pingsRange: '2101–4500',
       lengthKm: 10.4,
       status: 'surveying',
-      targetIds: ['SX-T07', 'SX-T02', 'SX-T04', 'SX-T12'],
+      targetIds: ['SX-T07', 'SX-T02', 'SX-T06', 'SX-T12'],
     },
     {
       id: 'LINE-03',
-      name: 'South Shoal & Reef Edge',
+      name: 'South Shoal & Marine Sanctuary Edge',
       code: 'TRK-03',
       heading: 358,
       pingsRange: '4501–6800',
       lengthKm: 9.6,
       status: 'nominal',
-      targetIds: ['SX-T03', 'SX-T05', 'SX-T09', 'SX-T10'],
+      targetIds: ['SX-T03', 'SX-T05', 'SX-T08', 'SX-T10'],
     },
     {
       id: 'LINE-04',
-      name: 'East Deep Trench Return',
+      name: 'East Deep Trench Swath',
       code: 'TRK-04',
       heading: 178,
       pingsRange: '6801–8800',
       lengthKm: 8.9,
       status: 'nominal',
-      targetIds: ['SX-T08', 'SX-T11', 'SX-T14', 'SX-T15', 'SX-T16'],
+      targetIds: ['SX-T09', 'SX-T11', 'SX-T14', 'SX-T15', 'SX-T16'],
     },
   ],
   /**
    * Vessel track waypoints [lat, lon, timeSeconds]
-   * 12 waypoints forming a lawnmower survey pattern
    */
   track: [
     { lat: 18.9350, lon: 72.8100, timeSeconds: 0,    depth: 38.2, heading: 178, speed: 4.1 },
     { lat: 18.9280, lon: 72.8100, timeSeconds: 612,  depth: 40.4, heading: 178, speed: 4.1 },
-    { lat: 18.9210, lon: 72.8100, timeSeconds: 1224, depth: 43.1, heading: 178, speed: 4.0 },
+    { lat: 18.9217, lon: 72.8214, timeSeconds: 1224, depth: 43.1, heading: 178, speed: 4.0 },
     { lat: 18.9140, lon: 72.8100, timeSeconds: 1836, depth: 45.7, heading: 178, speed: 4.2 },
     { lat: 18.9070, lon: 72.8100, timeSeconds: 2448, depth: 48.3, heading: 178, speed: 4.1 },
     { lat: 18.9070, lon: 72.8200, timeSeconds: 2700, depth: 48.8, heading: 90, speed: 3.8 },
@@ -98,25 +97,36 @@ export function interpolateVesselPosition(
   timeSeconds: number
 ): { lat: number; lon: number; depth: number; heading: number; speed: number } {
   const track = MISSION_DATA.track;
-  const clamped = Math.max(0, Math.min(timeSeconds, MISSION_DURATION_SECONDS));
-
-  let i = 0;
-  while (i < track.length - 1 && track[i + 1].timeSeconds <= clamped) i++;
-
-  if (i >= track.length - 1) {
-    const last = track[track.length - 1];
-    return { lat: last.lat, lon: last.lon, depth: last.depth, heading: last.heading, speed: last.speed };
+  if (!track || track.length === 0) {
+    return { lat: 18.9217, lon: 72.8214, depth: 43.1, heading: 178, speed: 4.0 };
   }
 
-  const a = track[i];
-  const b = track[i + 1];
-  const t = (clamped - a.timeSeconds) / (b.timeSeconds - a.timeSeconds);
+  const clampedTime = Math.max(0, Math.min(timeSeconds, MISSION_DURATION_SECONDS));
 
+  for (let i = 0; i < track.length - 1; i++) {
+    const p1 = track[i];
+    const p2 = track[i + 1];
+
+    if (clampedTime >= p1.timeSeconds && clampedTime <= p2.timeSeconds) {
+      const dt = p2.timeSeconds - p1.timeSeconds;
+      const progress = dt > 0 ? (clampedTime - p1.timeSeconds) / dt : 0;
+
+      return {
+        lat: p1.lat + (p2.lat - p1.lat) * progress,
+        lon: p1.lon + (p2.lon - p1.lon) * progress,
+        depth: p1.depth + (p2.depth - p1.depth) * progress,
+        heading: p1.heading,
+        speed: p1.speed + (p2.speed - p1.speed) * progress,
+      };
+    }
+  }
+
+  const last = track[track.length - 1];
   return {
-    lat:     a.lat     + (b.lat     - a.lat)     * t,
-    lon:     a.lon     + (b.lon     - a.lon)     * t,
-    depth:   a.depth   + (b.depth   - a.depth)   * t,
-    heading: a.heading + (b.heading - a.heading) * t,
-    speed:   a.speed   + (b.speed   - a.speed)   * t,
+    lat: last.lat,
+    lon: last.lon,
+    depth: last.depth,
+    heading: last.heading,
+    speed: last.speed,
   };
 }

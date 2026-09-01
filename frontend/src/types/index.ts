@@ -161,7 +161,14 @@ export type TabType = 'overview' | 'scan' | 'history' | 'map' | 'reports' | 'mod
 /* ─── Mission Intelligence & Hydrographic Types ─────────────────────────── */
 
 export type RiskLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-export type UncertaintyRating = 'LOW AMBIGUITY' | 'MODERATE UNCERTAINTY' | 'HIGH UNCERTAINTY' | 'AMBIGUOUS CONTACT — RE-SURVEY ADVISED';
+export type UncertaintyRating =
+  | 'HIGH CONFIDENCE'
+  | 'MODERATE CONFIDENCE'
+  | 'LOW AMBIGUITY'
+  | 'MODERATE UNCERTAINTY'
+  | 'HIGH UNCERTAINTY'
+  | 'FILTERED / NATURAL NOISE'
+  | 'AMBIGUOUS CONTACT — RE-SURVEY ADVISED';
 
 export interface TargetEvidence {
   objectShape: number;
@@ -285,6 +292,6 @@ export interface AnalyticsData {
   sonarIntensity: { segment: string; intensity: number }[];
 }
 
-export type MissionStatus = 'idle' | 'initializing' | 'running' | 'complete' | 'launching' | 'surveying' | 'contact_detected' | 'contact_classified' | 'completed';
+export type MissionStatus = 'nominal' | 'deploying' | 'idle' | 'initializing' | 'running' | 'complete' | 'launching' | 'surveying' | 'contact_detected' | 'contact_classified' | 'completed';
 export type PlaybackSpeed = 1 | 2 | 4;
 

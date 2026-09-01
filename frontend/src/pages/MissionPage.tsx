@@ -1,251 +1,203 @@
 import React, { useState } from 'react';
 import { useMission } from '../context/MissionContext';
-import { MissionTopBar } from '../components/mission/MissionTopBar';
-import { GuidedWalkthroughBar } from '../components/mission/GuidedWalkthroughBar';
 import { MissionHierarchyTree } from '../components/mission/MissionHierarchyTree';
 import { HeroSonarWaterfall } from '../components/mission/HeroSonarWaterfall';
 import { ContactInspector } from '../components/mission/ContactInspector';
-import { AcousticTelemetryPanel } from '../components/mission/AcousticTelemetryPanel';
 import { MissionMapPanel } from '../components/mission/MissionMapPanel';
 import { SeabedPanel } from '../components/mission/SeabedPanel';
 import { MissionTimeline } from '../components/mission/MissionTimeline';
 import {
-  ChevronLeft,
-  ChevronRight,
-  Layers,
-  Map as MapIcon,
-  Box,
-  Radio,
   Activity,
-  Zap,
+  Layers,
+  MapPin,
+  Box,
+  Scale,
+  Sparkles,
+  ShieldCheck,
   Minimize2,
+  ChevronRight,
+  ChevronLeft,
   X,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 export const MissionPage: React.FC = () => {
   const {
-    missionStatus,
-    isDemoRunning,
-    launchDemo,
+    isJudgeMode,
+    toggleJudgeMode,
     focusedPanel,
     setFocusedPanel,
+    selectedTarget,
+    demoStageInfo,
+    isDemoRunning,
   } = useMission();
 
-  const [isLeftTreeOpen, setIsLeftTreeOpen] = useState<boolean>(true);
+  const [activeCenterTab, setActiveCenterTab] = useState<'sonar' | 'map' | 'seabed'>('sonar');
+  const [isLeftListOpen, setIsLeftListOpen] = useState<boolean>(true);
   const [isRightInspectorOpen, setIsRightInspectorOpen] = useState<boolean>(true);
-  const [bottomWorkspaceTab, setBottomWorkspaceTab] = useState<'split' | 'signals' | 'map' | 'seabed'>('split');
 
   return (
-    <div
-      className="flex flex-col h-screen bg-[#080B11] overflow-hidden relative select-none font-mono"
-      style={{ fontFamily: "'JetBrains Mono', monospace" }}
-    >
-      {/* 1. Glanceable Control Room Top Bar (Open MCT Convention) */}
-      <MissionTopBar
-        isLeftOpen={isLeftTreeOpen}
-        onToggleLeft={() => setIsLeftTreeOpen(!isLeftTreeOpen)}
-        isRightOpen={isRightInspectorOpen}
-        onToggleRight={() => setIsRightInspectorOpen(!isRightInspectorOpen)}
-      />
-
-      {/* 2. Guided Walkthrough Stepper Bar (With Judge Mode controls) */}
-      <GuidedWalkthroughBar />
-
-      {/* Floating Left Tree Expander Tab (When Collapsed) */}
-      {!isLeftTreeOpen && !focusedPanel && (
-        <button
-          onClick={() => setIsLeftTreeOpen(true)}
-          title="Show Survey & Tracklines Tree"
-          className="absolute top-1/2 left-0 -translate-y-1/2 z-40 bg-[#10151D] border border-l-0 border-[#1B2330] hover:border-[#4CD9E8] text-[#4CD9E8] py-4 px-1.5 rounded-r-xl shadow-2xl flex flex-col items-center gap-2 group transition-all cursor-pointer"
-        >
-          <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          <span className="[writing-mode:vertical-lr] text-[8px] font-bold tracking-widest uppercase text-[#7C8AA0] group-hover:text-[#4CD9E8]">
-            SURVEY TREE
-          </span>
-        </button>
-      )}
-
-      {/* Floating Right Inspector Expander Tab (When Collapsed) */}
-      {!isRightInspectorOpen && !focusedPanel && (
-        <button
-          onClick={() => setIsRightInspectorOpen(true)}
-          title="Show Contact Inspector & Evidence"
-          className="absolute top-1/2 right-0 -translate-y-1/2 z-40 bg-[#10151D] border border-r-0 border-[#1B2330] hover:border-[#4CD9E8] text-[#4CD9E8] py-4 px-1.5 rounded-l-xl shadow-2xl flex flex-col items-center gap-2 group transition-all cursor-pointer"
-        >
-          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          <span className="[writing-mode:vertical-lr] text-[8px] font-bold tracking-widest uppercase text-[#7C8AA0] group-hover:text-[#4CD9E8]">
-            INSPECTOR
-          </span>
-        </button>
-      )}
-
-      {/* 3. Panel Focus Mode Overlay (Feature 3: Fullscreen Panel Takeover) */}
-      {focusedPanel && (
-        <div className="flex-1 flex flex-col bg-[#080B11] z-30 overflow-hidden relative">
-          <div className="bg-[#10151D] border-b border-[#1B2330] px-4 py-2 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#4CD9E8] animate-ping" />
-              <span className="text-[10px] font-black text-[#4CD9E8] tracking-widest uppercase">
-                EXPANDED PANEL FOCUS: {focusedPanel.toUpperCase()}
-              </span>
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-[#03070B] overflow-hidden select-none font-mono text-xs">
+      {/* 1. JUDGE MODE PROMINENT BANNER (When Active) */}
+      {isJudgeMode && (
+        <div className="bg-gradient-to-r from-[#0C171E] via-[#081118] to-[#0C171E] border-b border-[#FFB547]/40 px-6 py-2.5 flex flex-wrap items-center justify-between gap-4 shrink-0 shadow-lg animate-slide-up">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-[#FFB547]/20 border border-[#FFB547]/40 flex items-center justify-center text-[#FFB547]">
+              <Scale className="w-4 h-4" />
             </div>
-
-            <button
-              onClick={() => setFocusedPanel(null)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161C26] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] text-[9px] font-bold transition-all shadow-md cursor-pointer"
-            >
-              <Minimize2 className="w-3.5 h-3.5" />
-              <span>EXIT FOCUS VIEW (ESC)</span>
-            </button>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black text-[#FFB547] uppercase tracking-wider font-sans">
+                  JUDGE EVALUATION MODE
+                </span>
+                <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-[#FFB547]/20 text-[#FFB547] border border-[#FFB547]/40">
+                  MoES SIH 2026
+                </span>
+              </div>
+              <p className="text-[9px] text-[#6F8992]">
+                Automated 900 kHz Sonar Marine Debris & Ghost Net Detection Pipeline
+              </p>
+            </div>
           </div>
 
-          <div className="flex-1 overflow-hidden">
-            {focusedPanel === 'waterfall' && <HeroSonarWaterfall />}
-            {focusedPanel === 'inspector' && <ContactInspector />}
-            {focusedPanel === 'map' && <MissionMapPanel />}
-            {focusedPanel === 'seabed' && <SeabedPanel />}
-            {focusedPanel === 'signals' && <AcousticTelemetryPanel />}
-            {focusedPanel === 'tree' && <MissionHierarchyTree />}
+          {/* 6 Large High-Impact SIH Evaluation Metrics */}
+          <div className="flex items-center gap-6 text-center">
+            <div>
+              <span className="text-lg font-extrabold text-[#E4F2F5] font-mono leading-none">17</span>
+              <span className="text-[8px] text-[#6F8992] uppercase tracking-wider block mt-0.5">Anomalies</span>
+            </div>
+
+            <div className="h-6 w-px bg-[#16303B]" />
+
+            <div>
+              <span className="text-lg font-extrabold text-[#FF5D5D] font-mono leading-none">4</span>
+              <span className="text-[8px] text-[#FF5D5D] uppercase tracking-wider block mt-0.5 font-bold">High Priority</span>
+            </div>
+
+            <div className="h-6 w-px bg-[#16303B]" />
+
+            <div>
+              <span className="text-lg font-extrabold text-[#32E6D1] font-mono leading-none">94.7%</span>
+              <span className="text-[8px] text-[#32E6D1] uppercase tracking-wider block mt-0.5 font-bold">Top Conf (Net)</span>
+            </div>
+
+            <div className="h-6 w-px bg-[#16303B]" />
+
+            <div>
+              <span className="text-lg font-extrabold text-[#65D391] font-mono leading-none">20</span>
+              <span className="text-[8px] text-[#65D391] uppercase tracking-wider block mt-0.5">Rocks Filtered</span>
+            </div>
+
+            <div className="h-6 w-px bg-[#16303B]" />
+
+            <div>
+              <span className="text-lg font-extrabold text-[#E4F2F5] font-mono leading-none">12.84</span>
+              <span className="text-[8px] text-[#6F8992] uppercase tracking-wider block mt-0.5">km² Mapped</span>
+            </div>
+
+            <div className="h-6 w-px bg-[#16303B]" />
+
+            <div>
+              <span className="text-lg font-extrabold text-[#29B6F6] font-mono leading-none">10.4</span>
+              <span className="text-[8px] text-[#6F8992] uppercase tracking-wider block mt-0.5">ms Latency</span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* 4. Normal Multi-Panel Grid (When not in Focus Mode) */}
-      {!focusedPanel && (
-        <div
-          className="flex-1 grid overflow-hidden transition-all duration-300 relative"
-          style={{
-            gridTemplateColumns: `${isLeftTreeOpen ? '250px' : '0px'} 1fr ${
-              isRightInspectorOpen ? '280px' : '0px'
-            }`,
-            gridTemplateRows: '1fr 1fr',
-          }}
-        >
-          {/* Left Rail: Navigable Survey Tree (Missions → Tracklines → Contacts) */}
-          <div
-            className={`row-span-2 overflow-hidden transition-all duration-300 ${
-              !isLeftTreeOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-            }`}
-          >
-            <MissionHierarchyTree onCollapse={() => setIsLeftTreeOpen(false)} />
+      {/* 2. DEMO WALKTHROUGH LIVE BANNER (When Running) */}
+      {isDemoRunning && (
+        <div className="bg-[#0C171E] border-b border-[#32E6D1]/40 px-4 py-1.5 flex items-center justify-between text-xs shrink-0 shadow-md">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#32E6D1] animate-ping" />
+            <span className="text-[10px] font-black text-[#32E6D1] uppercase tracking-wider">
+              DEMO STAGE: {demoStageInfo.title}
+            </span>
+            <span className="text-[9px] text-[#E4F2F5]">
+              — {demoStageInfo.caption}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* 3. MAIN 3-COLUMN LAYOUT */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* LEFT COLUMN: Survey Target List (20-25% width) */}
+        {isLeftListOpen && (
+          <div className="w-64 lg:w-72 h-full shrink-0 border-r border-[#16303B] overflow-hidden">
+            <MissionHierarchyTree onCollapse={() => setIsLeftListOpen(false)} />
+          </div>
+        )}
+
+        {/* CENTER COLUMN: Side-Scan Sonar Viewer / Map / 3D (50-60% width — THE HERO) */}
+        <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-[#03070B]">
+          {/* Sub-Header Instruments Switcher (Clean, minimal) */}
+          <div className="h-9 px-4 bg-[#081118] border-b border-[#16303B] flex items-center justify-between shrink-0 text-xs">
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setActiveCenterTab('sonar')}
+                className={`px-3 py-1 rounded-lg text-[9px] font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeCenterTab === 'sonar'
+                    ? 'bg-[#32E6D1]/20 text-[#32E6D1] border border-[#32E6D1]/40'
+                    : 'text-[#6F8992] hover:text-[#E4F2F5]'
+                }`}
+              >
+                <Activity className="w-3 h-3" />
+                <span>SIDE-SCAN SONAR MOSAIC</span>
+              </button>
+
+              <button
+                onClick={() => setActiveCenterTab('map')}
+                className={`px-3 py-1 rounded-lg text-[9px] font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeCenterTab === 'map'
+                    ? 'bg-[#32E6D1]/20 text-[#32E6D1] border border-[#32E6D1]/40'
+                    : 'text-[#6F8992] hover:text-[#E4F2F5]'
+                }`}
+              >
+                <MapPin className="w-3 h-3" />
+                <span>GEOTAGGED MAP</span>
+              </button>
+
+              <button
+                onClick={() => setActiveCenterTab('seabed')}
+                className={`px-3 py-1 rounded-lg text-[9px] font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeCenterTab === 'seabed'
+                    ? 'bg-[#32E6D1]/20 text-[#32E6D1] border border-[#32E6D1]/40'
+                    : 'text-[#6F8992] hover:text-[#E4F2F5]'
+                }`}
+              >
+                <Box className="w-3 h-3" />
+                <span>3D SEAFLOOR</span>
+              </button>
+            </div>
+
+            {/* Target Geotag Pill */}
+            {selectedTarget && (
+              <div className="hidden sm:flex items-center gap-2 text-[9px] text-[#6F8992]">
+                <span>Target: <strong className="text-[#32E6D1]">{selectedTarget.id}</strong></span>
+                <span>·</span>
+                <span>{selectedTarget.lat.toFixed(4)}°N, {selectedTarget.lon.toFixed(4)}°E</span>
+              </div>
+            )}
           </div>
 
-          {/* Center Top: The Hero Scrolling Side-Scan Waterfall & Mosaic Display */}
-          <div className="border-b border-[#1B2330] overflow-hidden relative">
-            <HeroSonarWaterfall />
+          {/* Main Hero Viewport */}
+          <div className="flex-1 overflow-hidden relative">
+            {activeCenterTab === 'sonar' && <HeroSonarWaterfall />}
+            {activeCenterTab === 'map' && <MissionMapPanel />}
+            {activeCenterTab === 'seabed' && <SeabedPanel />}
           </div>
+        </div>
 
-          {/* Right Rail: Contact Inspector (Cropped Snippet, Range, Qualitative Uncertainty) */}
-          <div
-            className={`row-span-2 overflow-hidden transition-all duration-300 ${
-              !isRightInspectorOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-            }`}
-          >
+        {/* RIGHT COLUMN: Target Intelligence & Evidence (25-30% width) */}
+        {isRightInspectorOpen && (
+          <div className="w-72 lg:w-84 h-full shrink-0 border-l border-[#16303B] overflow-hidden">
             <ContactInspector onCollapse={() => setIsRightInspectorOpen(false)} />
           </div>
+        )}
+      </div>
 
-          {/* Center Bottom: Composable Hydrographic Workspace */}
-          <div className="flex flex-col overflow-hidden bg-[#080B11]">
-            {/* Workspace Tabs Header */}
-            <div className="flex items-center justify-between px-3 py-1 bg-[#10151D] border-b border-[#1B2330] shrink-0 text-[9px]">
-              <div className="flex items-center gap-1">
-                <span className="text-[#7C8AA0] uppercase tracking-widest mr-1">
-                  INSTRUMENTS:
-                </span>
-
-                <button
-                  onClick={() => setBottomWorkspaceTab('split')}
-                  className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 cursor-pointer ${
-                    bottomWorkspaceTab === 'split'
-                      ? 'bg-[#4CD9E8]/15 text-[#4CD9E8] border-[#4CD9E8]/40'
-                      : 'bg-[#161C26] text-[#7C8AA0] border-[#1B2330]'
-                  }`}
-                >
-                  <Layers className="w-3 h-3" />
-                  <span>3-WAY CONSOLE</span>
-                </button>
-
-                <button
-                  onClick={() => setBottomWorkspaceTab('signals')}
-                  className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 cursor-pointer ${
-                    bottomWorkspaceTab === 'signals'
-                      ? 'bg-[#4CD9E8]/15 text-[#4CD9E8] border-[#4CD9E8]/40'
-                      : 'bg-[#161C26] text-[#7C8AA0] border-[#1B2330]'
-                  }`}
-                >
-                  <Activity className="w-3 h-3" />
-                  <span>SIGNAL CHANNELS</span>
-                </button>
-
-                <button
-                  onClick={() => setBottomWorkspaceTab('map')}
-                  className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 cursor-pointer ${
-                    bottomWorkspaceTab === 'map'
-                      ? 'bg-[#4CD9E8]/15 text-[#4CD9E8] border-[#4CD9E8]/40'
-                      : 'bg-[#161C26] text-[#7C8AA0] border-[#1B2330]'
-                  }`}
-                >
-                  <MapIcon className="w-3 h-3" />
-                  <span>USBL GEO MAP</span>
-                </button>
-
-                <button
-                  onClick={() => setBottomWorkspaceTab('seabed')}
-                  className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 cursor-pointer ${
-                    bottomWorkspaceTab === 'seabed'
-                      ? 'bg-[#4CD9E8]/15 text-[#4CD9E8] border-[#4CD9E8]/40'
-                      : 'bg-[#161C26] text-[#7C8AA0] border-[#1B2330]'
-                  }`}
-                >
-                  <Box className="w-3 h-3" />
-                  <span>3D BATHYMETRY</span>
-                </button>
-              </div>
-
-              <span className="text-[#7C8AA0] hidden md:inline text-[8px]">
-                HYDROGRAPHIC PING BUFFER · SX-014
-              </span>
-            </div>
-
-            {/* Sub-Panel Viewports */}
-            <div className="flex-1 overflow-hidden">
-              {bottomWorkspaceTab === 'split' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 h-full overflow-hidden divide-x divide-[#1B2330]">
-                  <div className="h-full overflow-hidden">
-                    <AcousticTelemetryPanel />
-                  </div>
-                  <div className="h-full overflow-hidden">
-                    <MissionMapPanel />
-                  </div>
-                  <div className="h-full overflow-hidden">
-                    <SeabedPanel />
-                  </div>
-                </div>
-              )}
-
-              {bottomWorkspaceTab === 'signals' && (
-                <div className="h-full overflow-hidden">
-                  <AcousticTelemetryPanel />
-                </div>
-              )}
-
-              {bottomWorkspaceTab === 'map' && (
-                <div className="h-full overflow-hidden">
-                  <MissionMapPanel />
-                </div>
-              )}
-
-              {bottomWorkspaceTab === 'seabed' && (
-                <div className="h-full overflow-hidden">
-                  <SeabedPanel />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 5. Bottom Timeline / Survey Scrubber */}
+      {/* 4. BOTTOM BAR: SONARX AI PIPELINE + TIMELINE SCRUBBER */}
       <MissionTimeline />
     </div>
   );

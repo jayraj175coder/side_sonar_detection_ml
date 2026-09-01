@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import {
   Radio,
   RefreshCw,
-  ToggleLeft,
-  ToggleRight,
   Sparkles,
   Menu,
   Server,
@@ -15,36 +13,53 @@ import {
   PanelLeftOpen,
   Volume2,
   VolumeX,
-  Code2,
+  Play,
+  Pause,
+  RotateCcw,
+  Scale,
+  UploadCloud,
+  FileText,
+  MapPin,
+  Box,
+  BarChart2,
+  Eye,
+  Crosshair,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { ApiExplorerModal } from '../common/ApiExplorerModal';
+import { useMission } from '../../context/MissionContext';
 import { sonarAudio } from '../../utils/sonarAudio';
+import { TabType } from '../../types';
 
 interface HeaderProps {
-  title: string;
+  title?: string;
   subtitle?: string;
   onToggleMobileMenu?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  title,
-  subtitle,
   onToggleMobileMenu,
 }) => {
   const {
+    activeTab,
+    setActiveTab,
     isBackendConnected,
-    isDemoMode,
-    setIsDemoMode,
     refreshData,
     isLoading,
-    currentScan,
-    modelInfo,
     isSidebarCollapsed,
     toggleSidebar,
   } = useApp();
 
-  const [isApiModalOpen, setIsApiModalOpen] = useState<boolean>(false);
+  const {
+    isDemoRunning,
+    startGuidedDemo,
+    pauseGuidedDemo,
+    resumeGuidedDemo,
+    resetGuidedDemo,
+    isJudgeMode,
+    toggleJudgeMode,
+    demoStageInfo,
+  } = useMission();
+
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(sonarAudio.isMuted);
 
   const handleToggleAudio = () => {
@@ -53,117 +68,138 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <>
-      <header className="h-16 md:h-18 bg-[#060D17]/95 backdrop-blur-2xl border-b border-[#152438] px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 shadow-xl font-mono select-none">
-        {/* Title & Mobile / Desktop Toggle */}
-        <div className="flex items-center gap-3">
-          {/* Desktop Sidebar Toggle Button */}
-          <button
-            onClick={toggleSidebar}
-            className="hidden md:flex p-2 rounded-xl bg-[#0A1322] border border-[#152438] text-[#7C8AA0] hover:text-[#4CD9E8] hover:border-[#4CD9E8]/40 transition-all active:scale-95 shadow-md cursor-pointer"
-            title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar to left'}
-          >
-            {isSidebarCollapsed ? (
-              <PanelLeftOpen className="w-4 h-4 text-[#4CD9E8]" />
-            ) : (
-              <PanelLeftClose className="w-4 h-4" />
-            )}
-          </button>
-
-          {onToggleMobileMenu && (
-            <button
-              onClick={onToggleMobileMenu}
-              className="md:hidden p-2 rounded-xl bg-[#0A1322] border border-[#152438] text-[#EAEFF5] hover:text-[#4CD9E8] cursor-pointer"
-              title="Open Menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+    <header className="h-16 md:h-18 bg-[#081118]/95 backdrop-blur-2xl border-b border-[#16303B] px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 shadow-xl font-mono select-none">
+      {/* 1. Left: Brand + Mission MX-026 + Identity Tag */}
+      <div className="flex items-center gap-3">
+        {/* Desktop Sidebar Toggle Button */}
+        <button
+          onClick={toggleSidebar}
+          className="hidden md:flex p-2 rounded-xl bg-[#0C171E] border border-[#16303B] text-[#6F8992] hover:text-[#32E6D1] hover:border-[#32E6D1]/40 transition-all active:scale-95 shadow-md cursor-pointer"
+          title={isSidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
+        >
+          {isSidebarCollapsed ? (
+            <PanelLeftOpen className="w-4 h-4 text-[#32E6D1]" />
+          ) : (
+            <PanelLeftClose className="w-4 h-4" />
           )}
+        </button>
+
+        {onToggleMobileMenu && (
+          <button
+            onClick={onToggleMobileMenu}
+            className="md:hidden p-2 rounded-xl bg-[#0C171E] border border-[#16303B] text-[#E4F2F5] hover:text-[#32E6D1] cursor-pointer"
+            title="Open Menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
+
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-[#32E6D1]/15 border border-[#32E6D1]/30 flex items-center justify-center text-[#32E6D1] shadow-[0_0_15px_rgba(50,230,209,0.3)] shrink-0">
+            <Radio className="w-5 h-5 animate-pulse" />
+          </div>
 
           <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-sm md:text-base font-black text-[#EAEFF5] tracking-wide">
-                {title}
-              </h1>
-              {currentScan && (
-                <span className="hidden sm:inline-flex text-[9px] font-mono px-2 py-0.5 rounded-md bg-[#4CD9E8]/10 text-[#4CD9E8] border border-[#4CD9E8]/30">
-                  Scan: {currentScan.scan_id}
-                </span>
-              )}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-base font-black text-[#E4F2F5] tracking-wider uppercase">
+                SONARX
+              </span>
+              <span className="hidden sm:inline-flex text-[9px] font-bold px-2 py-0.5 rounded-md bg-[#32E6D1]/15 text-[#32E6D1] border border-[#32E6D1]/30">
+                AI MARINE DEBRIS DETECTION
+              </span>
+              <span className="text-[9px] text-[#6F8992] hidden md:inline">
+                · Mission: <strong className="text-[#E4F2F5]">MX-026</strong>
+              </span>
             </div>
-            {subtitle && (
-              <p className="text-[10px] text-[#7C8AA0] tracking-tight mt-0.5 hidden sm:block">
-                {subtitle}
-              </p>
-            )}
+            <p className="text-[10px] text-[#6F8992] tracking-tight hidden lg:block">
+              Transforming side-scan sonar imagery into explainable, geotagged marine intelligence.
+            </p>
           </div>
         </div>
+      </div>
 
-        {/* Action Controls & Telemetry Badges */}
-        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-xs">
-          {/* 1. MoES Drone Perception Status Badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0A1322] border border-[#3FD98A]/30 text-[#EAEFF5] text-[9px] font-bold shadow-md">
-            <span className="w-2 h-2 rounded-full bg-[#3FD98A] animate-pulse" />
-            <span className="text-[#3FD98A]">MoES AUV ENGINE</span>
-            <span className="text-[#7C8AA0] hidden md:inline">· AUTO-LABEL ON</span>
-          </div>
-
-          {/* 2. Interactive REST API Explorer Button */}
+      {/* 2. Center/Right: Prominent Demo Actions & Mode Controls */}
+      <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap text-xs">
+        {/* HERO START DEMO MISSION BUTTON */}
+        {!isDemoRunning ? (
           <button
-            onClick={() => setIsApiModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0A1322] border border-[#152438] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] text-[9px] font-bold transition-all shadow-md group cursor-pointer"
-            title="Open Interactive REST API Explorer"
+            onClick={startGuidedDemo}
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#32E6D1] to-[#29B6F6] hover:brightness-110 text-[#03070B] font-black text-xs transition-all shadow-[0_0_20px_rgba(50,230,209,0.35)] active:scale-95 cursor-pointer"
+            title="Start automated 30s judge evaluation walkthrough"
           >
-            <Code2 className="w-3.5 h-3.5 text-[#4CD9E8] group-hover:animate-pulse" />
-            <span>REST API</span>
-            <span className="text-[7px] px-1 py-0.2 rounded bg-[#3FD98A]/20 text-[#3FD98A]">v2</span>
+            <Play className="w-3.5 h-3.5 fill-current" />
+            <span>START DEMO MISSION</span>
           </button>
-
-          {/* 3. Audio Sonar Ping Feedback Toggle */}
-          <button
-            onClick={handleToggleAudio}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[9px] font-bold transition-all cursor-pointer ${
-              !isAudioMuted
-                ? 'bg-[#4CD9E8]/15 border-[#4CD9E8]/40 text-[#4CD9E8] shadow-[0_0_10px_rgba(76,217,232,0.2)]'
-                : 'bg-[#0A1322] border-[#152438] text-[#7C8AA0] hover:text-[#EAEFF5]'
-            }`}
-            title="Toggle Subsea Sonar Acoustic Feedback Sound"
-          >
-            {!isAudioMuted ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{!isAudioMuted ? 'AUDIO ON' : 'MUTED'}</span>
-          </button>
-
-          {/* 4. Backend Connection Status Badge */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0A1322] border border-[#152438] shadow-md">
-            <span
-              className={`w-2 h-2 rounded-full ${
-                isBackendConnected
-                  ? 'bg-[#3FD98A] shadow-[0_0_8px_#3FD98A]'
-                  : 'bg-[#4CD9E8] animate-pulse shadow-[0_0_8px_#4CD9E8]'
-              }`}
-            />
-            <span className="text-[9px] font-bold text-[#EAEFF5]">
-              {isBackendConnected ? 'FASTAPI LIVE' : 'HYDROGRAPHIC ENGINE'}
+        ) : (
+          <div className="flex items-center gap-1.5 bg-[#0C171E] p-1 rounded-xl border border-[#32E6D1]/40 shadow-[0_0_15px_rgba(50,230,209,0.2)]">
+            <span className="text-[9px] font-bold text-[#32E6D1] px-2 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#32E6D1] animate-ping" />
+              {demoStageInfo.title}
             </span>
+            <button
+              onClick={pauseGuidedDemo}
+              className="p-1 rounded-lg bg-[#081118] border border-[#16303B] text-[#E4F2F5] hover:text-[#32E6D1] cursor-pointer"
+              title="Pause walkthrough"
+            >
+              <Pause className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={resetGuidedDemo}
+              className="p-1 rounded-lg bg-[#081118] border border-[#16303B] text-[#6F8992] hover:text-[#FF5D5D] cursor-pointer"
+              title="Reset walkthrough"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
           </div>
+        )}
 
-          {/* 5. Refresh Action Button */}
-          <button
-            onClick={refreshData}
-            disabled={isLoading}
-            className="p-2 rounded-xl bg-[#0A1322] border border-[#152438] hover:border-[#4CD9E8]/40 text-[#7C8AA0] hover:text-[#4CD9E8] transition-all shadow-md cursor-pointer disabled:opacity-50"
-            title="Refresh Telemetry"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#4CD9E8]' : ''}`} />
-          </button>
+        {/* JUDGE MODE TOGGLE */}
+        <button
+          onClick={toggleJudgeMode}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
+            isJudgeMode
+              ? 'bg-[#FFB547]/20 border-[#FFB547] text-[#FFB547] shadow-[0_0_15px_rgba(255,181,71,0.25)]'
+              : 'bg-[#0C171E] border-[#16303B] text-[#6F8992] hover:text-[#E4F2F5]'
+          }`}
+          title="Toggle Judge Evaluation Mode (Simplified High-Impact Metrics)"
+        >
+          <Scale className="w-3.5 h-3.5" />
+          <span>{isJudgeMode ? 'JUDGE MODE: ON' : 'JUDGE MODE'}</span>
+        </button>
+
+        {/* UPLOAD & ANALYZE QUICK BUTTON */}
+        <button
+          onClick={() => setActiveTab('scan')}
+          className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[10px] font-bold transition-all cursor-pointer ${
+            activeTab === 'scan'
+              ? 'bg-[#32E6D1]/20 border-[#32E6D1] text-[#32E6D1]'
+              : 'bg-[#0C171E] border-[#16303B] text-[#6F8992] hover:text-[#E4F2F5]'
+          }`}
+          title="Upload new side-scan sonar image for AI analysis"
+        >
+          <UploadCloud className="w-3.5 h-3.5" />
+          <span>UPLOAD & ANALYZE</span>
+        </button>
+
+        {/* Audio Ping Sound Toggle */}
+        <button
+          onClick={handleToggleAudio}
+          className={`p-2 rounded-xl border text-xs transition-all cursor-pointer ${
+            !isAudioMuted
+              ? 'bg-[#32E6D1]/15 border-[#32E6D1]/40 text-[#32E6D1]'
+              : 'bg-[#0C171E] border-[#16303B] text-[#6F8992] hover:text-[#E4F2F5]'
+          }`}
+          title="Toggle Acoustic Sonar Ping Audio"
+        >
+          {!isAudioMuted ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+        </button>
+
+        {/* System Online Status Badge */}
+        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#0C171E] border border-[#16303B] text-[9px] font-bold text-[#65D391]">
+          <span className="w-2 h-2 rounded-full bg-[#65D391] animate-pulse" />
+          <span>SYSTEM ONLINE</span>
         </div>
-      </header>
-
-      {/* Interactive REST API Explorer Modal */}
-      <ApiExplorerModal
-        isOpen={isApiModalOpen}
-        onClose={() => setIsApiModalOpen(false)}
-      />
-    </>
+      </div>
+    </header>
   );
 };

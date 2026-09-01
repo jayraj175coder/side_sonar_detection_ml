@@ -3,7 +3,7 @@ import {
   FileText,
   Printer,
   Download,
-  ShieldCheck,
+  CheckCircle2,
   AlertTriangle,
   Calendar,
   MapPin,
@@ -15,207 +15,277 @@ import {
   Layers,
   Info,
   Boxes,
-  CheckCircle2,
   FileSpreadsheet,
+  Check,
+  ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { Badge } from '../components/common/Badge';
+import { MISSION_DATA } from '../data/mission';
+import { MISSION_TARGETS } from '../data/targets';
 
 export const ReportsPage: React.FC = () => {
-  const { scans, currentScan, setCurrentScan } = useApp();
-  const [selectedScanId, setSelectedScanId] = useState<string>(
-    currentScan?.scan_id || scans[0]?.scan_id || ''
-  );
-  const [isExporting, setIsExporting] = useState<boolean>(false);
-  const [exportSuccess, setExportSuccess] = useState<boolean>(false);
+  const [downloadJsonSuccess, setDownloadJsonSuccess] = useState<boolean>(false);
+  const [downloadCsvSuccess, setDownloadCsvSuccess] = useState<boolean>(false);
 
-  const activeScan = scans.find((s) => s.scan_id === selectedScanId) || currentScan || scans[0];
+  const heroTarget = MISSION_TARGETS.find((t) => t.id === 'SX-T07') || MISSION_TARGETS[0];
+  const highPriorityTargets = MISSION_TARGETS.filter((t) => t.risk === 'CRITICAL' || t.risk === 'HIGH');
+  const filteredTargets = MISSION_TARGETS.filter((t) => t.uncertaintyRating.includes('FILTERED'));
 
   const handlePrint = () => {
     window.print();
   };
 
   const handleDownloadJson = () => {
-    if (!activeScan) return;
-    setIsExporting(true);
+    const reportData = {
+      title: 'SONARX MARINE DEBRIS DETECTION REPORT',
+      mission_id: 'MX-026',
+      organization: 'Ministry of Earth Sciences (MoES)',
+      vessel: MISSION_DATA.vessel,
+      generated_at: new Date().toISOString(),
+      summary: {
+        survey_area_km2: 12.84,
+        total_anomalies_detected: 17,
+        high_priority_targets: 4,
+        natural_formations_filtered: 20,
+        swath_width_m: 75,
+        frequency: '900 kHz',
+      },
+      hero_detection: {
+        id: heroTarget.id,
+        classification: heroTarget.class,
+        confidence: heroTarget.confidence,
+        location: {
+          latitude: heroTarget.lat,
+          longitude: heroTarget.lon,
+          depth_m: heroTarget.depth,
+        },
+        dimensions: {
+          length_m: heroTarget.length,
+          width_m: heroTarget.width,
+          shadow_m: heroTarget.shadowLength,
+        },
+        evidence: heroTarget.evidence,
+        checkpoints: heroTarget.detectionEvidence,
+      },
+      target_register: MISSION_TARGETS.map((t) => ({
+        id: t.id,
+        class: t.class,
+        confidence: t.confidence,
+        latitude: t.lat,
+        longitude: t.lon,
+        depth: t.depth,
+        risk: t.risk,
+      })),
+    };
 
-    setTimeout(() => {
-      const dataStr =
-        'data:text/json;charset=utf-8,' +
-        encodeURIComponent(JSON.stringify(activeScan, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute('href', dataStr);
-      downloadAnchor.setAttribute('download', `${activeScan.scan_id}_moes_inspection_report.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(reportData, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', dataStr);
+    downloadAnchor.setAttribute('download', `MX-026_marine_debris_report.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
 
-      setIsExporting(false);
-      setExportSuccess(true);
-      setTimeout(() => setExportSuccess(false), 2500);
-    }, 400);
+    setDownloadJsonSuccess(true);
+    setTimeout(() => setDownloadJsonSuccess(false), 2500);
   };
 
-  if (!activeScan) {
-    return (
-      <div className="p-12 text-center rounded-3xl glass-panel space-y-3 font-mono border border-[#152438]">
-        <FileText className="w-12 h-12 text-[#7C8AA0] mx-auto animate-pulse" />
-        <h3 className="text-base font-bold text-[#EAEFF5]">
-          No Scan Available for Report
-        </h3>
-        <p className="text-xs text-[#7C8AA0]">
-          Upload and analyze a side-scan sonar image or enable Demo Mode to view sample reports.
-        </p>
-      </div>
-    );
-  }
+  const handleDownloadCsv = () => {
+    const headers = ['Target_ID', 'Class', 'Code', 'Confidence', 'Latitude', 'Longitude', 'Depth_M', 'Length_M', 'Width_M', 'Shadow_M', 'Priority_Risk'];
+    const rows = MISSION_TARGETS.map((t) => [
+      t.id,
+      `"${t.class}"`,
+      t.classCode,
+      (t.confidence * 100).toFixed(1) + '%',
+      t.lat,
+      t.lon,
+      t.depth,
+      t.length,
+      t.width,
+      t.shadowLength,
+      t.risk,
+    ].join(','));
 
-  const hasGeo =
-    activeScan.location.latitude !== null && activeScan.location.longitude !== null;
-  const isV2 = activeScan.model_version === 'v2' || activeScan.model_name?.includes('Marine-Debris');
+    const csvContent = `${headers.join(',')}\n${rows.join('\n')}`;
+    const dataStr = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', dataStr);
+    downloadAnchor.setAttribute('download', `MX-026_targets_register.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+
+    setDownloadCsvSuccess(true);
+    setTimeout(() => setDownloadCsvSuccess(false), 2500);
+  };
 
   return (
     <div className="space-y-6 animate-slide-up font-mono select-none">
-      {/* Top Selector & Action Bar (Hidden during Print) */}
-      <div className="print:hidden p-4 rounded-3xl glass-panel flex flex-wrap items-center justify-between gap-4 border border-[#152438]">
-        <div className="flex items-center gap-3">
-          <label className="text-xs font-mono text-[#7C8AA0] font-bold">
-            Select Track:
-          </label>
-          <select
-            value={selectedScanId}
-            onChange={(e) => {
-              setSelectedScanId(e.target.value);
-              const found = scans.find((s) => s.scan_id === e.target.value);
-              if (found) setCurrentScan(found);
-            }}
-            className="px-3.5 py-2 text-xs font-mono rounded-xl bg-[#060D17] border border-[#152438] text-[#EAEFF5] focus:outline-none focus:border-[#4CD9E8] cursor-pointer"
-          >
-            {scans.map((s) => (
-              <option key={s.scan_id} value={s.scan_id}>
-                {s.scan_id} — {s.filename} ({s.total_detections} targets)
-              </option>
-            ))}
-          </select>
+      {/* 1. Action Toolbar */}
+      <div className="print:hidden p-4 rounded-2xl bg-[#081118] border border-[#16303B] flex flex-wrap items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-center gap-2">
+          <FileText className="w-4 h-4 text-[#32E6D1]" />
+          <span className="text-xs font-bold text-[#E4F2F5] uppercase tracking-wider">
+            MISSION MX-026 // MARINE DEBRIS DOSSIER
+          </span>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleDownloadCsv}
+            className="px-3.5 py-2 rounded-xl bg-[#0C171E] hover:bg-[#16303B] border border-[#16303B] text-xs font-bold text-[#E4F2F5] flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+          >
+            {downloadCsvSuccess ? <Check className="w-3.5 h-3.5 text-[#65D391]" /> : <FileSpreadsheet className="w-3.5 h-3.5 text-[#65D391]" />}
+            <span>Export CSV</span>
+          </button>
+
           <button
             onClick={handleDownloadJson}
-            disabled={isExporting}
-            className={`px-4 py-2 rounded-xl border text-xs font-mono flex items-center gap-2 transition-all cursor-pointer ${
-              exportSuccess
-                ? 'bg-[#091D17] border-[#3FD98A] text-[#3FD98A]'
-                : 'bg-[#0A1322] hover:bg-[#101D31] border-[#152438] text-[#7C8AA0] hover:text-[#EAEFF5]'
-            }`}
+            className="px-3.5 py-2 rounded-xl bg-[#0C171E] hover:bg-[#16303B] border border-[#16303B] text-xs font-bold text-[#E4F2F5] flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
           >
-            {exportSuccess ? (
-              <>
-                <CheckCircle2 className="w-4 h-4 text-[#3FD98A]" />
-                <span>Downloaded!</span>
-              </>
-            ) : isExporting ? (
-              <>
-                <div className="w-3.5 h-3.5 border-2 border-[#4CD9E8] border-t-transparent rounded-full animate-spin" />
-                <span>Exporting...</span>
-              </>
-            ) : (
-              <>
-                <Download className="w-4 h-4 text-[#4CD9E8]" />
-                <span>Download JSON</span>
-              </>
-            )}
+            {downloadJsonSuccess ? <Check className="w-3.5 h-3.5 text-[#32E6D1]" /> : <Download className="w-3.5 h-3.5 text-[#32E6D1]" />}
+            <span>Export JSON</span>
           </button>
 
           <button
             onClick={handlePrint}
-            className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#4CD9E8] to-[#3FD98A] hover:brightness-110 text-[#03070E] font-black text-xs font-mono flex items-center gap-2 transition-all shadow-lg shadow-[#4CD9E8]/25 active:scale-95 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#32E6D1] to-[#29B6F6] text-[#03070B] font-black text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
           >
-            <Printer className="w-4 h-4" />
+            <Printer className="w-3.5 h-3.5" />
             <span>Print Report (PDF)</span>
           </button>
         </div>
       </div>
 
-      {/* Formal MoES Report Document Container */}
-      <div className="p-8 md:p-12 rounded-3xl glass-panel space-y-8 bg-[#060D17] border border-[#152438] shadow-2xl print:bg-white print:text-black print:p-0 print:border-none print:shadow-none">
-        {/* Document Header Letterhead */}
-        <div className="border-b-2 border-[#4CD9E8]/40 pb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      {/* 2. Structured Report Document Container */}
+      <div className="bg-[#081118] border border-[#16303B] rounded-3xl p-6 md:p-10 space-y-8 shadow-2xl print:border-none print:shadow-none print:p-0 print:bg-white print:text-black">
+        {/* Document Header */}
+        <div className="border-b border-[#16303B] pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-[#4CD9E8]/20 text-[#4CD9E8] border border-[#4CD9E8]/40 print:text-black print:border-black">
-                MoES SIH-2026 INTELLIGENCE BRIEFING
+              <span className="text-xl font-black text-[#E4F2F5] tracking-wider uppercase font-sans print:text-black">
+                SONARX
               </span>
-              <span className="font-mono text-xs text-[#7C8AA0] print:text-gray-600">
-                DOC-REF: {activeScan.scan_id}
+              <span className="text-[10px] px-2 py-0.5 rounded bg-[#32E6D1]/20 text-[#32E6D1] font-bold border border-[#32E6D1]/40 print:border-black print:text-black">
+                MoES SIH 2026 SPEC
               </span>
             </div>
-            <h2 className="text-xl md:text-2xl font-black text-[#EAEFF5] font-mono tracking-tight print:text-black">
-              Underwater Marine Debris & Sonar Anomaly Assessment
+            <h2 className="text-lg font-bold text-[#32E6D1] font-sans print:text-black">
+              MARINE DEBRIS & ANOMALY DETECTION DOSSIER
             </h2>
-            <p className="text-xs text-[#7C8AA0] font-sans print:text-gray-600">
-              Autonomous Acoustic Backscatter Perception Pipeline • Ministry of Earth Sciences
+            <p className="text-xs text-[#6F8992] print:text-gray-600">
+              Ministry of Earth Sciences · Automated Side-Scan Sonar Perception Pipeline
             </p>
           </div>
 
-          <div className="text-right font-mono text-xs text-[#7C8AA0] space-y-1 print:text-gray-700">
-            <p>
-              Generated: <strong className="text-[#EAEFF5] print:text-black">{activeScan.created_at}</strong>
-            </p>
-            <p>
-              Platform: <strong className="text-[#4CD9E8] print:text-black">SONARX Edge AI Engine</strong>
-            </p>
+          <div className="text-right text-xs space-y-1 text-[#6F8992] font-mono print:text-gray-600">
+            <p>Mission ID: <strong className="text-[#E4F2F5] print:text-black">MX-026</strong></p>
+            <p>Vessel: <span className="text-[#E4F2F5] print:text-black">{MISSION_DATA.vessel}</span></p>
+            <p>Survey Date: <span>2026-08-31</span></p>
           </div>
         </div>
 
-        {/* Mission Telemetry Executive Summary Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 rounded-2xl bg-[#0A1322] border border-[#152438] print:bg-gray-100 print:border-gray-300">
-          <div>
-            <p className="text-[10px] font-mono text-[#7C8AA0] uppercase">Acoustic Swath</p>
-            <p className="text-xs font-bold text-[#EAEFF5] font-mono mt-1 truncate print:text-black">
-              {activeScan.filename}
-            </p>
+        {/* Executive Metrics Funnel */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-mono">
+          <div className="p-4 rounded-2xl bg-[#0C171E] border border-[#16303B] print:border-gray-300">
+            <span className="text-[10px] text-[#6F8992] uppercase block">Survey Area</span>
+            <strong className="text-2xl font-extrabold text-[#E4F2F5] print:text-black">12.84 km²</strong>
           </div>
-          <div>
-            <p className="text-[10px] font-mono text-[#7C8AA0] uppercase">AI Perception Model</p>
-            <p className="text-xs font-bold text-[#4CD9E8] font-mono mt-1 print:text-black">
-              {activeScan.model_name || 'YOLOv8n-SIH-Marine-Debris-V2'}
-            </p>
+
+          <div className="p-4 rounded-2xl bg-[#0C171E] border border-[#16303B] print:border-gray-300">
+            <span className="text-[10px] text-[#6F8992] uppercase block">Total Anomalies</span>
+            <strong className="text-2xl font-extrabold text-[#E4F2F5] print:text-black">17</strong>
           </div>
-          <div>
-            <p className="text-[10px] font-mono text-[#7C8AA0] uppercase">GPS Geotag Location</p>
-            <p className="text-xs font-bold text-[#EAEFF5] font-mono mt-1 print:text-black">
-              {hasGeo ? `${activeScan.location.latitude?.toFixed(4)}°N, ${activeScan.location.longitude?.toFixed(4)}°E` : 'Ungeotagged'}
-            </p>
+
+          <div className="p-4 rounded-2xl bg-[#0C171E] border border-[#FF5D5D]/30 print:border-gray-300">
+            <span className="text-[10px] text-[#FF5D5D] uppercase block font-bold">High Priority</span>
+            <strong className="text-2xl font-extrabold text-[#FF5D5D] print:text-black">4</strong>
           </div>
-          <div>
-            <p className="text-[10px] font-mono text-[#7C8AA0] uppercase">Edge Runtime</p>
-            <p className="text-xs font-bold text-[#3FD98A] font-mono mt-1 print:text-black">
-              {activeScan.inference_ms.toFixed(1)} ms (640×640 px)
-            </p>
+
+          <div className="p-4 rounded-2xl bg-[#0C171E] border border-[#65D391]/30 print:border-gray-300">
+            <span className="text-[10px] text-[#65D391] uppercase block font-bold">Natural Filtered</span>
+            <strong className="text-2xl font-extrabold text-[#65D391] print:text-black">20 Rocks</strong>
           </div>
         </div>
 
-        {/* Executive Threat Assessment Narrative */}
+        {/* Top Detection Spotlight (Hero Ghost Net #07) */}
+        <div className="p-6 rounded-2xl bg-[#0C171E] border border-[#32E6D1]/40 space-y-4 print:border-gray-300">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black px-2 py-0.5 rounded bg-[#32E6D1] text-[#03070B] font-mono">
+                TOP DETECTION: {heroTarget.id}
+              </span>
+              <h3 className="text-base font-bold text-[#E4F2F5] font-sans print:text-black">
+                {heroTarget.class}
+              </h3>
+            </div>
+            <span className="text-base font-extrabold text-[#32E6D1] font-mono print:text-black">
+              {(heroTarget.confidence * 100).toFixed(1)}% AI CONFIDENCE
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+            <div className="space-y-1.5 bg-[#081118] p-3.5 rounded-xl border border-[#16303B] print:border-gray-300">
+              <span className="text-[10px] text-[#6F8992] uppercase block font-bold">Acoustic Dimensions & Geolocation</span>
+              <p>Location: <strong className="text-[#E4F2F5] print:text-black">{heroTarget.lat.toFixed(4)}° N, {heroTarget.lon.toFixed(4)}° E</strong></p>
+              <p>Seabed Depth: <strong className="text-[#E4F2F5] print:text-black">{heroTarget.depth} m</strong></p>
+              <p>Measured Size: <strong className="text-[#E4F2F5] print:text-black">{heroTarget.length}m (L) × {heroTarget.width}m (W)</strong></p>
+              <p>Acoustic Shadow: <strong className="text-[#32E6D1] print:text-black">{heroTarget.shadowLength} m (0.82m vertical relief)</strong></p>
+            </div>
+
+            <div className="space-y-1.5 bg-[#081118] p-3.5 rounded-xl border border-[#16303B] print:border-gray-300">
+              <span className="text-[10px] text-[#6F8992] uppercase block font-bold">Evidence Correlations</span>
+              <p>Object Shape: <strong className="text-[#E4F2F5] print:text-black">92%</strong></p>
+              <p>Acoustic Shadow: <strong className="text-[#E4F2F5] print:text-black">96%</strong></p>
+              <p>Seabed Contrast: <strong className="text-[#E4F2F5] print:text-black">89%</strong></p>
+              <p>Texture Analysis: <strong className="text-[#E4F2F5] print:text-black">94%</strong></p>
+            </div>
+          </div>
+        </div>
+
+        {/* Complete Survey Target Register Table */}
         <div className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-[#4CD9E8] tracking-wider font-mono flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#4CD9E8]" />
-            <span>Executive Findings & Environmental Hazard Audit</span>
-          </h3>
-          <div className="p-4 rounded-xl bg-[#0A1322] border border-[#152438] text-xs text-[#EAEFF5] leading-relaxed space-y-2">
-            <p>
-              Autonomous side-scan sonar perception executed over swath file <code className="text-[#4CD9E8]">{activeScan.filename}</code>.
-              A total of <strong className="text-[#4CD9E8]">{activeScan.total_detections} targets</strong> were localized above confidence threshold <strong className="text-[#4CD9E8]">{(activeScan.confidence_threshold * 100).toFixed(0)}%</strong>.
-            </p>
-            {isV2 ? (
-              <p>
-                Target breakdown identified <strong className="text-[#A855F7]">{activeScan.ghost_net_count || 0} Ghost Fishing Nets (ALDFG)</strong>, <strong className="text-[#F5A623]">{activeScan.debris_count || 0} Marine Debris objects</strong>, and <strong className="text-[#29B6F6]">{activeScan.pipeline_count || 0} Subsea Infrastructure hazards</strong>.
-              </p>
-            ) : (
-              <p>
-                Naval classification identified <strong className="text-[#F04438]">{activeScan.milco_count || 0} MILCO contacts</strong> and <strong className="text-[#4CD9E8]">{activeScan.nombo_count || 0} NOMBO obstacles</strong>.
-              </p>
-            )}
+          <h4 className="text-xs font-black text-[#E4F2F5] uppercase tracking-wider font-sans print:text-black">
+            SURVEY ANOMALIES REGISTER ({MISSION_TARGETS.length} TARGETS)
+          </h4>
+
+          <div className="overflow-x-auto rounded-2xl border border-[#16303B] bg-[#0C171E] print:border-gray-300">
+            <table className="w-full text-left text-xs font-mono">
+              <thead className="bg-[#081118] text-[#6F8992] border-b border-[#16303B] print:bg-gray-100 print:text-black">
+                <tr>
+                  <th className="py-2.5 px-3">ID</th>
+                  <th className="py-2.5 px-3">Classification</th>
+                  <th className="py-2.5 px-3">Confidence</th>
+                  <th className="py-2.5 px-3">Location (Lat, Lon)</th>
+                  <th className="py-2.5 px-3">Depth</th>
+                  <th className="py-2.5 px-3">Dimensions</th>
+                  <th className="py-2.5 px-3">Priority</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#16303B] print:divide-gray-200">
+                {MISSION_TARGETS.map((t) => (
+                  <tr key={t.id} className="hover:bg-[#081118]/50">
+                    <td className="py-2.5 px-3 font-bold text-[#32E6D1] print:text-black">{t.id}</td>
+                    <td className="py-2.5 px-3 text-[#E4F2F5] font-sans print:text-black">{t.class}</td>
+                    <td className="py-2.5 px-3 font-bold text-[#E4F2F5] print:text-black">{(t.confidence * 100).toFixed(1)}%</td>
+                    <td className="py-2.5 px-3 text-[#6F8992] print:text-black">{t.lat.toFixed(4)}°, {t.lon.toFixed(4)}°</td>
+                    <td className="py-2.5 px-3 text-[#6F8992] print:text-black">{t.depth.toFixed(1)}m</td>
+                    <td className="py-2.5 px-3 text-[#6F8992] print:text-black">{t.length}m × {t.width}m</td>
+                    <td className="py-2.5 px-3 font-bold">
+                      <span
+                        className={`text-[8px] px-1.5 py-0.5 rounded ${
+                          t.risk === 'CRITICAL' || t.risk === 'HIGH'
+                            ? 'bg-[#FF5D5D]/20 text-[#FF5D5D]'
+                            : 'bg-[#32E6D1]/20 text-[#32E6D1]'
+                        }`}
+                      >
+                        {t.risk}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

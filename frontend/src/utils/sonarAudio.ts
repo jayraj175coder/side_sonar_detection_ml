@@ -76,6 +76,11 @@ class SonarAudioService {
     }
   }
 
+  // Soft Target Selection Beep
+  playTargetBeep() {
+    this.playLockBeep();
+  }
+
   // Low Rumble Depth Pulse
   playDepthPulse() {
     if (this.isMuted) return;

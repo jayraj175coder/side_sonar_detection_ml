@@ -1,401 +1,305 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  ScanLine,
-  Crosshair,
-  Gauge,
-  Zap,
-  Radio,
-  ArrowRight,
-  ChevronRight,
-  Activity,
-  Layers,
-  Cpu,
+  UploadCloud,
+  CheckCircle2,
   AlertTriangle,
+  FileText,
+  BarChart2,
+  Clock,
+  Sparkles,
+  Layers,
+  Search,
+  ChevronRight,
+  TrendingUp,
   Boxes,
   MapPin,
-  CheckCircle2,
-  ShieldCheck,
-  Ship,
+  Play,
+  RotateCcw,
+  Zap,
+  Scale,
+  Cpu,
   Eye,
+  Radio,
+  Filter,
 } from 'lucide-react';
-import { MetricCard } from '../components/layout/MetricCard';
 import { useApp } from '../context/AppContext';
+import { useMission } from '../context/MissionContext';
+import { MISSION_TARGETS } from '../data/targets';
 import {
+  AreaChart,
+  Area,
   BarChart,
   Bar,
+  PieChart,
+  Pie,
+  Cell,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
-import { HolographicGlobe } from '../components/common/HolographicGlobe';
-import { MarineDriveVisualization } from '../components/common/MarineDriveVisualization';
 
 export const OverviewPage: React.FC = () => {
-  const { stats, scans, setActiveTab, setCurrentScan } = useApp();
+  const { setActiveTab } = useApp();
+  const { startGuidedDemo, toggleJudgeMode, isJudgeMode, setSelectedTargetId } = useMission();
 
-  const totalScans = stats?.total_scans ?? scans.length;
-  const objectsDetected =
-    stats?.objects_detected ??
-    scans.reduce((acc, s) => acc + s.total_detections, 0);
+  const heroTarget = MISSION_TARGETS.find((t) => t.id === 'SX-T07') || MISSION_TARGETS[0];
 
-  const ghostNetTotal =
-    stats?.ghost_net_detections ?? scans.reduce((acc, s) => acc + (s.ghost_net_count || 0), 0);
-  const debrisTotal =
-    stats?.debris_detections ?? scans.reduce((acc, s) => acc + (s.debris_count || 0), 0);
-  const pipelineTotal =
-    stats?.pipeline_detections ?? scans.reduce((acc, s) => acc + (s.pipeline_count || 0), 0);
-  const anomalyTotal =
-    stats?.anomaly_detections ?? scans.reduce((acc, s) => acc + (s.anomaly_count || 0), 0);
-
-  const avgConf =
-    stats?.avg_confidence !== undefined && stats.avg_confidence > 0
-      ? (stats.avg_confidence * 100).toFixed(1)
-      : scans.length > 0
-      ? (
-          (scans.reduce((acc, s) => acc + s.highest_confidence, 0) /
-            scans.length) *
-          100
-        ).toFixed(1)
-      : '84.2';
-
-  const avgLatency =
-    stats?.avg_inference_ms !== undefined && stats.avg_inference_ms > 0
-      ? stats.avg_inference_ms.toFixed(1)
-      : scans.length > 0
-      ? (
-          scans.reduce((acc, s) => acc + s.inference_ms, 0) / scans.length
-        ).toFixed(1)
-      : '10.2';
-
-  // Chart Data
-  const pieData = [
-    { name: 'Ghost Nets & ALDFG', value: Math.max(1, ghostNetTotal), color: '#A855F7' },
-    { name: 'Anthropogenic Debris', value: Math.max(1, debrisTotal), color: '#F5A623' },
-    { name: 'Pipeline Hazards', value: Math.max(1, pipelineTotal), color: '#29B6F6' },
-    { name: 'Seafloor Anomalies', value: Math.max(1, anomalyTotal), color: '#4CD9E8' },
+  const debrisDistribution = [
+    { name: 'Ghost Nets (ALDFG)', value: 6, color: '#32E6D1' },
+    { name: 'Lost Trawl Gear', value: 4, color: '#FFB547' },
+    { name: 'Anthropogenic Debris', value: 4, color: '#29B6F6' },
+    { name: 'Pipeline Hazards', value: 3, color: '#65D391' },
   ];
 
-  const activityData = scans.slice(0, 7).reverse().map((s, idx) => ({
-    name: `Track ${idx + 1}`,
-    scanId: s.scan_id,
-    nets: s.ghost_net_count || 0,
-    debris: s.debris_count || 0,
-    pipelines: s.pipeline_count || 0,
-    total: s.total_detections,
-  }));
-
-  const handleInspect = (scanId: string) => {
-    const target = scans.find((s) => s.scan_id === scanId);
-    if (target) {
-      setCurrentScan(target);
-      setActiveTab('scan');
-    }
-  };
+  const surveySwathTrend = [
+    { track: 'LINE-01', candidates: 9, filtered: 5, valid: 4 },
+    { track: 'LINE-02', candidates: 12, filtered: 6, valid: 6 },
+    { track: 'LINE-03', candidates: 8, filtered: 4, valid: 4 },
+    { track: 'LINE-04', candidates: 8, filtered: 5, valid: 3 },
+  ];
 
   return (
-    <div className="space-y-8 animate-slide-up font-mono select-none">
-      {/* 1. Hero Cinematic Ocean Banner with 3D Holographic Radar Globe */}
-      <div className="relative overflow-hidden rounded-3xl p-6 md:p-8 bg-gradient-to-r from-[#0C1A2E]/95 via-[#0A1629]/90 to-[#060D17]/95 border border-[#152438] shadow-2xl bg-acoustic-grid">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#4CD9E8]/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-          <div className="space-y-4 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#4CD9E8]/10 border border-[#4CD9E8]/30 text-[#4CD9E8] text-xs font-mono shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-[#4CD9E8] animate-ping" />
-              <span>SONARX INTELLIGENCE SYSTEM · SX-014</span>
-            </div>
-
-            <div className="space-y-1">
-              <span className="text-xs font-mono font-black tracking-widest text-[#4CD9E8] uppercase">
-                See What Lies Beneath.
-              </span>
-              <h1 className="text-3xl md:text-4xl font-black text-[#EAEFF5] tracking-tight leading-tight font-sans">
-                AI-Powered Side-Scan Sonar Perception & Seabed Mapping
-              </h1>
-            </div>
-
-            <p className="text-sm text-[#7C8AA0] leading-relaxed font-sans max-w-xl">
-              Autonomous subsea perception system for detecting, classifying, and 3D mapping underwater targets, abandoned gear (<strong className="text-[#A855F7]">Ghost Nets</strong>), pipeline hazards, and acoustic seafloor anomalies.
-            </p>
-
-            {/* Technical Metadata Strip */}
-            <div className="flex flex-wrap items-center gap-2 pt-1 text-[9px] font-mono text-[#7C8AA0]">
-              {['SIDE-SCAN SONAR', 'AI DETECTION', 'TARGET CLASSIFICATION', '3D SEAFLOOR', 'MISSION INTELLIGENCE'].map((tag) => (
-                <span key={tag} className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#0A1322] border border-[#152438]">
-                  <span className="w-1 h-1 rounded-full bg-[#4CD9E8]" />
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button
-                onClick={() => setActiveTab('mission')}
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#4CD9E8] via-[#29B6F6] to-[#4CD9E8] hover:brightness-110 text-[#03070E] font-black font-mono text-xs flex items-center gap-2 shadow-xl shadow-[#4CD9E8]/20 transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
-              >
-                <Crosshair className="w-4 h-4" />
-                <span>LAUNCH MISSION CONTROL</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-1" />
-              </button>
-
-              <button
-                onClick={() => setActiveTab('sonar')}
-                className="px-4 py-3 rounded-2xl bg-[#0A1322] hover:bg-[#101D31] border border-[#152438] hover:border-[#4CD9E8]/50 text-[#EAEFF5] font-mono text-xs flex items-center gap-2 transition-all cursor-pointer"
-              >
-                <Radio className="w-4 h-4 text-[#4CD9E8]" />
-                <span>Debris Intel Node</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('scan')}
-                className="px-4 py-3 rounded-2xl bg-[#0A1322] hover:bg-[#101D31] border border-[#4CD9E8]/30 text-[#4CD9E8] font-mono text-xs flex items-center gap-2 transition-all cursor-pointer"
-              >
-                <ScanLine className="w-4 h-4 text-[#4CD9E8]" />
-                <span>Upload Sonar Swath</span>
-              </button>
-            </div>
+    <div className="space-y-6 animate-slide-up font-mono select-none">
+      {/* 1. Hero Scientific Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#081118] via-[#0C171E] to-[#081118] border border-[#16303B] p-6 md:p-8 shadow-2xl">
+        <div className="relative z-10 max-w-3xl space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#32E6D1]/10 border border-[#32E6D1]/30 text-[#32E6D1] text-[10px] font-bold">
+            <Radio className="w-3.5 h-3.5 animate-pulse" />
+            <span>AI-POWERED MARINE DEBRIS & ANOMALY DETECTION</span>
           </div>
 
-          {/* 3D Holographic Globe with Telemetry Readouts */}
-          <div className="relative flex flex-col items-center justify-center p-5 rounded-3xl bg-[#060D17]/90 border border-[#152438] shadow-2xl shrink-0 overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-b from-[#4CD9E8]/10 via-transparent to-transparent pointer-events-none" />
-            <HolographicGlobe size={190} className="relative z-10 my-1" />
-            <div className="relative z-10 text-center space-y-1 pt-2 border-t border-[#152438] w-full">
-              <p className="text-[10px] font-mono font-bold text-[#4CD9E8] tracking-wider flex items-center justify-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#4CD9E8] animate-ping" />
-                AUV TELEMETRY MESH
-              </p>
-              <div className="flex items-center justify-center gap-2 text-[9px] font-mono text-[#7C8AA0]">
-                <span className="text-[#3FD98A] flex items-center gap-0.5">
-                  <CheckCircle2 className="w-3 h-3" />
-                  17.68°N, 83.21°E
-                </span>
-                <span>• Visakhapatnam</span>
-              </div>
-            </div>
+          <h1 className="text-2xl md:text-3xl font-black text-[#E4F2F5] tracking-tight font-sans">
+            Transforming side-scan sonar imagery into explainable, geotagged marine intelligence.
+          </h1>
+
+          <p className="text-xs text-[#6F8992] font-sans leading-relaxed">
+            SonarX automatically analyzes side-scan sonar imagery, detects suspicious marine debris and anomalies, filters natural acoustic formations, scores detections by confidence, geotags targets, and presents them for human verification.
+          </p>
+
+          {/* Call to Actions */}
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <button
+              onClick={() => {
+                setActiveTab('mission');
+                startGuidedDemo();
+              }}
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#32E6D1] to-[#29B6F6] text-[#03070B] font-black text-xs font-mono flex items-center gap-2 shadow-lg shadow-[#32E6D1]/25 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+            >
+              <Play className="w-4 h-4 fill-current" />
+              <span>START DEMO MISSION (MX-026)</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('scan')}
+              className="px-4 py-2.5 rounded-xl bg-[#0C171E] hover:bg-[#16303B] border border-[#16303B] text-[#E4F2F5] font-bold text-xs font-mono flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <UploadCloud className="w-4 h-4 text-[#32E6D1]" />
+              <span>Upload & Analyze</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveTab('mission');
+                toggleJudgeMode();
+              }}
+              className={`px-3.5 py-2.5 rounded-xl border font-bold text-xs font-mono flex items-center gap-2 transition-all cursor-pointer ${
+                isJudgeMode
+                  ? 'bg-[#FFB547]/20 border-[#FFB547] text-[#FFB547]'
+                  : 'bg-[#0C171E] border-[#16303B] text-[#6F8992] hover:text-[#E4F2F5]'
+              }`}
+            >
+              <Scale className="w-4 h-4" />
+              <span>Judge Mode</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Acoustic Sonar Radial Wave Graphic in Background */}
+        <div className="absolute top-1/2 -translate-y-1/2 right-8 w-60 h-60 hidden xl:flex items-center justify-center pointer-events-none opacity-20">
+          <div className="w-56 h-56 rounded-full border border-[#32E6D1] animate-ping" />
+          <div className="w-40 h-40 rounded-full border border-[#32E6D1]/60 absolute" />
+          <div className="w-24 h-24 rounded-full border border-[#32E6D1]/80 absolute" />
+          <div className="w-8 h-8 rounded-full bg-[#32E6D1] absolute" />
+        </div>
+      </div>
+
+      {/* 2. Executive SIH KPI Cards (Clean, Large, Uncluttered) */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 font-mono">
+        <div className="p-4 rounded-2xl bg-[#081118] border border-[#16303B] space-y-1 text-center">
+          <span className="text-[10px] text-[#6F8992] uppercase block">Total Anomalies</span>
+          <span className="text-2xl font-extrabold text-[#E4F2F5]">17</span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#081118] border border-[#FF5D5D]/30 space-y-1 text-center">
+          <span className="text-[10px] text-[#FF5D5D] uppercase block font-bold">High Priority</span>
+          <span className="text-2xl font-extrabold text-[#FF5D5D]">4</span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#081118] border border-[#32E6D1]/30 space-y-1 text-center">
+          <span className="text-[10px] text-[#32E6D1] uppercase block font-bold">Top Confidence</span>
+          <span className="text-2xl font-extrabold text-[#32E6D1]">94.7%</span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#081118] border border-[#65D391]/30 space-y-1 text-center">
+          <span className="text-[10px] text-[#65D391] uppercase block font-bold">Rocks Filtered</span>
+          <span className="text-2xl font-extrabold text-[#65D391]">20</span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#081118] border border-[#16303B] space-y-1 text-center">
+          <span className="text-[10px] text-[#6F8992] uppercase block">Surveyed Area</span>
+          <span className="text-2xl font-extrabold text-[#E4F2F5]">12.84 km²</span>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#081118] border border-[#16303B] space-y-1 text-center">
+          <span className="text-[10px] text-[#6F8992] uppercase block">Edge Latency</span>
+          <span className="text-2xl font-extrabold text-[#29B6F6]">10.4 ms</span>
+        </div>
+      </div>
+
+      {/* 3. Hero Target Spotlight Card */}
+      <div className="p-5 md:p-6 rounded-3xl bg-[#081118] border border-[#32E6D1]/40 space-y-4 shadow-xl">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-black px-2 py-0.5 rounded bg-[#32E6D1] text-[#03070B] font-mono">
+              FEATURED DETECTION: {heroTarget.id}
+            </span>
+            <h3 className="text-base font-bold text-[#E4F2F5] font-sans">
+              {heroTarget.class} — High-Priority ALDFG Entanglement Hazard
+            </h3>
+          </div>
+
+          <button
+            onClick={() => {
+              setSelectedTargetId('SX-T07');
+              setActiveTab('mission');
+            }}
+            className="px-3.5 py-1.5 rounded-xl bg-[#32E6D1]/15 hover:bg-[#32E6D1]/25 border border-[#32E6D1]/40 text-[#32E6D1] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+          >
+            <span>Inspect in Mission Control</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs font-mono">
+          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
+            <span className="text-[9px] text-[#6F8992] uppercase block">AI Confidence</span>
+            <strong className="text-base font-bold text-[#32E6D1]">94.7%</strong>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
+            <span className="text-[9px] text-[#6F8992] uppercase block">Dimensions</span>
+            <strong className="text-sm font-bold text-[#E4F2F5]">12.4m × 3.2m</strong>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
+            <span className="text-[9px] text-[#6F8992] uppercase block">Acoustic Shadow</span>
+            <strong className="text-sm font-bold text-[#32E6D1]">2.31m Relief</strong>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
+            <span className="text-[9px] text-[#6F8992] uppercase block">Depth</span>
+            <strong className="text-sm font-bold text-[#E4F2F5]">43.1 m</strong>
+          </div>
+
+          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
+            <span className="text-[9px] text-[#6F8992] uppercase block">Coordinates</span>
+            <strong className="text-xs font-bold text-[#E4F2F5] truncate block">18.9217°N, 72.8214°E</strong>
           </div>
         </div>
       </div>
 
-      {/* Core Workflow Visual Pipeline Strip */}
-      <div className="p-4 rounded-2xl bg-[#060D17] border border-[#152438] space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-mono font-black uppercase tracking-widest text-[#4CD9E8] flex items-center gap-1.5">
-            <Zap className="w-3 h-3 text-[#4CD9E8]" />
-            End-to-End SonarX Intelligence Workflow
-          </span>
-          <span className="text-[8px] font-mono text-[#7C8AA0]">Autonomous Pipeline · 10.2 ms / frame</span>
-        </div>
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[8px] font-mono text-[#7C8AA0] scrollbar-none">
-          {[
-            { step: '01', name: 'SONAR INGESTION', color: '#29B6F6' },
-            { step: '02', name: 'PREPROCESSING', color: '#29B6F6' },
-            { step: '03', name: 'NOISE REDUCTION', color: '#4CD9E8' },
-            { step: '04', name: 'ENHANCEMENT', color: '#4CD9E8' },
-            { step: '05', name: 'AI DETECTION', color: '#F5A623' },
-            { step: '06', name: 'CLASSIFICATION', color: '#F5A623' },
-            { step: '07', name: 'SHADOW ANALYSIS', color: '#A855F7' },
-            { step: '08', name: 'CONFIDENCE SCORING', color: '#A855F7' },
-            { step: '09', name: 'GEOREFERENCING', color: '#3FD98A' },
-            { step: '10', name: '3D SEAFLOOR', color: '#3FD98A' },
-            { step: '11', name: 'MISSION INTEL', color: '#4CD9E8' },
-            { step: '12', name: 'REPORT', color: '#4CD9E8' },
-          ].map((item, idx, arr) => (
-            <React.Fragment key={item.step}>
-              <div className="flex items-center gap-1 px-2 py-1 rounded bg-[#0A1322] border border-[#152438] shrink-0 hover:border-[#4CD9E8]/40 transition-colors">
-                <span className="text-[8px] font-bold" style={{ color: item.color }}>{item.step}</span>
-                <span className="text-[#EAEFF5] font-semibold">{item.name}</span>
-              </div>
-              {idx < arr.length - 1 && (
-                <span className="text-[#152438] shrink-0 font-bold">→</span>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-
-      {/* 2. Top KPI Metric Cards with Clear Visual Hierarchy */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-        <div className="lg:col-span-2">
-          <MetricCard
-            title="Total Targets Neutralized"
-            value={objectsDetected}
-            subtitle="Verified marine debris & ghost net contacts"
-            icon={Crosshair}
-            variant="purple"
-            trend="Live AUV stream"
-            isHero={true}
-          />
-        </div>
-        <MetricCard
-          title="Ghost Nets (ALDFG)"
-          value={ghostNetTotal}
-          subtitle="Critical gear threat"
-          icon={AlertTriangle}
-          variant="purple"
-        />
-        <MetricCard
-          title="Marine Debris"
-          value={debrisTotal}
-          subtitle="Anthropogenic waste"
-          icon={Boxes}
-          variant="amber"
-        />
-        <MetricCard
-          title="Avg Confidence"
-          value={`${avgConf}%`}
-          subtitle="Acoustic score"
-          icon={Gauge}
-          variant="cyan"
-        />
-        <MetricCard
-          title="Perception Latency"
-          value={`${avgLatency} ms`}
-          subtitle="Edge tensor runtime"
-          icon={Zap}
-          variant="emerald"
-        />
-      </div>
-
-      {/* 3. Marine Drive — Side-Scan Sonar Pipeline Visualization */}
-      <MarineDriveVisualization />
-
-      {/* 4. Visual Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Activity Timeline Chart */}
-        <div className="lg:col-span-2 p-6 rounded-3xl bg-[#060D17] border border-[#152438] space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <h4 className="text-xs font-black text-[#EAEFF5] font-mono uppercase tracking-wider">
-                Detection Distribution Across Survey Tracks
-              </h4>
-              <p className="text-[10px] text-[#7C8AA0] mt-0.5">
-                Breakdown of ghost nets, anthropogenic debris, and subsea pipelines
-              </p>
-            </div>
-            <div className="flex items-center gap-3 text-[9px] font-mono">
-              <span className="flex items-center gap-1.5 text-[#A855F7] font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#A855F7]" /> Ghost Nets
-              </span>
-              <span className="flex items-center gap-1.5 text-[#F5A623] font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#F5A623]" /> Debris
-              </span>
-              <span className="flex items-center gap-1.5 text-[#29B6F6] font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#29B6F6]" /> Pipelines
-              </span>
-            </div>
-          </div>
-
-          <div className="h-64 w-full pt-2">
-            {activityData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-xs font-mono text-[#7C8AA0]">
-                No survey swaths processed yet.
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={activityData}>
-                  <XAxis
-                    dataKey="name"
-                    stroke="#152438"
-                    tick={{ fill: '#7C8AA0', fontSize: 10, fontFamily: 'monospace' }}
-                  />
-                  <YAxis
-                    stroke="#152438"
-                    tick={{ fill: '#7C8AA0', fontSize: 10, fontFamily: 'monospace' }}
-                    allowDecimals={false}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0A1322',
-                      borderColor: '#152438',
-                      borderRadius: '12px',
-                      fontFamily: 'monospace',
-                      fontSize: '11px',
-                      boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
-                    }}
-                  />
-                  <Bar
-                    dataKey="nets"
-                    name="Ghost Nets"
-                    fill="#A855F7"
-                    radius={[6, 6, 0, 0]}
-                  />
-                  <Bar
-                    dataKey="debris"
-                    name="Marine Debris"
-                    fill="#F5A623"
-                    radius={[6, 6, 0, 0]}
-                  />
-                  <Bar
-                    dataKey="pipelines"
-                    name="Pipelines"
-                    fill="#29B6F6"
-                    radius={[6, 6, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-        </div>
-
-        {/* Classification Ratio Donut */}
-        <div className="p-6 rounded-3xl bg-[#060D17] border border-[#152438] space-y-4 flex flex-col justify-between">
-          <div>
-            <h4 className="text-xs font-black text-[#EAEFF5] font-mono uppercase tracking-wider">
-              MoES Target Distribution
+      {/* 4. Scientific Charts (Debris Classification & Noise Reduction Ratio) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Debris Class Breakdown (6 cols) */}
+        <div className="lg:col-span-6 p-5 rounded-3xl bg-[#081118] border border-[#16303B] space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold text-[#E4F2F5] uppercase tracking-wider font-sans">
+              MARINE DEBRIS CLASSIFICATION
             </h4>
-            <p className="text-[10px] text-[#7C8AA0] mt-0.5">
-              Cumulative target taxonomy breakdown
-            </p>
+            <span className="text-[9px] text-[#6F8992]">17 Valid Anomalies</span>
           </div>
 
-          <div className="h-48 w-full flex items-center justify-center">
-            {objectsDetected === 0 ? (
-              <div className="text-xs font-mono text-[#7C8AA0]">
-                0 objects recorded.
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={75}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#0A1322',
-                      borderColor: '#152438',
-                      borderRadius: '12px',
-                      fontFamily: 'monospace',
-                      fontSize: '11px',
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={debrisDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={45}
+                  outerRadius={75}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {debrisDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#0C171E',
+                    borderColor: '#16303B',
+                    borderRadius: '0.75rem',
+                    color: '#E4F2F5',
+                    fontSize: '11px',
+                    fontFamily: 'JetBrains Mono',
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-[9px] font-mono border-t border-[#152438] pt-3">
-            {pieData.map((d) => (
-              <div key={d.name} className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
-                <span className="text-[#7C8AA0] truncate">{d.name}</span>
-                <span className="font-bold text-[#EAEFF5] ml-auto">{d.value}</span>
+          <div className="grid grid-cols-2 gap-2 text-[10px]">
+            {debrisDistribution.map((item) => (
+              <div key={item.name} className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: item.color }} />
+                <span className="text-[#6F8992]">{item.name}</span>
+                <strong className="text-[#E4F2F5] ml-auto">{item.value}</strong>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Right: Noise Filtering & Candidate Funnel Per Trackline (6 cols) */}
+        <div className="lg:col-span-6 p-5 rounded-3xl bg-[#081118] border border-[#16303B] space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold text-[#E4F2F5] uppercase tracking-wider font-sans">
+              NOISE FILTERING FUNNEL BY TRACKLINE
+            </h4>
+            <span className="text-[9px] text-[#65D391]">20 Rocks Suppressed</span>
+          </div>
+
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={surveySwathTrend} barGap={4}>
+                <XAxis dataKey="track" stroke="#6F8992" fontSize={10} tickLine={false} />
+                <YAxis stroke="#6F8992" fontSize={10} tickLine={false} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#0C171E',
+                    borderColor: '#16303B',
+                    borderRadius: '0.75rem',
+                    color: '#E4F2F5',
+                    fontSize: '11px',
+                    fontFamily: 'JetBrains Mono',
+                  }}
+                />
+                <Bar dataKey="filtered" fill="#FF5D5D" name="Filtered Natural Noise" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="valid" fill="#32E6D1" name="Valid Debris Targets" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-[#6F8992] pt-1 border-t border-[#16303B]">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded bg-[#FF5D5D]" />
+              <span>Natural Formations Filtered</span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded bg-[#32E6D1]" />
+              <span>Valid Debris Targets</span>
+            </span>
           </div>
         </div>
       </div>

@@ -3,85 +3,39 @@
 
 @layer base {
   :root {
-    /* Role-based Mission Console Surface Tokens (Cold Naval Console) */
-    --surface-console: #080B11;
-    --surface-panel: #10151D;
-    --surface-panel-raised: #161C26;
-    --surface-border: #1B2330;
-    --surface-panel-border: #1B2330;
-    --surface-panel-border-glow: rgba(76, 217, 232, 0.35);
-
-    /* Operational Theme Tokens (Option A: Live Operations vs Forensic Attribution) */
-    --signal-live: #4CD9E8;             /* Cyan: Real-time AUV telemetry & Live Sonar */
-    --signal-live-dim: rgba(76, 217, 232, 0.25);
-    --signal-forensic: #57FFA8;         /* Phosphor Green: Post-event Debris Attribution & Forensic Intel */
-    --signal-forensic-dim: rgba(87, 255, 168, 0.25);
-    --surface-forensic-bg: #04080B;
-    --surface-forensic-panel: #060B0E;
-    --surface-forensic-border: #14231E;
-
-    /* Deep Ocean Hydrographic Theme */
-    --ocean-abyss: #03070E;
-    --ocean-deep: #060D17;
-    --ocean-surface: #0A1322;
-    --ocean-raised: #101D31;
-    --ocean-border: #152438;
-    --ocean-border-glow: rgba(76, 217, 232, 0.3);
-    --ocean-cyan: #4CD9E8;
-    --ocean-emerald: #3FD98A;
-    --ocean-amber: #F5A623;
-    --ocean-red: #F04438;
-    --ocean-purple: #A855F7;
-
-    /* Single Signal Phosphor Identity (Cold Cyan #4CD9E8) */
-    --signal-primary: #4CD9E8;
-    --signal-primary-dim: rgba(76, 217, 232, 0.25);
-    --signal-secondary: #29B6F6;
-    --signal-muted: #7C8AA0;
-    --text-primary: #EAEFF5;
-    --text-secondary: #7C8AA0;
-
-    /* Mission Status Tokens (Restrained Control-Room Standard) */
-    --status-nominal: #3FD98A;     /* All-clear teal-green */
-    --status-caution: #F5A623;     /* Needs attention amber */
-    --status-critical: #F04438;    /* Urgent red */
-
-    /* Contact Uncertainty Tokens */
-    --contact-confidence-high: #4CD9E8;
-    --contact-confidence-med: rgba(76, 217, 232, 0.65);
-    --contact-confidence-low: rgba(76, 217, 232, 0.3);
+    /* Exact Killer Redesign Design Tokens */
+    --bg-abyss: #03070B;
+    --bg-primary: #081118;
+    --bg-secondary: #0C171E;
+    --border-main: #16303B;
+    --border-glow: rgba(50, 230, 209, 0.35);
+    
+    --text-primary: #E4F2F5;
+    --text-secondary: #6F8992;
+    --text-muted: #4A636C;
+    
+    --sonar-cyan: #32E6D1;
+    --ocean-blue: #29B6F6;
+    --warning: #FFB547;
+    --critical: #FF5D5D;
+    --success: #65D391;
 
     /* Legacy Backward-Compatibility Variables */
-    --bg-abyss: #03070E;
-    --bg-surface: #0A1322;
-    --bg-surface-2: #101D31;
-    --border-subsea: #152438;
-    --border-subsea-glow: rgba(76, 217, 232, 0.35);
-    --text-muted: #7C8AA0;
-    --sonar-cyan: #4CD9E8;
-    --acoustic-blue: #29B6F6;
-    --warning: #F5A623;
-    --critical: #F04438;
-    --success: #3FD98A;
-    --accent-cyan: #4CD9E8;
-    --accent-teal: #3FD98A;
-    --accent-amber: #F5A623;
-    --accent-purple: #A855F7;
-    --accent-blue: #29B6F6;
-    
-    /* Semantic Detection Colors */
-    --color-ghost-net: #A855F7;
-    --color-debris: #F5A623;
-    --color-pipeline: #29B6F6;
-    --color-anomaly: #4CD9E8;
-    --color-milco: #F04438;
-    --color-nombo: #4CD9E8;
+    --surface-console: #03070B;
+    --surface-panel: #081118;
+    --surface-panel-raised: #0C171E;
+    --surface-border: #16303B;
+    --signal-live: #32E6D1;
+    --signal-forensic: #65D391;
+    --contact-confidence-high: #32E6D1;
+    --contact-confidence-med: #FFB547;
+    --contact-confidence-low: #6F8992;
   }
 
   body {
-    background: radial-gradient(circle at 50% 0%, #101D31 0%, #060D17 50%, #03070E 100%);
-    background-color: #03070E;
-    color: #EAEFF5;
+    background: radial-gradient(circle at 50% 0%, #0C171E 0%, #081118 45%, #03070B 100%);
+    background-color: #03070B;
+    color: #E4F2F5;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
@@ -97,77 +51,65 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.375rem 0.5rem;
+  padding: 0.35rem 0.55rem;
   border-radius: 0.5rem;
-  background-color: #0A1322;
-  border: 1px solid #152438;
-  color: #7C8AA0;
+  background-color: #081118;
+  border: 1px solid #16303B;
+  color: #6F8992;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.625rem;
+  font-size: 0.65rem;
+  font-weight: 700;
   transition: all 0.15s ease;
   cursor: pointer;
 }
 .toolbar-btn:hover {
-  color: #4CD9E8;
-  border-color: rgba(76, 217, 232, 0.4);
-  background-color: rgba(76, 217, 232, 0.08);
+  color: #32E6D1;
+  border-color: rgba(50, 230, 209, 0.4);
+  background-color: rgba(50, 230, 209, 0.08);
 }
 
 /* Background Acoustic Grid Pattern */
 .bg-acoustic-grid {
   background-image: 
-    linear-gradient(to right, rgba(76, 217, 232, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(76, 217, 232, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(50, 230, 209, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(50, 230, 209, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
 .bg-acoustic-dots {
-  background-image: radial-gradient(rgba(76, 217, 232, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(50, 230, 209, 0.12) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 
-/* Premium Subsea Ocean Glass Panels */
+/* Premium Scientific Glass Panels */
 .glass-panel {
-  background: linear-gradient(135deg, rgba(10, 19, 34, 0.85) 0%, rgba(6, 13, 23, 0.92) 100%);
+  background: linear-gradient(135deg, rgba(8, 17, 24, 0.92) 0%, rgba(12, 23, 30, 0.95) 100%);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(21, 36, 56, 0.9);
-  box-shadow: 0 10px 30px -10px rgba(3, 7, 14, 0.8), 0 0 20px -5px rgba(76, 217, 232, 0.06);
+  border: 1px solid rgba(22, 48, 59, 0.9);
+  box-shadow: 0 10px 30px -10px rgba(3, 7, 11, 0.8), 0 0 20px -5px rgba(50, 230, 209, 0.05);
 }
 
 .ocean-card {
-  background: linear-gradient(135deg, #0A1322 0%, #060D17 100%);
-  border: 1px solid #152438;
+  background: linear-gradient(135deg, #081118 0%, #0C171E 100%);
+  border: 1px solid #16303B;
   border-radius: 1rem;
   transition: all 0.25s ease;
 }
 .ocean-card:hover {
-  border-color: rgba(76, 217, 232, 0.35);
-  box-shadow: 0 8px 25px -8px rgba(76, 217, 232, 0.12);
+  border-color: rgba(50, 230, 209, 0.35);
+  box-shadow: 0 8px 25px -8px rgba(50, 230, 209, 0.12);
 }
 
 .glass-panel-hover {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-panel-hover:hover {
-  background: linear-gradient(135deg, rgba(16, 31, 68, 0.9) 0%, rgba(8, 17, 40, 0.92) 100%);
-  border-color: rgba(6, 182, 212, 0.4);
+  background: linear-gradient(135deg, rgba(12, 23, 30, 0.95) 0%, rgba(8, 17, 24, 0.98) 100%);
+  border-color: rgba(50, 230, 209, 0.4);
   box-shadow: 
     0 16px 45px -5px rgba(0, 0, 0, 0.7),
-    0 0 25px 0 rgba(6, 182, 212, 0.15),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    0 0 25px 0 rgba(50, 230, 209, 0.15);
   transform: translateY(-2px);
-}
-
-.glass-input {
-  background: rgba(4, 9, 22, 0.85);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-  backdrop-filter: blur(12px);
-  transition: all 0.2s ease;
-}
-.glass-input:focus {
-  border-color: #06B6D4;
-  background: rgba(6, 14, 34, 0.95);
-  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25), 0 0 15px rgba(6, 182, 212, 0.15);
 }
 
 /* Custom Tactical Scrollbars */
@@ -176,16 +118,16 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #030712;
+  background: #03070B;
 }
 ::-webkit-scrollbar-thumb {
-  background: #142548;
+  background: #16303B;
   border-radius: 9999px;
-  border: 1px solid rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(50, 230, 209, 0.15);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #06B6D4;
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+  background: #32E6D1;
+  box-shadow: 0 0 10px rgba(50, 230, 209, 0.5);
 }
 
 /* Animations & Keyframes */
@@ -200,218 +142,19 @@
   }
 }
 
+@keyframes pulse-cyan {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(50, 230, 209, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(50, 230, 209, 0.6);
+  }
+}
+
 .animate-slide-up {
   animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 35px rgba(6, 182, 212, 0.55);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 3s infinite ease-in-out;
-}
-
-@keyframes radar-sweep {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-radar {
-  animation: radar-sweep 4s linear infinite;
-  transform-origin: center center;
-}
-
-/* Sonar Waterfall Sweep Animation for Scanning Screen */
-@keyframes sonar-waterfall-sweep {
-  0% {
-    top: 0%;
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  85% {
-    opacity: 1;
-  }
-  100% {
-    top: 100%;
-    opacity: 0;
-  }
-}
-
-.animate-sonar-sweep {
-  animation: sonar-waterfall-sweep 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
-/* Bounding Box Animated Stroke Draw-In */
-@keyframes box-draw {
-  0% {
-    stroke-dashoffset: 1000;
-    fill-opacity: 0;
-  }
-  60% {
-    fill-opacity: 0;
-  }
-  100% {
-    stroke-dashoffset: 0;
-    fill-opacity: 0.2;
-  }
-}
-
-.animate-box-draw {
-  stroke-dasharray: 1000;
-  animation: box-draw 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Audio / Acoustic Chirp Equalizer Bars */
-@keyframes eq-bar {
-  0%, 100% { height: 15%; }
-  50% { height: 95%; }
-}
-
-.animate-eq-1 { animation: eq-bar 0.8s ease-in-out infinite; }
-.animate-eq-2 { animation: eq-bar 0.6s ease-in-out infinite 0.15s; }
-.animate-eq-3 { animation: eq-bar 1.0s ease-in-out infinite 0.3s; }
-.animate-eq-4 { animation: eq-bar 0.7s ease-in-out infinite 0.45s; }
-.animate-eq-5 { animation: eq-bar 0.9s ease-in-out infinite 0.2s; }
-
-/* Sexy Cyber-Naval Glassmorphism & Neon Glow Utilities */
-.sexy-glass-panel {
-  background: linear-gradient(135deg, rgba(16, 28, 48, 0.85) 0%, rgba(8, 14, 26, 0.92) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(76, 217, 232, 0.18);
-  box-shadow: 
-    0 12px 40px -5px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(76, 217, 232, 0.08),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-}
-
-.sexy-glass-card {
-  background: linear-gradient(135deg, rgba(16, 28, 48, 0.7) 0%, rgba(8, 14, 26, 0.8) 100%);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(76, 217, 232, 0.12);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.sexy-glass-card:hover {
-  background: linear-gradient(135deg, rgba(22, 40, 68, 0.88) 0%, rgba(10, 20, 36, 0.95) 100%);
-  border-color: rgba(76, 217, 232, 0.5);
-  box-shadow: 
-    0 16px 45px -5px rgba(0, 0, 0, 0.85),
-    0 0 25px 0 rgba(76, 217, 232, 0.2),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-}
-
-.sexy-glow-cyan {
-  box-shadow: 0 0 25px rgba(76, 217, 232, 0.4);
-}
-
-.sexy-glow-purple {
-  box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
-}
-
-.sexy-glow-emerald {
-  box-shadow: 0 0 25px rgba(63, 217, 138, 0.4);
-}
-
-/* Rotating Conic Radar Sweep Beam */
-@keyframes radar-beam-sweep {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.animate-radar-beam {
-  background: conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(76, 217, 232, 0.35) 360deg);
-  animation: radar-beam-sweep 4s linear infinite;
-  transform-origin: center center;
-}
-
-/* Expanding Sonar Ping Ripples */
-@keyframes sonar-ripple {
-  0% {
-    transform: scale(0.5);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(2.8);
-    opacity: 0;
-  }
-}
-
-.animate-sonar-ripple {
-  animation: sonar-ripple 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
-}
-
-/* Custom Leaflet Dark Container & Marker Reset */
-.leaflet-container {
-  background: #080B11 !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 1;
-}
-
-/* Dark Tactical Nautical Map Styling (Native Carto Dark Subsea) */
-.leaflet-tile-pane {
-  filter: brightness(0.95) contrast(1.15) hue-rotate(195deg) saturate(1.4) !important;
-}
-
-.leaflet-control-zoom {
-  display: none !important;
-}
-
-.leaflet-control-attribution {
-  background: rgba(3, 7, 18, 0.85) !important;
-  color: #64748B !important;
-  font-size: 10px !important;
-  backdrop-filter: blur(6px);
-  border-top-left-radius: 8px;
-  border: 1px solid rgba(30, 46, 78, 0.5);
-  border-bottom: none;
-  border-right: none;
-}
-.leaflet-control-attribution a {
-  color: #38BDF8 !important;
-}
-
-.leaflet-popup {
-  display: none !important;
-}
-
-/* Print Friendly Styles for MoES Reports */
-@media print {
-  body {
-    background: #FFFFFF !important;
-    color: #000000 !important;
-  }
-  aside, header, nav, button {
-    display: none !important;
-  }
-  .glass-panel {
-    background: #FFFFFF !important;
-    border: 1px solid #CCCCCC !important;
-    box-shadow: none !important;
-    color: #000000 !important;
-  }
-}
-
-/* Reduced Motion Support */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+.pulse-glow-cyan {
+  animation: pulse-cyan 2s infinite ease-in-out;
 }

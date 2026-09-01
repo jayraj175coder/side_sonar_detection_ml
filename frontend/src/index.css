@@ -334,9 +334,9 @@
   z-index: 1;
 }
 
-/* Dark Tactical Nautical Map Styling */
+/* Dark Tactical Nautical Map Styling (Native Carto Dark Subsea) */
 .leaflet-tile-pane {
-  filter: brightness(0.55) invert(1) contrast(2.8) hue-rotate(195deg) saturate(0.35) brightness(0.85) !important;
+  filter: brightness(0.95) contrast(1.15) hue-rotate(195deg) saturate(1.4) !important;
 }
 
 .leaflet-control-zoom {

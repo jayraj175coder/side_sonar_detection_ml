@@ -268,7 +268,7 @@ export const NewScanPage: React.FC = () => {
 
       {/* 2. Pre-Loaded Curated Sample Sonar Scans (For Judges / Instant Testing) */}
       {!isShowingActiveScanResult && (
-        <div className="p-4 rounded-2xl bg-[#10151D] border border-[#1B2330] space-y-2 shadow-lg">
+        <div className="p-4 rounded-2xl bg-[#060D17] border border-[#152438] space-y-2 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 text-[#4CD9E8] animate-pulse" />
@@ -286,7 +286,7 @@ export const NewScanPage: React.FC = () => {
               <button
                 key={sample.id}
                 onClick={() => handleSelectSample(sample)}
-                className="p-2.5 rounded-xl bg-[#161C26] border border-[#1B2330] hover:border-[#4CD9E8]/60 text-left transition-all hover:-translate-y-0.5 group cursor-pointer"
+                className="p-2.5 rounded-xl bg-[#0A1322] border border-[#152438] hover:border-[#4CD9E8]/60 text-left transition-all hover:-translate-y-0.5 group cursor-pointer"
               >
                 <div className="flex items-center justify-between">
                   <span

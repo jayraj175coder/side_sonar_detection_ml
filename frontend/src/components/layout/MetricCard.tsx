@@ -52,40 +52,44 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   }, [value]);
 
   const borderVariants = {
-    cyan: 'border-cyan-500/25 hover:border-cyan-400 text-cyan-400',
-    red: 'border-red-500/25 hover:border-red-400 text-red-400',
-    blue: 'border-blue-500/25 hover:border-blue-400 text-blue-400',
-    purple: 'border-purple-500/25 hover:border-purple-400 text-purple-400',
-    amber: 'border-amber-500/25 hover:border-amber-400 text-amber-400',
-    emerald: 'border-emerald-500/25 hover:border-emerald-400 text-emerald-400',
-    neutral: 'border-slate-800 hover:border-slate-700 text-slate-400',
+    cyan: 'border-[#4CD9E8]/30 hover:border-[#4CD9E8] text-[#4CD9E8]',
+    red: 'border-[#F04438]/30 hover:border-[#F04438] text-[#F04438]',
+    blue: 'border-[#29B6F6]/30 hover:border-[#29B6F6] text-[#29B6F6]',
+    purple: 'border-[#A855F7]/30 hover:border-[#A855F7] text-[#A855F7]',
+    amber: 'border-[#F5A623]/30 hover:border-[#F5A623] text-[#F5A623]',
+    emerald: 'border-[#3FD98A]/30 hover:border-[#3FD98A] text-[#3FD98A]',
+    neutral: 'border-[#152438] hover:border-[#4CD9E8]/40 text-[#7C8AA0]',
   };
 
   const glowVariants = {
-    cyan: 'from-cyan-950/40 via-transparent to-transparent',
-    red: 'from-red-950/40 via-transparent to-transparent',
-    blue: 'from-blue-950/40 via-transparent to-transparent',
-    purple: 'from-purple-950/40 via-transparent to-transparent',
-    amber: 'from-amber-950/40 via-transparent to-transparent',
-    emerald: 'from-emerald-950/40 via-transparent to-transparent',
-    neutral: 'from-slate-900/40 via-transparent to-transparent',
+    cyan: 'from-[#4CD9E8]/15 via-transparent to-transparent',
+    red: 'from-[#F04438]/15 via-transparent to-transparent',
+    blue: 'from-[#29B6F6]/15 via-transparent to-transparent',
+    purple: 'from-[#A855F7]/15 via-transparent to-transparent',
+    amber: 'from-[#F5A623]/15 via-transparent to-transparent',
+    emerald: 'from-[#3FD98A]/15 via-transparent to-transparent',
+    neutral: 'from-[#152438]/40 via-transparent to-transparent',
   };
 
   const iconBgVariants = {
-    cyan: 'bg-cyan-950/70 border-cyan-500/40 text-cyan-300 shadow-cyan-950/60 group-hover:scale-110 group-hover:rotate-6',
-    red: 'bg-red-950/70 border-red-500/40 text-red-300 shadow-red-950/60 group-hover:scale-110 group-hover:rotate-6',
-    blue: 'bg-blue-950/70 border-blue-500/40 text-blue-300 shadow-blue-950/60 group-hover:scale-110 group-hover:rotate-6',
-    purple: 'bg-purple-950/70 border-purple-500/40 text-purple-300 shadow-purple-950/60 group-hover:scale-110 group-hover:rotate-6',
-    amber: 'bg-amber-950/70 border-amber-500/40 text-amber-300 shadow-amber-950/60 group-hover:scale-110 group-hover:rotate-6',
-    emerald: 'bg-emerald-950/70 border-emerald-500/40 text-emerald-300 shadow-emerald-950/60 group-hover:scale-110 group-hover:rotate-6',
-    neutral: 'bg-slate-900 border-slate-800 text-slate-400 group-hover:scale-110',
+    cyan: 'bg-[#0A1A2E] border-[#4CD9E8]/40 text-[#4CD9E8] shadow-[0_0_15px_rgba(76,217,232,0.2)] group-hover:scale-110 group-hover:rotate-6',
+    red: 'bg-[#1E0E14] border-[#F04438]/40 text-[#F04438] shadow-[0_0_15px_rgba(240,68,56,0.2)] group-hover:scale-110 group-hover:rotate-6',
+    blue: 'bg-[#0A162B] border-[#29B6F6]/40 text-[#29B6F6] shadow-[0_0_15px_rgba(41,182,246,0.2)] group-hover:scale-110 group-hover:rotate-6',
+    purple: 'bg-[#180E2B] border-[#A855F7]/40 text-[#A855F7] shadow-[0_0_15px_rgba(168,85,247,0.2)] group-hover:scale-110 group-hover:rotate-6',
+    amber: 'bg-[#1D1408] border-[#F5A623]/40 text-[#F5A623] shadow-[0_0_15px_rgba(245,166,35,0.2)] group-hover:scale-110 group-hover:rotate-6',
+    emerald: 'bg-[#091D17] border-[#3FD98A]/40 text-[#3FD98A] shadow-[0_0_15px_rgba(63,217,138,0.2)] group-hover:scale-110 group-hover:rotate-6',
+    neutral: 'bg-[#0A1322] border-[#152438] text-[#7C8AA0] group-hover:scale-110',
   };
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl glass-panel p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl ${
+      className={`group relative overflow-hidden rounded-2xl p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl border ${
         borderVariants[variant]
-      } ${isHero ? 'ring-1 ring-cyan-500/40 bg-[#0C1736]/90' : ''}`}
+      } ${
+        isHero
+          ? 'bg-gradient-to-br from-[#0C1A2E] via-[#0A1424] to-[#050C18] shadow-[0_0_30px_rgba(76,217,232,0.15)] ring-1 ring-[#4CD9E8]/40'
+          : 'bg-gradient-to-br from-[#0A1322]/90 to-[#060D17]/95'
+      }`}
     >
       <div
         className={`absolute inset-0 bg-gradient-to-br ${glowVariants[variant]} pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity`}
@@ -93,32 +97,32 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 
       <div className="relative flex items-start justify-between gap-3">
         <div className="flex-1">
-          <p className="text-[11px] font-mono font-bold tracking-wider uppercase text-slate-400 flex items-center gap-1.5">
+          <p className="text-[10px] font-mono font-bold tracking-wider uppercase text-[#7C8AA0] flex items-center gap-1.5">
             <span>{title}</span>
             {isHero && (
-              <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
-                Primary KPI
+              <span className="text-[8px] px-1.5 py-0.2 rounded bg-[#4CD9E8]/20 text-[#4CD9E8] border border-[#4CD9E8]/40 font-bold">
+                PRIMARY KPI
               </span>
             )}
           </p>
 
           <h3
-            className={`mt-2 font-extrabold text-slate-100 font-mono tracking-tight ${
-              isHero ? 'text-3xl md:text-4xl text-cyan-300' : 'text-2xl'
+            className={`mt-2 font-black font-mono tracking-tight ${
+              isHero ? 'text-3xl md:text-4xl text-[#4CD9E8]' : 'text-2xl text-[#EAEFF5]'
             }`}
           >
             {displayValue}
           </h3>
 
           {subtitle && (
-            <p className="mt-1 text-xs text-slate-400 font-medium font-sans leading-relaxed">
+            <p className="mt-1 text-xs text-[#7C8AA0] font-medium font-sans leading-relaxed">
               {subtitle}
             </p>
           )}
 
           {trend && (
             <div className="mt-2 flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-md border border-emerald-500/30 flex items-center gap-1">
+              <span className="text-[10px] font-mono font-bold text-[#3FD98A] bg-[#091D17] px-2 py-0.5 rounded-md border border-[#3FD98A]/30 flex items-center gap-1">
                 <span>↑</span> {trend}
               </span>
             </div>

@@ -65,65 +65,65 @@ export const ScanHistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-slide-up">
+    <div className="space-y-6 animate-slide-up font-mono select-none">
       {/* 1. Top Search & Filter Bar */}
-      <div className="p-4 rounded-3xl glass-panel flex flex-wrap items-center justify-between gap-4">
+      <div className="p-4 rounded-3xl glass-panel flex flex-wrap items-center justify-between gap-4 border border-[#152438]">
         {/* Search Input */}
         <div className="relative flex-1 min-w-[240px]">
-          <Search className="w-4 h-4 text-cyan-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[#4CD9E8] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by Scan ID or image filename..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs font-mono rounded-xl bg-slate-950/80 border border-slate-800 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+            className="w-full pl-9 pr-4 py-2 text-xs font-mono rounded-xl bg-[#060D17] border border-[#152438] text-[#EAEFF5] placeholder-[#7C8AA0]/50 focus:outline-none focus:border-[#4CD9E8]"
           />
         </div>
 
         {/* Filter Badges */}
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex rounded-xl bg-slate-950/80 border border-slate-800 p-0.5 text-xs font-mono">
+          <div className="flex rounded-xl bg-[#060D17] border border-[#152438] p-0.5 text-xs font-mono">
             <button
               onClick={() => setFilterClass('ALL')}
-              className={`px-3 py-1 rounded-lg transition-all ${
+              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                 filterClass === 'ALL'
-                  ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#4CD9E8]/20 text-[#4CD9E8] font-bold border border-[#4CD9E8]/30'
+                  : 'text-[#7C8AA0] hover:text-[#EAEFF5]'
               }`}
             >
               All ({scans.length})
             </button>
             <button
               onClick={() => setFilterClass('GHOST_NET')}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all ${
+              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 filterClass === 'GHOST_NET'
-                  ? 'bg-purple-950/80 text-purple-300 font-bold border border-purple-500/40'
-                  : 'text-slate-400 hover:text-purple-300'
+                  ? 'bg-[#A855F7]/20 text-[#A855F7] font-bold border border-[#A855F7]/40'
+                  : 'text-[#7C8AA0] hover:text-[#A855F7]'
               }`}
             >
-              <AlertTriangle className="w-3 h-3 text-purple-400" />
+              <AlertTriangle className="w-3 h-3 text-[#A855F7]" />
               <span>Ghost Nets</span>
             </button>
             <button
               onClick={() => setFilterClass('DEBRIS')}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all ${
+              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 filterClass === 'DEBRIS'
-                  ? 'bg-amber-950/80 text-amber-300 font-bold border border-amber-500/40'
-                  : 'text-slate-400 hover:text-amber-300'
+                  ? 'bg-[#F5A623]/20 text-[#F5A623] font-bold border border-[#F5A623]/40'
+                  : 'text-[#7C8AA0] hover:text-[#F5A623]'
               }`}
             >
-              <Boxes className="w-3 h-3 text-amber-400" />
+              <Boxes className="w-3 h-3 text-[#F5A623]" />
               <span>Debris</span>
             </button>
             <button
               onClick={() => setFilterClass('PIPELINE')}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all ${
+              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
                 filterClass === 'PIPELINE'
-                  ? 'bg-blue-950/80 text-blue-300 font-bold border border-blue-500/40'
-                  : 'text-slate-400 hover:text-blue-300'
+                  ? 'bg-[#29B6F6]/20 text-[#29B6F6] font-bold border border-[#29B6F6]/40'
+                  : 'text-[#7C8AA0] hover:text-[#29B6F6]'
               }`}
             >
-              <Layers className="w-3 h-3 text-blue-400" />
+              <Layers className="w-3 h-3 text-[#29B6F6]" />
               <span>Pipelines</span>
             </button>
           </div>
@@ -132,7 +132,7 @@ export const ScanHistoryPage: React.FC = () => {
           <select
             value={sortBy}
             onChange={(e: any) => setSortBy(e.target.value)}
-            className="px-3 py-2 text-xs font-mono rounded-xl bg-slate-950/80 border border-slate-800 text-slate-300 focus:outline-none focus:border-cyan-400"
+            className="px-3 py-2 text-xs font-mono rounded-xl bg-[#060D17] border border-[#152438] text-[#EAEFF5] focus:outline-none focus:border-[#4CD9E8] cursor-pointer"
           >
             <option value="date">Sort: Newest First</option>
             <option value="detections">Sort: Highest Targets</option>
@@ -142,21 +142,21 @@ export const ScanHistoryPage: React.FC = () => {
       </div>
 
       {/* 2. Main Scans Table */}
-      <div className="rounded-3xl glass-panel overflow-hidden shadow-2xl">
+      <div className="rounded-3xl glass-panel overflow-hidden shadow-2xl border border-[#152438]">
         {filteredScans.length === 0 ? (
           <div className="p-14 text-center space-y-4">
-            <History className="w-12 h-12 text-slate-400 mx-auto animate-pulse" />
+            <History className="w-12 h-12 text-[#7C8AA0] mx-auto animate-pulse" />
             <div>
-              <p className="text-base font-extrabold text-slate-200 font-mono">
+              <p className="text-base font-black text-[#EAEFF5] font-mono">
                 No Scan Records Found
               </p>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-[#7C8AA0] mt-1">
                 Try adjusting your search criteria or launch a new sonar inspection.
               </p>
             </div>
             <button
               onClick={() => setActiveTab('scan')}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 text-slate-950 font-bold text-xs font-mono inline-flex items-center gap-1.5 shadow-lg active:scale-95 transition-all"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#4CD9E8] to-[#3FD98A] text-[#03070E] font-black text-xs font-mono inline-flex items-center gap-1.5 shadow-lg active:scale-95 transition-all cursor-pointer"
             >
               <ScanLine className="w-4 h-4" />
               <span>Launch New Scan</span>
@@ -165,7 +165,7 @@ export const ScanHistoryPage: React.FC = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-[#080E1C]/80 text-slate-400 border-b border-slate-800 uppercase tracking-wider">
+              <thead className="bg-[#060D17] text-[#7C8AA0] border-b border-[#152438] uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="py-3.5 px-4">Scan ID</th>
                   <th className="py-3.5 px-4">Source Track</th>
@@ -178,7 +178,7 @@ export const ScanHistoryPage: React.FC = () => {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-[#152438]/60">
                 {filteredScans.map((scan) => {
                   const hasGeo =
                     scan.location.latitude !== null &&
@@ -187,76 +187,76 @@ export const ScanHistoryPage: React.FC = () => {
                   return (
                     <tr
                       key={scan.scan_id}
-                      className="hover:bg-cyan-950/20 transition-colors text-slate-300"
+                      className="hover:bg-[#0A1A2E]/50 transition-colors text-[#EAEFF5]"
                     >
-                      <td className="py-3.5 px-4 font-bold text-cyan-300">
+                      <td className="py-3.5 px-4 font-bold text-[#4CD9E8]">
                         {scan.scan_id}
                       </td>
-                      <td className="py-3.5 px-4 font-medium text-slate-200 max-w-[180px] truncate">
+                      <td className="py-3.5 px-4 font-medium text-[#EAEFF5] max-w-[180px] truncate">
                         {scan.filename}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-400 text-[11px]">
+                      <td className="py-3.5 px-4 text-[#7C8AA0] text-[10px]">
                         {new Date(scan.created_at).toLocaleDateString()}{' '}
                         {new Date(scan.created_at).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
                       </td>
-                      <td className="py-3.5 px-4 font-extrabold text-slate-100">
+                      <td className="py-3.5 px-4 font-black text-[#EAEFF5]">
                         {scan.total_detections}
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {(scan.ghost_net_count || 0) > 0 && (
-                            <span className="px-2 py-0.5 rounded-md bg-purple-950/80 border border-purple-500/30 text-purple-300 font-bold text-[10px]">
+                            <span className="px-2 py-0.5 rounded-md bg-[#A855F7]/20 border border-[#A855F7]/40 text-[#A855F7] font-bold text-[9px]">
                               {scan.ghost_net_count} Net
                             </span>
                           )}
                           {(scan.debris_count || 0) > 0 && (
-                            <span className="px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/30 text-amber-300 font-bold text-[10px]">
+                            <span className="px-2 py-0.5 rounded-md bg-[#F5A623]/20 border border-[#F5A623]/40 text-[#F5A623] font-bold text-[9px]">
                               {scan.debris_count} Debris
                             </span>
                           )}
                           {(scan.pipeline_count || 0) > 0 && (
-                            <span className="px-2 py-0.5 rounded-md bg-blue-950/80 border border-blue-500/30 text-blue-300 font-bold text-[10px]">
+                            <span className="px-2 py-0.5 rounded-md bg-[#29B6F6]/20 border border-[#29B6F6]/40 text-[#29B6F6] font-bold text-[9px]">
                               {scan.pipeline_count} Pipe
                             </span>
                           )}
                           {(scan.milco_count || 0) > 0 && (
-                            <span className="px-2 py-0.5 rounded-md bg-red-950/80 border border-red-500/30 text-red-300 font-bold text-[10px]">
+                            <span className="px-2 py-0.5 rounded-md bg-[#F04438]/20 border border-[#F04438]/40 text-[#F04438] font-bold text-[9px]">
                               {scan.milco_count} MILCO
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 font-bold text-slate-100">
+                      <td className="py-3.5 px-4 font-black text-[#EAEFF5]">
                         {(scan.highest_confidence * 100).toFixed(1)}%
                       </td>
-                      <td className="py-3.5 px-4 text-[11px] text-slate-400">
+                      <td className="py-3.5 px-4 text-[10px] text-[#7C8AA0]">
                         {hasGeo ? (
-                          <span className="flex items-center gap-1 text-cyan-300">
+                          <span className="flex items-center gap-1 text-[#4CD9E8]">
                             <MapPin className="w-3 h-3" />
                             {scan.location.latitude?.toFixed(2)}°,{' '}
                             {scan.location.longitude?.toFixed(2)}°
                             {scan.geotag_source === 'ping_log' && (
-                              <span className="text-[9px] px-1 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                              <span className="text-[8px] px-1 rounded bg-[#4CD9E8]/10 text-[#4CD9E8] border border-[#4CD9E8]/30">
                                 LOG
                               </span>
                             )}
                           </span>
                         ) : (
-                          <span className="text-slate-400">Unavailable</span>
+                          <span className="text-[#7C8AA0]">Unavailable</span>
                         )}
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded bg-[#3FD98A]/20 border border-[#3FD98A]/40 text-[#3FD98A] text-[9px] font-bold">
                           COMPLETED
                         </span>
                       </td>
                       <td className="py-3.5 px-4 text-right space-x-2">
                         <button
                           onClick={() => handleInspect(scan)}
-                          className="px-3 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:text-cyan-200 transition-all font-semibold inline-flex items-center gap-1"
+                          className="px-3 py-1 rounded-lg bg-[#4CD9E8]/10 hover:bg-[#4CD9E8]/20 border border-[#4CD9E8]/30 text-[#4CD9E8] transition-all font-semibold inline-flex items-center gap-1 cursor-pointer"
                           title="Inspect Detection Overlay"
                         >
                           <Eye className="w-3 h-3" />
@@ -264,15 +264,15 @@ export const ScanHistoryPage: React.FC = () => {
                         </button>
                         <button
                           onClick={() => handleViewReport(scan)}
-                          className="px-3 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-slate-100 transition-colors inline-flex items-center gap-1 font-semibold"
+                          className="px-3 py-1 rounded-lg bg-[#0A1322] hover:bg-[#101D31] border border-[#152438] text-[#7C8AA0] hover:text-[#EAEFF5] transition-colors inline-flex items-center gap-1 font-semibold cursor-pointer"
                           title="Generate Inspection Report"
                         >
-                          <FileText className="w-3 h-3 text-cyan-400" />
+                          <FileText className="w-3 h-3 text-[#4CD9E8]" />
                           <span>Report</span>
                         </button>
                         <button
                           onClick={() => deleteScan(scan.scan_id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          className="p-1.5 rounded-lg text-[#7C8AA0] hover:text-[#F04438] hover:bg-[#F04438]/10 transition-colors cursor-pointer"
                           title="Delete Scan Record"
                         >
                           <Trash2 className="w-3.5 h-3.5 inline" />

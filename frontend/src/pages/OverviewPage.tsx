@@ -15,9 +15,10 @@ import {
   MapPin,
   CheckCircle2,
   ShieldCheck,
+  Ship,
+  Eye,
 } from 'lucide-react';
 import { MetricCard } from '../components/layout/MetricCard';
-import { Badge } from '../components/common/Badge';
 import { useApp } from '../context/AppContext';
 import {
   BarChart,
@@ -34,7 +35,7 @@ import { HolographicGlobe } from '../components/common/HolographicGlobe';
 import { MarineDriveVisualization } from '../components/common/MarineDriveVisualization';
 
 export const OverviewPage: React.FC = () => {
-  const { stats, scans, setActiveTab, setCurrentScan, modelInfo } = useApp();
+  const { stats, scans, setActiveTab, setCurrentScan } = useApp();
 
   const totalScans = stats?.total_scans ?? scans.length;
   const objectsDetected =
@@ -73,9 +74,9 @@ export const OverviewPage: React.FC = () => {
   // Chart Data
   const pieData = [
     { name: 'Ghost Nets & ALDFG', value: Math.max(1, ghostNetTotal), color: '#A855F7' },
-    { name: 'Anthropogenic Debris', value: Math.max(1, debrisTotal), color: '#F59E0B' },
-    { name: 'Pipeline Hazards', value: Math.max(1, pipelineTotal), color: '#3B82F6' },
-    { name: 'Seafloor Anomalies', value: Math.max(1, anomalyTotal), color: '#06B6D4' },
+    { name: 'Anthropogenic Debris', value: Math.max(1, debrisTotal), color: '#F5A623' },
+    { name: 'Pipeline Hazards', value: Math.max(1, pipelineTotal), color: '#29B6F6' },
+    { name: 'Seafloor Anomalies', value: Math.max(1, anomalyTotal), color: '#4CD9E8' },
   ];
 
   const activityData = scans.slice(0, 7).reverse().map((s, idx) => ({
@@ -96,36 +97,36 @@ export const OverviewPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-slide-up">
-      {/* 1. Hero Cinematic Banner with 3D Holographic Radar Globe */}
-      <div className="relative overflow-hidden rounded-3xl glass-panel border border-cyan-500/25 p-6 md:p-8 bg-gradient-to-r from-[#0C162E]/95 via-[#0B152B]/85 to-[#070D1B]/95 shadow-2xl bg-acoustic-grid">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="space-y-8 animate-slide-up font-mono select-none">
+      {/* 1. Hero Cinematic Ocean Banner with 3D Holographic Radar Globe */}
+      <div className="relative overflow-hidden rounded-3xl p-6 md:p-8 bg-gradient-to-r from-[#0C1A2E]/95 via-[#0A1629]/90 to-[#060D17]/95 border border-[#152438] shadow-2xl bg-acoustic-grid">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#4CD9E8]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
           <div className="space-y-4 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#4CD9E8]/10 border border-[#4CD9E8]/30 text-[#4CD9E8] text-xs font-mono shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-[#4CD9E8] animate-ping" />
               <span>SONARX INTELLIGENCE SYSTEM · SX-014</span>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs font-mono font-black tracking-widest text-[#32E6D1] uppercase">
+              <span className="text-xs font-mono font-black tracking-widest text-[#4CD9E8] uppercase">
                 See What Lies Beneath.
               </span>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-slate-100 tracking-tight leading-tight">
+              <h1 className="text-3xl md:text-4xl font-black text-[#EAEFF5] tracking-tight leading-tight font-sans">
                 AI-Powered Side-Scan Sonar Perception & Seabed Mapping
               </h1>
             </div>
 
-            <p className="text-sm text-slate-300 leading-relaxed font-sans max-w-xl">
-              Autonomous subsea perception system for detecting, classifying, and 3D mapping underwater targets, abandoned gear (<strong className="text-purple-400">Ghost Nets</strong>), pipeline hazards, and acoustic seafloor anomalies.
+            <p className="text-sm text-[#7C8AA0] leading-relaxed font-sans max-w-xl">
+              Autonomous subsea perception system for detecting, classifying, and 3D mapping underwater targets, abandoned gear (<strong className="text-[#A855F7]">Ghost Nets</strong>), pipeline hazards, and acoustic seafloor anomalies.
             </p>
 
             {/* Technical Metadata Strip */}
-            <div className="flex flex-wrap items-center gap-2 pt-1 text-[10px] font-mono text-[#66848D]">
-              {['SIDE-SCAN SONAR', 'AI DETECTION', 'TARGET CLASSIFICATION', '3D SEAFLOOR', 'MISSION INTELLIGENCE'].map((tag, idx) => (
-                <span key={tag} className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#081118] border border-[#16303B]">
-                  <span className="w-1 h-1 rounded-full bg-[#32E6D1]" />
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-[9px] font-mono text-[#7C8AA0]">
+              {['SIDE-SCAN SONAR', 'AI DETECTION', 'TARGET CLASSIFICATION', '3D SEAFLOOR', 'MISSION INTELLIGENCE'].map((tag) => (
+                <span key={tag} className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#0A1322] border border-[#152438]">
+                  <span className="w-1 h-1 rounded-full bg-[#4CD9E8]" />
                   {tag}
                 </span>
               ))}
@@ -134,7 +135,7 @@ export const OverviewPage: React.FC = () => {
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
                 onClick={() => setActiveTab('mission')}
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#32E6D1] via-[#29B6F6] to-[#32E6D1] hover:brightness-110 text-slate-950 font-extrabold font-mono text-xs flex items-center gap-2 shadow-xl shadow-[#32E6D1]/20 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#4CD9E8] via-[#29B6F6] to-[#4CD9E8] hover:brightness-110 text-[#03070E] font-black font-mono text-xs flex items-center gap-2 shadow-xl shadow-[#4CD9E8]/20 transition-all hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
               >
                 <Crosshair className="w-4 h-4" />
                 <span>LAUNCH MISSION CONTROL</span>
@@ -143,33 +144,33 @@ export const OverviewPage: React.FC = () => {
 
               <button
                 onClick={() => setActiveTab('sonar')}
-                className="px-4 py-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 font-mono text-xs flex items-center gap-2 transition-all hover:border-cyan-500/40"
+                className="px-4 py-3 rounded-2xl bg-[#0A1322] hover:bg-[#101D31] border border-[#152438] hover:border-[#4CD9E8]/50 text-[#EAEFF5] font-mono text-xs flex items-center gap-2 transition-all cursor-pointer"
               >
-                <Radio className="w-4 h-4 text-cyan-400" />
-                <span>Sonar Viewer</span>
+                <Radio className="w-4 h-4 text-[#4CD9E8]" />
+                <span>Debris Intel Node</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('scan')}
-                className="px-4 py-3 rounded-2xl bg-slate-950/80 hover:bg-slate-900 border border-cyan-500/30 text-cyan-300 font-mono text-xs flex items-center gap-2 transition-all"
+                className="px-4 py-3 rounded-2xl bg-[#0A1322] hover:bg-[#101D31] border border-[#4CD9E8]/30 text-[#4CD9E8] font-mono text-xs flex items-center gap-2 transition-all cursor-pointer"
               >
-                <ScanLine className="w-4 h-4 text-cyan-400" />
+                <ScanLine className="w-4 h-4 text-[#4CD9E8]" />
                 <span>Upload Sonar Swath</span>
               </button>
             </div>
           </div>
 
           {/* 3D Holographic Globe with Telemetry Readouts */}
-          <div className="relative flex flex-col items-center justify-center p-5 rounded-3xl bg-slate-950/80 border border-cyan-500/30 shadow-2xl shrink-0 overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/15 via-transparent to-transparent pointer-events-none" />
+          <div className="relative flex flex-col items-center justify-center p-5 rounded-3xl bg-[#060D17]/90 border border-[#152438] shadow-2xl shrink-0 overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-b from-[#4CD9E8]/10 via-transparent to-transparent pointer-events-none" />
             <HolographicGlobe size={190} className="relative z-10 my-1" />
-            <div className="relative z-10 text-center space-y-1 pt-2 border-t border-slate-800/80 w-full">
-              <p className="text-[11px] font-mono font-bold text-cyan-300 tracking-wider flex items-center justify-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+            <div className="relative z-10 text-center space-y-1 pt-2 border-t border-[#152438] w-full">
+              <p className="text-[10px] font-mono font-bold text-[#4CD9E8] tracking-wider flex items-center justify-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#4CD9E8] animate-ping" />
                 AUV TELEMETRY MESH
               </p>
-              <div className="flex items-center justify-center gap-2 text-[10px] font-mono text-slate-400">
-                <span className="text-emerald-400 flex items-center gap-0.5">
+              <div className="flex items-center justify-center gap-2 text-[9px] font-mono text-[#7C8AA0]">
+                <span className="text-[#3FD98A] flex items-center gap-0.5">
                   <CheckCircle2 className="w-3 h-3" />
                   17.68°N, 83.21°E
                 </span>
@@ -181,36 +182,36 @@ export const OverviewPage: React.FC = () => {
       </div>
 
       {/* Core Workflow Visual Pipeline Strip */}
-      <div className="p-4 rounded-2xl glass-panel border border-[#16303B] bg-[#081118]/80 space-y-2">
+      <div className="p-4 rounded-2xl bg-[#060D17] border border-[#152438] space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-mono font-black uppercase tracking-widest text-[#32E6D1] flex items-center gap-1.5">
-            <Zap className="w-3 h-3 text-[#32E6D1]" />
+          <span className="text-[10px] font-mono font-black uppercase tracking-widest text-[#4CD9E8] flex items-center gap-1.5">
+            <Zap className="w-3 h-3 text-[#4CD9E8]" />
             End-to-End SonarX Intelligence Workflow
           </span>
-          <span className="text-[9px] font-mono text-[#66848D]">Autonomous Pipeline · 10.2 ms / frame</span>
+          <span className="text-[8px] font-mono text-[#7C8AA0]">Autonomous Pipeline · 10.2 ms / frame</span>
         </div>
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[9px] font-mono text-[#66848D] scrollbar-none">
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[8px] font-mono text-[#7C8AA0] scrollbar-none">
           {[
             { step: '01', name: 'SONAR INGESTION', color: '#29B6F6' },
             { step: '02', name: 'PREPROCESSING', color: '#29B6F6' },
-            { step: '03', name: 'NOISE REDUCTION', color: '#32E6D1' },
-            { step: '04', name: 'ENHANCEMENT', color: '#32E6D1' },
-            { step: '05', name: 'AI DETECTION', color: '#FFB547' },
-            { step: '06', name: 'CLASSIFICATION', color: '#FFB547' },
+            { step: '03', name: 'NOISE REDUCTION', color: '#4CD9E8' },
+            { step: '04', name: 'ENHANCEMENT', color: '#4CD9E8' },
+            { step: '05', name: 'AI DETECTION', color: '#F5A623' },
+            { step: '06', name: 'CLASSIFICATION', color: '#F5A623' },
             { step: '07', name: 'SHADOW ANALYSIS', color: '#A855F7' },
             { step: '08', name: 'CONFIDENCE SCORING', color: '#A855F7' },
-            { step: '09', name: 'GEOREFERENCING', color: '#65D391' },
-            { step: '10', name: '3D SEAFLOOR', color: '#65D391' },
-            { step: '11', name: 'MISSION INTEL', color: '#32E6D1' },
-            { step: '12', name: 'REPORT', color: '#32E6D1' },
+            { step: '09', name: 'GEOREFERENCING', color: '#3FD98A' },
+            { step: '10', name: '3D SEAFLOOR', color: '#3FD98A' },
+            { step: '11', name: 'MISSION INTEL', color: '#4CD9E8' },
+            { step: '12', name: 'REPORT', color: '#4CD9E8' },
           ].map((item, idx, arr) => (
             <React.Fragment key={item.step}>
-              <div className="flex items-center gap-1 px-2 py-1 rounded bg-[#0C171E] border border-[#16303B] shrink-0 hover:border-[#32E6D1]/40 transition-colors">
+              <div className="flex items-center gap-1 px-2 py-1 rounded bg-[#0A1322] border border-[#152438] shrink-0 hover:border-[#4CD9E8]/40 transition-colors">
                 <span className="text-[8px] font-bold" style={{ color: item.color }}>{item.step}</span>
-                <span className="text-[#E4F2F5] font-semibold">{item.name}</span>
+                <span className="text-[#EAEFF5] font-semibold">{item.name}</span>
               </div>
               {idx < arr.length - 1 && (
-                <span className="text-[#16303B] shrink-0 font-bold">→</span>
+                <span className="text-[#152438] shrink-0 font-bold">→</span>
               )}
             </React.Fragment>
           ))}
@@ -252,7 +253,7 @@ export const OverviewPage: React.FC = () => {
           variant="cyan"
         />
         <MetricCard
-          title="ONNX Latency"
+          title="Perception Latency"
           value={`${avgLatency} ms`}
           subtitle="Edge tensor runtime"
           icon={Zap}
@@ -266,32 +267,32 @@ export const OverviewPage: React.FC = () => {
       {/* 4. Visual Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Activity Timeline Chart */}
-        <div className="lg:col-span-2 p-6 rounded-3xl glass-panel space-y-4">
+        <div className="lg:col-span-2 p-6 rounded-3xl bg-[#060D17] border border-[#152438] space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
+              <h4 className="text-xs font-black text-[#EAEFF5] font-mono uppercase tracking-wider">
                 Detection Distribution Across Survey Tracks
               </h4>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-[10px] text-[#7C8AA0] mt-0.5">
                 Breakdown of ghost nets, anthropogenic debris, and subsea pipelines
               </p>
             </div>
-            <div className="flex items-center gap-3 text-xs font-mono">
-              <span className="flex items-center gap-1.5 text-purple-400 font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-purple-500" /> Ghost Nets
+            <div className="flex items-center gap-3 text-[9px] font-mono">
+              <span className="flex items-center gap-1.5 text-[#A855F7] font-semibold">
+                <span className="w-2.5 h-2.5 rounded-sm bg-[#A855F7]" /> Ghost Nets
               </span>
-              <span className="flex items-center gap-1.5 text-amber-400 font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" /> Debris
+              <span className="flex items-center gap-1.5 text-[#F5A623] font-semibold">
+                <span className="w-2.5 h-2.5 rounded-sm bg-[#F5A623]" /> Debris
               </span>
-              <span className="flex items-center gap-1.5 text-blue-400 font-semibold">
-                <span className="w-2.5 h-2.5 rounded-sm bg-blue-500" /> Pipelines
+              <span className="flex items-center gap-1.5 text-[#29B6F6] font-semibold">
+                <span className="w-2.5 h-2.5 rounded-sm bg-[#29B6F6]" /> Pipelines
               </span>
             </div>
           </div>
 
           <div className="h-64 w-full pt-2">
             {activityData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-xs font-mono text-slate-400">
+              <div className="h-full flex items-center justify-center text-xs font-mono text-[#7C8AA0]">
                 No survey swaths processed yet.
               </div>
             ) : (
@@ -299,21 +300,21 @@ export const OverviewPage: React.FC = () => {
                 <BarChart data={activityData}>
                   <XAxis
                     dataKey="name"
-                    stroke="#475569"
-                    tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: 'monospace' }}
+                    stroke="#152438"
+                    tick={{ fill: '#7C8AA0', fontSize: 10, fontFamily: 'monospace' }}
                   />
                   <YAxis
-                    stroke="#475569"
-                    tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: 'monospace' }}
+                    stroke="#152438"
+                    tick={{ fill: '#7C8AA0', fontSize: 10, fontFamily: 'monospace' }}
                     allowDecimals={false}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#091024',
-                      borderColor: 'rgba(56, 189, 248, 0.2)',
+                      backgroundColor: '#0A1322',
+                      borderColor: '#152438',
                       borderRadius: '12px',
                       fontFamily: 'monospace',
-                      fontSize: '12px',
+                      fontSize: '11px',
                       boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
                     }}
                   />
@@ -326,13 +327,13 @@ export const OverviewPage: React.FC = () => {
                   <Bar
                     dataKey="debris"
                     name="Marine Debris"
-                    fill="#F59E0B"
+                    fill="#F5A623"
                     radius={[6, 6, 0, 0]}
                   />
                   <Bar
                     dataKey="pipelines"
                     name="Pipelines"
-                    fill="#3B82F6"
+                    fill="#29B6F6"
                     radius={[6, 6, 0, 0]}
                   />
                 </BarChart>
@@ -342,19 +343,19 @@ export const OverviewPage: React.FC = () => {
         </div>
 
         {/* Classification Ratio Donut */}
-        <div className="p-6 rounded-3xl glass-panel space-y-4 flex flex-col justify-between">
+        <div className="p-6 rounded-3xl bg-[#060D17] border border-[#152438] space-y-4 flex flex-col justify-between">
           <div>
-            <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
+            <h4 className="text-xs font-black text-[#EAEFF5] font-mono uppercase tracking-wider">
               MoES Target Distribution
             </h4>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-[10px] text-[#7C8AA0] mt-0.5">
               Cumulative target taxonomy breakdown
             </p>
           </div>
 
           <div className="h-48 w-full flex items-center justify-center">
             {objectsDetected === 0 ? (
-              <div className="text-xs font-mono text-slate-400">
+              <div className="text-xs font-mono text-[#7C8AA0]">
                 0 objects recorded.
               </div>
             ) : (
@@ -362,13 +363,12 @@ export const OverviewPage: React.FC = () => {
                 <PieChart>
                   <Pie
                     data={pieData}
-                    dataKey="value"
-                    nameKey="name"
                     cx="50%"
                     cy="50%"
                     innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={6}
+                    outerRadius={75}
+                    paddingAngle={4}
+                    dataKey="value"
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -376,12 +376,11 @@ export const OverviewPage: React.FC = () => {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#091024',
-                      borderColor: 'rgba(56, 189, 248, 0.2)',
+                      backgroundColor: '#0A1322',
+                      borderColor: '#152438',
                       borderRadius: '12px',
                       fontFamily: 'monospace',
-                      fontSize: '12px',
-                      boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
+                      fontSize: '11px',
                     }}
                   />
                 </PieChart>
@@ -389,98 +388,16 @@ export const OverviewPage: React.FC = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono border-t border-slate-800 pt-3">
-            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-purple-500/30">
-              <p className="text-purple-400 font-extrabold text-lg">{ghostNetTotal}</p>
-              <p className="text-[10px] text-slate-400 uppercase mt-0.5 font-medium">Ghost Nets</p>
-            </div>
-            <div className="p-2.5 rounded-xl bg-slate-950/80 border border-amber-500/30">
-              <p className="text-amber-400 font-extrabold text-lg">{debrisTotal}</p>
-              <p className="text-[10px] text-slate-400 uppercase mt-0.5 font-medium">Debris</p>
-            </div>
+          <div className="grid grid-cols-2 gap-2 text-[9px] font-mono border-t border-[#152438] pt-3">
+            {pieData.map((d) => (
+              <div key={d.name} className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
+                <span className="text-[#7C8AA0] truncate">{d.name}</span>
+                <span className="font-bold text-[#EAEFF5] ml-auto">{d.value}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-
-      {/* 5. Recent Drone Survey Scans Table */}
-      <div className="p-6 md:p-8 rounded-3xl glass-panel space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
-              Recent Drone Survey Swaths
-            </h4>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Live telemetry feed of processed side-scan sonar waterfall swaths
-            </p>
-          </div>
-          <button
-            onClick={() => setActiveTab('history')}
-            className="text-xs font-mono text-cyan-400 hover:text-cyan-300 flex items-center gap-1 hover:underline"
-          >
-            <span>View Full Archive</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {scans.length === 0 ? (
-          <div className="p-10 text-center rounded-2xl bg-slate-950/60 border border-slate-800 space-y-3">
-            <ScanLine className="w-10 h-10 text-slate-400 mx-auto animate-pulse" />
-            <p className="text-xs font-mono text-slate-400">
-              No sonar scans in history yet. Upload a drone sonar scan or enable Demo Mode.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-[#080E1C]/80 text-slate-400 border-b border-slate-800 uppercase tracking-wider">
-                <tr>
-                  <th className="py-3 px-3">Scan ID</th>
-                  <th className="py-3 px-3">Source Track</th>
-                  <th className="py-3 px-3">Model</th>
-                  <th className="py-3 px-3">Targets</th>
-                  <th className="py-3 px-3">Peak Confidence</th>
-                  <th className="py-3 px-3">Latency</th>
-                  <th className="py-3 px-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60">
-                {scans.slice(0, 6).map((scan) => (
-                  <tr
-                    key={scan.scan_id}
-                    className="hover:bg-cyan-950/20 transition-colors text-slate-300"
-                  >
-                    <td className="py-3 px-3 font-bold text-cyan-300">
-                      {scan.scan_id}
-                    </td>
-                    <td className="py-3 px-3 text-slate-200 max-w-[180px] truncate font-medium">
-                      {scan.filename}
-                    </td>
-                    <td className="py-3 px-3 text-slate-400 text-[11px]">
-                      {scan.model_name?.includes('Marine-Debris') ? 'SIH V2' : 'MILCO Baseline'}
-                    </td>
-                    <td className="py-3 px-3 font-bold text-slate-100">
-                      {scan.total_detections}
-                    </td>
-                    <td className="py-3 px-3 font-bold text-slate-100">
-                      {(scan.highest_confidence * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-3 px-3 text-slate-400">
-                      {scan.inference_ms.toFixed(1)} ms
-                    </td>
-                    <td className="py-3 px-3 text-right">
-                      <button
-                        onClick={() => handleInspect(scan.scan_id)}
-                        className="px-3.5 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 hover:text-cyan-200 transition-all font-semibold active:scale-95"
-                      >
-                        Inspect Swath
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
     </div>
   );

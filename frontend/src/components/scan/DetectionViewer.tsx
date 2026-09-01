@@ -208,12 +208,12 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
       </div>
 
       {/* 2. Interactive Inspection Canvas */}
-      <div className="rounded-3xl glass-panel overflow-hidden shadow-2xl border border-cyan-500/25">
+      <div className="rounded-3xl glass-panel overflow-hidden shadow-2xl border border-[#152438]">
         {/* Canvas Toolbar */}
-        <div className="p-3.5 bg-[#080F22]/95 backdrop-blur border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div className="p-3.5 bg-[#060D17]/95 backdrop-blur border-b border-[#152438] flex flex-wrap items-center justify-between gap-3">
           {/* Dynamic Confidence Slider & Presets */}
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="text-xs font-mono text-slate-400">Model Cutoff:</span>
+            <span className="text-xs font-mono text-[#7C8AA0]">Model Cutoff:</span>
             <input
               type="range"
               min="0.01"
@@ -221,9 +221,9 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               step="0.01"
               value={activeThreshold}
               onChange={(e) => setActiveThreshold(parseFloat(e.target.value))}
-              className="w-24 sm:w-32 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400"
+              className="w-24 sm:w-32 h-1.5 bg-[#101D31] rounded-lg appearance-none cursor-pointer accent-[#4CD9E8]"
             />
-            <span className="text-xs font-mono text-cyan-400 font-extrabold bg-slate-950 px-2.5 py-0.5 rounded-md border border-slate-800">
+            <span className="text-xs font-mono text-[#4CD9E8] font-black bg-[#0A1322] px-2.5 py-0.5 rounded-md border border-[#152438]">
               {(activeThreshold * 100).toFixed(0)}%
             </span>
 
@@ -231,30 +231,30 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
             <div className="flex items-center gap-1 text-[10px] font-mono">
               <button
                 onClick={() => setActiveThreshold(0.25)}
-                className={`px-2 py-0.5 rounded-md border transition-all ${
+                className={`px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
                   activeThreshold === 0.25
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold'
-                    : 'bg-slate-950 text-slate-400 border-slate-800'
+                    ? 'bg-[#4CD9E8]/20 text-[#4CD9E8] border-[#4CD9E8]/40 font-bold'
+                    : 'bg-[#0A1322] text-[#7C8AA0] border-[#152438]'
                 }`}
               >
                 25%
               </button>
               <button
                 onClick={() => setActiveThreshold(0.08)}
-                className={`px-2 py-0.5 rounded-md border transition-all ${
+                className={`px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
                   activeThreshold === 0.08
-                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold'
-                    : 'bg-slate-950 text-slate-400 border-slate-800'
+                    ? 'bg-[#F5A623]/20 text-[#F5A623] border-[#F5A623]/40 font-bold'
+                    : 'bg-[#0A1322] text-[#7C8AA0] border-[#152438]'
                 }`}
               >
                 8%
               </button>
               <button
                 onClick={() => setActiveThreshold(0.01)}
-                className={`px-2 py-0.5 rounded-md border transition-all ${
+                className={`px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
                   activeThreshold === 0.01
-                    ? 'bg-red-500/20 text-red-300 border-red-500/40 font-bold'
-                    : 'bg-slate-950 text-slate-400 border-slate-800'
+                    ? 'bg-[#F04438]/20 text-[#F04438] border-[#F04438]/40 font-bold'
+                    : 'bg-[#0A1322] text-[#7C8AA0] border-[#152438]'
                 }`}
               >
                 1%
@@ -397,12 +397,12 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
         </div>
 
         {/* Status Strip */}
-        <div className="p-3 bg-[#060B18] border-t border-slate-800 flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 gap-3">
+        <div className="p-3 bg-[#060D17] border-t border-[#152438] flex flex-wrap items-center justify-between text-xs font-mono text-[#7C8AA0] gap-3">
           <div className="flex items-center gap-4 flex-wrap">
             <span>Dimensions: {scan.image_width} × {scan.image_height} px</span>
-            <span>Active Targets: <strong className="text-cyan-300">{visibleDetections.length}</strong></span>
+            <span>Active Targets: <strong className="text-[#4CD9E8]">{visibleDetections.length}</strong></span>
             {scan.location && scan.location.latitude && (
-              <span className="text-emerald-400 flex items-center gap-1">
+              <span className="text-[#3FD98A] flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" />
                 Geotag: {scan.location.latitude.toFixed(4)}°N, {scan.location.longitude?.toFixed(4)}°E
                 {scan.geotag_source && ` (${scan.geotag_source})`}
@@ -410,7 +410,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
             )}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-700">
+            <span className="text-[10px] px-2 py-0.5 rounded bg-[#0A1322] border border-[#152438]">
               Noise Filter: {scan.noise_filtering_applied ? 'Active' : 'Disabled'}
             </span>
           </div>
@@ -422,28 +422,28 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="text-sm font-extrabold text-slate-100 font-mono uppercase tracking-wider">
+              <h4 className="text-sm font-black text-[#EAEFF5] font-mono uppercase tracking-wider">
                 Acoustic Contact Register
               </h4>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-950 text-cyan-300 border border-slate-800">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#0A1322] text-[#4CD9E8] border border-[#152438]">
                 Model: {scan.model_name || 'YOLOv8n-SIH-Marine-Debris-V2'}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-[#7C8AA0] mt-0.5">
               Hover or click any target row to highlight on the swath canvas
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleExportJson}
-              className="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-slate-300 flex items-center gap-1.5 transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-[#0A1322] hover:bg-[#101D31] border border-[#152438] text-xs font-mono text-[#7C8AA0] hover:text-[#EAEFF5] flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-cyan-400" />
+              <Download className="w-3.5 h-3.5 text-[#4CD9E8]" />
               <span>Export JSON</span>
             </button>
             <button
               onClick={() => setActiveTab('reports')}
-              className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-bold text-xs font-mono flex items-center gap-1.5 transition-all shadow-md active:scale-95"
+              className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#4CD9E8] to-[#3FD98A] hover:brightness-110 text-[#03070E] font-black text-xs font-mono flex items-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>Inspection Report</span>

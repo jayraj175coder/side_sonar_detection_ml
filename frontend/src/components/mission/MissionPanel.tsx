@@ -11,7 +11,7 @@ const StatRow: React.FC<{ label: string; value: string; accent?: string }> = ({ 
   </div>
 );
 
-export const MissionPanel: React.FC = () => {
+export const MissionPanel: React.FC<{ onCollapse?: () => void }> = ({ onCollapse }) => {
   const { playbackTime, missionStatus, missionProgress, selectedTargetId, setSelectedTargetId } = useMission();
   const vessel = interpolateVesselPosition(playbackTime);
   const m = MISSION_DATA;
@@ -20,23 +20,34 @@ export const MissionPanel: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-[#081118] border-r border-[#16303B] overflow-y-auto">
       {/* Mission ID Header */}
-      <div className="px-4 py-3 border-b border-[#16303B] bg-[#03070B]/60">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <Radio className="w-3.5 h-3.5 text-[#32E6D1] animate-pulse" />
-              <span className="text-[11px] font-mono font-black text-[#32E6D1] tracking-widest">MISSION {m.id}</span>
+      <div className="px-3.5 py-3 border-b border-[#16303B] bg-[#03070B]/60">
+        <div className="flex items-center justify-between gap-1">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <Radio className="w-3.5 h-3.5 text-[#32E6D1] animate-pulse shrink-0" />
+              <span className="text-[11px] font-mono font-black text-[#32E6D1] tracking-widest truncate">MISSION {m.id}</span>
             </div>
-            <p className="text-[10px] font-mono text-[#66848D] mt-0.5">{m.region}</p>
+            <p className="text-[10px] font-mono text-[#66848D] mt-0.5 truncate">{m.region}</p>
           </div>
-          <span className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold border ${
-            missionStatus === 'complete' ? 'bg-[#65D391]/10 border-[#65D391]/30 text-[#65D391]' :
-            missionStatus === 'running'  ? 'bg-[#32E6D1]/10 border-[#32E6D1]/30 text-[#32E6D1]' :
-            missionStatus === 'initializing' ? 'bg-[#FFB547]/10 border-[#FFB547]/30 text-[#FFB547]' :
-            'bg-[#16303B]/60 border-[#16303B] text-[#66848D]'
-          }`}>
-            {missionStatus.toUpperCase()}
-          </span>
+          <div className="flex items-center gap-1 shrink-0">
+            <span className={`px-2 py-0.5 rounded-full text-[9px] font-mono font-bold border ${
+              missionStatus === 'complete' ? 'bg-[#65D391]/10 border-[#65D391]/30 text-[#65D391]' :
+              missionStatus === 'running'  ? 'bg-[#32E6D1]/10 border-[#32E6D1]/30 text-[#32E6D1]' :
+              missionStatus === 'initializing' ? 'bg-[#FFB547]/10 border-[#FFB547]/30 text-[#FFB547]' :
+              'bg-[#16303B]/60 border-[#16303B] text-[#66848D]'
+            }`}>
+              {missionStatus.toUpperCase()}
+            </span>
+            {onCollapse && (
+              <button
+                onClick={onCollapse}
+                title="Collapse panel to left"
+                className="p-1 rounded bg-[#0C171E] border border-[#16303B] hover:border-[#32E6D1]/40 text-[#66848D] hover:text-[#32E6D1] transition-colors"
+              >
+                <ChevronRight className="w-3.5 h-3.5 rotate-180" />
+              </button>
+            )}
+          </div>
         </div>
         {/* Progress bar */}
         <div className="mt-2 h-0.5 bg-[#16303B] rounded-full overflow-hidden">

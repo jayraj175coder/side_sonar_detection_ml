@@ -12,6 +12,9 @@ import { DEMO_SCANS, DEMO_STATS } from '../services/demoData';
 interface AppContextType {
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
+  isSidebarCollapsed: boolean;
+  setIsSidebarCollapsed: (collapsed: boolean | ((prev: boolean) => boolean)) => void;
+  toggleSidebar: () => void;
   isDemoMode: boolean;
   setIsDemoMode: (enabled: boolean) => void;
   currentScan: PredictionResponse | null;
@@ -35,6 +38,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
   const [currentScan, setCurrentScan] = useState<PredictionResponse | null>(null);
   const [scans, setScans] = useState<PredictionResponse[]>([]);
@@ -44,6 +48,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const toggleSidebar = useCallback(() => {
+    setIsSidebarCollapsed((prev) => !prev);
+  }, []);
 
   const checkConnectionAndLoad = useCallback(async () => {
     setIsLoading(true);
@@ -141,6 +149,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         activeTab,
         setActiveTab,
+        isSidebarCollapsed,
+        setIsSidebarCollapsed,
+        toggleSidebar,
         isDemoMode,
         setIsDemoMode,
         currentScan,

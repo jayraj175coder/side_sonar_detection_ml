@@ -35,18 +35,27 @@ const RiskBadge: React.FC<{ risk: string }> = ({ risk }) => {
   );
 };
 
-export const TargetIntelPanel: React.FC = () => {
+export const TargetIntelPanel: React.FC<{ onCollapse?: () => void }> = ({ onCollapse }) => {
   const { selectedTargetId, setSelectedTargetId, visibleTargetIds } = useMission();
   const target = selectedTargetId ? getTargetById(selectedTargetId) : null;
 
   if (!target) {
     return (
       <div className="flex flex-col h-full bg-[#081118] border-l border-[#16303B] overflow-y-auto">
-        <div className="px-4 py-3 border-b border-[#16303B] bg-[#03070B]/60">
+        <div className="px-4 py-3 border-b border-[#16303B] bg-[#03070B]/60 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Crosshair className="w-3.5 h-3.5 text-[#66848D]" />
             <span className="text-[11px] font-mono font-black text-[#66848D] tracking-widest">TARGET INTELLIGENCE</span>
           </div>
+          {onCollapse && (
+            <button
+              onClick={onCollapse}
+              title="Collapse panel"
+              className="p-1 rounded bg-[#0C171E] border border-[#16303B] hover:border-[#32E6D1]/40 text-[#66848D] hover:text-[#32E6D1] transition-colors"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4">
@@ -98,7 +107,18 @@ export const TargetIntelPanel: React.FC = () => {
             <Crosshair className="w-3.5 h-3.5 text-[#32E6D1]" />
             <span className="text-[11px] font-mono font-black text-[#32E6D1] tracking-widest">TARGET {target.id}</span>
           </div>
-          <RiskBadge risk={target.risk} />
+          <div className="flex items-center gap-1.5">
+            <RiskBadge risk={target.risk} />
+            {onCollapse && (
+              <button
+                onClick={onCollapse}
+                title="Collapse panel"
+                className="p-1 rounded bg-[#0C171E] border border-[#16303B] hover:border-[#32E6D1]/40 text-[#66848D] hover:text-[#32E6D1] transition-colors"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
         <p className="text-[10px] font-mono text-[#66848D] mt-0.5">{target.class}</p>
       </div>

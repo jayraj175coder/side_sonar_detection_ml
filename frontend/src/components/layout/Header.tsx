@@ -11,6 +11,8 @@ import {
   Cpu,
   Layers,
   ShieldCheck,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -33,14 +35,29 @@ export const Header: React.FC<HeaderProps> = ({
     isLoading,
     currentScan,
     modelInfo,
+    isSidebarCollapsed,
+    toggleSidebar,
   } = useApp();
 
   const isV2 = modelInfo?.version === 'v2' || modelInfo?.name?.includes('Marine-Debris');
 
   return (
     <header className="h-16 md:h-20 bg-[#070D1B]/80 backdrop-blur-2xl border-b border-cyan-500/10 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 shadow-md">
-      {/* Title & Mobile Toggle */}
+      {/* Title & Mobile / Desktop Toggle */}
       <div className="flex items-center gap-3">
+        {/* Desktop Sidebar Toggle Button */}
+        <button
+          onClick={toggleSidebar}
+          className="hidden md:flex p-2 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-400 hover:text-cyan-300 hover:border-cyan-500/40 transition-all active:scale-95"
+          title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar to left'}
+        >
+          {isSidebarCollapsed ? (
+            <PanelLeftOpen className="w-4 h-4 text-cyan-400" />
+          ) : (
+            <PanelLeftClose className="w-4 h-4" />
+          )}
+        </button>
+
         {onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}

@@ -104,42 +104,57 @@ export const OverviewPage: React.FC = () => {
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
           <div className="space-y-4 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono shadow-sm">
-              <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
-              <span>Ministry of Earth Sciences (MoES) — SIH AI Pipeline Active</span>
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <span>SONARX INTELLIGENCE SYSTEM · SX-014</span>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-100 tracking-tight leading-tight">
-              Automated Marine Debris & Ghost Net Perception
-            </h1>
+            <div className="space-y-1">
+              <span className="text-xs font-mono font-black tracking-widest text-[#32E6D1] uppercase">
+                See What Lies Beneath.
+              </span>
+              <h1 className="text-3xl md:text-4xl font-extrabold text-slate-100 tracking-tight leading-tight">
+                AI-Powered Side-Scan Sonar Perception & Seabed Mapping
+              </h1>
+            </div>
 
-            <p className="text-sm text-slate-300 leading-relaxed font-sans">
-              Real-time deep learning detection of abandoned fishing gear (<strong className="text-purple-400">Ghost Nets / ALDFG</strong>), anthropogenic debris, subsea pipelines, and acoustic seafloor anomalies from Side-Scan Sonar (SSS) drone swaths.
+            <p className="text-sm text-slate-300 leading-relaxed font-sans max-w-xl">
+              Autonomous subsea perception system for detecting, classifying, and 3D mapping underwater targets, abandoned gear (<strong className="text-purple-400">Ghost Nets</strong>), pipeline hazards, and acoustic seafloor anomalies.
             </p>
+
+            {/* Technical Metadata Strip */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-[10px] font-mono text-[#66848D]">
+              {['SIDE-SCAN SONAR', 'AI DETECTION', 'TARGET CLASSIFICATION', '3D SEAFLOOR', 'MISSION INTELLIGENCE'].map((tag, idx) => (
+                <span key={tag} className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#081118] border border-[#16303B]">
+                  <span className="w-1 h-1 rounded-full bg-[#32E6D1]" />
+                  {tag}
+                </span>
+              ))}
+            </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
-                onClick={() => setActiveTab('scan')}
-                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 via-teal-400 to-cyan-400 hover:from-cyan-400 hover:to-teal-300 text-slate-950 font-extrabold font-mono text-xs flex items-center gap-2 shadow-xl shadow-cyan-500/30 transition-all hover:scale-[1.03] active:scale-[0.98]"
+                onClick={() => setActiveTab('mission')}
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#32E6D1] via-[#29B6F6] to-[#32E6D1] hover:brightness-110 text-slate-950 font-extrabold font-mono text-xs flex items-center gap-2 shadow-xl shadow-[#32E6D1]/20 transition-all hover:scale-[1.03] active:scale-[0.98]"
               >
-                <ScanLine className="w-4 h-4" />
-                <span>Upload Drone Sonar Swath</span>
+                <Crosshair className="w-4 h-4" />
+                <span>LAUNCH MISSION CONTROL</span>
                 <ArrowRight className="w-3.5 h-3.5 ml-1" />
               </button>
 
               <button
-                onClick={() => setActiveTab('map')}
+                onClick={() => setActiveTab('sonar')}
                 className="px-4 py-3 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 font-mono text-xs flex items-center gap-2 transition-all hover:border-cyan-500/40"
               >
                 <Radio className="w-4 h-4 text-cyan-400" />
-                <span>Geospatial Sonar Map</span>
+                <span>Sonar Viewer</span>
               </button>
 
               <button
-                onClick={() => setActiveTab('model')}
+                onClick={() => setActiveTab('scan')}
                 className="px-4 py-3 rounded-2xl bg-slate-950/80 hover:bg-slate-900 border border-cyan-500/30 text-cyan-300 font-mono text-xs flex items-center gap-2 transition-all"
               >
-                <Layers className="w-4 h-4 text-cyan-400" />
-                <span>Model Architecture Intel</span>
+                <ScanLine className="w-4 h-4 text-cyan-400" />
+                <span>Upload Sonar Swath</span>
               </button>
             </div>
           </div>
@@ -162,6 +177,43 @@ export const OverviewPage: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Core Workflow Visual Pipeline Strip */}
+      <div className="p-4 rounded-2xl glass-panel border border-[#16303B] bg-[#081118]/80 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-mono font-black uppercase tracking-widest text-[#32E6D1] flex items-center gap-1.5">
+            <Zap className="w-3 h-3 text-[#32E6D1]" />
+            End-to-End SonarX Intelligence Workflow
+          </span>
+          <span className="text-[9px] font-mono text-[#66848D]">Autonomous Pipeline · 10.2 ms / frame</span>
+        </div>
+        <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[9px] font-mono text-[#66848D] scrollbar-none">
+          {[
+            { step: '01', name: 'SONAR INGESTION', color: '#29B6F6' },
+            { step: '02', name: 'PREPROCESSING', color: '#29B6F6' },
+            { step: '03', name: 'NOISE REDUCTION', color: '#32E6D1' },
+            { step: '04', name: 'ENHANCEMENT', color: '#32E6D1' },
+            { step: '05', name: 'AI DETECTION', color: '#FFB547' },
+            { step: '06', name: 'CLASSIFICATION', color: '#FFB547' },
+            { step: '07', name: 'SHADOW ANALYSIS', color: '#A855F7' },
+            { step: '08', name: 'CONFIDENCE SCORING', color: '#A855F7' },
+            { step: '09', name: 'GEOREFERENCING', color: '#65D391' },
+            { step: '10', name: '3D SEAFLOOR', color: '#65D391' },
+            { step: '11', name: 'MISSION INTEL', color: '#32E6D1' },
+            { step: '12', name: 'REPORT', color: '#32E6D1' },
+          ].map((item, idx, arr) => (
+            <React.Fragment key={item.step}>
+              <div className="flex items-center gap-1 px-2 py-1 rounded bg-[#0C171E] border border-[#16303B] shrink-0 hover:border-[#32E6D1]/40 transition-colors">
+                <span className="text-[8px] font-bold" style={{ color: item.color }}>{item.step}</span>
+                <span className="text-[#E4F2F5] font-semibold">{item.name}</span>
+              </div>
+              {idx < arr.length - 1 && (
+                <span className="text-[#16303B] shrink-0 font-bold">→</span>
+              )}
+            </React.Fragment>
+          ))}
         </div>
       </div>
 

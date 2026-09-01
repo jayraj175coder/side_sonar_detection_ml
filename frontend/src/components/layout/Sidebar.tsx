@@ -11,9 +11,14 @@ import {
   AlertTriangle,
   Server,
   X,
+  Crosshair,
+  Eye,
+  BarChart2,
+  Zap,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { TabType } from '../../types';
+
 
 interface SidebarProps {
   isMobileOpen?: boolean;
@@ -32,6 +37,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
     isDemoMode,
     modelInfo,
   } = useApp();
+
+  const missionNavItems: {
+    id: TabType;
+    label: string;
+    icon: React.ComponentType<any>;
+    badge?: string;
+  }[] = [
+    { id: 'mission',   label: 'Mission Control', icon: Crosshair, badge: 'SX-014' },
+    { id: 'sonar',     label: 'Sonar Viewer',    icon: Eye },
+    { id: 'analytics', label: 'Analytics',        icon: BarChart2 },
+  ];
 
   const navItems: {
     id: TabType;
@@ -101,7 +117,55 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Navigation Items */}
-          <nav className="p-3 space-y-1.5">
+          <nav className="p-3 space-y-0.5">
+            {/* Mission Intel Section */}
+            <div className="px-3 py-2">
+              <span className="text-[8px] font-mono font-black uppercase tracking-widest text-[#32E6D1]/60 flex items-center gap-1.5">
+                <Zap className="w-2.5 h-2.5" />
+                Mission Intel
+              </span>
+            </div>
+            {missionNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleSelectTab(item.id)}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-mono font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-[#32E6D1]/20 to-[#29B6F6]/10 text-[#32E6D1] border border-[#32E6D1]/40 shadow-lg shadow-cyan-950/40 font-bold'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 transition-transform ${isActive ? 'text-[#32E6D1] scale-110' : 'text-slate-500'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.badge && (
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                      item.badge === 'SX-014'
+                        ? 'bg-[#32E6D1]/20 text-[#32E6D1] border border-[#32E6D1]/30'
+                        : 'bg-cyan-400 text-slate-950'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+
+            {/* Divider */}
+            <div className="px-3 py-2 mt-1">
+              <div className="h-px bg-[#16303B]/60" />
+            </div>
+            <div className="px-3 pb-1">
+              <span className="text-[8px] font-mono font-black uppercase tracking-widest text-slate-500/60">
+                Data Tools
+              </span>
+            </div>
+
+            {/* Standard nav items */}
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;

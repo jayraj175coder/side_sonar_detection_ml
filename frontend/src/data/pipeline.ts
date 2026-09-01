@@ -1,0 +1,86 @@
+import type { PipelineStage } from '../types';
+
+export const PIPELINE_STAGES: PipelineStage[] = [
+  {
+    id: 1,
+    name: 'Sonar Ingestion',
+    code: 'XTF-DECODE',
+    description: 'XTF binary stream decoded from AUV telemetry',
+    duration_ms: 310,
+    output: '2,048 pings extracted · 16-bit amplitude',
+  },
+  {
+    id: 2,
+    name: 'Signal Preprocessing',
+    code: 'PREPROC',
+    description: 'Time-varied gain (TVG) applied and slant-range corrected',
+    duration_ms: 420,
+    output: 'TVG correction complete · Range normalized',
+  },
+  {
+    id: 3,
+    name: 'Noise Reduction',
+    code: 'NOISE-FILT',
+    description: 'Adaptive threshold speckle filter removes acoustic interference',
+    duration_ms: 580,
+    output: 'Noise correction complete · SNR: +14.2 dB',
+  },
+  {
+    id: 4,
+    name: 'Waterfall Generation',
+    code: 'WTRFALL-GEN',
+    description: '16-bit amplitude map rendered as sonar waterfall tiles',
+    duration_ms: 240,
+    output: '800 × 600 px tile generated per ping block',
+  },
+  {
+    id: 5,
+    name: 'AI Detection',
+    code: 'YOLO-INFER',
+    description: 'YOLOv8n ONNX model runs over sonar waterfall tiles',
+    duration_ms: 10.2,
+    output: '17 anomalies detected · avg 10.2 ms / frame',
+  },
+  {
+    id: 6,
+    name: 'Segmentation',
+    code: 'SEG-MASK',
+    description: 'Instance segmentation masks isolate each detected object',
+    duration_ms: 8.7,
+    output: '17 masks generated · instance boundaries locked',
+  },
+  {
+    id: 7,
+    name: 'Shadow Analysis',
+    code: 'SHADOW-ANL',
+    description: 'Acoustic shadow geometry extracted to estimate object height',
+    duration_ms: 34,
+    output: 'Shadow ratios computed for 17 objects',
+  },
+  {
+    id: 8,
+    name: 'Classification',
+    code: 'CLASSIFY',
+    description: 'Targets classified: Mine-like / Wreck / Rock / Debris / Pipeline / Unknown',
+    duration_ms: 12,
+    output: '4 priority targets · 5 classes identified',
+  },
+  {
+    id: 9,
+    name: 'Georeferencing',
+    code: 'GEOREF',
+    description: 'Detection pixel positions projected to WGS-84 coordinates via USBL fix',
+    duration_ms: 45,
+    output: 'All 17 targets georeferenced · ±0.8 m accuracy',
+  },
+  {
+    id: 10,
+    name: 'Mission Intelligence',
+    code: 'INTEL-GEN',
+    description: 'Evidence report generated · anomaly risk scores computed',
+    duration_ms: 180,
+    output: 'Mission SX-014 report ready · 4 CRITICAL alerts',
+  },
+];
+
+export const TOTAL_PIPELINE_MS = PIPELINE_STAGES.reduce((acc, s) => acc + s.duration_ms, 0);

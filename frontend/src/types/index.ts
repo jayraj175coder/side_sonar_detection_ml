@@ -156,4 +156,112 @@ export interface DatasetCatalogResponse {
   datasets: Record<string, DatasetItem>;
 }
 
-export type TabType = 'overview' | 'scan' | 'history' | 'map' | 'reports' | 'model';
+export type TabType = 'overview' | 'scan' | 'history' | 'map' | 'reports' | 'model' | 'mission' | 'sonar' | 'analytics';
+
+/* ─── Mission Intelligence Types ─────────────────────────── */
+
+export type RiskLevel = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+
+export interface TargetEvidence {
+  objectShape: number;
+  acousticIntensity: number;
+  shadowGeometry: number;
+  seabedContrast: number;
+  dimensionalSimilarity: number;
+  backscatterPattern: number;
+}
+
+export interface MissionTarget {
+  id: string;
+  class: string;
+  classCode: string;
+  confidence: number;
+  depth: number;
+  length: number;
+  width: number;
+  shadowLength: number;
+  orientation: number;
+  slantRange: number;
+  lat: number;
+  lon: number;
+  risk: RiskLevel;
+  pingTime: number;
+  color: string;
+  evidence: TargetEvidence;
+  detectionEvidence: string[];
+}
+
+export interface TrackPoint {
+  lat: number;
+  lon: number;
+  timeSeconds: number;
+  depth: number;
+  heading: number;
+  speed: number;
+}
+
+export interface MissionData {
+  id: string;
+  name: string;
+  region: string;
+  vessel: string;
+  operator: string;
+  status: string;
+  startTime: string;
+  endTime: string;
+  duration: string;
+  surveyedArea: number;
+  trackLength: number;
+  avgDepth: number;
+  coveragePercent: number;
+  frequency: string;
+  swathWidth: number;
+  altimeter: number;
+  pingRate: number;
+  totalPings: number;
+  sonarModel: string;
+  track: TrackPoint[];
+  polygon: [number, number][];
+}
+
+export interface PipelineStage {
+  id: number;
+  name: string;
+  code: string;
+  description: string;
+  duration_ms: number;
+  output: string;
+}
+
+export interface AnalyticsDataPoint {
+  time: string;
+  detections: number;
+  cumulative: number;
+}
+
+export interface ClassDistributionItem {
+  name: string;
+  count: number;
+  color: string;
+}
+
+export interface AnalyticsData {
+  missionId: string;
+  surveyedArea: number;
+  duration: string;
+  trackLength: number;
+  totalTargets: number;
+  priorityTargets: number;
+  avgDepth: number;
+  coverage: number;
+  detectionsOverTime: AnalyticsDataPoint[];
+  confidenceDistribution: { range: string; count: number }[];
+  classDistribution: ClassDistributionItem[];
+  depthDistribution: { range: string; count: number }[];
+  coverageOverTime: { time: string; coverage: number }[];
+  sonarIntensity: { segment: string; intensity: number }[];
+}
+
+export type MissionStatus = 'idle' | 'initializing' | 'running' | 'complete';
+export type PlaybackSpeed = 1 | 2 | 4;
+

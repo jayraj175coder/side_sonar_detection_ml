@@ -3,34 +3,40 @@
 
 @layer base {
   :root {
-    --bg-abyss: #030712;
-    --bg-trench: #060D1E;
-    --bg-shelf: #0B1733;
-    --bg-surface: #0E1D3E;
-    --bg-panel: rgba(10, 20, 44, 0.75);
+    --bg-abyss: #03070B;
+    --bg-surface: #081118;
+    --bg-surface-2: #0C171E;
+    --border-subsea: #16303B;
+    --border-subsea-glow: rgba(50, 230, 209, 0.4);
     
-    --border-subsea: rgba(6, 182, 212, 0.18);
-    --border-subsea-glow: rgba(6, 182, 212, 0.45);
+    --text-primary: #E4F2F5;
+    --text-muted: #66848D;
     
-    --accent-cyan: #06B6D4;
+    --sonar-cyan: #32E6D1;
+    --acoustic-blue: #29B6F6;
+    --warning: #FFB547;
+    --critical: #FF5D5D;
+    --success: #65D391;
+    
+    --accent-cyan: #32E6D1;
     --accent-teal: #14B8A6;
-    --accent-amber: #F59E0B;
+    --accent-amber: #FFB547;
     --accent-purple: #A855F7;
-    --accent-blue: #3B82F6;
+    --accent-blue: #29B6F6;
     
     /* Semantic Detection Colors */
     --color-ghost-net: #A855F7;
-    --color-debris: #F59E0B;
-    --color-pipeline: #3B82F6;
-    --color-anomaly: #06B6D4;
-    --color-milco: #EF4444;
-    --color-nombo: #06B6D4;
+    --color-debris: #FFB547;
+    --color-pipeline: #29B6F6;
+    --color-anomaly: #32E6D1;
+    --color-milco: #FF5D5D;
+    --color-nombo: #32E6D1;
   }
 
   body {
-    background: radial-gradient(circle at 50% 0%, #0D1E42 0%, #050A18 50%, #02050E 100%);
-    background-color: #02050E;
-    color: #F8FAFC;
+    background: radial-gradient(circle at 50% 0%, #0C171E 0%, #081118 40%, #03070B 100%);
+    background-color: #03070B;
+    color: #E4F2F5;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
@@ -41,6 +47,27 @@
     font-family: 'JetBrains Mono', monospace;
   }
 }
+
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #0C171E;
+  border: 1px solid #16303B;
+  color: #66848D;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+.toolbar-btn:hover {
+  color: #32E6D1;
+  border-color: rgba(50, 230, 209, 0.4);
+  background-color: rgba(50, 230, 209, 0.05);
+}
+
 
 /* Background Acoustic Grid Pattern */
 .bg-acoustic-grid {

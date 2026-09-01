@@ -50,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     badge?: string;
   }[] = [
     { id: 'mission',   label: 'Mission Control', icon: Crosshair, badge: 'SX-014' },
-    { id: 'sonar',     label: 'Sonar Viewer',    icon: Eye },
+    { id: 'sonar',     label: 'Debris Intel',    icon: Eye,       badge: 'NODE-04' },
     { id: 'analytics', label: 'Analytics',        icon: BarChart2 },
   ];
 

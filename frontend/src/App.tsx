@@ -30,7 +30,7 @@ export const App: React.FC = () => {
       case 'reports':   return { title: 'Acoustic Inspection Reports', subtitle: 'Formal MoES environmental survey reports and data export' };
       case 'model':     return { title: 'Neural Model Specifications', subtitle: 'YOLOv8n ONNX architecture and empirical validation benchmarks' };
       case 'mission':   return { title: 'Mission Control',             subtitle: 'SX-014 · Arabian Sea Survey · Live Intelligence Workstation' };
-      case 'sonar':     return { title: 'Sonar Viewer',                subtitle: 'Interactive side-scan sonar image with detection overlay' };
+      case 'sonar':     return { title: 'Marine Debris Intelligence Node', subtitle: 'Lagrangian drift forecast, particle dispersion & vessel attribution matching' };
       case 'analytics': return { title: 'Mission Analytics',           subtitle: 'SX-014 · Survey statistics, detection metrics & coverage analysis' };
       default:          return { title: 'SONARX',                      subtitle: 'AI-Powered Side-Scan Sonar Intelligence' };
     }

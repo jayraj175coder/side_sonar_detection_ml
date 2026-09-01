@@ -1,0 +1,358 @@
+export interface MarineDebrisScenario {
+  id: string;
+  name: string;
+  region: string;
+  coordinates: string;
+  lat: number;
+  lon: number;
+  depthM: number;
+  swathWidthM: number;
+  frequencyKhz: number;
+  category: 'Ghost Net' | 'Industrial Debris' | 'Unexploded Ordnance' | 'Historic Wreck' | 'Lost Container';
+  threatLevel: 'CRITICAL' | 'HIGH' | 'MODERATE' | 'LOW';
+  primaryTargetId: string;
+  summary: string;
+  ecologicalImpact: string;
+  degradationTimeline: string;
+  ecosystemVulnerabilityScore: number; // 0-100
+  acousticFeatures: {
+    targetStrengthDb: number;
+    shadowLengthM: number;
+    calculatedHeightM: number;
+    specularPeakSnr: number;
+    substrateType: string;
+  };
+  targets: {
+    id: string;
+    class: string;
+    classCode: string;
+    confidence: number;
+    acrossTrackM: number;
+    slantRangeM: number;
+    bearingDeg: number;
+    lengthM: number;
+    widthM: number;
+    shadowM: number;
+    heightM: number;
+    color: string;
+    description: string;
+  }[];
+}
+
+export const MARINE_SCENARIOS: MarineDebrisScenario[] = [
+  {
+    id: 'gom-coral-net',
+    name: 'Gulf of Mannar Coral Biosphere',
+    region: 'Gulf of Mannar Marine National Park, Tamil Nadu',
+    coordinates: '09°08′12″ N, 79°12′44″ E',
+    lat: 9.1367,
+    lon: 79.2122,
+    depthM: 22.4,
+    swathWidthM: 75,
+    frequencyKhz: 900,
+    category: 'Ghost Net',
+    threatLevel: 'CRITICAL',
+    primaryTargetId: 'GOM-NET-01',
+    summary: 'High-density nylon monofilament gillnet snagged across Porites coral reef shelf. Actively trapping benthic organisms with continuous ghost fishing cycle.',
+    ecologicalImpact: 'Severe coral smothering, entanglement risk to endangered Dugong dugon and Green Sea Turtles (Chelonia mydas). 600+ year synthetic polymer persistence.',
+    degradationTimeline: '600–800 Years (Polyamide / Nylon-66 monofilament)',
+    ecosystemVulnerabilityScore: 94,
+    acousticFeatures: {
+      targetStrengthDb: -14.8,
+      shadowLengthM: 3.42,
+      calculatedHeightM: 1.18,
+      specularPeakSnr: 18.6,
+      substrateType: 'Biogenic Coral Silt & Rubble',
+    },
+    targets: [
+      {
+        id: 'GOM-NET-01',
+        class: 'Ghost Fishing Net',
+        classCode: 'NET',
+        confidence: 0.948,
+        acrossTrackM: -16.4,
+        slantRangeM: 24.2,
+        bearingDeg: 282,
+        lengthM: 14.8,
+        widthM: 4.2,
+        shadowM: 3.42,
+        heightM: 1.18,
+        color: '#A855F7',
+        description: 'Large monofilament netting bundle snagged on reef crest with floating header rope signature',
+      },
+      {
+        id: 'GOM-CORAL-02',
+        class: 'Coral Head / Reef Outcrop',
+        classCode: 'CORAL',
+        confidence: 0.892,
+        acrossTrackM: 18.2,
+        slantRangeM: 26.1,
+        bearingDeg: 78,
+        lengthM: 5.6,
+        widthM: 4.8,
+        shadowM: 2.1,
+        heightM: 0.85,
+        color: '#3FD98A',
+        description: 'Porites lutea massive coral dome with natural rough acoustic texture',
+      },
+      {
+        id: 'GOM-LINE-03',
+        class: 'Longline Snag',
+        classCode: 'DEB',
+        confidence: 0.784,
+        acrossTrackM: -28.5,
+        slantRangeM: 34.2,
+        bearingDeg: 260,
+        lengthM: 8.4,
+        widthM: 0.4,
+        shadowM: 1.2,
+        heightM: 0.35,
+        color: '#F5A623',
+        description: 'High-tensile longline with lead sinker cluster embedded in sandy substrate',
+      },
+    ],
+  },
+  {
+    id: 'mumbai-pipeline',
+    name: 'Mumbai High Offshore Oil Corridor',
+    region: 'Arabian Sea, Mumbai Offshore Basin',
+    coordinates: '19°22′45″ N, 71°21′18″ E',
+    lat: 19.3792,
+    lon: 71.3550,
+    depthM: 43.1,
+    swathWidthM: 75,
+    frequencyKhz: 900,
+    category: 'Industrial Debris',
+    threatLevel: 'HIGH',
+    primaryTargetId: 'MUM-PIPE-01',
+    summary: 'Subsea crude transmission pipeline segment intersecting discarded drilling casing, heavy steel wire ropes, and anchor drag scours.',
+    ecologicalImpact: 'Physical abrasion to seafloor substrate, obstruction to subsea ROV maintenance corridors, potential pipeline jacket coating damage.',
+    degradationTimeline: '70–120 Years (Structural Carbon Steel)',
+    ecosystemVulnerabilityScore: 82,
+    acousticFeatures: {
+      targetStrengthDb: -12.4,
+      shadowLengthM: 2.31,
+      calculatedHeightM: 0.82,
+      specularPeakSnr: 22.4,
+      substrateType: 'Dense Marine Clay & Silt',
+    },
+    targets: [
+      {
+        id: 'MUM-PIPE-01',
+        class: 'Subsea Pipeline Conduit',
+        classCode: 'PIP',
+        confidence: 0.962,
+        acrossTrackM: -18.4,
+        slantRangeM: 26.8,
+        bearingDeg: 284,
+        lengthM: 31.4,
+        widthM: 0.71,
+        shadowM: 2.31,
+        heightM: 0.82,
+        color: '#29B6F6',
+        description: '28-inch hydrocarbon transfer pipeline with continuous acoustic shadow trace',
+      },
+      {
+        id: 'MUM-STEEL-02',
+        class: 'Drill Collar Debris',
+        classCode: 'DEB',
+        confidence: 0.884,
+        acrossTrackM: 21.6,
+        slantRangeM: 29.4,
+        bearingDeg: 82,
+        lengthM: 4.8,
+        widthM: 0.45,
+        shadowM: 1.8,
+        heightM: 0.65,
+        color: '#F5A623',
+        description: 'Abandoned rotary drill collar with high specular cylindrical return',
+      },
+      {
+        id: 'MUM-CABLE-03',
+        class: 'Steel Wire Rope Cluster',
+        classCode: 'DEB',
+        confidence: 0.792,
+        acrossTrackM: 32.1,
+        slantRangeM: 38.5,
+        bearingDeg: 94,
+        lengthM: 9.2,
+        widthM: 1.8,
+        shadowM: 1.4,
+        heightM: 0.4,
+        color: '#F5A623',
+        description: 'Coiled heavy mooring wire rope with localized seabed scouring plume',
+      },
+    ],
+  },
+  {
+    id: 'vizag-ordnance',
+    name: 'Visakhapatnam Deep Harbor Anchorage',
+    region: 'Bay of Bengal, Eastern Naval Command Sector',
+    coordinates: '17°41′10″ N, 83°17′30″ E',
+    lat: 17.6861,
+    lon: 83.2917,
+    depthM: 38.4,
+    swathWidthM: 75,
+    frequencyKhz: 900,
+    category: 'Unexploded Ordnance',
+    threatLevel: 'CRITICAL',
+    primaryTargetId: 'VZG-MLO-01',
+    summary: 'Moored spherical metallic contact with high target strength and prominent acoustic shadow consistent with legacy naval ordnance / bottom mine.',
+    ecologicalImpact: 'High-risk explosive hazard in commercial navigation channel. Immediate hydrographic warning notice required.',
+    degradationTimeline: 'Indefinite / Active Chemical Threat',
+    ecosystemVulnerabilityScore: 98,
+    acousticFeatures: {
+      targetStrengthDb: -8.2,
+      shadowLengthM: 2.84,
+      calculatedHeightM: 0.94,
+      specularPeakSnr: 26.1,
+      substrateType: 'Fine Quartz Sand & Mud',
+    },
+    targets: [
+      {
+        id: 'VZG-MLO-01',
+        class: 'Mine-Like Object (MLO)',
+        classCode: 'MLO',
+        confidence: 0.934,
+        acrossTrackM: 14.8,
+        slantRangeM: 21.2,
+        bearingDeg: 72,
+        lengthM: 1.84,
+        widthM: 0.88,
+        shadowM: 2.84,
+        heightM: 0.94,
+        color: '#F04438',
+        description: 'Symmetric spherical metallic body with acoustic standoff shadow indicating mooring elevation',
+      },
+      {
+        id: 'VZG-ANCHOR-02',
+        class: 'Lost Admiralty Anchor',
+        classCode: 'DEB',
+        confidence: 0.865,
+        acrossTrackM: -22.4,
+        slantRangeM: 28.1,
+        bearingDeg: 275,
+        lengthM: 3.2,
+        widthM: 2.1,
+        shadowM: 2.2,
+        heightM: 0.78,
+        color: '#F5A623',
+        description: 'Fluke and shank acoustic signature embedded 0.4m in sand bank',
+      },
+    ],
+  },
+  {
+    id: 'palk-wreck',
+    name: 'Palk Strait Shallow Channel',
+    region: 'Palk Strait, Gulf of Mannar Northern Approach',
+    coordinates: '09°42′18″ N, 79°18′50″ E',
+    lat: 9.7050,
+    lon: 79.3139,
+    depthM: 16.8,
+    swathWidthM: 75,
+    frequencyKhz: 900,
+    category: 'Historic Wreck',
+    threatLevel: 'MODERATE',
+    primaryTargetId: 'PLK-WRK-01',
+    summary: 'Partially buried wooden hull shipwreck dating circa 1960 with scattered cargo framing, discarded net ballast, and ceramic debris field.',
+    ecologicalImpact: 'Artificial reef habitat colonization, local trawler snag zone, microplastic entrapment within structural hull cavities.',
+    degradationTimeline: '150–200 Years (Hardwood & Brass Framing)',
+    ecosystemVulnerabilityScore: 68,
+    acousticFeatures: {
+      targetStrengthDb: -6.4,
+      shadowLengthM: 8.64,
+      calculatedHeightM: 2.45,
+      specularPeakSnr: 21.8,
+      substrateType: 'Coarse Sand & Shell Hash',
+    },
+    targets: [
+      {
+        id: 'PLK-WRK-01',
+        class: 'Wooden Vessel Wreck',
+        classCode: 'WRK',
+        confidence: 0.928,
+        acrossTrackM: -24.6,
+        slantRangeM: 31.4,
+        bearingDeg: 268,
+        lengthM: 18.4,
+        widthM: 5.8,
+        shadowM: 8.64,
+        heightM: 2.45,
+        color: '#F5A623',
+        description: 'Intact keel line with collapsed deck beams casting multi-tier shadow across 9m swath',
+      },
+      {
+        id: 'PLK-DEB-02',
+        class: 'Dispersed Cargo Ballast',
+        classCode: 'DEB',
+        confidence: 0.812,
+        acrossTrackM: 16.2,
+        slantRangeM: 22.8,
+        bearingDeg: 68,
+        lengthM: 6.4,
+        widthM: 3.2,
+        shadowM: 1.6,
+        heightM: 0.52,
+        color: '#4CD9E8',
+        description: 'Cluster of acoustic anomalies aligned with prevailing tidal scour axis',
+      },
+    ],
+  },
+  {
+    id: 'goa-container',
+    name: 'Goa Coastal Shipping Fairway',
+    region: 'Arabian Sea, Mormugao Port Outer Anchorage',
+    coordinates: '15°24′33″ N, 73°45′12″ E',
+    lat: 15.4092,
+    lon: 73.7533,
+    depthM: 31.2,
+    swathWidthM: 75,
+    frequencyKhz: 900,
+    category: 'Lost Container',
+    threatLevel: 'HIGH',
+    primaryTargetId: 'GOA-BOX-01',
+    summary: 'Standard ISO 20-foot shipping container dislodged during monsoon transit, resting upside down with deformed roof corner and polymer cargo leakage.',
+    ecologicalImpact: 'Physical obstacle to deep-draft bulk carriers, concentrated release of synthetic packaging polymers into marine food web.',
+    degradationTimeline: '200–300 Years (Weathering Corten Steel & Plastics)',
+    ecosystemVulnerabilityScore: 88,
+    acousticFeatures: {
+      targetStrengthDb: -4.2,
+      shadowLengthM: 5.12,
+      calculatedHeightM: 1.84,
+      specularPeakSnr: 28.4,
+      substrateType: 'Soft Marine Mud & Silt',
+    },
+    targets: [
+      {
+        id: 'GOA-BOX-01',
+        class: 'Intermodal Cargo Container',
+        classCode: 'BOX',
+        confidence: 0.956,
+        acrossTrackM: 19.4,
+        slantRangeM: 27.2,
+        bearingDeg: 76,
+        lengthM: 6.1,
+        widthM: 2.44,
+        shadowM: 5.12,
+        heightM: 1.84,
+        color: '#4CD9E8',
+        description: 'Sharp 90-degree corner reflector with rectangular acoustic shadow matching ISO 20ft spec',
+      },
+      {
+        id: 'GOA-POLY-02',
+        class: 'Synthetic Polymer Debris Cluster',
+        classCode: 'DEB',
+        confidence: 0.835,
+        acrossTrackM: -14.8,
+        slantRangeM: 21.6,
+        bearingDeg: 280,
+        lengthM: 8.2,
+        widthM: 3.6,
+        shadowM: 1.4,
+        heightM: 0.45,
+        color: '#A855F7',
+        description: 'Dispersed low-density plastic tarpaulins and packaging wrapping trailing down-current',
+      },
+    ],
+  },
+];

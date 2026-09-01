@@ -11,6 +11,15 @@
     --surface-panel-border: #1B2330;
     --surface-panel-border-glow: rgba(76, 217, 232, 0.35);
 
+    /* Operational Theme Tokens (Option A: Live Operations vs Forensic Attribution) */
+    --signal-live: #4CD9E8;             /* Cyan: Real-time AUV telemetry & Live Sonar */
+    --signal-live-dim: rgba(76, 217, 232, 0.25);
+    --signal-forensic: #57FFA8;         /* Phosphor Green: Post-event Debris Attribution & Forensic Intel */
+    --signal-forensic-dim: rgba(87, 255, 168, 0.25);
+    --surface-forensic-bg: #04080B;
+    --surface-forensic-panel: #060B0E;
+    --surface-forensic-border: #14231E;
+
     /* Single Signal Phosphor Identity (Cold Cyan #4CD9E8) */
     --signal-primary: #4CD9E8;
     --signal-primary-dim: rgba(76, 217, 232, 0.25);

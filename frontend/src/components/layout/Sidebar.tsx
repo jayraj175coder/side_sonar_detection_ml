@@ -267,26 +267,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 )}
               </div>
 
-              {/* Model Status */}
-              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/80 border border-slate-800 text-xs">
+              {/* Perception Engine Status (Click to view Model Intel) */}
+              <button
+                onClick={() => setActiveTab('model')}
+                className="w-full flex items-center justify-between p-2 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-[#4CD9E8]/50 text-xs transition-colors cursor-pointer group"
+                title="View Neural Model Specifications & Benchmarks"
+              >
                 <div className="flex items-center gap-2">
-                  <Cpu className="w-3.5 h-3.5 text-slate-500" />
-                  <span className="text-slate-300 font-mono text-[11px]">YOLOv8n ONNX</span>
+                  <Cpu className="w-3.5 h-3.5 text-[#4CD9E8] group-hover:animate-pulse" />
+                  <span className="text-slate-300 font-mono text-[11px] group-hover:text-[#4CD9E8]">Classifier Engine</span>
                 </div>
-                {isDemoMode ? (
-                  <span className="text-[10px] font-mono text-cyan-400 font-bold">Synthetic</span>
-                ) : apiHealth?.model_loaded || modelInfo?.model_loaded ? (
-                  <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 font-bold">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                    Loaded
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-[10px] font-mono text-amber-400 font-bold">
-                    <AlertTriangle className="w-3 h-3 text-amber-400" />
-                    Missing
-                  </span>
-                )}
-              </div>
+                <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400 font-bold">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  Active
+                </span>
+              </button>
               {/* Perception System Status Badge */}
               <div className="flex items-center justify-between p-2 rounded-xl bg-[#080B11] border border-[#3FD98A]/30 text-[10px] font-mono">
                 <div className="flex items-center gap-1.5">

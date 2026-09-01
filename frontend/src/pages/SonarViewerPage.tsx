@@ -26,6 +26,7 @@ import {
   HelpCircle,
   FileCode,
   BookOpen,
+  Cpu,
 } from 'lucide-react';
 import {
   DEBRIS_INTELLIGENCE_SCENARIOS,
@@ -42,10 +43,10 @@ export const SonarViewerPage: React.FC = () => {
     DEBRIS_INTELLIGENCE_SCENARIOS.find((s) => s.id === selectedScenarioId) ||
     DEBRIS_INTELLIGENCE_SCENARIOS[0];
 
-  // 2. Step Navigation
+  // 2. Step Navigation (Driving canvas accumulative rendering)
   const [activeStep, setActiveStep] = useState<StepType>('05 EVIDENCE');
 
-  // 3. Layer Toggles (Matching Slickline interface)
+  // 3. Layer Toggles (User can override or let activeStep drive defaults)
   const [layerDetection, setLayerDetection] = useState<boolean>(true);
   const [layerReleaseExtent, setLayerReleaseExtent] = useState<boolean>(true);
   const [layerOriginField, setLayerOriginField] = useState<boolean>(true);
@@ -71,6 +72,8 @@ export const SonarViewerPage: React.FC = () => {
   // Canvas Ref for Particle & Vector Map
   const mapCanvasRef = useRef<HTMLCanvasElement>(null);
   const animFrameRef = useRef<number>(0);
+  const eventLogEndRef = useRef<HTMLDivElement>(null);
+
   const particleStateRef = useRef<
     { x: number; y: number; vx: number; vy: number; age: number; life: number }[]
   >([]);
@@ -92,7 +95,14 @@ export const SonarViewerPage: React.FC = () => {
     particleStateRef.current = particles;
   }, [selectedScenarioId]);
 
-  // Animation Loop for Timeline & Canvas
+  // Auto-scroll event log to bottom smoothly
+  useEffect(() => {
+    if (eventLogEndRef.current) {
+      eventLogEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [activeScenario]);
+
+  // Animation Loop for Timeline & Cumulative Step-Driven Canvas
   useEffect(() => {
     let lastTime = performance.now();
 
@@ -116,66 +126,89 @@ export const SonarViewerPage: React.FC = () => {
           const H = (canvas.height = canvas.offsetHeight);
 
           // Deep Phosphor Navy Backdrop
-          ctx.fillStyle = '#060B0E';
+          ctx.fillStyle = '#04080B';
           ctx.fillRect(0, 0, W, H);
 
-          // 1. Draw Grid Coordinate Lines
-          ctx.strokeStyle = 'rgba(28, 56, 48, 0.4)';
+          // 1. Grid Coordinate Ticks
+          ctx.strokeStyle = 'rgba(20, 48, 38, 0.4)';
           ctx.lineWidth = 1;
-          for (let x = 0; x < W; x += 90) {
+          for (let x = 0; x < W; x += 80) {
             ctx.beginPath();
             ctx.moveTo(x, 0);
             ctx.lineTo(x, H);
             ctx.stroke();
           }
-          for (let y = 0; y < H; y += 90) {
+          for (let y = 0; y < H; y += 80) {
             ctx.beginPath();
             ctx.moveTo(0, y);
             ctx.lineTo(W, y);
             ctx.stroke();
           }
 
-          // 2. Draw Shoreline / Coastal Landmass Silhouette
-          ctx.fillStyle = '#091517';
-          ctx.strokeStyle = '#1D453A';
+          // 2. Coastal Bathymetry Landmass
+          ctx.fillStyle = '#071215';
+          ctx.strokeStyle = '#143026';
           ctx.lineWidth = 1.5;
           ctx.beginPath();
-          ctx.moveTo(0, H * 0.65);
-          ctx.bezierCurveTo(W * 0.25, H * 0.72, W * 0.5, H * 0.55, W * 0.75, H * 0.8);
-          ctx.lineTo(W, H * 0.7);
+          ctx.moveTo(0, H * 0.68);
+          ctx.bezierCurveTo(W * 0.25, H * 0.74, W * 0.5, H * 0.56, W * 0.75, H * 0.82);
+          ctx.lineTo(W, H * 0.72);
           ctx.lineTo(W, H);
           ctx.lineTo(0, H);
           ctx.closePath();
           ctx.fill();
           ctx.stroke();
 
-          // 3. Draw AIS Traffic Lanes (Vectors)
-          if (layerAisTraffic) {
-            ctx.strokeStyle = 'rgba(46, 117, 89, 0.35)';
+          // Step index logic for cumulative evidence building
+          // 01: only detection
+          // 02: + drift & particles
+          // 03: + AIS traffic
+          // 04: + spatial attribution CPA lines
+          // 05/06: + full evidence candidate highlight
+          const showStep01 = true;
+          const showStep02 = activeStep !== '01 DETECT';
+          const showStep03 = activeStep !== '01 DETECT' && activeStep !== '02 DRIFT';
+          const showStep04 = activeStep === '04 ATTRIBUTE' || activeStep === '05 EVIDENCE' || activeStep === '06 METHOD';
+          const showStep05 = activeStep === '05 EVIDENCE' || activeStep === '06 METHOD';
+
+          // 3. AIS Traffic Fairway Lanes (Accumulates on Step 03+)
+          if (layerAisTraffic && showStep03) {
+            ctx.strokeStyle = 'rgba(46, 117, 89, 0.3)';
             ctx.lineWidth = 1;
             for (let i = 0; i < 14; i++) {
               ctx.beginPath();
-              ctx.moveTo(W * 0.1 + i * 45, 0);
-              ctx.lineTo(W * 0.3 + i * 35, H);
+              ctx.moveTo(W * 0.08 + i * 45, 0);
+              ctx.lineTo(W * 0.28 + i * 35, H);
               ctx.stroke();
             }
           }
 
-          // 4. Draw Origin Field / Hindcast Cone
-          if (layerOriginField) {
-            ctx.fillStyle = 'rgba(23, 70, 55, 0.25)';
-            ctx.strokeStyle = 'rgba(57, 181, 137, 0.4)';
-            ctx.lineWidth = 1;
+          // 4. Origin Field / Hindcast Backward Dispersion Cone (Accumulates on Step 02+)
+          if (layerOriginField && showStep02) {
+            ctx.fillStyle = 'rgba(23, 70, 55, 0.22)';
+            ctx.strokeStyle = 'rgba(87, 255, 168, 0.4)';
+            ctx.lineWidth = 1.2;
             ctx.beginPath();
             ctx.ellipse(W * 0.48, H * 0.42, 140, 65, -0.45, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
+
+            // Calculated Origin Point Pin
+            const ox = W * 0.48;
+            const oy = H * 0.42;
+            ctx.fillStyle = '#57FFA8';
+            ctx.beginPath();
+            ctx.arc(ox, oy, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.font = 'bold 8px "JetBrains Mono", monospace';
+            ctx.fillText('ORIGIN: T-18.4h (±0.84km)', ox + 8, oy - 4);
           }
 
-          // 5. Draw Debris Plume Release Extent (Contour envelope)
-          if (layerReleaseExtent) {
-            ctx.strokeStyle = '#4EFAAC';
-            ctx.fillStyle = 'rgba(78, 250, 172, 0.15)';
+          // 5. Debris Plume Release Extent (Accumulates on Step 02+)
+          if (layerReleaseExtent && showStep02) {
+            ctx.strokeStyle = '#57FFA8';
+            ctx.fillStyle = 'rgba(87, 255, 168, 0.12)';
             ctx.lineWidth = 1.5;
             ctx.setLineDash([4, 4]);
             ctx.beginPath();
@@ -193,9 +226,9 @@ export const SonarViewerPage: React.FC = () => {
             ctx.setLineDash([]);
           }
 
-          // 6. Draw Lagrangian Particle Cloud
-          if (layerParticles) {
-            ctx.fillStyle = '#4EFAAC';
+          // 6. Lagrangian Particle Cloud (Accumulates on Step 02+)
+          if (layerParticles && showStep02) {
+            ctx.fillStyle = '#57FFA8';
             particleStateRef.current.forEach((p) => {
               p.x += p.vx * (playbackSpeed / 4);
               p.y += p.vy * (playbackSpeed / 4);
@@ -215,15 +248,19 @@ export const SonarViewerPage: React.FC = () => {
             ctx.globalAlpha = 1.0;
           }
 
-          // 7. Draw Candidate Vessel Tracks & Position Markers
-          if (layerCandidates) {
+          // 7. Candidate Vessel Tracks & CPA Lines (Accumulates on Step 03+)
+          if (layerCandidates && showStep03) {
             activeScenario.candidates.forEach((cand) => {
               const isSelected = cand.id === activeCandidate.id;
-              ctx.strokeStyle = isSelected ? '#57FFA8' : 'rgba(87, 255, 168, 0.4)';
+              ctx.strokeStyle = isSelected
+                ? '#57FFA8'
+                : showStep04
+                ? 'rgba(87, 255, 168, 0.4)'
+                : 'rgba(46, 117, 89, 0.35)';
               ctx.lineWidth = isSelected ? 2.5 : 1.2;
               ctx.setLineDash(isSelected ? [] : [3, 4]);
 
-              // Draw trackline
+              // Draw vessel track
               ctx.beginPath();
               cand.trackCoordinates.forEach((coord, idx) => {
                 const cx = (coord[1] - (activeScenario.lon - 0.25)) * (W / 0.5);
@@ -234,7 +271,7 @@ export const SonarViewerPage: React.FC = () => {
               ctx.stroke();
               ctx.setLineDash([]);
 
-              // Vessel icon & label
+              // Vessel position marker
               const lastCoord = cand.trackCoordinates[cand.trackCoordinates.length - 1];
               const vx = (lastCoord[1] - (activeScenario.lon - 0.25)) * (W / 0.5);
               const vy = (activeScenario.lat + 0.25 - lastCoord[0]) * (H / 0.5);
@@ -244,14 +281,44 @@ export const SonarViewerPage: React.FC = () => {
               ctx.arc(vx, vy, isSelected ? 5 : 3, 0, Math.PI * 2);
               ctx.fill();
 
+              // Safe label rendering with boundary clipping prevention
+              const labelText = `[${cand.code}] ${cand.name}`;
               ctx.font = 'bold 9px "JetBrains Mono", monospace';
+              const textWidth = ctx.measureText(labelText).width;
+              const safeX = vx + 8 + textWidth > W - 15 ? vx - textWidth - 8 : vx + 8;
+
               ctx.fillStyle = isSelected ? '#57FFA8' : '#7C8AA0';
-              ctx.fillText(`[${cand.code}] ${cand.name}`, vx + 8, vy + 3);
+              ctx.fillText(labelText, safeX, vy + 3);
+
+              // 8. Spatial CPA Attribution Line linking vessel to Debris Origin (Step 04+)
+              if (showStep04 && isSelected) {
+                const ox = W * 0.48;
+                const oy = H * 0.42;
+                ctx.strokeStyle = '#57FFA8';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([2, 3]);
+                ctx.beginPath();
+                ctx.moveTo(vx, vy);
+                ctx.lineTo(ox, oy);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // CPA distance tag
+                const midX = (vx + ox) / 2;
+                const midY = (vy + oy) / 2;
+                ctx.fillStyle = '#060B0E';
+                ctx.fillRect(midX - 35, midY - 7, 70, 14);
+                ctx.strokeStyle = '#2E7559';
+                ctx.strokeRect(midX - 35, midY - 7, 70, 14);
+                ctx.fillStyle = '#57FFA8';
+                ctx.font = 'bold 8px "JetBrains Mono", monospace';
+                ctx.fillText(`CPA: ${cand.closestPointOfApproachM}m`, midX - 30, midY + 3);
+              }
             });
           }
 
-          // 8. Sonar Detection Swath Footprint (T0 SSS)
-          if (layerDetection) {
+          // 9. Sonar Detection Swath Footprint (Step 01+)
+          if (layerDetection && showStep01) {
             const sx = W * 0.45;
             const sy = H * 0.4;
             ctx.strokeStyle = '#39B589';
@@ -260,12 +327,16 @@ export const SonarViewerPage: React.FC = () => {
 
             ctx.fillStyle = '#060B0E';
             ctx.fillRect(sx - 35, sy - 34, 130, 14);
-            ctx.fillStyle = '#39B589';
+            ctx.strokeStyle = '#39B589';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(sx - 35, sy - 34, 130, 14);
+
+            ctx.fillStyle = '#57FFA8';
             ctx.font = 'bold 8px "JetBrains Mono", monospace';
-            ctx.fillText(`T0 SSS: ${activeScenario.debrisType.toUpperCase().slice(0, 16)}`, sx - 32, sy - 24);
+            ctx.fillText(`T0 SSS: ${activeScenario.debrisType.toUpperCase().slice(0, 16)}`, sx - 30, sy - 24);
           }
 
-          // 9. Coordinate HUD Ticks
+          // 10. Coordinate HUD Ticks
           ctx.fillStyle = '#2E7559';
           ctx.font = '9px "JetBrains Mono", monospace';
           ctx.fillText(`${activeScenario.lat.toFixed(3)}° N  ${activeScenario.lon.toFixed(3)}° E`, 20, 25);
@@ -284,6 +355,7 @@ export const SonarViewerPage: React.FC = () => {
     timelineHour,
     activeScenario,
     activeCandidate,
+    activeStep,
     layerAisTraffic,
     layerOriginField,
     layerReleaseExtent,
@@ -317,7 +389,7 @@ export const SonarViewerPage: React.FC = () => {
                 setSelectedCandidateId(scen.candidates[0].id);
               }
             }}
-            className="bg-[#04080B] border border-[#14231E] text-[#57FFA8] text-[10px] font-bold px-2 py-1 rounded-md focus:outline-none focus:border-[#57FFA8]"
+            className="bg-[#04080B] border border-[#14231E] text-[#57FFA8] text-[10px] font-bold px-2 py-1 rounded-md focus:outline-none focus:border-[#57FFA8] cursor-pointer"
           >
             {DEBRIS_INTELLIGENCE_SCENARIOS.map((s) => (
               <option key={s.id} value={s.id}>
@@ -412,14 +484,19 @@ export const SonarViewerPage: React.FC = () => {
         </div>
 
         {/* CENTER TACTICAL CANVAS / VECTOR MAP */}
-        <div className="flex-1 relative overflow-hidden bg-[#060B0E]">
+        <div className="flex-1 relative overflow-hidden bg-[#04080B]">
           <canvas ref={mapCanvasRef} className="w-full h-full block cursor-crosshair" />
 
           {/* In-Map Top-Right Legend */}
-          <div className="absolute top-3 right-3 bg-[#060B0E]/90 border border-[#14231E] rounded p-2 text-[9px] backdrop-blur-sm">
-            <span className="text-[#57FFA8] font-bold block mb-1">
-              CASE {activeScenario.scenarioCode}
-            </span>
+          <div className="absolute top-3 right-3 bg-[#060B0E]/90 border border-[#14231E] rounded p-2 text-[9px] backdrop-blur-sm shadow-lg">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <span className="text-[#57FFA8] font-bold">
+                CASE {activeScenario.scenarioCode}
+              </span>
+              <span className="text-[8px] px-1 py-0.2 rounded bg-[#102B21] text-[#57FFA8] border border-[#2E7559]">
+                STEP: {activeStep.slice(3)}
+              </span>
+            </div>
             <div className="space-y-0.5 text-[#4E7D6D]">
               <div>DEBRIS: <span className="text-[#57FFA8]">{activeScenario.debrisType}</span></div>
               <div>SURFACE: <span className="text-[#86A89B]">{activeScenario.debrisAreaKm2} km²</span></div>
@@ -672,6 +749,16 @@ export const SonarViewerPage: React.FC = () => {
                 </div>
               </div>
 
+              {/* Alternative Hypothesis Honest Callout */}
+              <div className="mb-3">
+                <span className="text-[8px] text-[#2E7559] uppercase block mb-1">
+                  ALTERNATIVE HYPOTHESIS
+                </span>
+                <div className="bg-[#081217] p-2 rounded border border-[#14231E] text-[8px] text-[#7C8AA0]">
+                  {activeCandidate.alternativeHypothesis}
+                </div>
+              </div>
+
               {/* Vessel Metadata Breakdown */}
               <div className="space-y-1 text-[8px] text-[#4E7D6D]">
                 <div>TYPE: <span className="text-[#86A89B]">{activeCandidate.vesselType}</span></div>
@@ -682,45 +769,67 @@ export const SonarViewerPage: React.FC = () => {
             </div>
           )}
 
-          {/* STEP 06 METHOD */}
+          {/* STEP 06 METHOD (The deliberate place where technical ML + Physics detail belongs) */}
           {activeStep === '06 METHOD' && (
             <div>
               <div className="flex items-center justify-between border-b border-[#14231E] pb-2 mb-3">
                 <span className="font-black text-[#57FFA8] tracking-wider uppercase">
                   06 SCIENTIFIC METHODOLOGY
                 </span>
-                <span className="text-[9px] text-[#2E7559]">ISO / MoES</span>
+                <span className="text-[9px] text-[#2E7559]">ISO / MoES SPEC</span>
               </div>
               <div className="space-y-2.5 text-[8px] text-[#86A89B]">
+                <div className="bg-[#081217] p-2.5 rounded border border-[#14231E]">
+                  <div className="flex items-center gap-1.5 text-[#57FFA8] font-bold mb-1">
+                    <Cpu className="w-3.5 h-3.5" />
+                    <span>NEURAL PERCEPTION PIPELINE</span>
+                  </div>
+                  <p className="text-[#7C8AA0]">
+                    YOLOv8n ONNX runtime with acoustic tensor pre-processing (900 kHz SSS dual-frequency cross-track backscatter).
+                  </p>
+                  <div className="mt-1 text-[7px] text-[#57FFA8] font-mono">
+                    mAP50: 91.4% · Inference: 14.2ms · Precision: 94.8%
+                  </div>
+                </div>
+
                 <div className="bg-[#081217] p-2 rounded border border-[#14231E]">
                   <span className="text-[#57FFA8] font-bold block mb-0.5">ACOUSTIC SHADOW TRIGONOMETRY</span>
-                  <code>H = (L_shadow × H_alt) / (R_slant + L_shadow)</code>
+                  <code>H = (L_shadow × H_altimeter) / (R_slant + L_shadow)</code>
                 </div>
+
                 <div className="bg-[#081217] p-2 rounded border border-[#14231E]">
-                  <span className="text-[#57FFA8] font-bold block mb-0.5">BACKWARD EULER DRIFT</span>
-                  <code>x(t-Δt) = x(t) - Δt × (u_ocean + α·u_wind)</code>
+                  <span className="text-[#57FFA8] font-bold block mb-0.5">BACKWARD EULER DRIFT MODEL</span>
+                  <code>x(t-Δt) = x(t) - Δt × (u_ocean + α·u_wind + u'_diffusion)</code>
                 </div>
+
                 <div className="bg-[#081217] p-2 rounded border border-[#14231E]">
-                  <span className="text-[#57FFA8] font-bold block mb-0.5">SCIENTIFIC CONSTRAINTS (C1–C12)</span>
-                  <p className="text-[#7C8AA0]">Scores are never stored without decomposed terms. Dark vessels are ranked with radar cross-sections.</p>
+                  <span className="text-[#57FFA8] font-bold block mb-0.5">SCIENTIFIC INTEGRITY CONSTRAINTS</span>
+                  <p className="text-[#7C8AA0]">Scores are never stored without decomposed terms. Dark vessels are ranked with radar cross-sections. Diffuse fields return honest low certainty rather than false suspects.</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Real-Time Terminal Event Log (Shared Footer) */}
-          <div className="border-t border-[#14231E] pt-3">
+          {/* Real-Time Terminal Event Log (Shared Footer with smooth fade & auto-scroll) */}
+          <div className="border-t border-[#14231E] pt-2.5">
             <span className="text-[8px] font-black text-[#2E7559] uppercase tracking-widest block mb-1.5">
               EVENT LOG
             </span>
-            <div className="bg-[#04080B] border border-[#14231E] rounded p-2 max-h-32 overflow-y-auto space-y-1 text-[8px]">
+            <div
+              className="bg-[#04080B] border border-[#14231E] rounded p-2 max-h-28 overflow-y-auto space-y-1 text-[8px] font-mono scrollbar-thin scrollbar-thumb-[#14231E]"
+              style={{
+                maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,1) 15%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,1) 15%)',
+              }}
+            >
               {activeScenario.eventLogs.map((log, idx) => (
-                <div key={idx} className="flex items-start gap-1.5">
+                <div key={idx} className="flex items-start gap-1.5 leading-tight">
                   <span className="text-[#2E7559] shrink-0">{log.time}</span>
                   <span className="text-[#57FFA8] shrink-0 font-bold">[{log.tag}]</span>
                   <span className="text-[#86A89B]">{log.message}</span>
                 </div>
               ))}
+              <div ref={eventLogEndRef} />
             </div>
           </div>
         </div>

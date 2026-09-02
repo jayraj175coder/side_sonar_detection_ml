@@ -11,6 +11,8 @@ import { MissionPage } from './pages/MissionPage';
 import { SonarViewerPage } from './pages/SonarViewerPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { MissionProvider } from './context/MissionContext';
+import { GeospatialConfigProvider } from './context/GeospatialConfigContext';
+import { GeospatialConfigModal } from './components/common/GeospatialConfigModal';
 import { useApp } from './context/AppContext';
 import {
   LayoutDashboard, ScanLine, History, MapPin, FileText, Cpu, Crosshair, Eye, BarChart2,
@@ -50,8 +52,9 @@ export const App: React.FC = () => {
   const isMissionFullscreen = activeTab === 'mission';
 
   return (
-    <MissionProvider>
-      <div className="flex h-screen bg-[#070b07] text-[#dcfce7] overflow-hidden font-mono select-none">
+    <GeospatialConfigProvider>
+      <MissionProvider>
+        <div className="flex h-screen bg-[#070b07] text-[#dcfce7] overflow-hidden font-mono select-none">
         {/* Fixed Left Sidebar */}
         <Sidebar
           isMobileOpen={isMobileMenuOpen}
@@ -110,6 +113,8 @@ export const App: React.FC = () => {
           })}
         </div>
       </div>
+      <GeospatialConfigModal />
     </MissionProvider>
-  );
+  </GeospatialConfigProvider>
+);
 };

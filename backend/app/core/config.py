@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     # Storage Configuration
     DATA_DIR: str = "./data"
 
+    # Geocoding & Geospatial Configuration (Optional External Services)
+    GEOCODING_API_KEY: str = os.getenv("GEOCODING_API_KEY", "")
+    GEOCODING_PROVIDER: str = os.getenv("GEOCODING_PROVIDER", "opencage")
+
     @property
     def resolved_model_path(self) -> Path:
         """Resolves model path relative to backend root if not absolute."""

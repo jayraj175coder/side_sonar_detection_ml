@@ -47,10 +47,9 @@ export const LiveGeotagMapPanel: React.FC<LiveGeotagMapPanelProps> = ({
         attributionControl: false,
       });
 
-      // Carto Dark tiles — 100% Free, zero API keys required
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-        subdomains: 'abcd',
+      // Esri Dark Marine Canvas — Free, zero watermarks, zero API keys required
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 18,
       }).addTo(map);
 
       // Survey Corridor Polygon

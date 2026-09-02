@@ -196,9 +196,9 @@ export const MissionMapPanel: React.FC = () => {
           className="w-full h-full"
           style={{ background: '#080B11' }}
         >
-          {/* Native Dark Carto Tiles */}
+          {/* Clean Dark Subsea Marine Tile Layer (Zero Watermarks, No Key Required) */}
           <TileLayer
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
             className="sonar-dark-tiles"
           />
 

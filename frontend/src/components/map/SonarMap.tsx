@@ -29,6 +29,7 @@ import {
   HydrographicVessel,
 } from '../../data/indiaMapData';
 import { useApp } from '../../context/AppContext';
+import { useGeospatialConfig } from '../../context/GeospatialConfigContext';
 
 // Custom Tactical Pin for Indian Maritime Sectors
 const createSectorPin = (sector: IndiaMaritimeSector, isSelected: boolean) => {
@@ -96,6 +97,8 @@ const MapFlyTo: React.FC<{ coords: [number, number]; zoom: number }> = ({ coords
 
 export const SonarMap: React.FC = () => {
   const { setActiveTab } = useApp();
+
+  const { activeTileUrl, activeTileAttribution } = useGeospatialConfig();
 
   const [selectedSector, setSelectedSector] = useState<IndiaMaritimeSector | null>(INDIA_MARITIME_SECTORS[0]);
   const [selectedVessel, setSelectedVessel] = useState<HydrographicVessel | null>(null);
@@ -208,10 +211,11 @@ export const SonarMap: React.FC = () => {
           >
             <MapFlyTo coords={mapCenter} zoom={mapZoom} />
 
-            {/* High-Contrast Dark Subsea Carto Tile Layer */}
+            {/* High-Contrast Dark Subsea Marine Tile Layer (Zero Watermarks, No Key Required) */}
             <TileLayer
-              attribution='&copy; <a href="https://carto.com/">CARTO</a> & Indian National Hydrographic Office'
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              key={activeTileUrl}
+              attribution={activeTileAttribution}
+              url={activeTileUrl}
             />
 
             {/* India Exclusive Economic Zone (EEZ) Boundary Polygon */}

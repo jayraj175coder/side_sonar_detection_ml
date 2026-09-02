@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { LiveDemoSequence } from '../components/console/LiveDemoSequence';
 import { ConsoleTopBar } from '../components/console/ConsoleTopBar';
 import { ConsoleLeftRail, LayerState } from '../components/console/ConsoleLeftRail';
@@ -6,8 +6,15 @@ import { ConsoleSonarCanvas } from '../components/console/ConsoleSonarCanvas';
 import { ConsoleStageDetail } from '../components/console/ConsoleStageDetail';
 import { ConsoleBottomTimeline, EventLogEntry } from '../components/console/ConsoleBottomTimeline';
 import {
-  SURVEY_SITES, SurveySite, CANDIDATE_ITEMS, CandidateItem,
-  STAGE_DETAILS, StageId, INITIAL_EVENT_LOGS, PIPELINE_STAGES,
+  SURVEY_SITES,
+  SurveySite,
+  CANDIDATE_ITEMS,
+  SITE_CANDIDATES,
+  CandidateItem,
+  STAGE_DETAILS,
+  StageId,
+  INITIAL_EVENT_LOGS,
+  PIPELINE_STAGES,
 } from '../data/consoleData';
 import { sonarAudio } from '../utils/sonarAudio';
 import { useMission } from '../context/MissionContext';
@@ -16,36 +23,36 @@ type DemoPhase = 'idle' | 'running' | 'done';
 
 const STAGE_LOG_EVENTS: Record<StageId, { tag: string; text: string; level: EventLogEntry['level'] }[]> = {
   '01': [
-    { tag: 'ING',  text: 'sonar_log_kutch_dark_042.xtf opened · 80,829 pings · 75m swath', level: 'info' },
-    { tag: 'ING',  text: 'navigation telemetry sync · 10 Hz ping interval locked', level: 'info' },
-    { tag: 'ING',  text: 'slant-range correction applied · letterbox 640×640', level: 'success' },
+    { tag: 'ING',  text: 'sonar_log_swath_active.xtf opened · 80,829 acoustic pings loaded', level: 'info' },
+    { tag: 'ING',  text: 'USBL telemetry locked · dual-flank port/stbd waterfall active', level: 'info' },
+    { tag: 'ING',  text: 'slant-range & TVG correction normalized to 640×640 frame', level: 'success' },
   ],
   '02': [
-    { tag: 'DEN',  text: 'bilateral spatial filter 5×5 · speckle −18.4 dB', level: 'info' },
-    { tag: 'DEN',  text: 'CLAHE contrast normalization · dynamic range +14.2 dB', level: 'success' },
-    { tag: 'DEN',  text: 'TVG altitude correction applied · drone track rendered', level: 'info' },
+    { tag: 'DEN',  text: 'bilateral spatial filter applied · speckle attenuated −18.4 dB', level: 'info' },
+    { tag: 'DEN',  text: 'CLAHE local contrast enhancement active · seabed dynamic range +14.2 dB', level: 'success' },
+    { tag: 'DEN',  text: 'nadir water column isolated · altitude track line generated', level: 'info' },
   ],
   '03': [
-    { tag: 'DET',  text: 'YOLOv8n ONNX forward pass · inference 10.4 ms', level: 'info' },
-    { tag: 'DET',  text: '37 raw candidates extracted · NMS IoU 0.45 applied', level: 'success' },
+    { tag: 'DET',  text: 'YOLOv8n ONNX perception forward pass · inference: 10.2 ms', level: 'info' },
+    { tag: 'DET',  text: '37 acoustic backscatter proposals extracted across swath', level: 'success' },
   ],
   '04': [
-    { tag: 'GATE', text: 'confidence gate applied · threshold 0.25', level: 'info' },
-    { tag: 'GATE', text: 'rejected SX-T04 — aspect ratio 1.11 → rock shadow', level: 'reject' },
-    { tag: 'GATE', text: 'rejected SX-T06 — zero vertical relief → sand ripple', level: 'reject' },
-    { tag: 'GATE', text: 'rejected SX-T08 — surface reverberation echo', level: 'reject' },
-    { tag: 'GATE', text: '20 natural formations rejected · 17 debris confirmed', level: 'success' },
+    { tag: 'GATE', text: 'dynamic confidence gate + acoustic shadow analysis running', level: 'info' },
+    { tag: 'GATE', text: 'suppressed native basalt bedrock clusters (symmetric backscatter)', level: 'reject' },
+    { tag: 'GATE', text: 'suppressed periodic sand megaripples (zero acoustic shadow relief)', level: 'reject' },
+    { tag: 'GATE', text: 'suppressed surface reverberation echoes via altitude check', level: 'reject' },
+    { tag: 'GATE', text: 'false positives suppressed · true debris anomalies confirmed', level: 'success' },
   ],
   '05': [
-    { tag: 'CLS',  text: 'debris taxonomy attribution · MoES ALDFG classification', level: 'info' },
-    { tag: 'CLS',  text: '6× ghost nets · 4× trawl gear · 3× pipeline spans confirmed', level: 'success' },
-    { tag: 'CLS',  text: '4 critical hazard targets flagged for ROV verification', level: 'warn' },
+    { tag: 'CLS',  text: 'MoES marine debris taxonomy attribution active', level: 'info' },
+    { tag: 'CLS',  text: 'identified ghost nets (ALDFG), trawl gear, pipelines, and barrels', level: 'success' },
+    { tag: 'CLS',  text: 'high-threat marine hazard tags dispatched to ROV recovery queue', level: 'warn' },
   ],
   '06': [
-    { tag: 'GEO',  text: 'WGS84 geotag attached from USBL interpolated coordinates', level: 'info' },
-    { tag: 'GEO',  text: 'SX-T07 ghost net · 18.9217°N, 72.8214°E · 43.1m', level: 'info' },
-    { tag: 'REP',  text: 'anomaly_report_MX026.json compiled · 17 targets geotagged', level: 'success' },
-    { tag: 'REP',  text: 'pipeline COMPLETE · dossier ready for download', level: 'success' },
+    { tag: 'GEO',  text: 'WGS84 USBL positioning interpolated for all confirmed anomalies', level: 'info' },
+    { tag: 'GEO',  text: 'hero target SX-T07: 18.9217°N, 72.8214°E · depth 43.1m · 94.7% conf', level: 'info' },
+    { tag: 'REP',  text: 'structured anomaly dossier generated · JSON and CSV registers ready', level: 'success' },
+    { tag: 'REP',  text: 'MISSION MX-026 ANALYSIS COMPLETE · inspection dossier compiled', level: 'success' },
   ],
 };
 
@@ -53,22 +60,24 @@ const STAGE_DURATION_MS = 2800;
 
 export const MissionPage: React.FC = () => {
   const { isDemoRunning, startGuidedDemo, resetGuidedDemo } = useMission();
-  // ── Live demo sequence overlay (shown on first load or when triggered) ──────
   const [showSequence, setShowSequence] = useState(true);
 
-  // Active if showSequence or isDemoRunning is true
   const isSequenceActive = showSequence || isDemoRunning;
 
   // ── Dashboard state ─────────────────────────────────────────────────────────
-  const [activeSite, setActiveSite]             = useState<SurveySite>(SURVEY_SITES[0]);
-  const [currentStageId, setCurrentStageId]     = useState<StageId>('01');
+  const [activeSite, setActiveSite] = useState<SurveySite>(SURVEY_SITES[0]);
+  const [currentStageId, setCurrentStageId] = useState<StageId>('06');
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>('SX-T07');
-  const [hoveredCandidateId, setHoveredCandidateId]   = useState<string | null>(null);
-  const [candidatesList]                        = useState<CandidateItem[]>(CANDIDATE_ITEMS);
+  const [hoveredCandidateId, setHoveredCandidateId] = useState<string | null>(null);
 
-  const [demoPhase, setDemoPhase]       = useState<DemoPhase>('idle');
-  const [isPlaying, setIsPlaying]       = useState(false);
-  const [stageProgress, setStageProgress] = useState(0);
+  // Dynamic filter state
+  const [confidenceThreshold, setConfidenceThreshold] = useState<number>(0.40);
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [shadowFilterEnabled, setShadowFilterEnabled] = useState<boolean>(true);
+
+  const [demoPhase, setDemoPhase] = useState<DemoPhase>('done');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [stageProgress, setStageProgress] = useState(1);
 
   const [layers, setLayers] = useState<LayerState>({
     rawSonar:       true,
@@ -82,28 +91,102 @@ export const MissionPage: React.FC = () => {
   });
 
   const [currentFrame, setCurrentFrame] = useState(1);
-  const [totalFrames]                   = useState(120);
+  const [totalFrames] = useState(120);
   const [speedMultiplier, setSpeedMultiplier] = useState(1);
-  const [eventLogs, setEventLogs]       = useState<EventLogEntry[]>(INITIAL_EVENT_LOGS);
+  const [eventLogs, setEventLogs] = useState<EventLogEntry[]>(INITIAL_EVENT_LOGS);
 
-  const demoTimerRef    = useRef<any>(null);
+  const demoTimerRef = useRef<any>(null);
   const progressTimerRef = useRef<any>(null);
-  const frameTimerRef   = useRef<any>(null);
+  const frameTimerRef = useRef<any>(null);
 
-  // ── Called when live demo sequence finishes ─────────────────────────────────
+  // ── Dynamic candidate calculation based on site & interactive filters ────────
+  const baseCandidates = useMemo(() => {
+    return SITE_CANDIDATES[activeSite.id] || CANDIDATE_ITEMS;
+  }, [activeSite.id]);
+
+  const dynamicCandidates: CandidateItem[] = useMemo(() => {
+    return baseCandidates.map((c) => {
+      // 1. Confidence threshold filter
+      if (c.confidence < confidenceThreshold) {
+        return {
+          ...c,
+          status: 'REJECTED' as const,
+          rejectReason: `Confidence score ${(c.confidence * 100).toFixed(1)}% is below dynamic cutoff ${(confidenceThreshold * 100).toFixed(0)}%`,
+        };
+      }
+
+      // 2. Acoustic shadow relief verification
+      if (shadowFilterEnabled && c.shadowLengthM <= 0.05) {
+        return {
+          ...c,
+          status: 'REJECTED' as const,
+          rejectReason: 'Zero acoustic shadow displacement; 2D seafloor artifact',
+        };
+      }
+
+      // 3. Natural rock / geological formations filter
+      if (
+        c.class.includes('Rock') ||
+        c.class.includes('Bedrock') ||
+        c.class.includes('Basalt')
+      ) {
+        if (c.aspectRatio < 1.35) {
+          return {
+            ...c,
+            status: 'REJECTED' as const,
+            rejectReason: 'Aspect ratio conforms to native geological bedrock cluster',
+          };
+        }
+      }
+
+      return {
+        ...c,
+        status: 'CONFIRMED' as const,
+        rejectReason: undefined,
+      };
+    });
+  }, [baseCandidates, confidenceThreshold, shadowFilterEnabled]);
+
+  // Filtered by category chip
+  const filteredCandidates = useMemo(() => {
+    return dynamicCandidates.filter((c) => {
+      if (selectedCategory === 'ALL') return true;
+      if (selectedCategory === 'NETS') return c.class.includes('Net');
+      if (selectedCategory === 'TRAWL') return c.class.includes('Trawl');
+      if (selectedCategory === 'PIPES') return c.class.includes('Pipeline') || c.class.includes('Cable');
+      if (selectedCategory === 'BARRELS') return c.class.includes('Barrel') || c.class.includes('Cargo');
+      if (selectedCategory === 'NOISE') return c.status === 'REJECTED';
+      return true;
+    });
+  }, [dynamicCandidates, selectedCategory]);
+
+  const rawCount = 37;
+  const rejectedCount = dynamicCandidates.filter((c) => c.status === 'REJECTED').length * 2 + 6;
+  const confirmedCount = dynamicCandidates.filter((c) => c.status === 'CONFIRMED').length;
+
+  // Survey site change handler
+  const handleSelectSite = useCallback((site: SurveySite) => {
+    setActiveSite(site);
+    sonarAudio.playTargetBeep?.();
+    const newItems = SITE_CANDIDATES[site.id] || CANDIDATE_ITEMS;
+    if (newItems.length > 0) {
+      setSelectedCandidateId(newItems[0].id);
+    }
+  }, []);
+
+  // Called when live demo sequence finishes
   const handleSequenceComplete = useCallback(() => {
     setShowSequence(false);
     resetGuidedDemo();
-    // Pre-populate dashboard as if the pipeline already ran (stage 06 done)
     setCurrentStageId('06');
     setDemoPhase('done');
     setStageProgress(1);
     const now = new Date();
-    const ts  = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const ts = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const newLogs: EventLogEntry[] = [
       ...INITIAL_EVENT_LOGS,
-      ...(['01','02','03','04','05','06'] as StageId[]).flatMap((sid) =>
-        STAGE_LOG_EVENTS[sid].map(l => ({ time: ts, ...l }))
+      ...(['01', '02', '03', '04', '05', '06'] as StageId[]).flatMap((sid) =>
+        STAGE_LOG_EVENTS[sid].map((l) => ({ time: ts, ...l }))
       ),
     ];
     setEventLogs(newLogs);
@@ -111,9 +194,9 @@ export const MissionPage: React.FC = () => {
 
   const pushLogs = useCallback((stageId: StageId) => {
     const lines = STAGE_LOG_EVENTS[stageId] || [];
-    const ts = `${String(new Date().getHours()).padStart(2,'0')}:${String(new Date().getMinutes()).padStart(2,'0')}`;
+    const ts = `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`;
     lines.forEach((ln, i) => {
-      setTimeout(() => setEventLogs(prev => [...prev.slice(-60), { time: ts, ...ln }]), i * 350);
+      setTimeout(() => setEventLogs((prev) => [...prev.slice(-60), { time: ts, ...ln }]), i * 350);
     });
   }, []);
 
@@ -125,7 +208,7 @@ export const MissionPage: React.FC = () => {
   }, [pushLogs]);
 
   const handleToggleLayer = useCallback((layerKey: keyof LayerState) => {
-    setLayers(prev => ({ ...prev, [layerKey]: !prev[layerKey] }));
+    setLayers((prev) => ({ ...prev, [layerKey]: !prev[layerKey] }));
     sonarAudio.playLockBeep?.();
   }, []);
 
@@ -146,17 +229,24 @@ export const MissionPage: React.FC = () => {
   }, [startGuidedDemo]);
 
   const handleTogglePlay = useCallback(() => {
-    if (demoPhase !== 'running') return;
+    if (demoPhase !== 'running') {
+      setIsPlaying((p) => !p);
+      return;
+    }
     if (isPlaying) {
       clearTimeout(demoTimerRef.current);
       clearInterval(progressTimerRef.current);
       setIsPlaying(false);
     } else {
       setIsPlaying(true);
-      const stages: StageId[] = ['01','02','03','04','05','06'];
+      const stages: StageId[] = ['01', '02', '03', '04', '05', '06'];
       let idx = stages.indexOf(currentStageId) + 1;
       const advance = () => {
-        if (idx >= stages.length) { setDemoPhase('done'); setIsPlaying(false); return; }
+        if (idx >= stages.length) {
+          setDemoPhase('done');
+          setIsPlaying(false);
+          return;
+        }
         handleSelectStage(stages[idx]);
         startProgressAnimation();
         idx++;
@@ -175,36 +265,48 @@ export const MissionPage: React.FC = () => {
     setCurrentStageId('01');
     setCurrentFrame(1);
     setStageProgress(0);
-    setSelectedCandidateId('SX-T07');
+    if (dynamicCandidates.length > 0) {
+      setSelectedCandidateId(dynamicCandidates[0].id);
+    }
     setHoveredCandidateId(null);
     setEventLogs(INITIAL_EVENT_LOGS);
     sonarAudio.playDepthPulse?.();
-  }, []);
+  }, [dynamicCandidates]);
 
   // Frame ticker
   useEffect(() => {
-    if (!isPlaying) { clearInterval(frameTimerRef.current); return; }
-    const ms = Math.max(80, Math.floor(800/speedMultiplier));
+    if (!isPlaying) {
+      clearInterval(frameTimerRef.current);
+      return;
+    }
+    const ms = Math.max(60, Math.floor(600 / speedMultiplier));
     frameTimerRef.current = setInterval(() => {
-      setCurrentFrame(f => f >= totalFrames ? 1 : f + 1);
+      setCurrentFrame((f) => (f >= totalFrames ? 1 : f + 1));
     }, ms);
     return () => clearInterval(frameTimerRef.current);
   }, [isPlaying, speedMultiplier, totalFrames]);
 
-  // Keyboard shortcuts (only when sequence is not showing)
+  // Keyboard shortcuts
   useEffect(() => {
-    if (showSequence) return;
+    if (isSequenceActive) return;
     const h = (e: KeyboardEvent) => {
-      if (['INPUT','SELECT','TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
-      if (e.code === 'Space') { e.preventDefault(); demoPhase === 'idle' ? handleRunDemo() : handleTogglePlay(); }
-      else if (e.key >= '1' && e.key <= '6') handleSelectStage(String(e.key).padStart(2,'0') as StageId);
-      else if (e.key === 'ArrowRight') setCurrentFrame(f => Math.min(f+1, totalFrames));
-      else if (e.key === 'ArrowLeft')  setCurrentFrame(f => Math.max(f-1, 1));
-      else if (e.key === 'r' || e.key === 'R') handleReset();
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        demoPhase === 'idle' ? handleRunDemo() : handleTogglePlay();
+      } else if (e.key >= '1' && e.key <= '6') {
+        handleSelectStage(String(e.key).padStart(2, '0') as StageId);
+      } else if (e.key === 'ArrowRight') {
+        setCurrentFrame((f) => Math.min(f + 1, totalFrames));
+      } else if (e.key === 'ArrowLeft') {
+        setCurrentFrame((f) => Math.max(f - 1, 1));
+      } else if (e.key === 'r' || e.key === 'R') {
+        handleReset();
+      }
     };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
-  }, [showSequence, demoPhase, handleRunDemo, handleTogglePlay, handleReset, handleSelectStage, totalFrames]);
+  }, [isSequenceActive, demoPhase, handleRunDemo, handleTogglePlay, handleReset, handleSelectStage, totalFrames]);
 
   useEffect(() => () => {
     clearTimeout(demoTimerRef.current);
@@ -215,39 +317,43 @@ export const MissionPage: React.FC = () => {
   const handleExportDossier = () => {
     sonarAudio.playLockBeep?.();
     const payload = {
-      product: 'SONARX ANALYSIS NODE 04',
+      product: 'SONARLINE ANALYSIS NODE 04',
       site: activeSite.name,
       source_file: activeSite.sourceFile,
       timestamp: activeSite.timestamp,
       swath_width_m: activeSite.swathWidthM,
       frequency: activeSite.frequency,
       active_stage: currentStageId,
-      funnel: { raw_candidates: 37, natural_noise_rejected: 20, confirmed_debris: 17 },
-      candidates: candidatesList,
+      confidence_threshold_applied: confidenceThreshold,
+      shadow_verification_gate: shadowFilterEnabled,
+      funnel: {
+        raw_candidates: rawCount,
+        natural_noise_rejected: rejectedCount,
+        confirmed_debris: confirmedCount,
+      },
+      candidates: dynamicCandidates,
       event_logs: eventLogs,
       exported_at: new Date().toISOString(),
     };
     const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
     const a = document.createElement('a');
-    a.href = url; a.download = `SONARX_${activeSite.id}_dossier.json`; a.click();
+    a.href = url;
+    a.download = `SONARLINE_${activeSite.id}_dossier.json`;
+    a.click();
     URL.revokeObjectURL(url);
   };
-
-  const confirmedCount = candidatesList.filter(c => c.status === 'CONFIRMED').length;
 
   return (
     <>
       {/* ── LIVE DEMO SEQUENCE OVERLAY ───────────────────────────────────── */}
-      {isSequenceActive && (
-        <LiveDemoSequence onComplete={handleSequenceComplete} />
-      )}
+      {isSequenceActive && <LiveDemoSequence onComplete={handleSequenceComplete} />}
 
       {/* ── INTERACTIVE MISSION CONTROL DASHBOARD ────────────────────────── */}
       {!isSequenceActive && (
         <div className="flex flex-col h-full w-full bg-[#030B14] text-[#E0F7F4] font-mono select-none overflow-hidden scanlines-overlay">
           <ConsoleTopBar
             activeSite={activeSite}
-            onSelectSite={setActiveSite}
+            onSelectSite={handleSelectSite}
             isPlaying={isPlaying}
             onTogglePlay={handleTogglePlay}
             onExportDossier={handleExportDossier}
@@ -262,9 +368,9 @@ export const MissionPage: React.FC = () => {
               onSelectStage={handleSelectStage}
               layers={layers}
               onToggleLayer={handleToggleLayer}
-              totalCandidatesCount={37}
+              totalCandidatesCount={rawCount}
               confirmedDebrisCount={confirmedCount}
-              hazardsCount={4}
+              hazardsCount={dynamicCandidates.filter((c) => c.status === 'CONFIRMED' && c.confidence > 0.85).length}
               demoPhase={demoPhase}
               onRunDemo={handleRunDemo}
               onReset={handleReset}
@@ -274,7 +380,8 @@ export const MissionPage: React.FC = () => {
               currentStageId={currentStageId}
               activeSite={activeSite}
               layers={layers}
-              candidates={candidatesList}
+              candidates={dynamicCandidates}
+              filteredCandidates={filteredCandidates}
               selectedCandidateId={selectedCandidateId}
               onSelectCandidate={setSelectedCandidateId}
               hoveredCandidateId={hoveredCandidateId}
@@ -286,11 +393,21 @@ export const MissionPage: React.FC = () => {
 
             <ConsoleStageDetail
               currentStageId={currentStageId}
-              candidates={candidatesList}
+              candidates={dynamicCandidates}
+              filteredCandidates={filteredCandidates}
               selectedCandidateId={selectedCandidateId}
               onSelectCandidate={setSelectedCandidateId}
               hoveredCandidateId={hoveredCandidateId}
               onHoverCandidate={setHoveredCandidateId}
+              confidenceThreshold={confidenceThreshold}
+              onChangeConfidenceThreshold={setConfidenceThreshold}
+              selectedCategory={selectedCategory}
+              onChangeCategory={setSelectedCategory}
+              shadowFilterEnabled={shadowFilterEnabled}
+              onToggleShadowFilter={() => setShadowFilterEnabled((v) => !v)}
+              rawCount={rawCount}
+              rejectedCount={rejectedCount}
+              confirmedCount={confirmedCount}
             />
           </div>
 
@@ -298,7 +415,7 @@ export const MissionPage: React.FC = () => {
             currentFrame={currentFrame}
             totalFrames={totalFrames}
             isPlaying={isPlaying}
-            onTogglePlay={() => demoPhase === 'idle' ? handleRunDemo() : handleTogglePlay()}
+            onTogglePlay={handleTogglePlay}
             onSeekFrame={setCurrentFrame}
             onRewind={handleReset}
             speedMultiplier={speedMultiplier}

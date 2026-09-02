@@ -43,6 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     icon: React.ComponentType<any>;
     badge?: string;
   }[] = [
+    { id: 'overview',  label: 'Overview',        icon: LayoutDashboard },
     { id: 'mission',   label: 'Mission Control', icon: Crosshair, badge: 'MX-026' },
     { id: 'scan',      label: 'Upload & Analyze', icon: UploadCloud, badge: 'AI-ONNX' },
     { id: 'map',       label: 'Subsea Map',      icon: MapPin },

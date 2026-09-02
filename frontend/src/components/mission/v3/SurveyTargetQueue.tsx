@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, AlertTriangle, ShieldCheck, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Search, Filter, AlertTriangle, ShieldCheck, CheckCircle2, ChevronRight, Target } from 'lucide-react';
 import { MissionV3Target } from '../../../data/missionV3Data';
 
 interface SurveyTargetQueueProps {
@@ -8,6 +8,7 @@ interface SurveyTargetQueueProps {
   onSelectTarget: (id: string) => void;
   hoveredTargetId?: string | null;
   onHoverTarget?: (id: string | null) => void;
+  onFocusHeroTarget?: (id: string) => void;
 }
 
 export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
@@ -16,6 +17,7 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
   onSelectTarget,
   hoveredTargetId,
   onHoverTarget,
+  onFocusHeroTarget,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -104,6 +106,7 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
             const isSelected = selectedTargetId === target.id;
             const isHovered = hoveredTargetId === target.id;
             const isFiltered = target.status === 'FILTERED';
+            const isGhostNet = target.id === 'SX-T07';
 
             let priorityBadgeClass = 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/40';
             if (target.priority === 'MEDIUM') {
@@ -157,14 +160,27 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
                   </div>
                 </div>
 
-                {/* Sub-details: coordinates */}
-                <div className="mt-1 text-[8.5px] text-[#4A8090] flex items-center justify-between font-mono">
+                {/* Sub-details: coordinates & Quick Focus Button */}
+                <div className="mt-1.5 pt-1 border-t border-[#0D2E4A]/40 text-[8.5px] text-[#4A8090] flex items-center justify-between font-mono">
                   <span>{target.latitude.toFixed(4)}° N, {target.longitude.toFixed(4)}° E</span>
-                  {isSelected && (
-                    <span className="text-[#00D4AA] flex items-center gap-0.5 font-bold">
+                  
+                  {isGhostNet ? (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectTarget('SX-T07');
+                        if (onFocusHeroTarget) onFocusHeroTarget('SX-T07');
+                      }}
+                      className="flex items-center gap-1 px-1.5 py-0.5 bg-[#00D4AA] text-[#030B14] font-black text-[8px] rounded-xs hover:brightness-110 shadow-[0_0_8px_rgba(0,212,170,0.3)] transition-all cursor-pointer"
+                    >
+                      <Target className="w-2.5 h-2.5" />
+                      <span>FOCUS HERO</span>
+                    </button>
+                  ) : isSelected ? (
+                    <span className="text-[#00D4AA] flex items-center gap-0.5 font-bold text-[8px]">
                       FOCUSED <ChevronRight className="w-3 h-3" />
                     </span>
-                  )}
+                  ) : null}
                 </div>
               </div>
             );

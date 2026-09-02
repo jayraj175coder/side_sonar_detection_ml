@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { ZoomIn, ZoomOut, RotateCcw, Maximize2, Crosshair, Sliders, Eye } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCcw, Maximize2, Crosshair, Sliders, Eye, Map } from 'lucide-react';
 import { MissionV3Target } from '../../../data/missionV3Data';
 
 interface LargeSonarViewerProps {
@@ -9,9 +9,9 @@ interface LargeSonarViewerProps {
   hoveredTargetId?: string | null;
   onHoverTarget?: (id: string | null) => void;
   isDemoRunning?: boolean;
-  demoPhaseStep?: number; // 1 to 8
-  contrastBoost?: number;
-  showAcousticShadows?: boolean;
+  demoPhaseStep?: number; // 0 to 7
+  heroConfidence?: number; // 0 to 94.7
+  onViewMissionMap?: () => void;
 }
 
 export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
@@ -21,7 +21,9 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
   hoveredTargetId,
   onHoverTarget,
   isDemoRunning = false,
-  demoPhaseStep = 8,
+  demoPhaseStep = 7,
+  heroConfidence = 94.7,
+  onViewMissionMap,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [zoomLevel, setZoomLevel] = useState(1.0);
@@ -35,7 +37,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentFrame((prev) => (prev >= 128 ? 1 : prev + 1));
-    }, 450);
+    }, 400);
     return () => clearInterval(timer);
   }, []);
 
@@ -82,14 +84,14 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             const speckle = (hash(x, y) - 0.5) * 22;
 
             intensity = (65 + ripple1 + ripple2 + speckle) * grazingFactor;
-            if (contrastEnhanced || (isDemoRunning && demoPhaseStep >= 2)) {
+            if (contrastEnhanced || (isDemoRunning && demoPhaseStep >= 1)) {
               intensity = Math.min(255, (intensity - 30) * 1.55);
             }
           }
 
           intensity = Math.max(0, Math.min(255, intensity));
 
-          // Real Kongberg / Klein deep sea cyan-teal phosphor palette
+          // Real Kongsberg / Klein deep sea cyan-teal phosphor palette
           const r = Math.floor(intensity * 0.12);
           const g = Math.floor(intensity * 0.62);
           const b = Math.floor(intensity * 0.78);
@@ -132,19 +134,17 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
     ctx.restore();
 
     // 3. Draw Detected Targets & Prominent Acoustic Shadows
-    if (showTargetsToggle) {
-      targets.forEach((target) => {
-        // In demo mode: only show candidates if phase >= 3
-        if (isDemoRunning && demoPhaseStep < 3) return;
+    // In Demo: Stage 0 (Ingest) & Stage 1 (Denoise) show NO boxes, just raw acoustic ping waterfall!
+    const shouldShowBoxes = !isDemoRunning || demoPhaseStep >= 2;
+
+    if (showTargetsToggle && shouldShowBoxes) {
+      targets.forEach((target, index) => {
+        // Stagger boxes appearing in Stage 2 (Detect)
+        if (isDemoRunning && demoPhaseStep === 2 && index > 6) return;
 
         const isSelected = selectedTargetId === target.id;
         const isHovered = hoveredTargetId === target.id;
         const isFiltered = target.status === 'FILTERED';
-
-        // In demo mode: filter phase (phase 4) dims filtered noise
-        if (isDemoRunning && demoPhaseStep >= 4 && isFiltered && !isSelected) {
-          // dimmed noise
-        }
 
         const cx = (target.rawX / 100) * W;
         const cy = (target.rawY / 100) * H;
@@ -154,7 +154,6 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
         ctx.save();
 
         // ── A. DRAW PROMINENT ACOUSTIC SHADOW ──
-        // (Length proportional to vertical relief: shadowLength * 16px)
         const shadowLen = Math.max(18, target.shadowLength * 20);
         const objW = Math.max(20, target.length * 2.8);
         const objH = Math.max(14, target.width * 3.2);
@@ -169,7 +168,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           ctx.closePath();
           ctx.fill();
 
-          // Highlight shadow edge for clear judge comprehension
+          // Highlight shadow edge
           ctx.strokeStyle = isSelected ? 'rgba(0, 212, 170, 0.45)' : 'rgba(13, 46, 74, 0.6)';
           ctx.lineWidth = 1;
           ctx.stroke();
@@ -204,29 +203,29 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
 
         // ── C. BOUNDING BOX & HERO LABEL ──
         if (isFiltered) {
-          // Filtered noise box: dashed gray/amber
-          ctx.strokeStyle = 'rgba(100, 116, 139, 0.5)';
+          // If in Demo Phase >= 3 (Filter Stage), show filtered status
+          ctx.strokeStyle = 'rgba(239, 68, 68, 0.35)';
           ctx.setLineDash([3, 3]);
           ctx.strokeRect(cx - objW / 2 - 4, cy - objH / 2 - 4, objW + 8, objH + 8);
           ctx.setLineDash([]);
-          ctx.fillStyle = '#94A3B8';
+          ctx.fillStyle = '#EF4444';
           ctx.font = '7.5px monospace';
-          ctx.fillText(`✕ ${target.id}`, cx - objW / 2, cy - objH / 2 - 6);
+          ctx.fillText(`✕ NOISE`, cx - objW / 2, cy - objH / 2 - 6);
         } else if (isSelected) {
-          // Selected Hero Target Box (clean box, subtle glow, prominent label)
+          // Selected Hero Target Box (Clean cyan box, pulse glow)
           ctx.strokeStyle = '#00D4AA';
           ctx.lineWidth = 2;
           ctx.strokeRect(cx - objW / 2 - 6, cy - objH / 2 - 6, objW + 12, objH + 12);
-          ctx.fillStyle = 'rgba(0, 212, 170, 0.12)';
+          ctx.fillStyle = 'rgba(0, 212, 170, 0.14)';
           ctx.fillRect(cx - objW / 2 - 6, cy - objH / 2 - 6, objW + 12, objH + 12);
 
-          // HERO LABEL BOX:
-          // ┌──────────────────────┐
-          // │      GHOST NET       │
-          // │        94.7%         │
-          // └──────────────────────┘
-          const labelW = 140;
-          const labelH = 34;
+          // HERO LABEL BOX with animated confidence in demo:
+          // ┌──────────────────────────┐
+          // │        GHOST NET         │
+          // │     94.7% CONFIDENCE     │
+          // └──────────────────────────┘
+          const labelW = 150;
+          const labelH = 36;
           const labelX = cx - labelW / 2;
           const labelY = cy - objH / 2 - labelH - 10;
 
@@ -237,13 +236,15 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           ctx.strokeRect(labelX, labelY, labelW, labelH);
 
           ctx.fillStyle = '#E0F7F4';
-          ctx.font = 'bold 10px monospace';
+          ctx.font = 'bold 10.5px monospace';
           ctx.textAlign = 'center';
           ctx.fillText(target.label.toUpperCase(), cx, labelY + 14);
 
+          const displayConf = isDemoRunning ? heroConfidence.toFixed(1) : (target.confidence * 100).toFixed(1);
+
           ctx.fillStyle = '#00D4AA';
           ctx.font = 'black 11px monospace';
-          ctx.fillText(`${(target.confidence * 100).toFixed(1)}% AI CONFIDENCE`, cx, labelY + 28);
+          ctx.fillText(`${displayConf}% AI CONFIDENCE`, cx, labelY + 29);
           ctx.textAlign = 'left';
         } else {
           // Other targets: small clean marker
@@ -289,7 +290,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
       }
       ctx.restore();
     }
-  }, [targets, selectedTargetId, hoveredTargetId, showTargetsToggle, contrastEnhanced, measureActive, measurePoints, currentFrame, isDemoRunning, demoPhaseStep]);
+  }, [targets, selectedTargetId, hoveredTargetId, showTargetsToggle, contrastEnhanced, measureActive, measurePoints, currentFrame, isDemoRunning, demoPhaseStep, heroConfidence]);
 
   // Click on canvas to select nearest target or measure
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -308,7 +309,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
       return;
     }
 
-    // Find nearest target within 35px radius
+    // Find nearest target within 38px radius
     let nearestId: string | null = null;
     let minDist = 38;
 
@@ -347,6 +348,17 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
 
         {/* Compact Toolbar */}
         <div className="flex items-center gap-1.5">
+          {onViewMissionMap && (
+            <button
+              onClick={onViewMissionMap}
+              className="flex items-center gap-1 px-2 py-0.5 bg-[#082830] border border-[#00D4AA]/60 text-[#00D4AA] hover:bg-[#00D4AA] hover:text-[#030B14] text-[9px] font-bold rounded-xs cursor-pointer transition-colors shadow-[0_0_8px_rgba(0,212,170,0.2)] mr-1"
+              title="View Subsea Mission Map"
+            >
+              <Map className="w-3 h-3" />
+              <span>VIEW MAP</span>
+            </button>
+          )}
+
           <button
             onClick={() => setZoomLevel(1.0)}
             className="panel-btn hover:text-[#00D4AA]"

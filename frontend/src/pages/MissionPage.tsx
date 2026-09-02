@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { MissionTopHeader } from '../components/mission/v3/MissionTopHeader';
 import { SurveyTargetQueue } from '../components/mission/v3/SurveyTargetQueue';
 import { LargeSonarViewer } from '../components/mission/v3/LargeSonarViewer';
+import { MissionSubseaMapViewer } from '../components/mission/v3/MissionSubseaMapViewer';
 import { TargetIntelligencePanel } from '../components/mission/v3/TargetIntelligencePanel';
 import { BottomPipelineTimeline } from '../components/mission/v3/BottomPipelineTimeline';
+import { ImpactTranslationBanner } from '../components/mission/v3/ImpactTranslationBanner';
 import { UploadClassifyModal } from '../components/mission/UploadClassifyModal';
 import {
   MISSION_V3_TARGETS,
@@ -22,16 +24,24 @@ export const MissionPage: React.FC = () => {
   const [isJudgeMode, setIsJudgeMode] = useState<boolean>(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
 
+  // Center Viewport Switcher ('sonar' | 'map')
+  const [centerViewMode, setCenterViewMode] = useState<'sonar' | 'map'>('sonar');
+
   // AI Pipeline & Timeline State
-  const [currentStageIndex, setCurrentStageIndex] = useState<number>(6); // Default on 07 VERIFY
+  const [currentStageIndex, setCurrentStageIndex] = useState<number>(6); // Default 07 VERIFY
   const [currentFrame, setCurrentFrame] = useState<number>(81);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [timelineSpeed, setTimelineSpeed] = useState<number>(1);
 
-  // Live Demo Mode State
+  // Live Demo Mode & Hero Sequence State
   const [isDemoRunning, setIsDemoRunning] = useState<boolean>(false);
-  const [demoPhaseStep, setDemoPhaseStep] = useState<number>(8);
-  const demoIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [demoPhaseStep, setDemoPhaseStep] = useState<number>(7); // 0 to 7
+  const [heroConfidence, setHeroConfidence] = useState<number>(94.7);
+  const [explainabilityStep, setExplainabilityStep] = useState<number>(4); // 0 to 4 chips
+  const [isVerified, setIsVerified] = useState<boolean>(true);
+
+  const demoTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const frameIntervalRef = useRef<ReturnType<typeof setInterval>[]>([]);
 
   // Selected Target object
   const selectedTarget = useMemo(() => {
@@ -43,51 +53,149 @@ export const MissionPage: React.FC = () => {
   const highPriorityCount = targets.filter((t) => t.priority === 'HIGH').length;
   const filteredCount = targets.filter((t) => t.status === 'FILTERED').length;
 
+  // Clear all demo timers
+  const clearDemoTimers = useCallback(() => {
+    demoTimeoutsRef.current.forEach((t) => clearTimeout(t));
+    demoTimeoutsRef.current = [];
+    frameIntervalRef.current.forEach((t) => clearInterval(t));
+    frameIntervalRef.current = [];
+  }, []);
+
   // ── Target Selection Handler (Bidirectional Sync) ──
   const handleSelectTarget = useCallback((id: string) => {
     setSelectedTargetId(id);
     sonarAudio.playTargetBeep?.();
   }, []);
 
-  // ── Live Demo Engine (35–40s Guided Progression) ──
-  const handleStartDemo = useCallback(() => {
-    sonarAudio.playLockBeep?.();
-    setIsDemoRunning(true);
-    setDemoPhaseStep(1);
-    setCurrentStageIndex(0); // 01 INGEST
+  // ── Hero Ghost Net Sequence (Manual or Scripted) ──
+  const runHeroSequence = useCallback(() => {
+    setSelectedTargetId('SX-T07');
+    setCenterViewMode('sonar');
+    setHeroConfidence(0);
+    setIsVerified(false);
+    setExplainabilityStep(0);
 
-    if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
-
-    let step = 1;
-    // Advance each stage every 4 seconds
-    demoIntervalRef.current = setInterval(() => {
-      step++;
-      if (step > 8) {
-        if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
-        setIsDemoRunning(false);
-        setDemoPhaseStep(8);
-        setCurrentStageIndex(7); // 08 REPORT
-        return;
-      }
-
-      setDemoPhaseStep(step);
-      setCurrentStageIndex(step - 1);
-
-      // Critical moment in Stage 6 / 7: Force-focus on Hero Ghost Net SX-T07
-      if (step === 6 || step === 7) {
-        setSelectedTargetId('SX-T07');
+    // Animate confidence count-up 0% -> 94.7%
+    let conf = 0;
+    const confInterval = setInterval(() => {
+      conf += 3.2;
+      if (conf >= 94.7) {
+        conf = 94.7;
+        clearInterval(confInterval);
+        setIsVerified(true);
         sonarAudio.playLockBeep?.();
-      } else {
-        sonarAudio.playTargetBeep?.();
       }
-    }, 4200);
+      setHeroConfidence(conf);
+    }, 45);
+    frameIntervalRef.current.push(confInterval);
+
+    // Stagger explainability chips appearing
+    const t1 = setTimeout(() => { setExplainabilityStep(1); sonarAudio.playTargetBeep?.(); }, 1400);
+    const t2 = setTimeout(() => { setExplainabilityStep(2); sonarAudio.playTargetBeep?.(); }, 2200);
+    const t3 = setTimeout(() => { setExplainabilityStep(3); sonarAudio.playTargetBeep?.(); }, 3000);
+    const t4 = setTimeout(() => { setExplainabilityStep(4); sonarAudio.playLockBeep?.(); }, 3800);
+    demoTimeoutsRef.current.push(t1, t2, t3, t4);
   }, []);
+
+  // ── SCRIPTED LIVE DEMO SEQUENCE (~25-28 SECONDS) ──
+  const handleStartDemo = useCallback(() => {
+    clearDemoTimers();
+    sonarAudio.playSonarPing?.();
+
+    setIsDemoRunning(true);
+    setCenterViewMode('sonar');
+    setDemoPhaseStep(0);
+    setCurrentStageIndex(0); // 01 INGEST
+    setCurrentFrame(1);
+    setHeroConfidence(0);
+    setIsVerified(false);
+    setExplainabilityStep(0);
+
+    // Smooth Scrubber Frame Increment (001 -> 128 over 25 seconds)
+    let frame = 1;
+    const fTimer = setInterval(() => {
+      frame += 1;
+      if (frame > 128) {
+        clearInterval(fTimer);
+      } else {
+        setCurrentFrame(frame);
+      }
+    }, 190);
+    frameIntervalRef.current.push(fTimer);
+
+    // T+2.5s: 02 DENOISE
+    const s1 = setTimeout(() => {
+      setCurrentStageIndex(1);
+      setDemoPhaseStep(1);
+      sonarAudio.playTargetBeep?.();
+    }, 2500);
+
+    // T+5.5s: 03 DETECT (Bounding boxes start drawing on)
+    const s2 = setTimeout(() => {
+      setCurrentStageIndex(2);
+      setDemoPhaseStep(2);
+      sonarAudio.playTargetBeep?.();
+    }, 5500);
+
+    // T+8.5s: 04 FILTER (20 Noise/rock candidates suppressed)
+    const s3 = setTimeout(() => {
+      setCurrentStageIndex(3);
+      setDemoPhaseStep(3);
+      sonarAudio.playTargetBeep?.();
+    }, 8500);
+
+    // T+11.5s: 05 CLASSIFY & HERO GHOST NET SEQUENCE
+    const s4 = setTimeout(() => {
+      setCurrentStageIndex(4);
+      setDemoPhaseStep(4);
+      runHeroSequence();
+    }, 11500);
+
+    // T+16.5s: 06 GEOTAG
+    const s5 = setTimeout(() => {
+      setCurrentStageIndex(5);
+      setDemoPhaseStep(5);
+      sonarAudio.playTargetBeep?.();
+    }, 16500);
+
+    // T+19.5s: 07 VERIFY
+    const s6 = setTimeout(() => {
+      setCurrentStageIndex(6);
+      setDemoPhaseStep(6);
+      sonarAudio.playLockBeep?.();
+    }, 19500);
+
+    // T+22.0s: 08 REPORT
+    const s7 = setTimeout(() => {
+      setCurrentStageIndex(7);
+      setDemoPhaseStep(7);
+      sonarAudio.playLockBeep?.();
+    }, 22000);
+
+    // T+24.5s: CLOSING MAP MOMENT (Swaps center view to Mission Subsea Map!)
+    const s8 = setTimeout(() => {
+      setCenterViewMode('map');
+      sonarAudio.playLockBeep?.();
+      setIsDemoRunning(false); // Demo finishes, remaining in triumphant map view!
+    }, 24500);
+
+    demoTimeoutsRef.current.push(s1, s2, s3, s4, s5, s6, s7, s8);
+  }, [clearDemoTimers, runHeroSequence]);
 
   const handleStopDemo = useCallback(() => {
-    if (demoIntervalRef.current) clearInterval(demoIntervalRef.current);
+    clearDemoTimers();
     setIsDemoRunning(false);
-    setDemoPhaseStep(8);
-  }, []);
+    setDemoPhaseStep(7);
+    setCurrentStageIndex(6);
+    setHeroConfidence(94.7);
+    setIsVerified(true);
+    setExplainabilityStep(4);
+  }, [clearDemoTimers]);
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => clearDemoTimers();
+  }, [clearDemoTimers]);
 
   // Keyboard shortcut: Spacebar toggles Play/Pause or starts demo
   useEffect(() => {
@@ -108,7 +216,6 @@ export const MissionPage: React.FC = () => {
     const site = SURVEY_SITES[0];
     const confirmedTargets = targets.filter((t) => t.status === 'CONFIRMED');
 
-    // Convert to format accepted by incident generator
     const candidateAdapter = confirmedTargets.map((t) => ({
       id: t.id,
       class: t.label,
@@ -144,7 +251,10 @@ export const MissionPage: React.FC = () => {
         filteredCount={filteredCount}
       />
 
-      {/* ── MAIN WORKSPACE (EXACTLY 3 COLUMNS: LEFT QUEUE, CENTER SONAR HERO, RIGHT INTEL HERO) ── */}
+      {/* ── IMPACT TRANSLATION BANNER (Translates ML stats to human impact) ── */}
+      <ImpactTranslationBanner isDemoRunning={isDemoRunning} />
+
+      {/* ── MAIN WORKSPACE (3 COLUMNS: LEFT QUEUE, CENTER HERO VIEW, RIGHT INTEL HERO) ── */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* 1. LEFT — Survey + Detection Queue */}
         <SurveyTargetQueue
@@ -153,23 +263,39 @@ export const MissionPage: React.FC = () => {
           onSelectTarget={handleSelectTarget}
           hoveredTargetId={hoveredTargetId}
           onHoverTarget={setHoveredTargetId}
+          onFocusHeroTarget={runHeroSequence}
         />
 
-        {/* 2. CENTER — Large Side-Scan Sonar Viewer (55–60% of main workspace, Visual Hero) */}
-        <LargeSonarViewer
-          targets={targets}
-          selectedTargetId={selectedTargetId}
-          onSelectTarget={handleSelectTarget}
-          hoveredTargetId={hoveredTargetId}
-          onHoverTarget={setHoveredTargetId}
-          isDemoRunning={isDemoRunning}
-          demoPhaseStep={demoPhaseStep}
-        />
+        {/* 2. CENTER — Dual Mode Hero Viewport (Sonar Waterfall or Closing Subsea Mission Map) */}
+        {centerViewMode === 'sonar' ? (
+          <LargeSonarViewer
+            targets={targets}
+            selectedTargetId={selectedTargetId}
+            onSelectTarget={handleSelectTarget}
+            hoveredTargetId={hoveredTargetId}
+            onHoverTarget={setHoveredTargetId}
+            isDemoRunning={isDemoRunning}
+            demoPhaseStep={demoPhaseStep}
+            heroConfidence={heroConfidence}
+            onViewMissionMap={() => setCenterViewMode('map')}
+          />
+        ) : (
+          <MissionSubseaMapViewer
+            targets={targets}
+            selectedTargetId={selectedTargetId}
+            onSelectTarget={handleSelectTarget}
+            onBackToSonar={() => setCenterViewMode('sonar')}
+            onExportReport={handleExportReport}
+          />
+        )}
 
         {/* 3. RIGHT — Selected Target Intelligence (Information Hero) */}
         <TargetIntelligencePanel
           target={selectedTarget}
-          isVerified={currentStageIndex >= 6}
+          isVerified={isVerified}
+          isDemoRunning={isDemoRunning}
+          heroConfidence={heroConfidence}
+          explainabilityStep={explainabilityStep}
         />
       </div>
 
@@ -181,7 +307,10 @@ export const MissionPage: React.FC = () => {
         totalFrames={128}
         isPlaying={isPlaying}
         onTogglePlay={() => setIsPlaying((v) => !v)}
-        onReset={() => setCurrentFrame(1)}
+        onReset={() => {
+          setCurrentFrame(1);
+          setCurrentStageIndex(0);
+        }}
         speed={timelineSpeed}
         onSelectSpeed={setTimelineSpeed}
         isDemoRunning={isDemoRunning}

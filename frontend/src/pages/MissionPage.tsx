@@ -17,6 +17,7 @@ import { sonarAudio } from '../utils/sonarAudio';
 import { exportOfficialIncidentReport } from '../utils/incidentReportGenerator';
 import { SURVEY_SITES } from '../data/consoleData';
 import { LiveDemoSequence } from '../components/console/LiveDemoSequence';
+import { JudgeModeProofView } from '../components/mission/v3/JudgeModeProofView';
 
 export const MissionPage: React.FC = () => {
   // ── State Management ──
@@ -24,6 +25,9 @@ export const MissionPage: React.FC = () => {
   const [selectedTargetId, setSelectedTargetId] = useState<string>('SX-T07');
   const [hoveredTargetId, setHoveredTargetId] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
+
+  // Judge Mode (20-Second Simplified Proof View)
+  const [isJudgeMode, setIsJudgeMode] = useState<boolean>(false);
 
   // Center Viewport Switcher ('sonar' | 'map' | '3d')
   const [centerViewMode, setCenterViewMode] = useState<'sonar' | 'map' | '3d'>('sonar');
@@ -261,6 +265,8 @@ export const MissionPage: React.FC = () => {
         isDemoRunning={isDemoRunning}
         onStartDemo={handleStartDemo}
         onStopDemo={handleStopDemo}
+        isJudgeMode={isJudgeMode}
+        onToggleJudgeMode={() => setIsJudgeMode((v) => !v)}
         onOpenCinematicDemo={() => setShowCinematicDemo(true)}
         onOpenUpload={() => setIsUploadModalOpen(true)}
         onExportReport={handleExportReport}
@@ -277,17 +283,28 @@ export const MissionPage: React.FC = () => {
       {/* ── IMPACT TRANSLATION BANNER (Translates ML stats to human impact) ── */}
       <ImpactTranslationBanner isDemoRunning={isDemoRunning} />
 
-      {/* ── MAIN WORKSPACE (3 COLUMNS: LEFT QUEUE, CENTER HERO VIEW, RIGHT INTEL HERO) ── */}
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* 1. LEFT — Survey + Detection Queue */}
-        <SurveyTargetQueue
-          targets={processedTargets}
-          selectedTargetId={selectedTargetId}
-          onSelectTarget={handleSelectTarget}
-          hoveredTargetId={hoveredTargetId}
-          onHoverTarget={setHoveredTargetId}
-          onFocusHeroTarget={runHeroSequence}
+      {/* ── MAIN WORKSPACE: JUDGE MODE 3-PANEL PROOF OR FULL WORKSTATION ── */}
+      {isJudgeMode ? (
+        <JudgeModeProofView
+          heroTarget={selectedTarget}
+          onExitJudgeMode={() => setIsJudgeMode(false)}
+          onExportReport={handleExportReport}
+          confidenceThreshold={confidenceThreshold}
         />
+      ) : (
+        <div className="flex-1 flex overflow-hidden relative">
+          {/* 1. LEFT — Survey + Detection Queue */}
+          <SurveyTargetQueue
+            targets={processedTargets}
+            selectedTargetId={selectedTargetId}
+            onSelectTarget={handleSelectTarget}
+            hoveredTargetId={hoveredTargetId}
+            onHoverTarget={setHoveredTargetId}
+            onFocusHeroTarget={runHeroSequence}
+            currentStageIndex={currentStageIndex}
+            confidenceThreshold={confidenceThreshold}
+            onChangeConfidenceThreshold={setConfidenceThreshold}
+          />
 
         {/* 2. CENTER — 3-Way Hero Viewport (Sonar Waterfall | Subsea Mission Map | 3D Seafloor) */}
         {centerViewMode === 'sonar' ? (
@@ -330,7 +347,8 @@ export const MissionPage: React.FC = () => {
           heroConfidence={heroConfidence}
           explainabilityStep={explainabilityStep}
         />
-      </div>
+        </div>
+      )}
 
       {/* ── 4. BOTTOM — AI Pipeline & Mission Timeline ── */}
       <BottomPipelineTimeline

@@ -25,16 +25,14 @@ export const App: React.FC = () => {
 
   const getPageHeaderInfo = () => {
     switch (activeTab) {
-      case 'overview':  return { title: 'Mission Overview',            subtitle: 'Aggregate acoustic survey metrics & live telemetry' };
-      case 'scan':      return { title: 'Acoustic Target Inspection',  subtitle: 'Upload side-scan sonar imagery for YOLOv8n object detection' };
-      case 'history':   return { title: 'Survey Archive',              subtitle: 'Comprehensive log of analyzed side-scan sonar tracks' };
-      case 'map':       return { title: 'Detection Map',               subtitle: 'Geospatial overview of analyzed sonar scans' };
-      case 'reports':   return { title: 'Acoustic Inspection Reports', subtitle: 'Formal MoES environmental survey reports and data export' };
-      case 'model':     return { title: 'Neural Model Specifications', subtitle: 'YOLOv8n ONNX architecture and empirical validation benchmarks' };
-      case 'mission':   return { title: 'Mission Control',             subtitle: 'SX-014 · Arabian Sea Survey · Live Intelligence Workstation' };
-      case 'sonar':     return { title: 'Marine Debris Intelligence Node', subtitle: 'Lagrangian drift forecast, particle dispersion & vessel attribution matching' };
-      case 'analytics': return { title: 'Mission Analytics',           subtitle: 'SX-014 · Survey statistics, detection metrics & coverage analysis' };
-      default:          return { title: 'SONARX',                      subtitle: 'AI-Powered Side-Scan Sonar Intelligence' };
+      case 'overview':  return { title: 'SONARX // Overview',             subtitle: 'Automated Side-Scan Sonar Intelligence for Marine Survey Teams' };
+      case 'scan':      return { title: 'Upload & Analyze',               subtitle: 'Raw side-scan sonar image ingestion & automated YOLOv8 ONNX perception' };
+      case 'mission':   return { title: 'Mission Control',                subtitle: 'Mumbai Shelf Corridor · Interactive Side-Scan Analysis Workstation' };
+      case 'map':       return { title: 'Subsea Map',                     subtitle: 'Geospatial coordinate mapping & acoustic anomaly positions' };
+      case 'analytics': return { title: 'Mission Analytics',              subtitle: 'Anomaly distributions, noise suppression ratios & survey efficiency metrics' };
+      case 'reports':   return { title: 'Marine Debris Anomaly Dossier',  subtitle: 'MoES compliance reports, WGS84 target registers & retrieval recommendations' };
+      case 'model':     return { title: 'Model Intel',                    subtitle: 'YOLOv8n ONNX perception architecture, acoustic noise filter & validation metrics' };
+      default:          return { title: 'SONARX',                         subtitle: 'Automated Side-Scan Sonar Intelligence for Marine Survey Teams' };
     }
   };
 

@@ -206,13 +206,13 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
         // ── C. BOUNDING BOX & HERO LABEL ──
         if (isFiltered) {
           // If in Demo Phase >= 3 (Filter Stage), show filtered status
-          ctx.strokeStyle = 'rgba(239, 68, 68, 0.35)';
+          ctx.strokeStyle = 'rgba(239, 68, 68, 0.45)';
           ctx.setLineDash([3, 3]);
           ctx.strokeRect(cx - objW / 2 - 4, cy - objH / 2 - 4, objW + 8, objH + 8);
           ctx.setLineDash([]);
           ctx.fillStyle = '#EF4444';
-          ctx.font = '7.5px monospace';
-          ctx.fillText(`✕ NOISE`, cx - objW / 2, cy - objH / 2 - 6);
+          ctx.font = 'bold 8px monospace';
+          ctx.fillText(`✕ NOISE / ROCK`, cx - objW / 2, cy - objH / 2 - 6);
         } else if (isSelected) {
           // Selected Hero Target Box (Clean cyan box, pulse glow)
           ctx.strokeStyle = '#00D4AA';
@@ -221,13 +221,14 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           ctx.fillStyle = 'rgba(0, 212, 170, 0.14)';
           ctx.fillRect(cx - objW / 2 - 6, cy - objH / 2 - 6, objW + 12, objH + 12);
 
-          // HERO LABEL BOX with animated confidence in demo:
+          // HERO LABEL BOX with 3 clear lines as requested:
           // ┌──────────────────────────┐
           // │        GHOST NET         │
+          // │          SX-T07          │
           // │     94.7% CONFIDENCE     │
           // └──────────────────────────┘
-          const labelW = 150;
-          const labelH = 36;
+          const labelW = 160;
+          const labelH = 46;
           const labelX = cx - labelW / 2;
           const labelY = cy - objH / 2 - labelH - 10;
 
@@ -238,15 +239,19 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           ctx.strokeRect(labelX, labelY, labelW, labelH);
 
           ctx.fillStyle = '#E0F7F4';
-          ctx.font = 'bold 10.5px monospace';
+          ctx.font = 'bold 10px monospace';
           ctx.textAlign = 'center';
-          ctx.fillText(target.label.toUpperCase(), cx, labelY + 14);
+          ctx.fillText(target.label.toUpperCase(), cx, labelY + 13);
+
+          ctx.fillStyle = '#7C98A6';
+          ctx.font = 'bold 8.5px monospace';
+          ctx.fillText(target.id, cx, labelY + 25);
 
           const displayConf = isDemoRunning ? heroConfidence.toFixed(1) : (target.confidence * 100).toFixed(1);
 
           ctx.fillStyle = '#00D4AA';
-          ctx.font = 'black 11px monospace';
-          ctx.fillText(`${displayConf}% AI CONFIDENCE`, cx, labelY + 29);
+          ctx.font = 'black 10.5px monospace';
+          ctx.fillText(`${displayConf}% CONFIDENCE`, cx, labelY + 39);
           ctx.textAlign = 'left';
         } else {
           // Other targets: small clean marker
@@ -427,10 +432,10 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           <button
             onClick={() => setContrastEnhanced((v) => !v)}
             className={`panel-btn ${contrastEnhanced ? 'text-[#00D4AA] border-[#00D4AA]/60 bg-[#082830]' : 'text-[#4A8090]'}`}
-            title="Toggle CLAHE Contrast Boost"
+            title="Toggle Raw Sonar vs Bilateral CLAHE Denoised Sonar"
           >
             <Sliders className="w-3 h-3 mr-1" />
-            <span>CONTRAST</span>
+            <span>{contrastEnhanced ? 'DENOISED (CLAHE)' : 'RAW / DENOISED'}</span>
           </button>
         </div>
       </div>
@@ -446,8 +451,17 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           className="w-full h-full object-contain cursor-crosshair transition-transform duration-200"
         />
 
-        {/* Dynamic HUD Watermark Indicator */}
-        <div className="absolute bottom-3 left-3 bg-[#030B14]/85 border border-[#0D2E4A] px-2.5 py-1 text-[8.5px] text-[#4A8090] flex items-center gap-3">
+        {/* Dynamic HUD Pipeline Summary Ribbon */}
+        <div className="absolute bottom-3 left-3 bg-[#030B14]/90 border border-[#00D4AA]/40 px-3 py-1.5 text-[8.5px] text-[#7C98A6] flex items-center gap-3 shadow-[0_0_12px_rgba(0,212,170,0.15)] rounded-xs">
+          <span>AI FOUND: <strong className="text-[#E0F7F4]">8 CANDIDATES</strong></span>
+          <span className="text-[#00D4AA]">→</span>
+          <span>FILTER: <strong className="text-[#EF4444]">4 REJECTED (NOISE/ROCKS)</strong></span>
+          <span className="text-[#00D4AA]">→</span>
+          <span>VERIFIED: <strong className="text-[#00D4AA]">4 CONFIRMED DEBRIS</strong></span>
+        </div>
+
+        {/* Dynamic HUD Telemetry Indicator */}
+        <div className="absolute bottom-3 right-3 bg-[#030B14]/85 border border-[#0D2E4A] px-2.5 py-1 text-[8.5px] text-[#4A8090] flex items-center gap-3 rounded-xs">
           <span>TOWFISH SPEED: <strong className="text-[#00D4AA]">4.1 kts</strong></span>
           <span>·</span>
           <span>ALTITUDE: <strong className="text-[#E0F7F4]">8.4 m</strong></span>

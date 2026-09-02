@@ -44,22 +44,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     badge?: string;
   }[] = [
     { id: 'overview',  label: 'Overview',        icon: LayoutDashboard },
-    { id: 'mission',   label: 'Mission Control', icon: Crosshair, badge: 'MX-026' },
-    { id: 'scan',      label: 'Upload & Analyze', icon: UploadCloud, badge: 'AI-ONNX' },
+    { id: 'scan',      label: 'Upload & Analyze', icon: UploadCloud, badge: 'ONNX' },
+    { id: 'mission',   label: 'Mission Control', icon: Crosshair, badge: 'HERO' },
     { id: 'map',       label: 'Subsea Map',      icon: MapPin },
     { id: 'analytics', label: 'Analytics',       icon: BarChart2 },
     { id: 'reports',   label: 'Reports',         icon: FileText },
-    { id: 'history',   label: 'Survey Archive',  icon: History },
-    { id: 'model',     label: 'Model Intel',     icon: Cpu, badge: 'v2.4' },
-  ];
-
-  const advancedNavItems: {
-    id: TabType;
-    label: string;
-    icon: React.ComponentType<any>;
-    badge?: string;
-  }[] = [
-    { id: 'sonar',     label: 'Forensic Drift Intel', icon: Eye, badge: 'ADVANCED' },
+    { id: 'model',     label: 'Model Intel',     icon: Cpu, badge: 'YOLOv8' },
   ];
 
   const handleNavClick = (id: TabType) => {
@@ -133,49 +123,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               })}
             </nav>
           </div>
-
-          {/* Advanced / Secondary Analysis (Commented out) */}
-          {/*
-          <div>
-            {!isSidebarCollapsed && (
-              <p className="px-3 text-[9px] font-bold text-[#6F8992] uppercase tracking-widest mb-2">
-                Secondary Research
-              </p>
-            )}
-            <nav className="space-y-1">
-              {advancedNavItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleNavClick(item.id)}
-                    title={isSidebarCollapsed ? item.label : undefined}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer group ${
-                      isActive
-                        ? 'bg-[#32E6D1]/20 border border-[#32E6D1]/40 text-[#32E6D1]'
-                        : 'text-[#6F8992] hover:text-[#E4F2F5] hover:bg-[#0C171E]'
-                    } ${isSidebarCollapsed ? 'justify-center px-0' : ''}`}
-                  >
-                    <Icon
-                      className={`w-4 h-4 shrink-0 ${
-                        isActive ? 'text-[#32E6D1]' : 'text-[#6F8992]'
-                      }`}
-                    />
-                    {!isSidebarCollapsed && (
-                      <span className="truncate flex-1 text-left">{item.label}</span>
-                    )}
-                    {!isSidebarCollapsed && item.badge && (
-                      <span className="text-[7px] font-mono px-1 py-0.2 rounded bg-[#0C171E] border border-[#16303B] text-[#6F8992]">
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-          */}
         </div>
 
         {/* Footer Diagnostics Strip */}

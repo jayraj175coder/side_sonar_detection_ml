@@ -319,16 +319,18 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
       </div>
 
       {/* ── 2. PROMINENT EXPLAINABILITY PANEL ("WHY SONARX FLAGGED THIS") ── */}
-      {/* Placed prominently at the top so it is visible without scrolling during live demo */}
       <div className="p-3.5 border-b border-[#0D2E4A] bg-[#05121F] space-y-2.5">
         <div className="flex items-center justify-between">
           <div className="text-[10.5px] font-black text-[#00D4AA] uppercase tracking-wider flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-[#00D4AA]" />
-            <span>WHY SONARX FLAGGED THIS</span>
+            <span>AI EVIDENCE SCORES</span>
           </div>
-          <span className="text-[8px] font-bold px-1.5 py-0.2 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded-xs">
-            LIVE REASONING
+          <span className="text-[7.5px] font-bold px-1.5 py-0.2 bg-[#082830] text-[#7C98A6] border border-[#00D4AA]/40 rounded-xs uppercase">
+            Model / Heuristic Evidence
           </span>
+        </div>
+        <div className="text-[8px] text-[#7C98A6]">
+          Evidence scores derived from YOLOv8n spatial activations & acoustic shadow geometry:
         </div>
 
         {/* 4 Reasoning Chips (Animates in during demo) */}

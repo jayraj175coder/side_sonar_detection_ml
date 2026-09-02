@@ -21,27 +21,39 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({
   const stages = [
     {
       id: 1,
-      title: 'Acoustic Frame Calibration & Geotag Ingestion',
-      desc: 'Letterbox normalization (640×640), slant-range correction & ping log extraction',
+      title: '01 INGESTING — Raw SSS Imagery',
+      desc: 'Dual-channel port/starboard backscatter calibration & letterbox normalization (640×640)',
       icon: Layers,
     },
     {
       id: 2,
-      title: 'ONNX Deep Learning Tensor Inference',
-      desc: 'Executing forward pass with YOLOv8n-SIH-Marine-Debris-V2 weights',
-      icon: Cpu,
+      title: '02 DENOISING — Preprocessing',
+      desc: 'Bilateral filtering speckle suppression & CLAHE contrast boost',
+      icon: Radio,
     },
     {
       id: 3,
-      title: 'IoU NMS & Acoustic Shadow Verification',
-      desc: 'Rule-based noise filtering: shadow contrast ratios & aspect ratio priors',
-      icon: ShieldCheck,
+      title: '03 DETECTING — YOLOv8n ONNX Forward Pass',
+      desc: 'Computing candidate proposals via marine_sonar_v2.onnx tensor inference',
+      icon: Cpu,
     },
     {
       id: 4,
-      title: 'Synthesizing MoES Inspection Briefing',
-      desc: 'Binding WGS84 coordinates and compiling environmental risk assessment',
-      icon: Radio,
+      title: '04 FILTERING — Acoustic Shadow Gate',
+      desc: 'Acoustic shadow trigonometry verification: rejecting flat basalt rocks and sand ripples',
+      icon: ShieldCheck,
+    },
+    {
+      id: 5,
+      title: '05 CLASSIFYING — Debris Taxonomy',
+      desc: 'Categorizing Ghost Net (ALDFG), lost fishing gear, pipeline hazards & anthropogenic debris',
+      icon: Sparkles,
+    },
+    {
+      id: 6,
+      title: '06 GEOTAGGING — WGS-84 Fix & Dossier',
+      desc: 'Sensor-derived USBL latitude/longitude georeferencing and incident dossier compilation',
+      icon: Compass,
     },
   ];
 

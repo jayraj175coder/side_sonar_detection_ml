@@ -5,6 +5,8 @@ interface MissionTopHeaderProps {
   isDemoRunning: boolean;
   onStartDemo: () => void;
   onStopDemo: () => void;
+  isJudgeMode?: boolean;
+  onToggleJudgeMode?: () => void;
   onOpenCinematicDemo?: () => void;
   onOpenUpload: () => void;
   onExportReport: () => void;
@@ -22,6 +24,8 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
   isDemoRunning,
   onStartDemo,
   onStopDemo,
+  isJudgeMode = false,
+  onToggleJudgeMode,
   onOpenCinematicDemo,
   onOpenUpload,
   onExportReport,
@@ -59,13 +63,13 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
         </div>
 
         {/* Center: Real survey parameters & status */}
-        <div className="hidden lg:flex items-center gap-5 px-3 py-1 bg-[#05121F] border border-[#0D2E4A] rounded-xs text-[10px]">
+        <div className="hidden lg:flex items-center gap-4 px-3 py-1 bg-[#05121F] border border-[#0D2E4A] rounded-xs text-[10px]">
           <div className="flex items-center gap-1.5">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D4AA] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D4AA]"></span>
             </span>
-            <span className="font-bold text-[#00D4AA] tracking-wider uppercase text-[9.5px]">
+            <span className="font-bold text-[#00D4AA] tracking-wider uppercase text-[9px]">
               {isDemoRunning ? `DEMO: ${activePhaseName || 'RUNNING'}` : 'SYSTEM ONLINE'}
             </span>
           </div>
@@ -73,23 +77,43 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
           <div className="h-3.5 w-px bg-[#0D2E4A]" />
 
           <div className="text-left">
-            <span className="text-[#4A8090] text-[8px] uppercase">SECTOR: </span>
-            <strong className="text-[#E0F7F4] text-[9.5px]">MUMBAI SHELF CORRIDOR</strong>
+            <span className="text-[#4A8090] text-[8px] uppercase">SURVEY: </span>
+            <strong className="text-[#E0F7F4] text-[9px]">MUMBAI SHELF CORRIDOR</strong>
           </div>
 
           <div className="h-3.5 w-px bg-[#0D2E4A]" />
 
-          <div className="flex items-center gap-2 text-[#4A8090] text-[9.5px]">
+          <div className="flex items-center gap-2 text-[#4A8090] text-[9px]">
             <span><strong className="text-[#E0F7F4]">900</strong> kHz</span>
             <span>·</span>
             <span><strong className="text-[#E0F7F4]">75</strong> m SWATH</span>
             <span>·</span>
-            <span><strong className="text-[#00D4AA]">4.1</strong> KTS</span>
+            <span>FRAME <strong className="text-[#00D4AA]">088</strong> / 128</span>
+            <span>·</span>
+            <span>MODEL: <strong className="text-[#E0F7F4]">YOLOv8 / ONNX</strong></span>
+            <span>·</span>
+            <span><strong className="text-[#00D4AA]">42</strong> ms</span>
           </div>
         </div>
 
         {/* Right: Streamlined Action Buttons */}
         <div className="flex items-center gap-2">
+          {/* JUDGE MODE TOGGLE */}
+          {onToggleJudgeMode && (
+            <button
+              onClick={onToggleJudgeMode}
+              className={`flex items-center gap-1.5 px-3 py-1.5 border text-[10px] font-black cursor-pointer rounded-xs transition-all ${
+                isJudgeMode
+                  ? 'bg-[#F59E0B] text-[#030B14] border-[#F59E0B] shadow-[0_0_12px_rgba(245,158,11,0.4)]'
+                  : 'bg-[#05121F] border-[#0D2E4A] hover:border-[#F59E0B]/60 text-[#F59E0B]'
+              }`}
+              title="Toggle 20-second simplified Judge Mode presentation"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>{isJudgeMode ? 'JUDGE MODE: ON' : 'JUDGE MODE'}</span>
+            </button>
+          )}
+
           {/* CINEMATIC STORY DEMO FOR JUDGES */}
           {onOpenCinematicDemo && (
             <button

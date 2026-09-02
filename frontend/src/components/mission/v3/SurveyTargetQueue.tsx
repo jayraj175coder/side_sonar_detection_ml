@@ -1,6 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, AlertTriangle, ShieldCheck, CheckCircle2, ChevronRight, Target } from 'lucide-react';
-import { MissionV3Target } from '../../../data/missionV3Data';
+import {
+  Search,
+  Filter,
+  AlertTriangle,
+  ShieldCheck,
+  CheckCircle2,
+  ChevronRight,
+  Target,
+  Sliders,
+  Sparkles,
+} from 'lucide-react';
+import { MissionV3Target, PIPELINE_STAGES_V3 } from '../../../data/missionV3Data';
 
 interface SurveyTargetQueueProps {
   targets: MissionV3Target[];
@@ -9,6 +19,9 @@ interface SurveyTargetQueueProps {
   hoveredTargetId?: string | null;
   onHoverTarget?: (id: string | null) => void;
   onFocusHeroTarget?: (id: string) => void;
+  currentStageIndex?: number;
+  confidenceThreshold?: number;
+  onChangeConfidenceThreshold?: (val: number) => void;
 }
 
 export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
@@ -18,6 +31,9 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
   hoveredTargetId,
   onHoverTarget,
   onFocusHeroTarget,
+  currentStageIndex = 6,
+  confidenceThreshold = 40,
+  onChangeConfidenceThreshold,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -46,46 +62,124 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
 
   return (
     <aside className="w-72 lg:w-80 bg-[#05121F] border-r border-[#0D2E4A] flex flex-col font-mono select-none overflow-hidden shrink-0 z-20">
-      {/* ── HEADER ── */}
-      <div className="p-3.5 border-b border-[#0D2E4A] bg-[#030B14] space-y-2.5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xs font-black tracking-wider text-[#E0F7F4] uppercase">
-              SURVEY TARGETS
-            </h2>
-            <div className="text-[10px] text-[#4A8090]">
-              {targets.length} DETECTIONS LOGGED
-            </div>
-          </div>
-          <span className="text-[9px] font-bold px-2 py-0.5 bg-[#082830] border border-[#00D4AA]/40 text-[#00D4AA] rounded-sm shadow-[0_0_8px_rgba(0,212,170,0.15)]">
-            QUEUE ACTIVE
+      {/* ── 1. PIPELINE STAGES PROGRESSION (SECTION 5 REQUIREMENT) ── */}
+      <div className="p-3 border-b border-[#0D2E4A] bg-[#030B14] space-y-1.5">
+        <div className="flex items-center justify-between text-[9px] font-bold text-[#7C98A6] uppercase tracking-wider">
+          <span>AI PIPELINE PROGRESSION</span>
+          <span className="text-[#00D4AA] font-bold">
+            STAGE 0{currentStageIndex + 1} / 08
           </span>
         </div>
 
-        {/* Search input */}
+        <div className="grid grid-cols-2 gap-1 text-[8.5px]">
+          {PIPELINE_STAGES_V3.slice(0, 7).map((stg, idx) => {
+            const isDone = idx < currentStageIndex;
+            const isCurrent = idx === currentStageIndex;
+            return (
+              <div
+                key={stg.number}
+                className={`px-1.5 py-0.5 rounded-xs flex items-center gap-1 border transition-all ${
+                  isCurrent
+                    ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA] font-bold shadow-[0_0_8px_rgba(0,212,170,0.2)]'
+                    : isDone
+                    ? 'bg-[#05121F] border-[#0D2E4A] text-[#E0F7F4]'
+                    : 'bg-[#02070D] border-transparent text-[#4A8090]'
+                }`}
+              >
+                <span className={isCurrent ? 'text-[#00D4AA] animate-pulse' : isDone ? 'text-[#00D4AA]' : 'text-[#4A8090]'}>
+                  {isDone ? '✓' : isCurrent ? '●' : '○'}
+                </span>
+                <span className="truncate">{stg.number} {stg.name}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── 2. DEDICATED ACOUSTIC NOISE FILTER PANEL (SECTION 6 REQUIREMENT) ── */}
+      <div className="p-3 border-b border-[#0D2E4A] bg-[#05121F] space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[9.5px] font-black text-[#E0F7F4] uppercase tracking-wider flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#00D4AA]" />
+            <span>ACOUSTIC NOISE FILTER</span>
+          </span>
+          <span className="text-[8px] px-1 py-0.2 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded-xs font-bold">
+            SHADOW GATE ACTIVE
+          </span>
+        </div>
+
+        {/* Triage Counts */}
+        <div className="grid grid-cols-3 gap-1 text-center">
+          <div className="p-1.5 bg-[#030B14] border border-[#0D2E4A] rounded-xs">
+            <div className="text-[7.5px] text-[#7C98A6] uppercase">CANDIDATES</div>
+            <div className="text-sm font-black text-[#E0F7F4]">8</div>
+          </div>
+          <div className="p-1.5 bg-[#030B14] border border-[#EF4444]/40 rounded-xs">
+            <div className="text-[7.5px] text-[#EF4444] uppercase">REJECTED</div>
+            <div className="text-sm font-black text-[#EF4444]">4</div>
+          </div>
+          <div className="p-1.5 bg-[#030B14] border border-[#00D4AA]/40 rounded-xs">
+            <div className="text-[7.5px] text-[#00D4AA] uppercase">CONFIRMED</div>
+            <div className="text-sm font-black text-[#00D4AA]">4</div>
+          </div>
+        </div>
+
+        {/* Filter Reasons & Confirmed Breakdown */}
+        <div className="space-y-1 text-[8px] text-[#7C98A6] pt-0.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[#EF4444]">✕ Filter Reasons:</span>
+            <span>2× low conf · 1× rock · 1× sediment</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[#00D4AA]">✓ Confirmed Debris:</span>
+            <span>2× Ghost Net · 1× Gear · 1× Debris</span>
+          </div>
+        </div>
+
+        {/* Interactive Confidence Cutoff Slider */}
+        {onChangeConfidenceThreshold && (
+          <div className="pt-1 border-t border-[#0D2E4A]/80">
+            <div className="flex items-center justify-between text-[8px] mb-1">
+              <span className="text-[#7C98A6] font-bold">Confidence Threshold:</span>
+              <span className="text-[#00D4AA] font-bold">{confidenceThreshold}%</span>
+            </div>
+            <input
+              type="range"
+              min="15"
+              max="85"
+              value={confidenceThreshold}
+              onChange={(e) => onChangeConfidenceThreshold(Number(e.target.value))}
+              className="w-full h-1 bg-[#0A1E30] accent-[#00D4AA] cursor-pointer"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ── 3. SEARCH & CATEGORY FILTER ── */}
+      <div className="p-2.5 border-b border-[#0D2E4A] bg-[#030B14] space-y-1.5">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#4A8090]" />
+          <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-[#4A8090]" />
           <input
             type="text"
-            placeholder="Search targets (e.g. Ghost Net, SX-T07)..."
+            placeholder="Search targets..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-8 pr-2.5 py-1.5 bg-[#0A1E30] border border-[#0D2E4A] text-[10.5px] text-[#E0F7F4] placeholder-[#4A8090] focus:outline-none focus:border-[#00D4AA]/70 rounded-sm"
+            className="w-full pl-7 pr-2 py-1 bg-[#0A1E30] border border-[#0D2E4A] text-[9.5px] text-[#E0F7F4] placeholder-[#4A8090] focus:outline-none focus:border-[#00D4AA]/70 rounded-xs"
           />
         </div>
 
-        {/* Category filter pills */}
-        <div className="flex flex-wrap gap-1 pt-0.5">
+        {/* Filter pills */}
+        <div className="flex flex-wrap gap-1">
           {CATEGORIES.map((cat) => {
             const isActive = selectedCategory === cat;
             return (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-2 py-0.5 text-[8.5px] font-bold border transition-all cursor-pointer rounded-xs ${
+                className={`px-1.5 py-0.5 text-[8px] font-bold border transition-all cursor-pointer rounded-xs ${
                   isActive
                     ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] shadow-[0_0_8px_rgba(0,212,170,0.3)]'
-                    : 'bg-[#0A1E30] text-[#4A8090] border-[#0D2E4A] hover:text-[#E0F7F4] hover:border-[#00D4AA]/40'
+                    : 'bg-[#0A1E30] text-[#7C98A6] border-[#0D2E4A] hover:text-[#E0F7F4]'
                 }`}
               >
                 {cat}
@@ -95,10 +189,10 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
         </div>
       </div>
 
-      {/* ── TARGET LIST ── */}
-      <div className="flex-1 overflow-y-auto divide-y divide-[#0D2E4A]/60 p-2 space-y-1.5">
+      {/* ── 4. TARGET REGISTER CARDS ── */}
+      <div className="flex-1 overflow-y-auto divide-y divide-[#0D2E4A]/60 p-2 space-y-1">
         {filteredTargets.length === 0 ? (
-          <div className="p-6 text-center text-[#4A8090] text-xs">
+          <div className="p-6 text-center text-[#7C98A6] text-xs">
             No targets match filter.
           </div>
         ) : (
@@ -108,90 +202,76 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
             const isFiltered = target.status === 'FILTERED';
             const isGhostNet = target.id === 'SX-T07';
 
-            let priorityBadgeClass = 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/40';
-            if (target.priority === 'MEDIUM') {
-              priorityBadgeClass = 'bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/40';
-            } else if (target.priority === 'LOW') {
-              priorityBadgeClass = 'bg-[#38BDF8]/20 text-[#38BDF8] border-[#38BDF8]/40';
-            } else if (target.priority === 'FILTERED') {
-              priorityBadgeClass = 'bg-[#4A8090]/20 text-[#4A8090] border-[#4A8090]/40';
-            }
-
             return (
               <div
                 key={target.id}
                 onClick={() => onSelectTarget(target.id)}
-                onMouseEnter={() => onHoverTarget && onHoverTarget(target.id)}
-                onMouseLeave={() => onHoverTarget && onHoverTarget(null)}
-                className={`p-2.5 border transition-all cursor-pointer rounded-sm relative ${
+                onMouseEnter={() => onHoverTarget?.(target.id)}
+                onMouseLeave={() => onHoverTarget?.(null)}
+                className={`p-2.5 rounded-xs transition-all duration-150 cursor-pointer border ${
                   isSelected
-                    ? 'bg-[#082830] border-[#00D4AA] shadow-[0_0_12px_rgba(0,212,170,0.2)] text-[#E0F7F4]'
+                    ? 'bg-[#082830] border-[#00D4AA] shadow-[0_0_12px_rgba(0,212,170,0.2)]'
                     : isHovered
-                    ? 'bg-[#0A1E30] border-[#1A4E6A] text-[#E0F7F4]'
-                    : 'bg-[#030B14] border-[#0D2E4A] text-[#E0F7F4]/90 hover:border-[#00D4AA]/40'
-                }`}
+                    ? 'bg-[#0A1E30] border-[#00D4AA]/40'
+                    : 'bg-[#05121F] border-[#0D2E4A] hover:border-[#0D2E4A]/80'
+                } ${isFiltered ? 'opacity-55' : ''}`}
               >
-                {/* Active selection indicator bar */}
-                {isSelected && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00D4AA]" />
-                )}
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-xs text-[#00D4AA]">{target.id}</span>
-                    <span className="text-xs font-semibold text-[#E0F7F4]">{target.label}</span>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`text-[10.5px] font-bold ${isGhostNet ? 'text-[#00D4AA]' : 'text-[#E0F7F4]'}`}>
+                        {target.id}
+                      </span>
+                      <span className="text-[8px] text-[#4A8090]">·</span>
+                      <span className="text-[9.5px] text-[#7C98A6] font-semibold">
+                        {target.label}
+                      </span>
+                    </div>
+                    <div className="text-[8.5px] text-[#4A8090] mt-0.5">
+                      DEPTH: -{target.depth.toFixed(1)}m · SHADOW: {target.shadowLength.toFixed(2)}m
+                    </div>
                   </div>
 
-                  <span className={`text-[8px] font-bold px-1.5 py-0.2 border uppercase rounded-xs ${priorityBadgeClass}`}>
-                    {target.priority}
-                  </span>
-                </div>
-
-                <div className="mt-1.5 flex items-center justify-between text-[10px]">
-                  <div className="font-mono">
-                    <span className="text-[#4A8090]">CONF: </span>
-                    <strong className={isFiltered ? 'text-[#4A8090]' : target.confidence > 0.9 ? 'text-[#00D4AA]' : 'text-[#F59E0B]'}>
-                      {(target.confidence * 100).toFixed(1)}%
-                    </strong>
-                  </div>
-
-                  <div className="text-[#4A8090] font-mono text-[9px]">
-                    DEPTH: <span className="text-[#E0F7F4]">{target.depth.toFixed(1)}m</span>
-                  </div>
-                </div>
-
-                {/* Sub-details: coordinates & Quick Focus Button */}
-                <div className="mt-1.5 pt-1 border-t border-[#0D2E4A]/40 text-[8.5px] text-[#4A8090] flex items-center justify-between font-mono">
-                  <span>{target.latitude.toFixed(4)}° N, {target.longitude.toFixed(4)}° E</span>
-                  
-                  {isGhostNet ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectTarget('SX-T07');
-                        if (onFocusHeroTarget) onFocusHeroTarget('SX-T07');
-                      }}
-                      className="flex items-center gap-1 px-1.5 py-0.5 bg-[#00D4AA] text-[#030B14] font-black text-[8px] rounded-xs hover:brightness-110 shadow-[0_0_8px_rgba(0,212,170,0.3)] transition-all cursor-pointer"
+                  <div className="text-right">
+                    <span
+                      className={`text-[8.5px] font-black px-1.5 py-0.2 rounded-xs border uppercase ${
+                        isFiltered
+                          ? 'bg-[#EF4444]/15 text-[#EF4444] border-[#EF4444]/40'
+                          : target.priority === 'HIGH'
+                          ? 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/50'
+                          : target.priority === 'MEDIUM'
+                          ? 'bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/50'
+                          : 'bg-[#4A8090]/20 text-[#7C98A6] border-[#4A8090]/50'
+                      }`}
                     >
-                      <Target className="w-2.5 h-2.5" />
-                      <span>FOCUS HERO</span>
-                    </button>
-                  ) : isSelected ? (
-                    <span className="text-[#00D4AA] flex items-center gap-0.5 font-bold text-[8px]">
-                      FOCUSED <ChevronRight className="w-3 h-3" />
+                      {isFiltered ? 'FILTERED' : `${(target.confidence * 100).toFixed(0)}%`}
                     </span>
-                  ) : null}
+                  </div>
                 </div>
+
+                {isGhostNet && (
+                  <div className="mt-2 pt-2 border-t border-[#00D4AA]/30 flex items-center justify-between">
+                    <span className="text-[8px] font-bold text-[#00D4AA] flex items-center gap-1">
+                      <Sparkles className="w-2.5 h-2.5" />
+                      FLAGSHIP HAZARD
+                    </span>
+                    {onFocusHeroTarget && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onFocusHeroTarget('SX-T07');
+                        }}
+                        className="px-2 py-0.5 bg-[#00D4AA] text-[#030B14] font-black text-[8px] rounded-xs hover:brightness-110 cursor-pointer"
+                      >
+                        FOCUS HERO
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })
         )}
-      </div>
-
-      {/* ── FOOTER STATUS ── */}
-      <div className="p-2 border-t border-[#0D2E4A] bg-[#030B14] text-[9px] text-[#4A8090] flex items-center justify-between">
-        <span>SHOWING {filteredTargets.length} TARGETS</span>
-        <span className="text-[#00D4AA]">SYNC ACTIVE</span>
       </div>
     </aside>
   );

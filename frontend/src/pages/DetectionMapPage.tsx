@@ -22,15 +22,19 @@ export const DetectionMapPage: React.FC = () => {
   return (
     <div className="space-y-4 font-mono select-none">
       {/* 1. Geospatial Sensor Grounding & API Key Status Banner */}
-      <div className="p-3 bg-[#030B14] border border-[#0D2E4A] rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 text-[10px]">
-        <div className="flex items-center gap-3">
+      <div className="p-3 bg-[#030B14] border border-[#0D2E4A] rounded-xs flex flex-col md:flex-row md:items-center justify-between gap-3 text-[10px]">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5 text-[#00D4AA] font-bold">
-            <CheckCircle2 className="w-4 h-4 text-[#00D4AA]" />
-            <span>GEOTAGGING: ✓ INTRINSIC SENSOR COORDINATES AVAILABLE</span>
+            <span className="w-2 h-2 rounded-full bg-[#00D4AA] animate-pulse" />
+            <span>GEOTAGGING STATUS: ● SENSOR COORDINATES AVAILABLE</span>
           </div>
           <span className="text-[#2A5060]">|</span>
-          <span className="text-[#4A8090]">
-            PROVIDER: <strong className="text-[#E0F7F4] uppercase">{provider.replace('_', ' ')}</strong>
+          <span className="text-[#7C98A6]">
+            SOURCE: <strong className="text-[#E0F7F4]">Sonar Metadata / Ping CSV</strong>
+          </span>
+          <span className="text-[#2A5060]">|</span>
+          <span className="text-[#7C98A6]">
+            DATUM: <strong className="text-[#00D4AA]">WGS84</strong>
           </span>
         </div>
 
@@ -39,7 +43,7 @@ export const DetectionMapPage: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="text-[#EF4444] font-bold flex items-center gap-1">
                 <AlertTriangle className="w-3.5 h-3.5" />
-                <span>BASEMAP: API KEY NOT CONFIGURED</span>
+                <span>MAP TILES: API KEY NOT CONFIGURED</span>
               </span>
               <button
                 onClick={openModal}
@@ -50,12 +54,12 @@ export const DetectionMapPage: React.FC = () => {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <span className="text-[#00D4AA] font-bold">✓ BASEMAP ACTIVE</span>
+              <span className="text-[#00D4AA] font-bold">✓ BASEMAP ACTIVE (Esri Marine)</span>
               <button
                 onClick={openModal}
-                className="px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#4A8090] hover:text-[#00D4AA] font-bold text-[9px] cursor-pointer rounded-xs"
+                className="px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#7C98A6] hover:text-[#00D4AA] font-bold text-[9px] cursor-pointer rounded-xs"
               >
-                CONFIGURE KEY
+                MAP SETTINGS
               </button>
             </div>
           )}
@@ -64,7 +68,7 @@ export const DetectionMapPage: React.FC = () => {
 
       {/* Warning callout if external API key is missing */}
       {status === 'KEY_MISSING' && (
-        <div className="p-3 bg-[#1C0D0D] border border-[#EF4444]/60 rounded-xl text-[9.5px] text-[#E0F7F4] space-y-1">
+        <div className="p-3 bg-[#1C0D0D] border border-[#EF4444]/60 rounded-xs text-[9.5px] text-[#E0F7F4] space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-[#EF4444] font-black uppercase">
               GEOTAGGING SERVICE NOT CONFIGURED
@@ -79,47 +83,47 @@ export const DetectionMapPage: React.FC = () => {
 
       {/* 2. Maritime Metric Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="p-3.5 rounded-2xl bg-[#05121F] border border-[#0D2E4A] flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_12px_rgba(0,212,170,0.2)] shrink-0">
-            <Globe2 className="w-5 h-5" />
+        <div className="p-3.5 bg-[#05121F] border border-[#0D2E4A] rounded-xs flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shrink-0 rounded-xs">
+            <Globe2 className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[8px] text-[#4A8090] uppercase block">INDIA EEZ COVERAGE</span>
-            <strong className="text-sm font-black text-[#E0F7F4]">2,372,000 km²</strong>
-            <span className="text-[8px] text-[#00D4AA] block font-bold">● WGS-84 BATHYMETRY</span>
+            <span className="text-[8px] text-[#4A8090] uppercase block">SURVEY EXTENT</span>
+            <strong className="text-xs font-black text-[#E0F7F4]">48.2 NM CORRIDOR</strong>
+            <span className="text-[8px] text-[#00D4AA] block font-bold">Mumbai Continental Shelf</span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#05121F] border border-[#0D2E4A] flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#0A1E30] border border-[#38BDF8]/40 flex items-center justify-center text-[#38BDF8] shadow-[0_0_12px_rgba(56,189,248,0.2)] shrink-0">
-            <Ship className="w-5 h-5" />
+        <div className="p-3.5 bg-[#05121F] border border-[#0D2E4A] rounded-xs flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#0A1E30] border border-[#38BDF8]/40 flex items-center justify-center text-[#38BDF8] shrink-0 rounded-xs">
+            <Ship className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[8px] text-[#4A8090] uppercase block">ACTIVE FLEET UNITS</span>
-            <strong className="text-sm font-black text-[#E0F7F4]">4 RESEARCH SHIPS</strong>
-            <span className="text-[8px] text-[#38BDF8] block font-bold">INS Sandhayak / NHO</span>
+            <span className="text-[8px] text-[#4A8090] uppercase block">SONAR FREQUENCY</span>
+            <strong className="text-xs font-black text-[#E0F7F4]">900 kHz CHIRP</strong>
+            <span className="text-[8px] text-[#38BDF8] block font-bold">75m Swath Width</span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#05121F] border border-[#0D2E4A] flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#0A1E30] border border-[#C084FC]/40 flex items-center justify-center text-[#C084FC] shadow-[0_0_12px_rgba(192,132,252,0.2)] shrink-0">
-            <Layers className="w-5 h-5" />
+        <div className="p-3.5 bg-[#05121F] border border-[#0D2E4A] rounded-xs flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#0A1E30] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shrink-0 rounded-xs">
+            <Layers className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[8px] text-[#4A8090] uppercase block">SURVEY BASINS</span>
-            <strong className="text-sm font-black text-[#E0F7F4]">8 COASTAL SECTORS</strong>
-            <span className="text-[8px] text-[#C084FC] block font-bold">Arabian & Bengal Seas</span>
+            <span className="text-[8px] text-[#4A8090] uppercase block">CONFIRMED DEBRIS</span>
+            <strong className="text-xs font-black text-[#00D4AA]">10 VERIFIED</strong>
+            <span className="text-[8px] text-[#7C98A6] block font-bold">7 Natural Rocks Filtered</span>
           </div>
         </div>
 
-        <div className="p-3.5 rounded-2xl bg-[#05121F] border border-[#0D2E4A] flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#0D1A08] border border-[#EF4444]/40 flex items-center justify-center text-[#EF4444] shadow-[0_0_12px_rgba(239,68,68,0.2)] shrink-0">
-            <Activity className="w-5 h-5 animate-pulse" />
+        <div className="p-3.5 bg-[#05121F] border border-[#0D2E4A] rounded-xs flex items-center gap-3">
+          <div className="w-9 h-9 bg-[#0D1A08] border border-[#EF4444]/40 flex items-center justify-center text-[#EF4444] shrink-0 rounded-xs">
+            <Activity className="w-4 h-4 animate-pulse" />
           </div>
           <div>
-            <span className="text-[8px] text-[#4A8090] uppercase block">CLASSIFIED CONTACTS</span>
-            <strong className="text-sm font-black text-[#E0F7F4]">17 ANOMALIES</strong>
-            <span className="text-[8px] text-[#EF4444] block font-bold">4 High Priority</span>
+            <span className="text-[8px] text-[#4A8090] uppercase block">HERO TARGET</span>
+            <strong className="text-xs font-black text-[#EF4444]">SX-T07 GHOST NET</strong>
+            <span className="text-[8px] text-[#EF4444] block font-bold">18.9217° N, 72.8214° E</span>
           </div>
         </div>
       </div>

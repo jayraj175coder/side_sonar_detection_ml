@@ -86,25 +86,78 @@ export const ModelInfoPage: React.FC = () => {
       {/* 4. Tab Content */}
       <div className="p-4 bg-[#05121F] border border-[#0D2E4A] space-y-4">
         {activeTab === 'architecture' && (
-          <div className="space-y-3">
-            <h3 className="text-xs font-black text-[#00D4AA] uppercase">
-              YOLOv8n-Marine-Debris Architecture & Quantization
+          <div className="space-y-4">
+            <h3 className="text-xs font-black text-[#00D4AA] uppercase tracking-wider">
+              YOLOv8n-Marine-Debris Architecture & ONNX Pipeline
             </h3>
-            <p className="text-[#4A8090] leading-relaxed">
-              The model utilizes a lightweight YOLOv8 Nano backbone modified for single-channel side-scan sonar acoustic reflectivity arrays. The perception pipeline operates at a native resolution of 640x640 with an anchor-free split decoupled head.
+            <p className="text-[#7C98A6] leading-relaxed">
+              The model utilizes a lightweight YOLOv8 Nano architecture fine-tuned specifically for single-channel side-scan sonar acoustic reflectivity arrays. The inference pipeline operates at a native resolution of 640×640 with an anchor-free split decoupled head.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[10px]">
-              <div className="p-3 bg-[#030B14] border border-[#0D2E4A] space-y-1.5">
-                <span className="text-[#00D4AA] font-bold block">BACKBONE & NECK</span>
-                <p className="text-[#4A8090]">
-                  Modified CSPDarknet with C2f feature aggregation modules optimized for acoustic highlight-shadow pairings.
-                </p>
+
+            {/* Core Specifications Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-[9.5px]">
+              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A]">
+                <span className="text-[#4A8090] text-[8px] uppercase block">MODEL ARCHITECTURE</span>
+                <strong className="text-[#E0F7F4] font-bold">YOLOv8n (Ultralytics)</strong>
               </div>
+              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A]">
+                <span className="text-[#4A8090] text-[8px] uppercase block">INFERENCE RUNTIME</span>
+                <strong className="text-[#00D4AA] font-bold">ONNX Runtime (CPU)</strong>
+              </div>
+              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A]">
+                <span className="text-[#4A8090] text-[8px] uppercase block">INFERENCE TASK</span>
+                <strong className="text-[#E0F7F4] font-bold">Object Detection (2D Bbox)</strong>
+              </div>
+              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A]">
+                <span className="text-[#4A8090] text-[8px] uppercase block">INPUT TENSOR</span>
+                <strong className="text-[#E0F7F4] font-bold">1 × 3 × 640 × 640 (Float32)</strong>
+              </div>
+            </div>
+
+            {/* Classes & Pre/Post Processing */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-[9.5px]">
+              {/* Classes */}
               <div className="p-3 bg-[#030B14] border border-[#0D2E4A] space-y-1.5">
-                <span className="text-[#00D4AA] font-bold block">EDGE DEPLOYMENT</span>
-                <p className="text-[#4A8090]">
-                  Exported to ONNX (Open Neural Network Exchange) with INT8 calibration, capable of 96 FPS on NVIDIA Jetson Orin Nano (5-10W TDP).
-                </p>
+                <span className="text-[#00D4AA] font-bold text-[10px] block">TRAINED CLASSES (data.yaml)</span>
+                <div className="space-y-1 text-[#7C98A6]">
+                  <div><strong className="text-[#E0F7F4]">0: ghost_net_aldfg</strong> (ALDFG Nylon Nets)</div>
+                  <div><strong className="text-[#E0F7F4]">1: anthropogenic_debris</strong> (Lost Gear & Metal)</div>
+                  <div><strong className="text-[#E0F7F4]">2: pipeline_hazard</strong> (Subsea Pipes & Cables)</div>
+                  <div><strong className="text-[#E0F7F4]">3: seafloor_anomaly</strong> (Seabed Debris Targets)</div>
+                </div>
+              </div>
+
+              {/* Preprocessing */}
+              <div className="p-3 bg-[#030B14] border border-[#0D2E4A] space-y-1.5">
+                <span className="text-[#00D4AA] font-bold text-[10px] block">PREPROCESSING PIPELINE</span>
+                <div className="space-y-1 text-[#7C98A6]">
+                  <div>✓ Aspect-Preserving Letterbox Pad (640×640)</div>
+                  <div>✓ Pixel Float32 Normalization (0.0 to 1.0)</div>
+                  <div>✓ Bilateral Filter (Speckle Noise Suppression)</div>
+                  <div>✓ CLAHE (Local Contrast Enhancement)</div>
+                </div>
+              </div>
+
+              {/* Postprocessing */}
+              <div className="p-3 bg-[#030B14] border border-[#0D2E4A] space-y-1.5">
+                <span className="text-[#00D4AA] font-bold text-[10px] block">POSTPROCESSING & NOISE GATING</span>
+                <div className="space-y-1 text-[#7C98A6]">
+                  <div>✓ Non-Maximum Suppression (IoU: 0.45)</div>
+                  <div>✓ Confidence Threshold Cutoff (15% - 85%)</div>
+                  <div>✓ Acoustic Shadow Trigonometry Gate</div>
+                  <div>✓ Natural Basalt Rock Rejection Filter</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Implementation Status vs Planned */}
+            <div className="p-3 bg-[#030B14] border border-[#00D4AA]/40 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 text-[9px]">
+              <div>
+                <span className="text-[#00D4AA] font-bold">IMPLEMENTATION STATUS:</span>
+                <span className="text-[#E0F7F4] ml-2">Active & Running (marine_sonar_v2.onnx · 12.3 MB)</span>
+              </div>
+              <div className="text-[8px] px-2 py-0.5 bg-[#082830] text-[#7C98A6] border border-[#0D2E4A] rounded-xs">
+                PLANNED EXTENSION: Jetson Orin Autonomous Towfish Edge Container
               </div>
             </div>
           </div>

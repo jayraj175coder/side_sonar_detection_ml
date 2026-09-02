@@ -80,13 +80,19 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
 
   // Auto-advance
   useEffect(() => {
-    if (scene >= TOTAL_SCENES - 1) return;
+    if (scene >= TOTAL_SCENES - 1) {
+      if (autoTimer.current) clearTimeout(autoTimer.current);
+      autoTimer.current = setTimeout(onComplete, 5000);
+      return () => {
+        if (autoTimer.current) clearTimeout(autoTimer.current);
+      };
+    }
     if (autoTimer.current) clearTimeout(autoTimer.current);
     autoTimer.current = setTimeout(advance, AUTO_MS);
     return () => {
       if (autoTimer.current) clearTimeout(autoTimer.current);
     };
-  }, [scene, advance]);
+  }, [scene, advance, onComplete]);
 
   // Progress bar fill
   useEffect(() => {
@@ -801,20 +807,18 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
           })}
         </div>
 
-        {reportRows >= confirmed.length && (
-          <div className="mt-3 space-y-2">
-            <button
-              onClick={onComplete}
-              className="w-full flex items-center justify-center gap-2.5 px-4 py-3 bg-[#00D4AA] text-[#030B14] font-black text-sm border border-[#00D4AA] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_25px_rgba(0,212,170,0.45)]"
-            >
-              <span>⚡ ENTER MISSION CONTROL</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <div className="text-center text-[8.5px] text-[#4A8090]">
-              Full pipeline verified · Ready for operator parameter tuning & exploration
-            </div>
+        <div className="mt-3 space-y-2">
+          <button
+            onClick={onComplete}
+            className="w-full flex items-center justify-center gap-2.5 px-4 py-3 bg-[#00D4AA] text-[#030B14] font-black text-sm border border-[#00D4AA] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_25px_rgba(0,212,170,0.55)] animate-pulse"
+          >
+            <span>⚡ ENTER MISSION CONTROL</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          <div className="text-center text-[8.5px] text-[#4A8090]">
+            Full pipeline verified · Click to enter Mission Control or auto-advancing in 5s
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -830,6 +834,15 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         </div>
         <div className="flex-1">{renderProgressRail()}</div>
         <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={onComplete}
+            className="flex items-center gap-1.5 px-3 py-1 bg-[#00D4AA] text-[#030B14] font-bold text-[9px] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,212,170,0.3)]"
+            title="Jump directly to interactive Mission Control"
+          >
+            <span>⚡ MISSION CONTROL</span>
+            <ArrowRight className="w-3 h-3" />
+          </button>
+
           {scene < TOTAL_SCENES - 1 && (
             <button
               onClick={() => {

@@ -371,7 +371,7 @@ export const MissionPage: React.FC = () => {
 
       {/* ── INTERACTIVE MISSION CONTROL DASHBOARD ────────────────────────── */}
       {!isSequenceActive && (
-        <div className="flex flex-col h-full w-full bg-[#030B14] text-[#E0F7F4] font-mono select-none overflow-hidden scanlines-overlay">
+        <div className="flex flex-col h-full w-full bg-[#030B14] text-[#E0F7F4] font-mono overflow-hidden pointer-events-auto">
           <ConsoleTopBar
             activeSite={activeSite}
             onSelectSite={handleSelectSite}

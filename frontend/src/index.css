@@ -76,7 +76,6 @@
     rgba(0, 100, 212, 0.01)
   );
   background-size: 100% 3px, 6px 100%;
-  pointer-events: none;
 }
 
 /* Scrollbar */

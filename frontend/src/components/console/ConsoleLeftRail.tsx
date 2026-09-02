@@ -73,13 +73,22 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
               <span>PIPELINE RUNNING…</span>
             </div>
           ) : (
-            <button
-              onClick={onReset}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-[#0A1E30] border border-[#00D4AA]/50 text-[#00D4AA] font-bold text-[10px] cursor-pointer hover:bg-[#082830] transition-all"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>↺ REPLAY DEMO</span>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={onRunDemo}
+                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 bg-[#00D4AA] text-[#030B14] border border-[#00D4AA] font-bold text-[10px] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_12px_rgba(0,212,170,0.25)]"
+              >
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                <span>START DEMO</span>
+              </button>
+              <button
+                onClick={onReset}
+                className="p-2 bg-[#0A1E30] border border-[#0D2E4A] hover:border-[#00D4AA]/50 text-[#4A8090] hover:text-[#00D4AA] text-[10px] cursor-pointer transition-all"
+                title="Reset pipeline to Stage 01"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            </div>
           )}
         </div>
 
@@ -130,26 +139,21 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
           </div>
 
           <div className="space-y-0.5 text-[10px]">
-            {LAYER_DEFS.map(({ key, label, stageMin }) => {
+            {LAYER_DEFS.map(({ key, label }) => {
               const isActive = layers[key];
-              const isAvailable = currentStageNum >= stageMin || demoPhase === 'idle';
               return (
-                <label
+                <div
                   key={key}
                   onClick={() => onToggleLayer(key)}
-                  className={`flex items-center gap-2 px-1.5 py-0.5 cursor-pointer transition-colors ${
-                    isAvailable
-                      ? 'hover:bg-[#0A1E30] text-[#4A8090] hover:text-[#E0F7F4]'
-                      : 'opacity-30 pointer-events-none'
-                  }`}
+                  className="flex items-center gap-2 px-1.5 py-1 cursor-pointer transition-colors hover:bg-[#0A1E30] text-[#4A8090] hover:text-[#E0F7F4]"
                 >
                   <span className={`font-mono text-[9px] font-bold ${isActive ? 'text-[#00D4AA]' : 'text-[#2A5060]'}`}>
                     [{isActive ? 'X' : ' '}]
                   </span>
-                  <span className={`text-[9px] ${isActive ? 'text-[#E0F7F4]' : 'text-[#4A8090]'}`}>
+                  <span className={`text-[9px] ${isActive ? 'text-[#E0F7F4] font-bold' : 'text-[#4A8090]'}`}>
                     {label}
                   </span>
-                </label>
+                </div>
               );
             })}
           </div>

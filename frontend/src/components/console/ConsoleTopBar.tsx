@@ -105,10 +105,8 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
         >
           {demoPhase === 'running' ? (
             isPlaying ? <><Pause className="w-3.5 h-3.5" /><span>PAUSE</span></> : <><Play className="w-3.5 h-3.5 fill-current" /><span>RESUME</span></>
-          ) : demoPhase === 'done' ? (
-            <><RotateCcw className="w-3.5 h-3.5" /><span>REPLAY</span></>
           ) : (
-            <><Zap className="w-3.5 h-3.5" /><span>RUN LIVE DEMO</span></>
+            <><Play className="w-3.5 h-3.5 fill-current" /><span>START LIVE DEMO</span></>
           )}
         </button>
 

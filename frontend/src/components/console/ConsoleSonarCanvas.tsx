@@ -136,7 +136,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      const t = Math.min(stageProgress, 1);
+      const t = demoPhase === 'running' ? Math.min(stageProgress, 1) : Math.min(Math.max((currentFrame - 1) / 119, 0), 1);
       const vx = W * 0.12 + (W * 0.88 - W * 0.12) * t;
       const vy = H * 0.06 + (H * 0.94 - H * 0.06) * t;
 
@@ -260,7 +260,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       });
     };
 
-    // ── CLEAR & DISPATCH RENDER ──────────────────────────────────────────────
+    // ── CLEAR & DISPATCH RENDER PER ACTIVE STAGE ────────────────────────────
     ctx.fillStyle = '#01050A';
     ctx.fillRect(0, 0, W, H);
 
@@ -286,12 +286,31 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       return;
     }
 
-    if (layers.rawSonar) drawSonarBase(true, 0.9);
-    if (layers.denoisedSonar && stageNum >= 2) drawSonarBase(false, 0.85);
+    // 1. Sonar Base Layer (changes between raw noise and denoised)
+    if (stageNum === 1) {
+      drawSonarBase(true, 1.0);
+    } else if (stageNum === 2) {
+      drawSonarBase(false, 1.0);
+    } else {
+      if (layers.rawSonar && !layers.denoisedSonar) drawSonarBase(true, 1.0);
+      else if (layers.denoisedSonar && !layers.rawSonar) drawSonarBase(false, 1.0);
+      else {
+        drawSonarBase(true, 0.35);
+        drawSonarBase(false, 0.9);
+      }
+    }
 
     drawNadir();
-    drawDroneTrack();
-    drawDetections();
+
+    // 2. Drone survey track (visible stage 2+)
+    if (stageNum >= 2 && layers.droneTrack) {
+      drawDroneTrack();
+    }
+
+    // 3. Candidate Detections (Only in stage 3+)
+    if (stageNum >= 3) {
+      drawDetections();
+    }
 
     // Subtle scanline overlay
     ctx.save();
@@ -316,12 +335,12 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
   const stageNum = parseInt(currentStageId, 10);
   const STAGE_LABELS: Record<string, string> = {
-    '1': 'RAW SONAR INGEST — Dual-channel Acoustic Stream',
-    '2': 'DENOISE — CLAHE & Spatial Bilateral Filter Active',
-    '3': 'DETECT — YOLOv8n Candidate Proposals',
-    '4': 'FILTER — Acoustic Shadow Gate & False-Positive Gating',
-    '5': 'CLASSIFY — MoES Debris Attribution & Risk Taxonomy',
-    '6': 'REPORT — Geotagged Anomaly Register Compiled',
+    '1': 'STAGE 01 // RAW ACOUSTIC WATERFALL — 900 kHz Raw Backscatter Stream',
+    '2': 'STAGE 02 // DENOISE & CONTRAST — CLAHE Normalization & TVG Correction Active',
+    '3': 'STAGE 03 // DETECT — YOLOv8n ONNX Candidate Proposals (37 Detected)',
+    '4': 'STAGE 04 // FILTER — Dynamic Confidence & Acoustic Shadow Relief Gating',
+    '5': 'STAGE 05 // CLASSIFY — MoES ALDFG Marine Debris Taxonomy Attribution',
+    '6': 'STAGE 06 // REPORT — High-Precision WGS84 USBL Geotagged Register',
   };
 
   const handleReticleClick = (id: string) => {
@@ -341,7 +360,9 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
               : STAGE_LABELS[String(stageNum)] || `STAGE ${currentStageId}`}
           </span>
           <span className="text-[#2A5060]">|</span>
-          <span className="text-[#00D4AA] font-bold">{filteredCandidates.length} TARGETS PLOTTED</span>
+          <span className="text-[#00D4AA] font-bold">
+            {stageNum <= 2 ? 'ACQUISITION PHASE' : `${filteredCandidates.length} TARGETS PLOTTED`}
+          </span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -396,8 +417,8 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
           STBD TOW: {activeSite.latRange[0].toFixed(4)}°N, {activeSite.lonRange[1].toFixed(4)}°E
         </div>
 
-        {/* Interactive Reticle Overlays */}
-        {demoPhase !== 'idle' &&
+        {/* Interactive Reticle Overlays (Visible only in Stage 3 and above) */}
+        {demoPhase !== 'idle' && stageNum >= 3 &&
           filteredCandidates.map((cand) => {
             const isConfirmed = cand.status === 'CONFIRMED';
             if (isConfirmed && !layers.confirmedDebris) return null;
@@ -458,20 +479,8 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
             );
           })}
 
-        {/* Stage 06 Dossier Ready Banner */}
-        {stageNum >= 6 && demoPhase !== 'idle' && (
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-[#05121F]/95 border border-[#00D4AA]/80 px-6 py-2.5 text-center shadow-[0_0_30px_rgba(0,212,170,0.3)] z-30">
-            <div className="text-[#00D4AA] font-black text-sm tracking-wider mb-0.5">
-              ✓ ANOMALY DOSSIER READY
-            </div>
-            <div className="text-[#4A8090] text-[9px] font-mono">
-              {filteredCandidates.filter((c) => c.status === 'CONFIRMED').length} confirmed debris targets · {activeSite.swathWidthM}m swath · WGS84 geotagged
-            </div>
-          </div>
-        )}
-
-        {/* Dynamic Class Legend */}
-        {layers.classLabels && demoPhase !== 'idle' && (
+        {/* Dynamic Class Legend (Visible in Stage 5 & 6) */}
+        {layers.classLabels && demoPhase !== 'idle' && stageNum >= 5 && (
           <div className="absolute bottom-8 left-2 bg-[#05121F]/95 border border-[#0D2E4A] px-2 py-1.5 text-[8px] font-mono space-y-0.5 z-20">
             <div className="text-[#4A8090] font-bold mb-0.5 uppercase">ACOUSTIC TAXONOMY</div>
             {Object.entries(CLASS_COLORS)

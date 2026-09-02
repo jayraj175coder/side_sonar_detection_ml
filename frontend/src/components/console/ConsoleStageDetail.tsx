@@ -1,5 +1,5 @@
-import React from 'react';
-import { AlertTriangle, CheckCircle2, Sliders, ShieldCheck, Download, Filter } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Sliders, ShieldCheck, Download, Filter, FileSpreadsheet } from 'lucide-react';
 import { STAGE_DETAILS, StageId, CandidateItem } from '../../data/consoleData';
 
 interface ConsoleStageDetailProps {
@@ -21,6 +21,39 @@ interface ConsoleStageDetailProps {
   confirmedCount: number;
 }
 
+// ── Quick ~200ms Count-up / Count-down Component ─────────────────────────────
+const AnimatedNumber: React.FC<{ value: number }> = ({ value }) => {
+  const [display, setDisplay] = useState(value);
+  const prevRef = useRef(value);
+
+  useEffect(() => {
+    const startVal = prevRef.current;
+    const endVal = value;
+    if (startVal === endVal) return;
+
+    const duration = 200;
+    const startTime = performance.now();
+
+    const frame = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(startVal + (endVal - startVal) * ease);
+      setDisplay(current);
+      if (progress < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        prevRef.current = endVal;
+      }
+    };
+
+    const handle = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(handle);
+  }, [value]);
+
+  return <span>{display}</span>;
+};
+
 export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
   currentStageId,
   candidates,
@@ -40,13 +73,44 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
   confirmedCount,
 }) => {
   const stage = STAGE_DETAILS[currentStageId] || STAGE_DETAILS['01'];
-  const isFilter = currentStageId === '04';
 
-  const selectedCandidate =
-    candidates.find((c) => c.id === selectedCandidateId) ||
-    filteredCandidates[0] ||
-    candidates[0];
+  // Sort candidates: confirmed first (by confidence desc), then rejected (by confidence desc)
+  const sortedCandidates = useMemo(() => {
+    return [...filteredCandidates].sort((a, b) => {
+      if (a.status === 'CONFIRMED' && b.status !== 'CONFIRMED') return -1;
+      if (a.status !== 'CONFIRMED' && b.status === 'CONFIRMED') return 1;
+      return b.confidence - a.confidence;
+    });
+  }, [filteredCandidates]);
 
+  // Selected candidate
+  const selectedCandidate = useMemo(() => {
+    return (
+      candidates.find((c) => c.id === selectedCandidateId) ||
+      sortedCandidates[0] ||
+      candidates[0]
+    );
+  }, [candidates, selectedCandidateId, sortedCandidates]);
+
+  // Dynamic "Why" explanation generator based on real candidate geometry
+  const getDynamicRejectReason = (c: CandidateItem): string => {
+    if (c.status === 'CONFIRMED') return '';
+    if (c.confidence < confidenceThreshold) {
+      return `REJECTED — confidence ${(c.confidence * 100).toFixed(1)}% is below operator threshold ${(confidenceThreshold * 100).toFixed(0)}%`;
+    }
+    if (shadowFilterEnabled && c.shadowLengthM <= 0.05) {
+      return `REJECTED — shadow length ${c.shadowLengthM.toFixed(1)}m indicates zero acoustic vertical relief (likely sediment ripple or surface echo)`;
+    }
+    if (shadowFilterEnabled && c.aspectRatio > 6.0) {
+      return `REJECTED — aspect ratio ${c.aspectRatio.toFixed(1)} exceeds natural-object threshold (6.0); geometric shadow rule triggered`;
+    }
+    if (c.class.includes('Rock') || c.class.includes('Bedrock') || c.class.includes('Basalt')) {
+      return `REJECTED — aspect ratio ${c.aspectRatio.toFixed(1)} & diffuse backscatter matches native seabed geological formation`;
+    }
+    return c.rejectReason || 'REJECTED — anomalous acoustic signature';
+  };
+
+  // Export single target JSON
   const handleExportSingleTarget = (cand: CandidateItem) => {
     const payload = {
       target_id: cand.id,
@@ -57,7 +121,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
       depth_m: cand.depthM,
       dimensions: cand.dimensions,
       status: cand.status,
-      reject_reason: cand.rejectReason || null,
+      reject_reason: cand.status === 'REJECTED' ? getDynamicRejectReason(cand) : null,
       wgs84_coordinates: { latitude: cand.lat, longitude: cand.lon },
       timestamp: new Date().toISOString(),
     };
@@ -66,6 +130,30 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
     const a = document.createElement('a');
     a.href = url;
     a.download = `TARGET_${cand.id}_dossier.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Export filtered register CSV
+  const handleExportCSV = () => {
+    const headers = ['ID', 'Classification', 'Confidence', 'AspectRatio', 'ShadowLengthM', 'DepthM', 'Status', 'Latitude', 'Longitude'];
+    const rows = sortedCandidates.map((c) => [
+      c.id,
+      `"${c.class}"`,
+      c.confidence.toFixed(3),
+      c.aspectRatio.toFixed(2),
+      c.shadowLengthM.toFixed(2),
+      c.depthM.toFixed(1),
+      c.status,
+      c.lat.toFixed(5),
+      c.lon.toFixed(5),
+    ]);
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `CANDIDATE_REGISTER_${selectedCategory}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -94,7 +182,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
           </span>
         </div>
 
-        {/* 2. Dynamic Metric Row: 3 Stat Tiles */}
+        {/* 2. Dynamic Metric Row: 3 Animated Funnel Tiles */}
         <div className="grid grid-cols-3 gap-1.5 text-center">
           {/* RAW / M1 */}
           <div className="p-2 border border-[#0D2E4A] bg-[#030B14] space-y-0.5 transition-all">
@@ -102,7 +190,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
               RAW DETECTIONS
             </span>
             <strong className="text-xs font-black text-[#E0F7F4] block font-mono">
-              {rawCount}
+              <AnimatedNumber value={rawCount} />
             </strong>
           </div>
 
@@ -112,7 +200,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
               REJECTED (NOISE)
             </span>
             <strong className="text-xs font-black text-[#f59e0b] block font-mono">
-              {rejectedCount}
+              <AnimatedNumber value={rejectedCount} />
             </strong>
           </div>
 
@@ -122,7 +210,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
               CONFIRMED DEBRIS
             </span>
             <strong className="text-xs font-black text-[#00D4AA] block font-mono">
-              {confirmedCount}
+              <AnimatedNumber value={confirmedCount} />
             </strong>
           </div>
         </div>
@@ -142,52 +230,70 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
               <Sliders className="w-3 h-3 text-[#00D4AA]" />
               <span>DYNAMIC FILTER ENGINE</span>
             </div>
-            <span className="text-[7.5px] text-[#4A8090]">LIVE ADJUST</span>
+            <span className="text-[7.5px] text-[#00D4AA] font-bold animate-pulse">LIVE RECOMPUTE</span>
           </div>
 
           {/* Slider: Confidence Cutoff */}
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[8px] font-bold">
               <span className="text-[#4A8090]">CONFIDENCE THRESHOLD:</span>
-              <span className="text-[#00D4AA] font-mono">{(confidenceThreshold * 100).toFixed(0)}%</span>
+              <span className="text-[#00D4AA] font-mono text-[9px] px-1.5 py-0.2 bg-[#082830] border border-[#00D4AA]/50 shadow-[0_0_8px_rgba(0,212,170,0.2)]">
+                {(confidenceThreshold * 100).toFixed(0)}%
+              </span>
             </div>
             <input
               type="range"
-              min="0.15"
-              max="0.95"
-              step="0.05"
+              min="0.00"
+              max="1.00"
+              step="0.01"
               value={confidenceThreshold}
               onChange={(e) => onChangeConfidenceThreshold(parseFloat(e.target.value))}
-              className="w-full h-1 bg-[#0A1E30] rounded-none appearance-none cursor-pointer accent-[#00D4AA]"
+              className="w-full h-1.5 bg-[#0A1E30] appearance-none cursor-pointer accent-[#00D4AA]"
             />
             <div className="flex justify-between text-[7px] text-[#2A5060]">
-              <span>15% (Permissive)</span>
+              <span>0% (Permissive)</span>
               <span>50%</span>
-              <span>95% (Strict)</span>
+              <span>100% (Strict)</span>
             </div>
           </div>
 
           {/* Shadow Verification Gate Toggle */}
           <div
             onClick={onToggleShadowFilter}
-            className="flex items-center justify-between p-1.5 bg-[#0A1E30] border border-[#0D2E4A] cursor-pointer hover:border-[#00D4AA]/40 transition-colors"
+            className={`flex items-center justify-between p-2 border cursor-pointer transition-all ${
+              shadowFilterEnabled
+                ? 'bg-[#082830] border-[#00D4AA]/80 text-[#E0F7F4] shadow-[0_0_10px_rgba(0,212,170,0.15)]'
+                : 'bg-[#0A1E30] border-[#0D2E4A] text-[#4A8090] hover:border-[#00D4AA]/40'
+            }`}
           >
             <div className="flex items-center gap-1.5 text-[8px]">
-              <ShieldCheck className={`w-3 h-3 ${shadowFilterEnabled ? 'text-[#00D4AA]' : 'text-[#4A8090]'}`} />
-              <span className={shadowFilterEnabled ? 'text-[#E0F7F4]' : 'text-[#4A8090]'}>
-                ACOUSTIC SHADOW VERIFICATION
-              </span>
+              <ShieldCheck className={`w-3.5 h-3.5 ${shadowFilterEnabled ? 'text-[#00D4AA]' : 'text-[#4A8090]'}`} />
+              <div className="flex flex-col text-left">
+                <span className="font-bold">ACOUSTIC SHADOW VERIFICATION</span>
+                <span className="text-[7px] text-[#4A8090]">
+                  {shadowFilterEnabled ? 'Filters 0m shadow relief & aspect > 6.0' : 'Bypassed — restores geometric rejects'}
+                </span>
+              </div>
             </div>
-            <span className={`text-[8px] font-bold ${shadowFilterEnabled ? 'text-[#00D4AA]' : 'text-[#2A5060]'}`}>
-              {shadowFilterEnabled ? 'ACTIVE' : 'BYPASSED'}
+            <span
+              className={`text-[8px] font-bold px-1.5 py-0.5 border ${
+                shadowFilterEnabled
+                  ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA]'
+                  : 'bg-[#030B14] text-[#2A5060] border-[#0D2E4A]'
+              }`}
+            >
+              {shadowFilterEnabled ? 'ACTIVE' : 'OFF'}
             </span>
           </div>
 
           {/* Category Filter Pills */}
           <div className="space-y-1">
-            <div className="flex items-center gap-1 text-[7.5px] text-[#4A8090] font-bold uppercase">
-              <Filter className="w-2.5 h-2.5" />
-              <span>TAXONOMY FILTER:</span>
+            <div className="flex items-center justify-between text-[7.5px] text-[#4A8090] font-bold uppercase">
+              <div className="flex items-center gap-1">
+                <Filter className="w-2.5 h-2.5 text-[#00D4AA]" />
+                <span>TAXONOMY FILTER:</span>
+              </div>
+              <span>Dims non-matching to 15%</span>
             </div>
             <div className="grid grid-cols-6 gap-1">
               {CATEGORY_TABS.map((tab) => {
@@ -198,8 +304,8 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                     onClick={() => onChangeCategory(tab.id)}
                     className={`py-0.5 text-[7.5px] font-bold border transition-all cursor-pointer text-center ${
                       isActive
-                        ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA]'
-                        : 'bg-[#0A1E30] text-[#4A8090] border-[#0D2E4A] hover:text-[#E0F7F4]'
+                        ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] shadow-[0_0_8px_rgba(0,212,170,0.3)]'
+                        : 'bg-[#0A1E30] text-[#4A8090] border-[#0D2E4A] hover:text-[#E0F7F4] hover:border-[#00D4AA]/40'
                     }`}
                   >
                     {tab.label}
@@ -210,11 +316,21 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
           </div>
         </div>
 
-        {/* 4. Candidate Register with 3-Stop Confidence Colors */}
+        {/* 4. Candidate Register (Sorted by Verdict) */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-[8.5px] text-[#4A8090] font-bold uppercase tracking-wider">
             <span>CANDIDATE REGISTER</span>
-            <span>{filteredCandidates.length} OF {candidates.length} SHOWING</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[#00D4AA]">showing {sortedCandidates.length} of {candidates.length} total</span>
+              <button
+                onClick={handleExportCSV}
+                className="hover:text-[#00D4AA] cursor-pointer flex items-center gap-0.5"
+                title="Export register to CSV"
+              >
+                <FileSpreadsheet className="w-2.5 h-2.5" />
+                <span>CSV</span>
+              </button>
+            </div>
           </div>
 
           <div className="border border-[#0D2E4A] bg-[#030B14] overflow-hidden max-h-48 overflow-y-auto">
@@ -229,7 +345,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#0D2E4A]">
-                {filteredCandidates.map((item) => {
+                {sortedCandidates.map((item) => {
                   const isSelected = selectedCandidateId === item.id;
                   const isHovered = hoveredCandidateId === item.id;
                   const isConfirmed = item.status === 'CONFIRMED';
@@ -289,7 +405,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
           </div>
         </div>
 
-        {/* 5. Selected Candidate Focused Dossier */}
+        {/* 5. Selected Candidate Focused Dossier with Dynamic "Why" Explanation */}
         {selectedCandidate && (
           <div className="p-2.5 bg-[#0A1E30] border border-[#0D2E4A] text-[8.5px] space-y-1.5">
             <div className="flex items-center justify-between text-[#00D4AA] font-bold">
@@ -300,9 +416,10 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
               <span className="text-[#4A8090]">CLASSIFICATION:</span>
               <strong className="text-[#00D4AA]">{selectedCandidate.class}</strong>
             </div>
-            {selectedCandidate.rejectReason ? (
-              <div className="p-1.5 bg-[#140808] border border-[#ef4444]/40 text-[#ef4444] text-[8px]">
-                <strong>FILTER RATIONALE:</strong> {selectedCandidate.rejectReason}
+
+            {selectedCandidate.status === 'REJECTED' ? (
+              <div className="p-1.5 bg-[#140808] border border-[#ef4444]/50 text-[#ef4444] text-[8px] leading-relaxed">
+                <strong>WHY REJECTED:</strong> {getDynamicRejectReason(selectedCandidate)}
               </div>
             ) : (
               <div className="p-1.5 bg-[#082830] border border-[#00D4AA]/40 text-[#00D4AA] text-[8px] flex items-center justify-between">
@@ -310,10 +427,15 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                 <span>ASPECT {selectedCandidate.aspectRatio.toFixed(1)} · SHADOW {selectedCandidate.shadowLengthM}m</span>
               </div>
             )}
-            <div className="flex items-center justify-between text-[#4A8090] text-[8px]">
-              <span>GEOTAG: {selectedCandidate.lat.toFixed(4)}°N, {selectedCandidate.lon.toFixed(4)}°E</span>
-              <span>DEPTH: {selectedCandidate.depthM}m</span>
+
+            <div className="grid grid-cols-2 gap-1 text-[#4A8090] text-[8px] pt-0.5">
+              <div>CONFIDENCE: <strong className="text-[#E0F7F4]">{(selectedCandidate.confidence * 100).toFixed(1)}%</strong></div>
+              <div>DEPTH: <strong className="text-[#E0F7F4]">{selectedCandidate.depthM}m</strong></div>
+              <div className="col-span-2">
+                GEOTAG: <strong className="text-[#00D4AA]">{selectedCandidate.lat.toFixed(4)}°N, {selectedCandidate.lon.toFixed(4)}°E</strong>
+              </div>
             </div>
+
             <button
               onClick={() => handleExportSingleTarget(selectedCandidate)}
               className="w-full flex items-center justify-center gap-1.5 py-1 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#00D4AA] text-[8px] font-bold cursor-pointer transition-colors"

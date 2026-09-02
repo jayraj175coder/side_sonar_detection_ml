@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { ZoomIn, ZoomOut, RotateCcw, Crosshair, MapPin, Radio, Compass } from 'lucide-react';
+import { ZoomIn, ZoomOut, RotateCcw, Crosshair } from 'lucide-react';
 import { CandidateItem, StageId, SurveySite } from '../../data/consoleData';
 import { LayerState } from './ConsoleLeftRail';
 import { sonarAudio } from '../../utils/sonarAudio';
@@ -31,6 +31,7 @@ interface ConsoleSonarCanvasProps {
   currentFrame?: number;
   demoPhase: DemoPhase;
   stageProgress: number;
+  selectedCategory?: string;
 }
 
 export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
@@ -46,12 +47,12 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
   currentFrame = 42,
   demoPhase,
   stageProgress,
+  selectedCategory = 'ALL',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [zoomLevel, setZoomLevel] = useState<number>(1.0);
-  const animRef = useRef<number>(0);
+  const [zoomLevel, setZoomLevel] = useState(1.0);
 
-  // Render authentic side-scan acoustic canvas
+  // ── Realistic Acoustic Side-Scan Sonar Shader Simulation ───────────────────
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -60,72 +61,98 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
     const W = canvas.width;
     const H = canvas.height;
-    const stageNum = parseInt(currentStageId, 10);
+    const midX = W / 2;
 
-    const dn = (x: number, y: number, seed = 0) =>
-      Math.abs(Math.sin(x * 127.1 + y * 311.7 + seed * 74.1) * 43758.5453) % 1;
+    const scrollOffset = (currentFrame * 1.5) % 40;
 
-    // Base seabed texture with realistic acoustic backscatter ripples
-    const drawSonarBase = (noisy: boolean, alpha = 1) => {
+    // Dual-channel acoustic seabed generator
+    const drawSonarBase = (noisy: boolean, opacity: number) => {
       ctx.save();
-      ctx.globalAlpha = alpha;
+      ctx.globalAlpha = opacity;
 
-      const scrollOffset = (currentFrame * 1.5) % 40;
+      // Base abyssal bathymetry
+      const grad = ctx.createLinearGradient(0, 0, W, 0);
+      grad.addColorStop(0, '#020C17');
+      grad.addColorStop(0.44, '#051829');
+      grad.addColorStop(0.49, '#01050A'); // Nadir trench
+      grad.addColorStop(0.51, '#01050A');
+      grad.addColorStop(0.56, '#051829');
+      grad.addColorStop(1, '#020C17');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
 
-      for (let x = 0; x < W; x += 3) {
-        for (let y = 0; y < H; y += 3) {
-          // Distance from central nadir line (transducer altitude falloff)
-          const distFromCenter = Math.abs(x - W / 2) / (W / 2);
-          const rangeGain = Math.pow(distFromCenter, 0.45);
+      // Acoustic backscatter wavelets (horizontal ripples)
+      for (let y = 0; y < H; y += 4) {
+        const py = (y + scrollOffset) % H;
+        const wave = Math.sin(py * 0.08) * 0.5 + 0.5;
 
-          const seabedWave =
-            Math.sin(x * 0.02 + (y + scrollOffset) * 0.035) * 0.08 +
-            Math.sin((y + scrollOffset) * 0.02) * 0.05 +
-            0.12;
+        // Port channel
+        ctx.fillStyle = noisy
+          ? `rgba(0, 212, 170, ${0.03 + wave * 0.04 + (Math.random() - 0.5) * 0.03})`
+          : `rgba(0, 212, 170, ${0.04 + wave * 0.05})`;
+        ctx.fillRect(0, py, midX - 16, 3);
 
-          const speckle = noisy ? dn(x, y + currentFrame, 1) * 0.35 : 0;
-          const val = Math.floor((seabedWave + speckle) * rangeGain * 52);
+        // Starboard channel
+        ctx.fillStyle = noisy
+          ? `rgba(0, 212, 170, ${0.03 + wave * 0.04 + (Math.random() - 0.5) * 0.03})`
+          : `rgba(0, 212, 170, ${0.04 + wave * 0.05})`;
+        ctx.fillRect(midX + 16, py, midX - 16, 3);
+      }
 
-          // Deep bioluminescent ocean palette: navy-teal backscatter
-          const r = Math.floor(val * 0.12);
-          const g = Math.floor(val * 0.62);
-          const b = Math.min(255, Math.floor(val * 0.95) + 12);
-
-          ctx.fillStyle = `rgb(${r},${g},${b})`;
-          ctx.fillRect(x, y, 3, 3);
+      // High speckle noise for raw sonar
+      if (noisy) {
+        ctx.fillStyle = '#00D4AA';
+        for (let i = 0; i < 900; i++) {
+          const rx = Math.random() * W;
+          const ry = Math.random() * H;
+          if (Math.abs(rx - midX) > 16) {
+            ctx.globalAlpha = Math.random() * 0.15;
+            ctx.fillRect(rx, ry, 1.5, 1.5);
+          }
         }
       }
+
       ctx.restore();
     };
 
-    // Central water column / nadir blind zone
+    // Center Nadir Blind Zone
     const drawNadir = () => {
-      const nadirWidth = 32;
+      ctx.save();
       ctx.fillStyle = '#01050A';
-      ctx.fillRect(W / 2 - nadirWidth / 2, 0, nadirWidth, H);
+      ctx.fillRect(midX - 14, 0, 28, H);
 
-      // Nadir transducer dashed centerline
-      ctx.strokeStyle = '#00D4AA';
-      ctx.globalAlpha = 0.4;
-      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = 'rgba(0,212,170,0.3)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(W / 2, 0);
-      ctx.lineTo(W / 2, H);
+      ctx.moveTo(midX - 14, 0);
+      ctx.lineTo(midX - 14, H);
+      ctx.moveTo(midX + 14, 0);
+      ctx.lineTo(midX + 14, H);
+      ctx.stroke();
+
+      // Nadir track centerline
+      ctx.strokeStyle = '#00D4AA';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(midX, 0);
+      ctx.lineTo(midX, H);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.globalAlpha = 1;
 
-      // Range markers along nadir
       ctx.fillStyle = '#4A8090';
       ctx.font = '7px monospace';
-      ctx.fillText('0m', W / 2 - 6, 14);
-      ctx.fillText(`${(activeSite.swathWidthM / 2).toFixed(0)}m`, W / 2 - 10, H - 8);
+      ctx.save();
+      ctx.translate(midX - 3, H / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('NADIR BLIND ZONE · ALT 12.4m', -40, 0);
+      ctx.restore();
+
+      ctx.restore();
     };
 
-    // Drone / AUV survey trajectory
+    // Drone survey trajectory
     const drawDroneTrack = () => {
-      if (!layers.droneTrack) return;
       ctx.save();
       ctx.strokeStyle = 'rgba(0,212,170,0.45)';
       ctx.lineWidth = 1.5;
@@ -157,24 +184,44 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
     // Candidate rendering with realistic directional acoustic shadows
     const drawDetections = () => {
-      const itemsToDraw = filteredCandidates;
-
-      itemsToDraw.forEach((cand) => {
+      candidates.forEach((cand) => {
         const cx = (cand.rawX / 100) * W;
         const cy = (cand.rawY / 100) * H;
         const isConfirmed = cand.status === 'CONFIRMED';
-        const isSelected = selectedCandidateId === cand.id || hoveredCandidateId === cand.id;
+        const isSelected = selectedCandidateId === cand.id;
+        const isHovered = hoveredCandidateId === cand.id;
         const color = isConfirmed ? (CLASS_COLORS[cand.class] || '#00D4AA') : REJECT_COLOR;
 
-        // In side-scan sonar, shadows always project OUTWARD from center nadir!
+        // Check if candidate matches taxonomy filter
+        const matchesCategory =
+          !selectedCategory ||
+          selectedCategory === 'ALL' ||
+          (selectedCategory === 'NETS' && cand.class.includes('Net')) ||
+          (selectedCategory === 'TRAWL' && cand.class.includes('Trawl')) ||
+          (selectedCategory === 'PIPES' && (cand.class.includes('Pipeline') || cand.class.includes('Cable'))) ||
+          (selectedCategory === 'BARRELS' && (cand.class.includes('Barrel') || cand.class.includes('Cargo'))) ||
+          (selectedCategory === 'NOISE' && cand.status === 'REJECTED');
+
+        // Directional shadow geometry (outward from center nadir)
         const isPort = cx < W / 2;
         const shadowDir = isPort ? -1 : 1;
         const shadowLen = Math.max(14, cand.shadowLengthM * 9);
 
         ctx.save();
+        ctx.globalAlpha = matchesCategory ? 1.0 : 0.15;
 
+        // 1. Raw proposal bounding box (controlled by layers.rawDetections)
+        if (layers.rawDetections) {
+          ctx.strokeStyle = isConfirmed ? 'rgba(0,212,170,0.35)' : 'rgba(239,68,68,0.35)';
+          ctx.lineWidth = 0.8;
+          ctx.setLineDash([2, 2]);
+          ctx.strokeRect(cx - 26, cy - 18, 52, 36);
+          ctx.setLineDash([]);
+        }
+
+        // 2. Confirmed Debris (controlled by layers.confirmedDebris)
         if (isConfirmed && layers.confirmedDebris) {
-          // Acoustic shadow (pure black acoustic void)
+          // Acoustic shadow void
           ctx.fillStyle = '#01050A';
           ctx.beginPath();
           ctx.moveTo(cx + shadowDir * 8, cy - 6);
@@ -187,19 +234,28 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
           // High backscatter highlight echo
           ctx.fillStyle = color;
           ctx.shadowColor = color;
-          ctx.shadowBlur = isSelected ? 18 : 8;
+          ctx.shadowBlur = isSelected ? 22 : isHovered ? 14 : 8;
           ctx.beginPath();
           ctx.ellipse(cx, cy, 12, 7, 0.4, 0, Math.PI * 2);
           ctx.fill();
 
           // Bounding Box
           ctx.strokeStyle = color;
-          ctx.lineWidth = isSelected ? 2 : 1.5;
+          ctx.lineWidth = isSelected ? 2.5 : 1.5;
           ctx.strokeRect(cx - 24, cy - 16, 48, 32);
           ctx.fillStyle = `${color}18`;
           ctx.fillRect(cx - 24, cy - 16, 48, 32);
 
-          // Class Label
+          // Selection Radar Halo
+          if (isSelected) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          // Class Label (controlled by layers.classLabels)
           if (layers.classLabels) {
             ctx.shadowBlur = 0;
             ctx.fillStyle = color;
@@ -207,53 +263,52 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
             const shortLabel = cand.class.split(' ').slice(0, 2).join(' ');
             ctx.fillText(shortLabel, cx - 23, cy - 19);
           }
+
+          // Geotag pin heads (controlled by layers.geotagMarkers)
+          if (layers.geotagMarkers) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - 5);
+            ctx.lineTo(cx, cy - 22);
+            ctx.stroke();
+
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.arc(cx, cy - 24, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#05121F';
+            ctx.fillRect(cx - 40, cy - 48, 80, 20);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 0.8;
+            ctx.strokeRect(cx - 40, cy - 48, 80, 20);
+            ctx.fillStyle = color;
+            ctx.font = '7px monospace';
+            ctx.fillText(`${cand.lat.toFixed(4)}°N`, cx - 36, cy - 38);
+            ctx.fillText(`${cand.lon.toFixed(4)}°E`, cx - 36, cy - 30);
+          }
         } else if (!isConfirmed && layers.noiseRejected) {
-          // Rejected dashed wireframe
-          ctx.strokeStyle = 'rgba(239,68,68,0.55)';
+          // 3. Rejected dashed wireframe (controlled by layers.noiseRejected)
+          ctx.strokeStyle = 'rgba(239,68,68,0.65)';
           ctx.setLineDash([3, 3]);
-          ctx.lineWidth = 1;
+          ctx.lineWidth = isSelected ? 2 : 1;
           ctx.strokeRect(cx - 20, cy - 13, 40, 26);
           ctx.setLineDash([]);
           ctx.fillStyle = 'rgba(239,68,68,0.08)';
           ctx.fillRect(cx - 20, cy - 13, 40, 26);
-          ctx.fillStyle = 'rgba(239,68,68,0.7)';
-          ctx.font = 'bold 8.5px monospace';
-          ctx.fillText('✕ NOISE', cx - 16, cy + 3);
-        }
+          ctx.fillStyle = '#ef4444';
+          ctx.font = 'bold 8px monospace';
+          ctx.fillText('✕ NOISE', cx - 17, cy + 3);
 
-        // Raw detection box overlay
-        if (layers.rawDetections && !isConfirmed && !layers.noiseRejected) {
-          ctx.strokeStyle = 'rgba(0,212,170,0.5)';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(cx - 22, cy - 14, 44, 28);
-        }
-
-        // Geotag pin heads
-        if (layers.geotagMarkers && isConfirmed) {
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.moveTo(cx, cy - 5);
-          ctx.lineTo(cx, cy - 22);
-          ctx.stroke();
-
-          ctx.fillStyle = color;
-          ctx.shadowColor = color;
-          ctx.shadowBlur = 10;
-          ctx.beginPath();
-          ctx.arc(cx, cy - 24, 4, 0, Math.PI * 2);
-          ctx.fill();
-
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = '#05121F';
-          ctx.fillRect(cx - 40, cy - 48, 80, 20);
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 0.8;
-          ctx.strokeRect(cx - 40, cy - 48, 80, 20);
-          ctx.fillStyle = color;
-          ctx.font = '7px monospace';
-          ctx.fillText(`${cand.lat.toFixed(4)}°N`, cx - 36, cy - 38);
-          ctx.fillText(`${cand.lon.toFixed(4)}°E`, cx - 36, cy - 30);
+          if (layers.classLabels) {
+            ctx.fillStyle = 'rgba(239,68,68,0.8)';
+            ctx.font = '7px monospace';
+            ctx.fillText(cand.class.split(' ')[0], cx - 20, cy - 16);
+          }
         }
 
         ctx.restore();
@@ -286,15 +341,15 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       return;
     }
 
-    // 1. Sonar Base Layer (changes between raw noise and denoised)
+    // 1. Sonar Base Layer (controlled by layers.rawSonar & layers.denoisedSonar)
     if (stageNum === 1) {
-      drawSonarBase(true, 1.0);
+      if (layers.rawSonar) drawSonarBase(true, 1.0);
     } else if (stageNum === 2) {
-      drawSonarBase(false, 1.0);
+      if (layers.denoisedSonar) drawSonarBase(false, 1.0);
     } else {
       if (layers.rawSonar && !layers.denoisedSonar) drawSonarBase(true, 1.0);
       else if (layers.denoisedSonar && !layers.rawSonar) drawSonarBase(false, 1.0);
-      else {
+      else if (layers.rawSonar && layers.denoisedSonar) {
         drawSonarBase(true, 0.35);
         drawSonarBase(false, 0.9);
       }
@@ -302,12 +357,12 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
     drawNadir();
 
-    // 2. Drone survey track (visible stage 2+)
+    // 2. Drone survey track (visible stage 2+ and controlled by layers.droneTrack)
     if (stageNum >= 2 && layers.droneTrack) {
       drawDroneTrack();
     }
 
-    // 3. Candidate Detections (Only in stage 3+)
+    // 3. Candidate Detections (visible stage 3+)
     if (stageNum >= 3) {
       drawDetections();
     }
@@ -331,6 +386,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
     currentFrame,
     demoPhase,
     stageProgress,
+    selectedCategory,
   ]);
 
   const stageNum = parseInt(currentStageId, 10);
@@ -361,7 +417,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
           </span>
           <span className="text-[#2A5060]">|</span>
           <span className="text-[#00D4AA] font-bold">
-            {stageNum <= 2 ? 'ACQUISITION PHASE' : `${filteredCandidates.length} TARGETS PLOTTED`}
+            {stageNum <= 2 ? 'ACQUISITION PHASE' : `${filteredCandidates.length} OF ${candidates.length} TARGETS PLOTTED`}
           </span>
         </div>
 
@@ -417,12 +473,21 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
           STBD TOW: {activeSite.latRange[0].toFixed(4)}°N, {activeSite.lonRange[1].toFixed(4)}°E
         </div>
 
-        {/* Interactive Reticle Overlays (Visible only in Stage 3 and above) */}
+        {/* Interactive Reticle Overlays (Visible in Stage 3+) */}
         {demoPhase !== 'idle' && stageNum >= 3 &&
-          filteredCandidates.map((cand) => {
+          candidates.map((cand) => {
             const isConfirmed = cand.status === 'CONFIRMED';
             if (isConfirmed && !layers.confirmedDebris) return null;
             if (!isConfirmed && !layers.noiseRejected) return null;
+
+            const matchesCategory =
+              !selectedCategory ||
+              selectedCategory === 'ALL' ||
+              (selectedCategory === 'NETS' && cand.class.includes('Net')) ||
+              (selectedCategory === 'TRAWL' && cand.class.includes('Trawl')) ||
+              (selectedCategory === 'PIPES' && (cand.class.includes('Pipeline') || cand.class.includes('Cable'))) ||
+              (selectedCategory === 'BARRELS' && (cand.class.includes('Barrel') || cand.class.includes('Cargo'))) ||
+              (selectedCategory === 'NOISE' && cand.status === 'REJECTED');
 
             const isSelected = selectedCandidateId === cand.id;
             const isHovered = hoveredCandidateId === cand.id;
@@ -431,13 +496,13 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
             return (
               <div
                 key={cand.id}
-                onClick={() => handleReticleClick(cand.id)}
-                onMouseEnter={() => onHoverCandidate && onHoverCandidate(cand.id)}
-                onMouseLeave={() => onHoverCandidate && onHoverCandidate(null)}
+                onClick={() => matchesCategory && handleReticleClick(cand.id)}
+                onMouseEnter={() => matchesCategory && onHoverCandidate && onHoverCandidate(cand.id)}
+                onMouseLeave={() => matchesCategory && onHoverCandidate && onHoverCandidate(null)}
                 style={{ left: `${cand.rawX}%`, top: `${cand.rawY}%`, borderColor: color }}
                 className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all cursor-pointer group z-20 ${
-                  isSelected || isHovered ? 'z-40' : ''
-                }`}
+                  !matchesCategory ? 'opacity-15 pointer-events-none' : 'opacity-100'
+                } ${isSelected || isHovered ? 'z-40' : ''}`}
               >
                 {isConfirmed ? (
                   <div
@@ -462,10 +527,10 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
                   </div>
                 )}
 
-                {/* Cybernetic Hover Class Pill */}
+                {/* Cybernetic Hover Class Pill / Tooltip */}
                 {(isSelected || isHovered) && (
                   <div
-                    className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 whitespace-nowrap text-[8px] font-bold border bg-[#05121F] shadow-lg flex items-center gap-1.5"
+                    className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 whitespace-nowrap text-[8px] font-bold border bg-[#05121F] shadow-lg flex items-center gap-1.5 pointer-events-none"
                     style={{ color, borderColor: color }}
                   >
                     <span className="font-mono">{cand.id}</span>

@@ -111,17 +111,26 @@ export const MissionPage: React.FC = () => {
         return {
           ...c,
           status: 'REJECTED' as const,
-          rejectReason: `Confidence score ${(c.confidence * 100).toFixed(1)}% is below dynamic cutoff ${(confidenceThreshold * 100).toFixed(0)}%`,
+          rejectReason: `REJECTED — confidence ${(c.confidence * 100).toFixed(1)}% is below operator threshold ${(confidenceThreshold * 100).toFixed(0)}%`,
         };
       }
 
-      // 2. Acoustic shadow relief verification
-      if (shadowFilterEnabled && c.shadowLengthM <= 0.05) {
-        return {
-          ...c,
-          status: 'REJECTED' as const,
-          rejectReason: 'Zero acoustic shadow displacement; 2D seafloor artifact',
-        };
+      // 2. Acoustic shadow verification rule (when active)
+      if (shadowFilterEnabled) {
+        if (c.shadowLengthM <= 0.05) {
+          return {
+            ...c,
+            status: 'REJECTED' as const,
+            rejectReason: `REJECTED — shadow length ${c.shadowLengthM.toFixed(1)}m indicates zero acoustic vertical relief (likely sediment ripple or surface echo)`,
+          };
+        }
+        if (c.aspectRatio > 6.0) {
+          return {
+            ...c,
+            status: 'REJECTED' as const,
+            rejectReason: `REJECTED — aspect ratio ${c.aspectRatio.toFixed(1)} exceeds natural-object threshold (6.0); geometric shadow rule triggered`,
+          };
+        }
       }
 
       // 3. Natural rock / geological formations filter
@@ -130,13 +139,11 @@ export const MissionPage: React.FC = () => {
         c.class.includes('Bedrock') ||
         c.class.includes('Basalt')
       ) {
-        if (c.aspectRatio < 1.35) {
-          return {
-            ...c,
-            status: 'REJECTED' as const,
-            rejectReason: 'Aspect ratio conforms to native geological bedrock cluster',
-          };
-        }
+        return {
+          ...c,
+          status: 'REJECTED' as const,
+          rejectReason: `REJECTED — aspect ratio ${c.aspectRatio.toFixed(1)} & diffuse backscatter matches native seabed geological formation`,
+        };
       }
 
       return {
@@ -160,9 +167,9 @@ export const MissionPage: React.FC = () => {
     });
   }, [dynamicCandidates, selectedCategory]);
 
-  const rawCount = 37;
-  const rejectedCount = dynamicCandidates.filter((c) => c.status === 'REJECTED').length * 2 + 6;
+  const rawCount = dynamicCandidates.length;
   const confirmedCount = dynamicCandidates.filter((c) => c.status === 'CONFIRMED').length;
+  const rejectedCount = dynamicCandidates.filter((c) => c.status === 'REJECTED').length;
 
   // Survey site change handler
   const handleSelectSite = useCallback((site: SurveySite) => {
@@ -389,6 +396,7 @@ export const MissionPage: React.FC = () => {
               currentFrame={currentFrame}
               demoPhase={demoPhase}
               stageProgress={stageProgress}
+              selectedCategory={selectedCategory}
             />
 
             <ConsoleStageDetail

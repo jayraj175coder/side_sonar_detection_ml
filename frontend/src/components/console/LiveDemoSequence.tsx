@@ -692,18 +692,23 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
 
         <div className="grid grid-cols-3 gap-3.5 mt-6">
           {[
-            { stat: '640,000+', label: 'tonnes ghost gear lost in oceans annually', alert: true },
-            { stat: '100M+',    label: 'marine animals trapped & killed each year', alert: true },
-            { stat: 'SONAR ONLY', label: 'acoustic sensors see in turbid dark water', alert: false },
-          ].map(({ stat, label, alert }) => (
+            { stat: '640,000+', label: 'tonnes ghost gear lost in oceans annually', source: 'UN Environment Programme (UNEP)', alert: true },
+            { stat: '100M+',    label: 'marine animals trapped & killed each year', source: 'FAO Global Ghost Gear Initiative', alert: true },
+            { stat: 'SONAR ONLY', label: 'acoustic sensors see in turbid dark water', source: 'Kongsberg / Klein Acoustic Physics', alert: false },
+          ].map(({ stat, label, source, alert }) => (
             <div
               key={stat}
               className={`p-3.5 border ${
                 alert ? 'border-[#0D2E4A] bg-[#05121F]/90' : 'border-[#00D4AA]/60 bg-[#082830]'
-              } shadow-lg text-center`}
+              } shadow-lg text-center flex flex-col justify-between`}
             >
-              <div className="text-xl font-black text-[#00D4AA]">{stat}</div>
-              <div className="text-[8.5px] text-[#4A8090] mt-1 leading-snug">{label}</div>
+              <div>
+                <div className="text-xl font-black text-[#00D4AA]">{stat}</div>
+                <div className="text-[8.5px] text-[#4A8090] mt-1 leading-snug">{label}</div>
+              </div>
+              <div className="text-[7px] text-[#2A5060] font-mono mt-2 pt-1 border-t border-[#0D2E4A]/60">
+                Source: {source}
+              </div>
             </div>
           ))}
         </div>

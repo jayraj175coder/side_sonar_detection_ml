@@ -57,6 +57,11 @@ export const ModelInfoPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Honest Calibration Caveat */}
+      <div className="text-[8.5px] text-[#4A8090] font-mono -mt-1 px-0.5">
+        * Note: Confidence scores are model-reported outputs, not independently validated against ground truth in this demo environment.
+      </div>
+
       {/* 3. Sub-Tab Navigation */}
       <div className="flex items-center gap-1 border-b border-[#0D2E4A] pb-2 text-[10px]">
         {[

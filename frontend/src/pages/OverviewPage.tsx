@@ -49,7 +49,7 @@ export const OverviewPage: React.FC = () => {
   const heroTarget = MISSION_TARGETS.find((t) => t.id === 'SX-T07') || MISSION_TARGETS[0];
 
   const debrisDistribution = [
-    { name: 'Ghost Nets (ALDFG)', value: 6, color: '#4ade80' },
+    { name: 'Ghost Nets (ALDFG)', value: 6, color: '#00D4AA' },
     { name: 'Lost Trawl Gear', value: 4, color: '#f59e0b' },
     { name: 'Anthropogenic Debris', value: 4, color: '#38bdf8' },
     { name: 'Pipeline Hazards', value: 3, color: '#86efac' },
@@ -63,20 +63,20 @@ export const OverviewPage: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-slide-up font-mono select-none text-[11px] text-[#dcfce7]">
+    <div className="space-y-6 animate-slide-up font-mono select-none text-[11px] text-[#E0F7F4]">
       {/* 1. Hero Scientific Banner */}
-      <div className="relative overflow-hidden bg-[#090e09] border border-[#193019] p-6 md:p-7 shadow-xl">
+      <div className="relative overflow-hidden bg-[#05121F] border border-[#0D2E4A] p-6 md:p-7 shadow-xl">
         <div className="relative z-10 max-w-3xl space-y-2.5">
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#122415] border border-[#4ade80]/40 text-[#4ade80] text-[9.5px] font-bold">
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#082830] border border-[#00D4AA]/40 text-[#00D4AA] text-[9.5px] font-bold">
             <Radio className="w-3.5 h-3.5 animate-pulse" />
             <span>AI-POWERED MARINE DEBRIS & ANOMALY DETECTION PIPELINE</span>
           </div>
 
-          <h1 className="text-xl md:text-2xl font-black text-[#dcfce7] tracking-tight uppercase">
+          <h1 className="text-xl md:text-2xl font-black text-[#E0F7F4] tracking-tight uppercase">
             Transforming side-scan sonar imagery into explainable, geotagged marine intelligence.
           </h1>
 
-          <p className="text-[10px] text-[#64876b] leading-relaxed">
+          <p className="text-[10px] text-[#4A8090] leading-relaxed">
             Automated acoustic perception for the Ministry of Earth Sciences: Ingests raw side-scan sonar imagery, applies bilateral noise suppression and CLAHE contrast enhancement, runs YOLOv8n ONNX perception, rejects natural geological formations, attaches WGS84 coordinates, and compiles structured dossiers.
           </p>
 
@@ -87,7 +87,7 @@ export const OverviewPage: React.FC = () => {
                 setActiveTab('mission');
                 startGuidedDemo();
               }}
-              className="panel-btn flex items-center gap-2 px-3.5 py-1.5 bg-[#4ade80] text-[#070b07] border-[#4ade80] font-black text-xs hover:brightness-110 active:scale-95"
+              className="panel-btn flex items-center gap-2 px-3.5 py-1.5 bg-[#00D4AA] text-[#030B14] border-[#00D4AA] font-black text-xs hover:brightness-110 active:scale-95"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>RUN LIVE DEMO MISSION</span>
@@ -95,7 +95,7 @@ export const OverviewPage: React.FC = () => {
 
             <button
               onClick={() => setActiveTab('scan')}
-              className="panel-btn flex items-center gap-2 px-3.5 py-1.5 hover:text-[#4ade80]"
+              className="panel-btn flex items-center gap-2 px-3.5 py-1.5 hover:text-[#00D4AA]"
             >
               <UploadCloud className="w-3.5 h-3.5" />
               <span>UPLOAD & ANALYZE IMAGE</span>
@@ -105,67 +105,67 @@ export const OverviewPage: React.FC = () => {
       </div>
 
       {/* 2. Scalability & Fleet Deployment Path (SIH Criteria Requirement) */}
-      <div className="p-4 bg-[#090e09] border border-[#193019] space-y-3">
-        <div className="flex items-center justify-between pb-1 border-b border-[#193019]">
-          <span className="text-[9.5px] font-bold text-[#64876b] uppercase tracking-widest">
+      <div className="p-4 bg-[#05121F] border border-[#0D2E4A] space-y-3">
+        <div className="flex items-center justify-between pb-1 border-b border-[#0D2E4A]">
+          <span className="text-[9.5px] font-bold text-[#4A8090] uppercase tracking-widest">
             SCALABILITY & FLEET DEPLOYMENT ROADMAP (SIH EVALUATION PATH)
           </span>
-          <span className="text-[8px] text-[#4ade80] font-bold">4-STAGE FLEET READINESS</span>
+          <span className="text-[8px] text-[#00D4AA] font-bold">4-STAGE FLEET READINESS</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2.5 text-[9.5px]">
           {/* Stage 1 */}
-          <div className="p-3 bg-[#070b07] border border-[#4ade80]/40 space-y-1.5">
+          <div className="p-3 bg-[#030B14] border border-[#00D4AA]/40 space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[8px] font-bold text-[#4ade80] px-1 bg-[#122415] border border-[#4ade80]/40">
+              <span className="text-[8px] font-bold text-[#00D4AA] px-1 bg-[#082830] border border-[#00D4AA]/40">
                 STAGE 01 · ACTIVE NOW
               </span>
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#4ade80]" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#00D4AA]" />
             </div>
-            <strong className="text-[#dcfce7] block font-bold">ANALYST CONSOLE DEMO</strong>
-            <p className="text-[#64876b]">
+            <strong className="text-[#E0F7F4] block font-bold">ANALYST CONSOLE DEMO</strong>
+            <p className="text-[#4A8090]">
               Browser-based interactive verification interface for MoES hydrographic officers and survey teams.
             </p>
           </div>
 
           {/* Stage 2 */}
-          <div className="p-3 bg-[#070b07] border border-[#193019] space-y-1.5">
+          <div className="p-3 bg-[#030B14] border border-[#0D2E4A] space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[8px] font-bold text-[#64876b] px-1 bg-[#0e160e] border border-[#193019]">
+              <span className="text-[8px] font-bold text-[#4A8090] px-1 bg-[#0A1E30] border border-[#0D2E4A]">
                 STAGE 02 · EDGE AUV
               </span>
-              <Cpu className="w-3.5 h-3.5 text-[#64876b]" />
+              <Cpu className="w-3.5 h-3.5 text-[#4A8090]" />
             </div>
-            <strong className="text-[#dcfce7] block font-bold">ONBOARD JETSON INFERENCE</strong>
-            <p className="text-[#64876b]">
+            <strong className="text-[#E0F7F4] block font-bold">ONBOARD JETSON INFERENCE</strong>
+            <p className="text-[#4A8090]">
               YOLOv8n ONNX model quantized to INT8 running real-time 10.4ms inference on submerged tow-bodies.
             </p>
           </div>
 
           {/* Stage 3 */}
-          <div className="p-3 bg-[#070b07] border border-[#193019] space-y-1.5">
+          <div className="p-3 bg-[#030B14] border border-[#0D2E4A] space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[8px] font-bold text-[#64876b] px-1 bg-[#0e160e] border border-[#193019]">
+              <span className="text-[8px] font-bold text-[#4A8090] px-1 bg-[#0A1E30] border border-[#0D2E4A]">
                 STAGE 03 · FLEET SYNC
               </span>
-              <Server className="w-3.5 h-3.5 text-[#64876b]" />
+              <Server className="w-3.5 h-3.5 text-[#4A8090]" />
             </div>
-            <strong className="text-[#dcfce7] block font-bold">FLEET SYNC TO MoES HUB</strong>
-            <p className="text-[#64876b]">
+            <strong className="text-[#E0F7F4] block font-bold">FLEET SYNC TO MoES HUB</strong>
+            <p className="text-[#4A8090]">
               Acoustic modem / satellite telemetry synchronization streaming geotagged anomaly dossiers to central servers.
             </p>
           </div>
 
           {/* Stage 4 */}
-          <div className="p-3 bg-[#070b07] border border-[#193019] space-y-1.5">
+          <div className="p-3 bg-[#030B14] border border-[#0D2E4A] space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="text-[8px] font-bold text-[#64876b] px-1 bg-[#0e160e] border border-[#193019]">
+              <span className="text-[8px] font-bold text-[#4A8090] px-1 bg-[#0A1E30] border border-[#0D2E4A]">
                 STAGE 04 · NATIONAL
               </span>
-              <Compass className="w-3.5 h-3.5 text-[#64876b]" />
+              <Compass className="w-3.5 h-3.5 text-[#4A8090]" />
             </div>
-            <strong className="text-[#dcfce7] block font-bold">NATIONAL DEBRIS DENSITY MAP</strong>
-            <p className="text-[#64876b]">
+            <strong className="text-[#E0F7F4] block font-bold">NATIONAL DEBRIS DENSITY MAP</strong>
+            <p className="text-[#4A8090]">
               Longitudinal GIS heatmaps and automated salvage vessel routing for Indian EEZ environmental remediation.
             </p>
           </div>
@@ -174,33 +174,33 @@ export const OverviewPage: React.FC = () => {
 
       {/* 3. Executive KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-2.5 text-center font-mono">
-        <div className="p-3 bg-[#090e09] border border-[#193019] space-y-0.5">
-          <span className="text-[8px] text-[#64876b] uppercase block">Total Anomalies</span>
-          <span className="text-xl font-bold text-[#dcfce7]">17</span>
+        <div className="p-3 bg-[#05121F] border border-[#0D2E4A] space-y-0.5">
+          <span className="text-[8px] text-[#4A8090] uppercase block">Total Anomalies</span>
+          <span className="text-xl font-bold text-[#E0F7F4]">17</span>
         </div>
 
-        <div className="p-3 bg-[#090e09] border border-[#ef4444]/40 space-y-0.5">
+        <div className="p-3 bg-[#05121F] border border-[#ef4444]/40 space-y-0.5">
           <span className="text-[8px] text-[#ef4444] uppercase block font-bold">High Priority</span>
           <span className="text-xl font-bold text-[#ef4444]">4</span>
         </div>
 
-        <div className="p-3 bg-[#090e09] border border-[#4ade80]/40 space-y-0.5">
-          <span className="text-[8px] text-[#4ade80] uppercase block font-bold">Top Confidence</span>
-          <span className="text-xl font-bold text-[#4ade80]">94.7%</span>
+        <div className="p-3 bg-[#05121F] border border-[#00D4AA]/40 space-y-0.5">
+          <span className="text-[8px] text-[#00D4AA] uppercase block font-bold">Top Confidence</span>
+          <span className="text-xl font-bold text-[#00D4AA]">94.7%</span>
         </div>
 
-        <div className="p-3 bg-[#090e09] border border-[#4ade80]/40 space-y-0.5">
-          <span className="text-[8px] text-[#4ade80] uppercase block font-bold">Rocks Filtered</span>
-          <span className="text-xl font-bold text-[#4ade80]">20</span>
+        <div className="p-3 bg-[#05121F] border border-[#00D4AA]/40 space-y-0.5">
+          <span className="text-[8px] text-[#00D4AA] uppercase block font-bold">Rocks Filtered</span>
+          <span className="text-xl font-bold text-[#00D4AA]">20</span>
         </div>
 
-        <div className="p-3 bg-[#090e09] border border-[#193019] space-y-0.5">
-          <span className="text-[8px] text-[#64876b] uppercase block">Surveyed Area</span>
-          <span className="text-xl font-bold text-[#dcfce7]">12.84 km²</span>
+        <div className="p-3 bg-[#05121F] border border-[#0D2E4A] space-y-0.5">
+          <span className="text-[8px] text-[#4A8090] uppercase block">Surveyed Area</span>
+          <span className="text-xl font-bold text-[#E0F7F4]">12.84 km²</span>
         </div>
 
-        <div className="p-3 bg-[#090e09] border border-[#193019] space-y-0.5">
-          <span className="text-[8px] text-[#64876b] uppercase block">Edge Latency</span>
+        <div className="p-3 bg-[#05121F] border border-[#0D2E4A] space-y-0.5">
+          <span className="text-[8px] text-[#4A8090] uppercase block">Edge Latency</span>
           <span className="text-xl font-bold text-[#38bdf8]">10.4 ms</span>
         </div>
       </div>
@@ -208,23 +208,23 @@ export const OverviewPage: React.FC = () => {
       {/* 4. Target Spotlight & Debris Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
         {/* Hero Target Card */}
-        <div className="lg:col-span-7 p-4 bg-[#090e09] border border-[#193019] space-y-3">
-          <div className="flex items-center justify-between pb-1 border-b border-[#193019]">
-            <span className="text-[9px] font-bold text-[#64876b] uppercase tracking-widest">
+        <div className="lg:col-span-7 p-4 bg-[#05121F] border border-[#0D2E4A] space-y-3">
+          <div className="flex items-center justify-between pb-1 border-b border-[#0D2E4A]">
+            <span className="text-[9px] font-bold text-[#4A8090] uppercase tracking-widest">
               PRIMARY ANOMALY SPOTLIGHT // SX-T07
             </span>
-            <span className="text-[8px] text-[#4ade80] font-bold px-1.5 py-0.2 bg-[#122415] border border-[#4ade80]/40">
+            <span className="text-[8px] text-[#00D4AA] font-bold px-1.5 py-0.2 bg-[#082830] border border-[#00D4AA]/40">
               94.7% CONFIDENCE
             </span>
           </div>
 
           <div className="space-y-1.5 text-[10px]">
             <div className="flex items-center justify-between">
-              <strong className="text-sm text-[#4ade80]">{heroTarget.class}</strong>
-              <span className="text-[#64876b]">{heroTarget.length}m x {heroTarget.width}m</span>
+              <strong className="text-sm text-[#00D4AA]">{heroTarget.class}</strong>
+              <span className="text-[#4A8090]">{heroTarget.length}m x {heroTarget.width}m</span>
             </div>
-            <p className="text-[#64876b]">{heroTarget.operatorCaveat}</p>
-            <div className="p-2 bg-[#070b07] border border-[#193019] text-[9px] text-[#64876b] flex items-center justify-between">
+            <p className="text-[#4A8090]">{heroTarget.operatorCaveat}</p>
+            <div className="p-2 bg-[#030B14] border border-[#0D2E4A] text-[9px] text-[#4A8090] flex items-center justify-between">
               <span>LAT: {heroTarget.lat}°N</span>
               <span>LON: {heroTarget.lon}°E</span>
               <span>DEPTH: {heroTarget.depth}m</span>
@@ -233,20 +233,20 @@ export const OverviewPage: React.FC = () => {
         </div>
 
         {/* Debris Class Breakdown Chart */}
-        <div className="lg:col-span-5 p-4 bg-[#090e09] border border-[#193019] space-y-3">
-          <div className="flex items-center justify-between pb-1 border-b border-[#193019]">
-            <span className="text-[9px] font-bold text-[#64876b] uppercase tracking-widest">
+        <div className="lg:col-span-5 p-4 bg-[#05121F] border border-[#0D2E4A] space-y-3">
+          <div className="flex items-center justify-between pb-1 border-b border-[#0D2E4A]">
+            <span className="text-[9px] font-bold text-[#4A8090] uppercase tracking-widest">
               DEBRIS TAXONOMY DISTRIBUTION
             </span>
-            <span className="text-[8px] text-[#64876b]">17 TARGETS</span>
+            <span className="text-[8px] text-[#4A8090]">17 TARGETS</span>
           </div>
 
           <div className="space-y-1.5 text-[9.5px]">
             {debrisDistribution.map((d, i) => (
-              <div key={i} className="flex items-center justify-between p-1.5 bg-[#070b07] border border-[#193019]">
+              <div key={i} className="flex items-center justify-between p-1.5 bg-[#030B14] border border-[#0D2E4A]">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2" style={{ backgroundColor: d.color }} />
-                  <span className="text-[#dcfce7]">{d.name}</span>
+                  <span className="text-[#E0F7F4]">{d.name}</span>
                 </div>
                 <strong className="font-mono" style={{ color: d.color }}>{d.value} items</strong>
               </div>

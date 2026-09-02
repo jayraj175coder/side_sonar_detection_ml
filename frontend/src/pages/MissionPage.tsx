@@ -1,39 +1,33 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { LiveDemoSequence } from '../components/console/LiveDemoSequence';
 import { ConsoleTopBar } from '../components/console/ConsoleTopBar';
 import { ConsoleLeftRail, LayerState } from '../components/console/ConsoleLeftRail';
 import { ConsoleSonarCanvas } from '../components/console/ConsoleSonarCanvas';
 import { ConsoleStageDetail } from '../components/console/ConsoleStageDetail';
 import { ConsoleBottomTimeline, EventLogEntry } from '../components/console/ConsoleBottomTimeline';
 import {
-  SURVEY_SITES,
-  SurveySite,
-  CANDIDATE_ITEMS,
-  CandidateItem,
-  STAGE_DETAILS,
-  StageId,
-  INITIAL_EVENT_LOGS,
-  PIPELINE_STAGES,
+  SURVEY_SITES, SurveySite, CANDIDATE_ITEMS, CandidateItem,
+  STAGE_DETAILS, StageId, INITIAL_EVENT_LOGS, PIPELINE_STAGES,
 } from '../data/consoleData';
 import { sonarAudio } from '../utils/sonarAudio';
+import { useMission } from '../context/MissionContext';
 
 type DemoPhase = 'idle' | 'running' | 'done';
 
-// Stage-specific event log lines that stream in during the live demo
 const STAGE_LOG_EVENTS: Record<StageId, { tag: string; text: string; level: EventLogEntry['level'] }[]> = {
   '01': [
-    { tag: 'ING', text: 'sonar_log_kutch_dark_042.xtf opened · 80,829 pings · 75m swath', level: 'info' },
-    { tag: 'ING', text: 'navigation telemetry sync · 10 Hz ping interval locked', level: 'info' },
-    { tag: 'ING', text: 'slant-range correction applied · letterbox 640×640 normalization', level: 'success' },
+    { tag: 'ING',  text: 'sonar_log_kutch_dark_042.xtf opened · 80,829 pings · 75m swath', level: 'info' },
+    { tag: 'ING',  text: 'navigation telemetry sync · 10 Hz ping interval locked', level: 'info' },
+    { tag: 'ING',  text: 'slant-range correction applied · letterbox 640×640', level: 'success' },
   ],
   '02': [
-    { tag: 'DEN', text: 'bilateral spatial filter 5×5 · speckle attenuated −18.4 dB', level: 'info' },
-    { tag: 'DEN', text: 'CLAHE contrast normalization · dynamic range +14.2 dB', level: 'success' },
-    { tag: 'DEN', text: 'TVG altitude correction applied · drone track overlay rendered', level: 'info' },
+    { tag: 'DEN',  text: 'bilateral spatial filter 5×5 · speckle −18.4 dB', level: 'info' },
+    { tag: 'DEN',  text: 'CLAHE contrast normalization · dynamic range +14.2 dB', level: 'success' },
+    { tag: 'DEN',  text: 'TVG altitude correction applied · drone track rendered', level: 'info' },
   ],
   '03': [
-    { tag: 'DET', text: 'YOLOv8n ONNX forward pass · inference 10.4 ms', level: 'info' },
-    { tag: 'DET', text: '37 raw candidates extracted · NMS IoU 0.45 applied', level: 'success' },
-    { tag: 'DET', text: 'bounding boxes rendered on acoustic mosaic', level: 'info' },
+    { tag: 'DET',  text: 'YOLOv8n ONNX forward pass · inference 10.4 ms', level: 'info' },
+    { tag: 'DET',  text: '37 raw candidates extracted · NMS IoU 0.45 applied', level: 'success' },
   ],
   '04': [
     { tag: 'GATE', text: 'confidence gate applied · threshold 0.25', level: 'info' },
@@ -43,67 +37,86 @@ const STAGE_LOG_EVENTS: Record<StageId, { tag: string; text: string; level: Even
     { tag: 'GATE', text: '20 natural formations rejected · 17 debris confirmed', level: 'success' },
   ],
   '05': [
-    { tag: 'CLS', text: 'debris taxonomy attribution · MoES ALDFG classification', level: 'info' },
-    { tag: 'CLS', text: '6× ghost nets (ALDFG) · 4× trawl gear · 3× pipeline spans', level: 'success' },
-    { tag: 'CLS', text: '4 critical hazard targets flagged for ROV verification', level: 'warn' },
+    { tag: 'CLS',  text: 'debris taxonomy attribution · MoES ALDFG classification', level: 'info' },
+    { tag: 'CLS',  text: '6× ghost nets · 4× trawl gear · 3× pipeline spans confirmed', level: 'success' },
+    { tag: 'CLS',  text: '4 critical hazard targets flagged for ROV verification', level: 'warn' },
   ],
   '06': [
-    { tag: 'GEO', text: 'WGS84 geotag attached · USBL interpolated coordinates', level: 'info' },
-    { tag: 'GEO', text: 'SX-T07 ghost net · 18.9217°N, 72.8214°E · 43.1m depth', level: 'info' },
-    { tag: 'REP', text: 'anomaly_report_MX026.json compiled · 17 targets geotagged', level: 'success' },
-    { tag: 'REP', text: 'pipeline COMPLETE · dossier ready for download', level: 'success' },
+    { tag: 'GEO',  text: 'WGS84 geotag attached from USBL interpolated coordinates', level: 'info' },
+    { tag: 'GEO',  text: 'SX-T07 ghost net · 18.9217°N, 72.8214°E · 43.1m', level: 'info' },
+    { tag: 'REP',  text: 'anomaly_report_MX026.json compiled · 17 targets geotagged', level: 'success' },
+    { tag: 'REP',  text: 'pipeline COMPLETE · dossier ready for download', level: 'success' },
   ],
 };
 
-const STAGE_DURATION_MS = 2800; // Auto-advance per stage
+const STAGE_DURATION_MS = 2800;
 
 export const MissionPage: React.FC = () => {
-  const [activeSite, setActiveSite] = useState<SurveySite>(SURVEY_SITES[0]);
-  const [currentStageId, setCurrentStageId] = useState<StageId>('01');
+  const { isDemoRunning, startGuidedDemo, resetGuidedDemo } = useMission();
+  // ── Live demo sequence overlay (shown on first load or when triggered) ──────
+  const [showSequence, setShowSequence] = useState(true);
+
+  // Active if showSequence or isDemoRunning is true
+  const isSequenceActive = showSequence || isDemoRunning;
+
+  // ── Dashboard state ─────────────────────────────────────────────────────────
+  const [activeSite, setActiveSite]             = useState<SurveySite>(SURVEY_SITES[0]);
+  const [currentStageId, setCurrentStageId]     = useState<StageId>('01');
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>('SX-T07');
-  const [hoveredCandidateId, setHoveredCandidateId] = useState<string | null>(null);
-  const [candidatesList] = useState<CandidateItem[]>(CANDIDATE_ITEMS);
+  const [hoveredCandidateId, setHoveredCandidateId]   = useState<string | null>(null);
+  const [candidatesList]                        = useState<CandidateItem[]>(CANDIDATE_ITEMS);
 
-  // Demo engine state
-  const [demoPhase, setDemoPhase] = useState<DemoPhase>('idle');
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [stageProgress, setStageProgress] = useState<number>(0); // 0–1 within current stage
-  const demoTimerRef = useRef<any>(null);
-  const progressTimerRef = useRef<any>(null);
+  const [demoPhase, setDemoPhase]       = useState<DemoPhase>('idle');
+  const [isPlaying, setIsPlaying]       = useState(false);
+  const [stageProgress, setStageProgress] = useState(0);
 
-  // Layers
   const [layers, setLayers] = useState<LayerState>({
-    rawSonar: true,
-    denoisedSonar: true,
-    droneTrack: true,
-    rawDetections: true,
-    noiseRejected: true,
-    confirmedDebris: true,
-    classLabels: true,
-    geotagMarkers: true,
+    rawSonar:       true,
+    denoisedSonar:  true,
+    droneTrack:     true,
+    rawDetections:  true,
+    noiseRejected:  true,
+    confirmedDebris:true,
+    classLabels:    true,
+    geotagMarkers:  true,
   });
 
-  // Timeline
-  const [currentFrame, setCurrentFrame] = useState<number>(1);
-  const [totalFrames] = useState<number>(120);
-  const [speedMultiplier, setSpeedMultiplier] = useState<number>(1);
-  const [eventLogs, setEventLogs] = useState<EventLogEntry[]>(INITIAL_EVENT_LOGS);
+  const [currentFrame, setCurrentFrame] = useState(1);
+  const [totalFrames]                   = useState(120);
+  const [speedMultiplier, setSpeedMultiplier] = useState(1);
+  const [eventLogs, setEventLogs]       = useState<EventLogEntry[]>(INITIAL_EVENT_LOGS);
 
-  const frameTimerRef = useRef<any>(null);
+  const demoTimerRef    = useRef<any>(null);
+  const progressTimerRef = useRef<any>(null);
+  const frameTimerRef   = useRef<any>(null);
 
-  // Push log entries for a stage
+  // ── Called when live demo sequence finishes ─────────────────────────────────
+  const handleSequenceComplete = useCallback(() => {
+    setShowSequence(false);
+    resetGuidedDemo();
+    // Pre-populate dashboard as if the pipeline already ran (stage 06 done)
+    setCurrentStageId('06');
+    setDemoPhase('done');
+    setStageProgress(1);
+    const now = new Date();
+    const ts  = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const newLogs: EventLogEntry[] = [
+      ...INITIAL_EVENT_LOGS,
+      ...(['01','02','03','04','05','06'] as StageId[]).flatMap((sid) =>
+        STAGE_LOG_EVENTS[sid].map(l => ({ time: ts, ...l }))
+      ),
+    ];
+    setEventLogs(newLogs);
+  }, [resetGuidedDemo]);
+
   const pushLogs = useCallback((stageId: StageId) => {
     const lines = STAGE_LOG_EVENTS[stageId] || [];
-    const now = new Date();
-    const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const ts = `${String(new Date().getHours()).padStart(2,'0')}:${String(new Date().getMinutes()).padStart(2,'0')}`;
     lines.forEach((ln, i) => {
-      setTimeout(() => {
-        setEventLogs((prev) => [...prev.slice(-60), { time: timeStr, ...ln }]);
-      }, i * 350);
+      setTimeout(() => setEventLogs(prev => [...prev.slice(-60), { time: ts, ...ln }]), i * 350);
     });
   }, []);
 
-  // Advance pipeline to a stage (manual or programmatic)
   const handleSelectStage = useCallback((id: StageId) => {
     setCurrentStageId(id);
     setStageProgress(0);
@@ -112,51 +125,26 @@ export const MissionPage: React.FC = () => {
   }, [pushLogs]);
 
   const handleToggleLayer = useCallback((layerKey: keyof LayerState) => {
-    setLayers((prev) => ({ ...prev, [layerKey]: !prev[layerKey] }));
+    setLayers(prev => ({ ...prev, [layerKey]: !prev[layerKey] }));
     sonarAudio.playLockBeep?.();
   }, []);
 
-  // ── Stage progress animation (0→1 over STAGE_DURATION_MS) ─────────────────
   const startProgressAnimation = useCallback(() => {
     if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     setStageProgress(0);
     const start = Date.now();
     progressTimerRef.current = setInterval(() => {
-      const elapsed = Date.now() - start;
-      const p = Math.min(elapsed / STAGE_DURATION_MS, 1);
+      const p = Math.min((Date.now() - start) / STAGE_DURATION_MS, 1);
       setStageProgress(p);
       if (p >= 1) clearInterval(progressTimerRef.current);
     }, 30);
   }, []);
 
-  // ── Demo auto-play engine ──────────────────────────────────────────────────
   const handleRunDemo = useCallback(() => {
-    if (demoPhase === 'running') return;
-    setDemoPhase('running');
-    setIsPlaying(true);
-    setCurrentFrame(1);
-    setEventLogs(INITIAL_EVENT_LOGS);
+    setShowSequence(true);
+    startGuidedDemo();
+  }, [startGuidedDemo]);
 
-    const stages: StageId[] = ['01', '02', '03', '04', '05', '06'];
-    let idx = 0;
-
-    const advance = () => {
-      if (idx >= stages.length) {
-        setDemoPhase('done');
-        setIsPlaying(false);
-        return;
-      }
-      const sid = stages[idx];
-      handleSelectStage(sid);
-      startProgressAnimation();
-      idx++;
-      demoTimerRef.current = setTimeout(advance, STAGE_DURATION_MS + 200);
-    };
-
-    advance();
-  }, [demoPhase, handleSelectStage, startProgressAnimation]);
-
-  // Pause / resume
   const handleTogglePlay = useCallback(() => {
     if (demoPhase !== 'running') return;
     if (isPlaying) {
@@ -165,23 +153,15 @@ export const MissionPage: React.FC = () => {
       setIsPlaying(false);
     } else {
       setIsPlaying(true);
-      // Resume from current stage → just re-advance to next
-      const stages: StageId[] = ['01', '02', '03', '04', '05', '06'];
-      const currentIdx = stages.indexOf(currentStageId);
-      let idx = currentIdx + 1;
-
+      const stages: StageId[] = ['01','02','03','04','05','06'];
+      let idx = stages.indexOf(currentStageId) + 1;
       const advance = () => {
-        if (idx >= stages.length) {
-          setDemoPhase('done');
-          setIsPlaying(false);
-          return;
-        }
+        if (idx >= stages.length) { setDemoPhase('done'); setIsPlaying(false); return; }
         handleSelectStage(stages[idx]);
         startProgressAnimation();
         idx++;
         demoTimerRef.current = setTimeout(advance, STAGE_DURATION_MS + 200);
       };
-
       demoTimerRef.current = setTimeout(advance, STAGE_DURATION_MS + 200);
     }
   }, [demoPhase, isPlaying, currentStageId, handleSelectStage, startProgressAnimation]);
@@ -201,31 +181,31 @@ export const MissionPage: React.FC = () => {
     sonarAudio.playDepthPulse?.();
   }, []);
 
-  // Frame ticker when playing
+  // Frame ticker
   useEffect(() => {
     if (!isPlaying) { clearInterval(frameTimerRef.current); return; }
-    const ms = Math.max(80, Math.floor(800 / speedMultiplier));
+    const ms = Math.max(80, Math.floor(800/speedMultiplier));
     frameTimerRef.current = setInterval(() => {
-      setCurrentFrame((f) => (f >= totalFrames ? 1 : f + 1));
+      setCurrentFrame(f => f >= totalFrames ? 1 : f + 1);
     }, ms);
     return () => clearInterval(frameTimerRef.current);
   }, [isPlaying, speedMultiplier, totalFrames]);
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts (only when sequence is not showing)
   useEffect(() => {
-    const handle = (e: KeyboardEvent) => {
+    if (showSequence) return;
+    const h = (e: KeyboardEvent) => {
       if (['INPUT','SELECT','TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
       if (e.code === 'Space') { e.preventDefault(); demoPhase === 'idle' ? handleRunDemo() : handleTogglePlay(); }
       else if (e.key >= '1' && e.key <= '6') handleSelectStage(String(e.key).padStart(2,'0') as StageId);
-      else if (e.key === 'ArrowRight') setCurrentFrame((f) => Math.min(f + 1, totalFrames));
-      else if (e.key === 'ArrowLeft') setCurrentFrame((f) => Math.max(f - 1, 1));
+      else if (e.key === 'ArrowRight') setCurrentFrame(f => Math.min(f+1, totalFrames));
+      else if (e.key === 'ArrowLeft')  setCurrentFrame(f => Math.max(f-1, 1));
       else if (e.key === 'r' || e.key === 'R') handleReset();
     };
-    window.addEventListener('keydown', handle);
-    return () => window.removeEventListener('keydown', handle);
-  }, [demoPhase, handleRunDemo, handleTogglePlay, handleReset, handleSelectStage, totalFrames]);
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [showSequence, demoPhase, handleRunDemo, handleTogglePlay, handleReset, handleSelectStage, totalFrames]);
 
-  // Cleanup on unmount
   useEffect(() => () => {
     clearTimeout(demoTimerRef.current);
     clearInterval(progressTimerRef.current);
@@ -235,7 +215,7 @@ export const MissionPage: React.FC = () => {
   const handleExportDossier = () => {
     sonarAudio.playLockBeep?.();
     const payload = {
-      product: 'SONARLINE ANALYSIS NODE 04',
+      product: 'SONARX ANALYSIS NODE 04',
       site: activeSite.name,
       source_file: activeSite.sourceFile,
       timestamp: activeSite.timestamp,
@@ -247,89 +227,86 @@ export const MissionPage: React.FC = () => {
       event_logs: eventLogs,
       exported_at: new Date().toISOString(),
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `SONARLINE_${activeSite.id}_analysis_dossier.json`;
-    a.click();
+    a.href = url; a.download = `SONARX_${activeSite.id}_dossier.json`; a.click();
     URL.revokeObjectURL(url);
   };
 
-  const totalCandidatesCount = 37;
-  const confirmedDebrisCount = candidatesList.filter((c) => c.status === 'CONFIRMED').length;
-  const hazardsCount = 4;
+  const confirmedCount = candidatesList.filter(c => c.status === 'CONFIRMED').length;
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#070b07] text-[#dcfce7] font-mono select-none overflow-hidden scanlines-overlay">
+    <>
+      {/* ── LIVE DEMO SEQUENCE OVERLAY ───────────────────────────────────── */}
+      {isSequenceActive && (
+        <LiveDemoSequence onComplete={handleSequenceComplete} />
+      )}
 
-      {/* 1. TOP STATUS BAR */}
-      <ConsoleTopBar
-        activeSite={activeSite}
-        onSelectSite={setActiveSite}
-        isPlaying={isPlaying}
-        onTogglePlay={handleTogglePlay}
-        onExportDossier={handleExportDossier}
-        onReset={handleReset}
-        demoPhase={demoPhase}
-        onRunDemo={handleRunDemo}
-      />
+      {/* ── INTERACTIVE MISSION CONTROL DASHBOARD ────────────────────────── */}
+      {!isSequenceActive && (
+        <div className="flex flex-col h-full w-full bg-[#030B14] text-[#E0F7F4] font-mono select-none overflow-hidden scanlines-overlay">
+          <ConsoleTopBar
+            activeSite={activeSite}
+            onSelectSite={setActiveSite}
+            isPlaying={isPlaying}
+            onTogglePlay={handleTogglePlay}
+            onExportDossier={handleExportDossier}
+            onReset={handleReset}
+            demoPhase={demoPhase}
+            onRunDemo={handleRunDemo}
+          />
 
-      {/* 2. THREE-COLUMN MAIN WORKSPACE */}
-      <div className="flex-1 flex overflow-hidden relative">
+          <div className="flex-1 flex overflow-hidden relative">
+            <ConsoleLeftRail
+              currentStageId={currentStageId}
+              onSelectStage={handleSelectStage}
+              layers={layers}
+              onToggleLayer={handleToggleLayer}
+              totalCandidatesCount={37}
+              confirmedDebrisCount={confirmedCount}
+              hazardsCount={4}
+              demoPhase={demoPhase}
+              onRunDemo={handleRunDemo}
+              onReset={handleReset}
+            />
 
-        {/* Left: Pipeline Rail + Layers + Demo Button */}
-        <ConsoleLeftRail
-          currentStageId={currentStageId}
-          onSelectStage={handleSelectStage}
-          layers={layers}
-          onToggleLayer={handleToggleLayer}
-          totalCandidatesCount={totalCandidatesCount}
-          confirmedDebrisCount={confirmedDebrisCount}
-          hazardsCount={hazardsCount}
-          demoPhase={demoPhase}
-          onRunDemo={handleRunDemo}
-          onReset={handleReset}
-        />
+            <ConsoleSonarCanvas
+              currentStageId={currentStageId}
+              activeSite={activeSite}
+              layers={layers}
+              candidates={candidatesList}
+              selectedCandidateId={selectedCandidateId}
+              onSelectCandidate={setSelectedCandidateId}
+              hoveredCandidateId={hoveredCandidateId}
+              onHoverCandidate={setHoveredCandidateId}
+              currentFrame={currentFrame}
+              demoPhase={demoPhase}
+              stageProgress={stageProgress}
+            />
 
-        {/* Center: Stage-aware cinematic sonar canvas */}
-        <ConsoleSonarCanvas
-          currentStageId={currentStageId}
-          activeSite={activeSite}
-          layers={layers}
-          candidates={candidatesList}
-          selectedCandidateId={selectedCandidateId}
-          onSelectCandidate={setSelectedCandidateId}
-          hoveredCandidateId={hoveredCandidateId}
-          onHoverCandidate={setHoveredCandidateId}
-          currentFrame={currentFrame}
-          demoPhase={demoPhase}
-          stageProgress={stageProgress}
-        />
+            <ConsoleStageDetail
+              currentStageId={currentStageId}
+              candidates={candidatesList}
+              selectedCandidateId={selectedCandidateId}
+              onSelectCandidate={setSelectedCandidateId}
+              hoveredCandidateId={hoveredCandidateId}
+              onHoverCandidate={setHoveredCandidateId}
+            />
+          </div>
 
-        {/* Right: Stage detail + funnel + candidate table */}
-        <ConsoleStageDetail
-          currentStageId={currentStageId}
-          candidates={candidatesList}
-          selectedCandidateId={selectedCandidateId}
-          onSelectCandidate={setSelectedCandidateId}
-          hoveredCandidateId={hoveredCandidateId}
-          onHoverCandidate={setHoveredCandidateId}
-        />
-      </div>
-
-      {/* 3. BOTTOM TIMELINE + EVENT LOG */}
-      <ConsoleBottomTimeline
-        currentFrame={currentFrame}
-        totalFrames={totalFrames}
-        isPlaying={isPlaying}
-        onTogglePlay={() => demoPhase === 'idle' ? handleRunDemo() : handleTogglePlay()}
-        onSeekFrame={setCurrentFrame}
-        onRewind={handleReset}
-        speedMultiplier={speedMultiplier}
-        onSelectSpeed={setSpeedMultiplier}
-        logs={eventLogs}
-      />
-    </div>
+          <ConsoleBottomTimeline
+            currentFrame={currentFrame}
+            totalFrames={totalFrames}
+            isPlaying={isPlaying}
+            onTogglePlay={() => demoPhase === 'idle' ? handleRunDemo() : handleTogglePlay()}
+            onSeekFrame={setCurrentFrame}
+            onRewind={handleReset}
+            speedMultiplier={speedMultiplier}
+            onSelectSpeed={setSpeedMultiplier}
+            logs={eventLogs}
+          />
+        </div>
+      )}
+    </>
   );
 };

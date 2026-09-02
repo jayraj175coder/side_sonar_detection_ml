@@ -3,48 +3,56 @@
 
 @layer base {
   :root {
-    /* Phosphor Green Intelligence Console Tokens */
-    --bg-abyss: #070b07;
-    --bg-primary: #0a0f0a;
-    --bg-secondary: #0e160e;
-    --bg-elevated: #131e13;
-    
-    --border-main: #193019;
-    --border-bright: #2d552d;
-    --border-glow: rgba(74, 222, 128, 0.35);
-    
-    --text-primary: #dcfce7;
-    --text-secondary: #64876b;
-    --text-muted: #3d5843;
-    
-    --phosphor-green: #4ade80;
-    --phosphor-dim: #22c55e;
-    --phosphor-bright: #86efac;
-    
-    --amber-warning: #f59e0b;
-    --amber-bright: #fbbf24;
-    --red-reject: #ef4444;
-    --cyan-ocean: #38bdf8;
-    
-    /* Legacy Backward-Compatibility */
-    --surface-console: #070b07;
-    --surface-panel: #0a0f0a;
-    --surface-panel-raised: #0e160e;
-    --surface-border: #193019;
-    --sonar-cyan: #4ade80;
-    --signal-live: #4ade80;
-    --signal-forensic: #4ade80;
-    --contact-confidence-high: #4ade80;
-    --contact-confidence-med: #f59e0b;
-    --contact-confidence-low: #64876b;
-    --warning: #f59e0b;
-    --critical: #ef4444;
-    --success: #4ade80;
+    /* ──────────────────────────────────────────────────────────────────
+       SONARX — Ocean Bioluminescent Theme
+       Inspired by real deep-sea sonar instrument software (Kongsberg/Klein)
+       Primary: bioluminescent teal  |  Background: abyssal ocean black-blue
+    ────────────────────────────────────────────────────────────────── */
+    --bg-abyss:       #030B14;   /* deepest ocean — main background */
+    --bg-primary:     #05121F;   /* panel background */
+    --bg-secondary:   #0A1E30;   /* hover / subtle fill */
+    --bg-elevated:    #0D2640;   /* card / elevated panel */
+
+    --border-main:    #0D2E4A;   /* panel borders */
+    --border-bright:  #1A4E6A;   /* highlighted border */
+    --border-glow:    rgba(0, 212, 170, 0.35);  /* teal glow */
+
+    --text-primary:   #E0F7F4;   /* bright text (seafoam white) */
+    --text-secondary: #4A8090;   /* dim text (ocean mist) */
+    --text-muted:     #2A5060;   /* faint text (deep sea) */
+
+    --teal-primary:   #00D4AA;   /* bioluminescent teal — primary accent */
+    --teal-dim:       #00A882;   /* dimmer teal */
+    --teal-bright:    #5EFFD8;   /* bright teal highlight */
+    --teal-glow-bg:   #082830;   /* teal-tinted bg for active states */
+    --teal-subtle:    #0A3028;   /* subtle teal bg */
+
+    --amber-warning:  #F59E0B;
+    --amber-bright:   #FBBF24;
+    --red-reject:     #EF4444;
+    --sonar-blue:     #38BDF8;
+
+    /* Legacy aliases (keep existing components working) */
+    --phosphor-green:   #00D4AA;
+    --phosphor-dim:     #00A882;
+    --phosphor-bright:  #5EFFD8;
+    --surface-console:  #030B14;
+    --surface-panel:    #05121F;
+    --surface-panel-raised: #0A1E30;
+    --surface-border:   #0D2E4A;
+    --sonar-cyan:       #00D4AA;
+    --signal-live:      #00D4AA;
+    --contact-confidence-high: #00D4AA;
+    --contact-confidence-med:  #F59E0B;
+    --contact-confidence-low:  #4A8090;
+    --warning:    #F59E0B;
+    --critical:   #EF4444;
+    --success:    #00D4AA;
   }
 
   body {
-    background-color: #070b07;
-    color: #dcfce7;
+    background-color: #030B14;
+    color: #E0F7F4;
     font-family: 'JetBrains Mono', monospace;
     min-height: 100vh;
     overflow-x: hidden;
@@ -56,46 +64,36 @@
   }
 }
 
-/* Phosphor Screen Scanlines Overlay (Subtle) */
+/* Ocean Sonar Scanlines Overlay */
 .scanlines-overlay {
   background: linear-gradient(
-    rgba(18, 16, 16, 0) 50%, 
-    rgba(0, 0, 0, 0.25) 50%
+    rgba(0, 8, 20, 0) 50%,
+    rgba(0, 0, 0, 0.20) 50%
   ), linear-gradient(
     90deg,
-    rgba(255, 0, 0, 0.03),
-    rgba(0, 255, 0, 0.01),
-    rgba(0, 0, 255, 0.03)
+    rgba(0, 212, 170, 0.01),
+    rgba(0, 0, 0, 0),
+    rgba(0, 100, 212, 0.01)
   );
   background-size: 100% 3px, 6px 100%;
   pointer-events: none;
 }
 
-/* Phosphor Terminal Scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-::-webkit-scrollbar-track {
-  background: #070b07;
-}
-::-webkit-scrollbar-thumb {
-  background: #193019;
-  border-radius: 0px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #4ade80;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #030B14; }
+::-webkit-scrollbar-thumb { background: #0D2E4A; border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: #00D4AA; }
 
-/* Instrument button */
+/* Instrument button — ocean theme */
 .panel-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.25rem 0.5rem;
-  background-color: #0e160e;
-  border: 1px solid #193019;
-  color: #64876b;
+  background-color: #0A1E30;
+  border: 1px solid #0D2E4A;
+  color: #4A8090;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.65rem;
   font-weight: 700;
@@ -105,12 +103,42 @@
   border-radius: 0px;
 }
 .panel-btn:hover {
-  color: #4ade80;
-  border-color: #4ade80;
-  background-color: rgba(74, 222, 128, 0.08);
+  color: #00D4AA;
+  border-color: #00D4AA;
+  background-color: rgba(0, 212, 170, 0.08);
 }
 .panel-btn-active {
-  color: #070b07;
-  background-color: #4ade80;
-  border-color: #4ade80;
+  color: #030B14;
+  background-color: #00D4AA;
+  border-color: #00D4AA;
+}
+
+/* Live demo scene fade-in */
+@keyframes scene-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.scene-enter {
+  animation: scene-fade-in 0.4s ease forwards;
+}
+
+/* Typewriter cursor blink */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.cursor-blink::after {
+  content: '▊';
+  animation: cursor-blink 0.8s step-end infinite;
+  color: #00D4AA;
+  margin-left: 1px;
+}
+
+/* Progress rail glow pulse */
+@keyframes dot-pulse {
+  0%, 100% { box-shadow: 0 0 4px #00D4AA; }
+  50%       { box-shadow: 0 0 12px #00D4AA, 0 0 20px rgba(0,212,170,0.4); }
+}
+.dot-active {
+  animation: dot-pulse 1.2s ease-in-out infinite;
 }

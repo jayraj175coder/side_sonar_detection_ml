@@ -7,7 +7,7 @@ type DemoPhase = 'idle' | 'running' | 'done';
 
 // Debris class colors
 const CLASS_COLORS: Record<string, string> = {
-  'Ghost Net (ALDFG)':        '#4ade80',
+  'Ghost Net (ALDFG)':        '#00D4AA',
   'Lost Fishing Trawl Gear':  '#38bdf8',
   'Anthropogenic Debris Bundle': '#f59e0b',
   'Subsea Pipeline Free-Span': '#fb923c',
@@ -16,6 +16,7 @@ const CLASS_COLORS: Record<string, string> = {
   'Sediment Sand Megaripple':  '#6b7280',
   'Multipath Surface Echo':    '#6b7280',
 };
+const REJECT_COLOR = '#EF4444';
 
 interface ConsoleSonarCanvasProps {
   currentStageId: StageId;
@@ -109,14 +110,14 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       const t = Math.min(stageProgress, 1);
       const vx = W * 0.08 + (W * 0.92 - W * 0.08) * t;
       const vy = H * 0.05 + (H * 0.95 - H * 0.05) * t;
-      ctx.fillStyle = '#4ade80';
-      ctx.shadowColor = '#4ade80';
+      ctx.fillStyle = '#00D4AA';
+      ctx.shadowColor = '#00D4AA';
       ctx.shadowBlur = 8;
       ctx.beginPath(); ctx.arc(vx, vy, 5, 0, Math.PI * 2); ctx.fill();
       ctx.shadowBlur = 0;
 
       // AUV label
-      ctx.fillStyle = '#4ade80';
+      ctx.fillStyle = '#00D4AA';
       ctx.font = '8px monospace';
       ctx.fillText('◈ AUV', vx + 7, vy + 3);
       ctx.restore();
@@ -140,7 +141,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
         // label
         ctx.globalAlpha = 0.8;
-        ctx.fillStyle = '#4ade80';
+        ctx.fillStyle = '#00D4AA';
         ctx.font = '8px monospace';
         ctx.fillText(c.label, cx - 22, cy - c.h * H - 4);
       });
@@ -161,7 +162,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
         ctx.strokeRect(cx - 22, cy - 15, 44, 30);
         ctx.fillStyle = 'rgba(74,222,128,0.08)';
         ctx.fillRect(cx - 22, cy - 15, 44, 30);
-        ctx.fillStyle = '#4ade80';
+        ctx.fillStyle = '#00D4AA';
         ctx.font = '7px monospace';
         ctx.fillText(`${(cand.confidence * 100).toFixed(0)}%`, cx - 10, cy + 6);
         ctx.restore();
@@ -177,15 +178,15 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
         ctx.save();
         if (isConfirmed && layers.confirmedDebris) {
-          ctx.strokeStyle = '#4ade80';
-          ctx.shadowColor = '#4ade80';
+          ctx.strokeStyle = '#00D4AA';
+          ctx.shadowColor = '#00D4AA';
           ctx.shadowBlur = 12;
           ctx.lineWidth = 1.5;
           ctx.strokeRect(cx - 22, cy - 15, 44, 30);
           ctx.fillStyle = 'rgba(74,222,128,0.12)';
           ctx.fillRect(cx - 22, cy - 15, 44, 30);
           // acoustic highlight
-          ctx.fillStyle = '#4ade80';
+          ctx.fillStyle = '#00D4AA';
           ctx.shadowBlur = 6;
           ctx.beginPath();
           ctx.ellipse(cx, cy, 12, 7, 0.4, 0, Math.PI * 2);
@@ -207,51 +208,79 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       });
     };
 
-    // ── Stage 05 CLASSIFY: colored by class ──────────────────────────────────
+    // ── Stage 05/06 CLASSIFY: colored by class + rejected layer toggle ────────
     const drawClassifiedDetections = () => {
-      candidates.filter((c) => c.status === 'CONFIRMED').forEach((cand) => {
-        const cx = (cand.rawX / 100) * W;
-        const cy = (cand.rawY / 100) * H;
-        const color = CLASS_COLORS[cand.class] || '#4ade80';
-        const isSelected = selectedCandidateId === cand.id || hoveredCandidateId === cand.id;
+      // Draw confirmed candidates if layer is active
+      if (layers.confirmedDebris) {
+        candidates.filter((c) => c.status === 'CONFIRMED').forEach((cand) => {
+          const cx = (cand.rawX / 100) * W;
+          const cy = (cand.rawY / 100) * H;
+          const color = CLASS_COLORS[cand.class] || '#00D4AA';
+          const isSelected = selectedCandidateId === cand.id || hoveredCandidateId === cand.id;
 
-        ctx.save();
-        ctx.strokeStyle = color;
-        ctx.shadowColor = color;
-        ctx.shadowBlur = isSelected ? 16 : 8;
-        ctx.lineWidth = isSelected ? 2 : 1.5;
-        ctx.strokeRect(cx - 24, cy - 16, 48, 32);
-        ctx.fillStyle = `${color}18`;
-        ctx.fillRect(cx - 24, cy - 16, 48, 32);
+          ctx.save();
+          ctx.strokeStyle = color;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = isSelected ? 16 : 8;
+          ctx.lineWidth = isSelected ? 2 : 1.5;
+          ctx.strokeRect(cx - 24, cy - 16, 48, 32);
+          ctx.fillStyle = `${color}18`;
+          ctx.fillRect(cx - 24, cy - 16, 48, 32);
 
-        // acoustic highlight
-        ctx.fillStyle = color;
-        ctx.shadowBlur = 5;
-        ctx.beginPath();
-        ctx.ellipse(cx, cy, 11, 6, 0.4, 0, Math.PI * 2);
-        ctx.fill();
-
-        // acoustic shadow
-        const shadowLen = Math.max(14, cand.shadowLengthM * 9);
-        ctx.fillStyle = '#020302';
-        ctx.shadowBlur = 0;
-        ctx.beginPath();
-        ctx.moveTo(cx + 8, cy - 5);
-        ctx.lineTo(cx + 8 + shadowLen, cy - 7);
-        ctx.lineTo(cx + 8 + shadowLen, cy + 7);
-        ctx.lineTo(cx + 8, cy + 5);
-        ctx.closePath();
-        ctx.fill();
-
-        // class label
-        if (layers.classLabels) {
+          // acoustic highlight
           ctx.fillStyle = color;
-          ctx.font = 'bold 7.5px monospace';
-          const shortLabel = cand.class.split(' ').slice(0, 2).join(' ');
-          ctx.fillText(shortLabel, cx - 23, cy - 19);
-        }
-        ctx.restore();
-      });
+          ctx.shadowBlur = 5;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, 11, 6, 0.4, 0, Math.PI * 2);
+          ctx.fill();
+
+          // acoustic shadow
+          const shadowLen = Math.max(14, cand.shadowLengthM * 9);
+          ctx.fillStyle = '#020302';
+          ctx.shadowBlur = 0;
+          ctx.beginPath();
+          ctx.moveTo(cx + 8, cy - 5);
+          ctx.lineTo(cx + 8 + shadowLen, cy - 7);
+          ctx.lineTo(cx + 8 + shadowLen, cy + 7);
+          ctx.lineTo(cx + 8, cy + 5);
+          ctx.closePath();
+          ctx.fill();
+
+          // class label
+          if (layers.classLabels) {
+            ctx.fillStyle = color;
+            ctx.font = 'bold 7.5px monospace';
+            const shortLabel = cand.class.split(' ').slice(0, 2).join(' ');
+            ctx.fillText(shortLabel, cx - 23, cy - 19);
+          }
+          ctx.restore();
+        });
+      }
+
+      // Draw rejected candidates if layer is active
+      if (layers.noiseRejected) {
+        candidates.filter((c) => c.status === 'REJECTED').forEach((cand) => {
+          const cx = (cand.rawX / 100) * W;
+          const cy = (cand.rawY / 100) * H;
+          ctx.save();
+          ctx.strokeStyle = 'rgba(239,68,68,0.5)';
+          ctx.setLineDash([3, 3]);
+          ctx.lineWidth = 1;
+          ctx.strokeRect(cx - 20, cy - 13, 40, 26);
+          ctx.setLineDash([]);
+          ctx.fillStyle = 'rgba(239,68,68,0.06)';
+          ctx.fillRect(cx - 20, cy - 13, 40, 26);
+          ctx.fillStyle = 'rgba(239,68,68,0.6)';
+          ctx.font = '8px monospace';
+          ctx.fillText('✕', cx - 4, cy + 4);
+          ctx.restore();
+        });
+      }
+
+      // Draw raw detections if layer is active
+      if (layers.rawDetections && !layers.confirmedDebris && !layers.noiseRejected) {
+        drawRawDetections(1);
+      }
     };
 
     // ── Stage 06 REPORT: geotag pins ─────────────────────────────────────────
@@ -260,7 +289,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       candidates.filter((c) => c.status === 'CONFIRMED').forEach((cand) => {
         const cx = (cand.rawX / 100) * W;
         const cy = (cand.rawY / 100) * H;
-        const color = CLASS_COLORS[cand.class] || '#4ade80';
+        const color = CLASS_COLORS[cand.class] || '#00D4AA';
 
         ctx.save();
         // pin stem
@@ -281,7 +310,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
         // coordinate tag
         ctx.shadowBlur = 0;
-        ctx.fillStyle = '#090e09';
+        ctx.fillStyle = '#05121F';
         ctx.fillRect(cx - 42, cy - 50, 84, 22);
         ctx.strokeStyle = color;
         ctx.lineWidth = 0.8;
@@ -306,14 +335,14 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       ctx.save();
       ctx.fillStyle = 'rgba(6,9,6,0.55)';
       ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = '#4ade80';
+      ctx.fillStyle = '#00D4AA';
       ctx.font = 'bold 16px monospace';
       ctx.textAlign = 'center';
       ctx.fillText('● AWAITING MISSION TRIGGER', W / 2, H / 2 - 18);
-      ctx.fillStyle = '#64876b';
+      ctx.fillStyle = '#4A8090';
       ctx.font = '11px monospace';
       ctx.fillText('Press  [ ▶ RUN LIVE DEMO ]  or  [SPACE]  to begin', W / 2, H / 2 + 10);
-      ctx.fillStyle = '#3d5843';
+      ctx.fillStyle = '#2A5060';
       ctx.font = '9px monospace';
       ctx.fillText('AI-Powered Side-Scan Sonar Debris Detection Pipeline', W / 2, H / 2 + 30);
       ctx.textAlign = 'left';
@@ -379,7 +408,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       // Draw horizontal sweep line
       ctx.save();
       ctx.globalAlpha = 0.5;
-      ctx.fillStyle = '#4ade80';
+      ctx.fillStyle = '#00D4AA';
       ctx.fillRect(0, row, canvas.width, 2);
       ctx.restore();
       row = (row + 3) % canvas.height;
@@ -402,18 +431,18 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
   return (
     <div className="flex-1 bg-[#060906] flex flex-col relative select-none font-mono overflow-hidden">
       {/* Canvas Top Bar */}
-      <div className="h-7 bg-[#090e09] border-b border-[#193019] px-3 flex items-center justify-between text-[9px] text-[#64876b] shrink-0 z-10">
+      <div className="h-7 bg-[#05121F] border-b border-[#0D2E4A] px-3 flex items-center justify-between text-[9px] text-[#4A8090] shrink-0 z-10">
         <div className="flex items-center gap-2">
-          <Crosshair className="w-3 h-3 text-[#4ade80]" />
-          <span className="text-[#dcfce7] font-bold">
+          <Crosshair className="w-3 h-3 text-[#00D4AA]" />
+          <span className="text-[#E0F7F4] font-bold">
             {demoPhase === 'idle' ? 'SONAR MOSAIC // AWAITING' : STAGE_LABELS[String(stageNum)] || `STAGE ${currentStageId}`}
           </span>
         </div>
         <div className="flex items-center gap-3">
           <span className="hidden md:inline">{activeSite.swathWidthM}m SWATH · FRAME {String(currentFrame).padStart(3,'0')}</span>
-          <button onClick={() => setZoomLevel((z) => Math.min(z + 0.2, 2.0))} className="p-1 hover:text-[#4ade80]" title="Zoom In"><ZoomIn className="w-3 h-3" /></button>
-          <button onClick={() => setZoomLevel((z) => Math.max(z - 0.2, 0.8))} className="p-1 hover:text-[#4ade80]" title="Zoom Out"><ZoomOut className="w-3 h-3" /></button>
-          <button onClick={() => setZoomLevel(1.0)} className="p-1 hover:text-[#4ade80]" title="Reset Zoom"><RotateCcw className="w-3 h-3" /></button>
+          <button onClick={() => setZoomLevel((z) => Math.min(z + 0.2, 2.0))} className="p-1 hover:text-[#00D4AA]" title="Zoom In"><ZoomIn className="w-3 h-3" /></button>
+          <button onClick={() => setZoomLevel((z) => Math.max(z - 0.2, 0.8))} className="p-1 hover:text-[#00D4AA]" title="Zoom Out"><ZoomOut className="w-3 h-3" /></button>
+          <button onClick={() => setZoomLevel(1.0)} className="p-1 hover:text-[#00D4AA]" title="Reset Zoom"><RotateCcw className="w-3 h-3" /></button>
         </div>
       </div>
 
@@ -428,26 +457,27 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
         />
 
         {/* Coordinate corners */}
-        <div className="absolute top-2 left-2 text-[8px] text-[#3d5843] bg-[#070b07]/90 px-1.5 py-0.5 border border-[#193019]">
+        <div className="absolute top-2 left-2 text-[8px] text-[#2A5060] bg-[#030B14]/90 px-1.5 py-0.5 border border-[#0D2E4A]">
           NW: {activeSite.latRange[1].toFixed(4)}°N, {activeSite.lonRange[0].toFixed(4)}°E
         </div>
-        <div className="absolute top-2 right-2 text-[8px] text-[#3d5843] bg-[#070b07]/90 px-1.5 py-0.5 border border-[#193019]">
+        <div className="absolute top-2 right-2 text-[8px] text-[#2A5060] bg-[#030B14]/90 px-1.5 py-0.5 border border-[#0D2E4A]">
           NE: {activeSite.latRange[1].toFixed(4)}°N, {activeSite.lonRange[1].toFixed(4)}°E
         </div>
-        <div className="absolute bottom-6 left-2 text-[8px] text-[#3d5843] bg-[#070b07]/90 px-1.5 py-0.5 border border-[#193019]">
+        <div className="absolute bottom-6 left-2 text-[8px] text-[#2A5060] bg-[#030B14]/90 px-1.5 py-0.5 border border-[#0D2E4A]">
           SW: {activeSite.latRange[0].toFixed(4)}°N, {activeSite.lonRange[0].toFixed(4)}°E
         </div>
-        <div className="absolute bottom-6 right-2 text-[8px] text-[#3d5843] bg-[#070b07]/90 px-1.5 py-0.5 border border-[#193019]">
+        <div className="absolute bottom-6 right-2 text-[8px] text-[#2A5060] bg-[#030B14]/90 px-1.5 py-0.5 border border-[#0D2E4A]">
           SE: {activeSite.latRange[0].toFixed(4)}°N, {activeSite.lonRange[1].toFixed(4)}°E
         </div>
 
         {/* Stage 05/06 — interactive reticle overlays */}
         {(stageNum >= 5 && demoPhase !== 'idle') && candidates.map((cand) => {
           const isConfirmed = cand.status === 'CONFIRMED';
-          if (!isConfirmed) return null;
+          if (isConfirmed && !layers.confirmedDebris) return null;
+          if (!isConfirmed && !layers.noiseRejected) return null;
           const isSelected = selectedCandidateId === cand.id;
           const isHovered = hoveredCandidateId === cand.id;
-          const color = CLASS_COLORS[cand.class] || '#4ade80';
+          const color = isConfirmed ? (CLASS_COLORS[cand.class] || '#00D4AA') : REJECT_COLOR;
           return (
             <div
               key={cand.id}
@@ -457,15 +487,21 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
               style={{ left: `${cand.rawX}%`, top: `${cand.rawY}%`, borderColor: color }}
               className={`absolute -translate-x-1/2 -translate-y-1/2 transition-all cursor-pointer group z-20 ${isSelected || isHovered ? 'z-40' : ''}`}
             >
-              <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'scale-125' : isHovered ? 'scale-110' : ''}`}
-                style={{ borderColor: color, background: `${color}20`, boxShadow: isSelected ? `0 0 14px ${color}` : undefined }}>
-                <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-              </div>
-              {/* Hover class pill */}
+              {isConfirmed ? (
+                <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'scale-125' : isHovered ? 'scale-110' : ''}`}
+                  style={{ borderColor: color, background: `${color}20`, boxShadow: isSelected ? `0 0 14px ${color}` : undefined }}>
+                  <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+                </div>
+              ) : (
+                <div className={`w-6 h-6 border border-dashed flex items-center justify-center transition-all ${isSelected ? 'scale-125 border-[#EF4444] bg-[#EF4444]/20' : 'border-[#EF4444]/60 bg-[#05121F]/80'}`}>
+                  <span className="text-[8px] text-[#EF4444] font-bold">✕</span>
+                </div>
+              )}
+              {/* Hover class or reject pill */}
               {(isSelected || isHovered) && (
-                <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 whitespace-nowrap text-[8px] font-bold border bg-[#090e09]"
+                <div className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 whitespace-nowrap text-[8px] font-bold border bg-[#05121F]"
                   style={{ color, borderColor: color }}>
-                  {cand.id} · {cand.class.split(' ').slice(0,2).join(' ')} · {(cand.confidence*100).toFixed(0)}%
+                  {cand.id} · {isConfirmed ? cand.class.split(' ').slice(0,2).join(' ') : 'REJECTED NOISE'} · {(cand.confidence*100).toFixed(0)}%
                 </div>
               )}
             </div>
@@ -474,31 +510,31 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
         {/* Stage 06 REPORT: dossier overlay panel */}
         {stageNum >= 6 && demoPhase !== 'idle' && (
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-[#090e09]/95 border border-[#4ade80]/70 px-6 py-3 text-center shadow-[0_0_30px_rgba(74,222,128,0.25)] z-30">
-            <div className="text-[#4ade80] font-black text-sm tracking-wider mb-1">✓ ANOMALY DOSSIER READY</div>
-            <div className="text-[#64876b] text-[9px] font-mono">
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-[#05121F]/95 border border-[#00D4AA]/70 px-6 py-3 text-center shadow-[0_0_30px_rgba(74,222,128,0.25)] z-30">
+            <div className="text-[#00D4AA] font-black text-sm tracking-wider mb-1">✓ ANOMALY DOSSIER READY</div>
+            <div className="text-[#4A8090] text-[9px] font-mono">
               17 confirmed debris targets · 4 critical hazards · {activeSite.swathWidthM}m swath · WGS84 geotagged
             </div>
-            <div className="text-[#3d5843] text-[8.5px] mt-1">PS Component 3 of 4 — Geotagging & Reporting Engine ✓</div>
+            <div className="text-[#2A5060] text-[8.5px] mt-1">PS Component 3 of 4 — Geotagging & Reporting Engine ✓</div>
           </div>
         )}
 
         {/* PS component badge per stage */}
         {demoPhase !== 'idle' && (
-          <div className="absolute top-10 right-2 bg-[#090e09]/90 border border-[#193019] px-2 py-1 text-[8px] font-mono text-[#64876b] z-20 space-y-0.5">
-            <div className={stageNum >= 1 ? 'text-[#4ade80]' : ''}>① INGEST {stageNum >= 1 ? '✓' : ''}</div>
-            <div className={stageNum >= 2 ? 'text-[#4ade80]' : ''}>② DENOISE {stageNum >= 2 ? '✓' : ''}</div>
-            <div className={stageNum >= 3 ? 'text-[#4ade80]' : ''}>③ DETECT {stageNum >= 3 ? '✓' : ''}</div>
-            <div className={stageNum >= 4 ? 'text-[#4ade80]' : ''}>④ FILTER {stageNum >= 4 ? '✓' : ''}</div>
-            <div className={stageNum >= 5 ? 'text-[#4ade80]' : ''}>⑤ CLASSIFY {stageNum >= 5 ? '✓' : ''}</div>
-            <div className={stageNum >= 6 ? 'text-[#4ade80]' : ''}>⑥ REPORT {stageNum >= 6 ? '✓' : ''}</div>
+          <div className="absolute top-10 right-2 bg-[#05121F]/90 border border-[#0D2E4A] px-2 py-1 text-[8px] font-mono text-[#4A8090] z-20 space-y-0.5">
+            <div className={stageNum >= 1 ? 'text-[#00D4AA]' : ''}>① INGEST {stageNum >= 1 ? '✓' : ''}</div>
+            <div className={stageNum >= 2 ? 'text-[#00D4AA]' : ''}>② DENOISE {stageNum >= 2 ? '✓' : ''}</div>
+            <div className={stageNum >= 3 ? 'text-[#00D4AA]' : ''}>③ DETECT {stageNum >= 3 ? '✓' : ''}</div>
+            <div className={stageNum >= 4 ? 'text-[#00D4AA]' : ''}>④ FILTER {stageNum >= 4 ? '✓' : ''}</div>
+            <div className={stageNum >= 5 ? 'text-[#00D4AA]' : ''}>⑤ CLASSIFY {stageNum >= 5 ? '✓' : ''}</div>
+            <div className={stageNum >= 6 ? 'text-[#00D4AA]' : ''}>⑥ REPORT {stageNum >= 6 ? '✓' : ''}</div>
           </div>
         )}
 
         {/* Class legend (stage 05+) */}
         {stageNum >= 5 && demoPhase !== 'idle' && layers.classLabels && (
-          <div className="absolute bottom-8 left-2 bg-[#090e09]/90 border border-[#193019] px-2 py-1.5 text-[8px] font-mono space-y-0.5 z-20">
-            <div className="text-[#64876b] font-bold mb-0.5 uppercase">DEBRIS CLASS LEGEND</div>
+          <div className="absolute bottom-8 left-2 bg-[#05121F]/90 border border-[#0D2E4A] px-2 py-1.5 text-[8px] font-mono space-y-0.5 z-20">
+            <div className="text-[#4A8090] font-bold mb-0.5 uppercase">DEBRIS CLASS LEGEND</div>
             {Object.entries(CLASS_COLORS).filter(([,c]) => c !== '#6b7280').map(([label, color]) => (
               <div key={label} className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full" style={{ background: color }} />
@@ -513,11 +549,11 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
         )}
 
         {/* Bottom sensor info */}
-        <div className="absolute bottom-1 left-2 text-[8px] text-[#3d5843]">
+        <div className="absolute bottom-1 left-2 text-[8px] text-[#2A5060]">
           {activeSite.frequency} · {activeSite.swathWidthM}m SWATH · TOW DEPTH {activeSite.towDepthM}m
         </div>
-        <div className="absolute bottom-1 right-2 flex items-center gap-1.5 text-[8px] text-[#4ade80]">
-          <div className="w-12 h-1 bg-[#4ade80]" />
+        <div className="absolute bottom-1 right-2 flex items-center gap-1.5 text-[8px] text-[#00D4AA]">
+          <div className="w-12 h-1 bg-[#00D4AA]" />
           <span>10 m SCALE</span>
         </div>
       </div>

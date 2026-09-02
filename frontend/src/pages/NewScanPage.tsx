@@ -33,7 +33,7 @@ const SAMPLE_SONAR_SCANS = [
     name: 'Gulf of Mannar — Ghost Net (900 kHz)',
     region: 'Tamil Nadu Coral Biosphere',
     tag: 'Ghost Net (NET)',
-    color: '#4ade80',
+    color: '#00D4AA',
     lat: '9.1367',
     lon: '79.2122',
     fileMock: 'gom_monofilament_ghostnet_900khz.png',
@@ -158,7 +158,7 @@ export const NewScanPage: React.FC = () => {
     canvas.height = 480;
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      ctx.fillStyle = '#070b07';
+      ctx.fillStyle = '#030B14';
       ctx.fillRect(0, 0, 640, 480);
       ctx.fillStyle = '#020402';
       ctx.fillRect(300, 0, 40, 480);
@@ -349,31 +349,31 @@ export const NewScanPage: React.FC = () => {
   return (
     <div className="space-y-4 select-none font-mono text-[11px]">
       {/* ── 1. TOP ACTION BAR: Title + AUTO/MANUAL toggle ── */}
-      <div className="p-4 bg-[#090e09] border border-[#193019] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-4 bg-[#05121F] border border-[#0D2E4A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
-            <Radio className="w-3.5 h-3.5 text-[#4ade80] animate-pulse" />
-            <span className="text-sm font-black text-[#4ade80] uppercase tracking-wider">
+            <Radio className="w-3.5 h-3.5 text-[#00D4AA] animate-pulse" />
+            <span className="text-sm font-black text-[#00D4AA] uppercase tracking-wider">
               MARINE DEBRIS INSPECTOR
             </span>
-            <span className="text-[8.5px] px-1.5 py-0.2 bg-[#122415] border border-[#4ade80]/40 text-[#4ade80] font-bold">
+            <span className="text-[8.5px] px-1.5 py-0.2 bg-[#082830] border border-[#00D4AA]/40 text-[#00D4AA] font-bold">
               MoES SIH 2026
             </span>
           </div>
-          <p className="text-[9.5px] text-[#64876b]">
+          <p className="text-[9.5px] text-[#4A8090]">
             Upload raw side-scan sonar swath imagery → AI detection → noise filter → geotag → download dossier.
           </p>
         </div>
 
         {/* AUTO / MANUAL MODE TOGGLE */}
         <div className="flex items-center gap-1 shrink-0">
-          <span className="text-[8.5px] text-[#64876b] mr-1">PIPELINE MODE:</span>
+          <span className="text-[8.5px] text-[#4A8090] mr-1">PIPELINE MODE:</span>
           <button
             onClick={() => setPipelineMode('auto')}
             className={`flex items-center gap-1.5 px-3 py-1.5 border text-[9.5px] font-bold transition-all cursor-pointer ${
               pipelineMode === 'auto'
-                ? 'bg-[#4ade80] text-[#070b07] border-[#4ade80]'
-                : 'bg-[#0e160e] text-[#64876b] border-[#193019] hover:text-[#dcfce7]'
+                ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA]'
+                : 'bg-[#0A1E30] text-[#4A8090] border-[#0D2E4A] hover:text-[#E0F7F4]'
             }`}
             title="Pipeline stages fire automatically one after another"
           >
@@ -384,8 +384,8 @@ export const NewScanPage: React.FC = () => {
             onClick={() => setPipelineMode('manual')}
             className={`flex items-center gap-1.5 px-3 py-1.5 border text-[9.5px] font-bold transition-all cursor-pointer ${
               pipelineMode === 'manual'
-                ? 'bg-[#f59e0b] text-[#070b07] border-[#f59e0b]'
-                : 'bg-[#0e160e] text-[#64876b] border-[#193019] hover:text-[#dcfce7]'
+                ? 'bg-[#f59e0b] text-[#030B14] border-[#f59e0b]'
+                : 'bg-[#0A1E30] text-[#4A8090] border-[#0D2E4A] hover:text-[#E0F7F4]'
             }`}
             title="Click RUN NEXT STAGE to advance each step manually"
           >
@@ -405,20 +405,20 @@ export const NewScanPage: React.FC = () => {
               key={d.num}
               className={`p-3 border text-center space-y-1 transition-all duration-500 ${
                 done
-                  ? 'bg-[#122415] border-[#4ade80]/60 shadow-[0_0_12px_rgba(74,222,128,0.18)]'
-                  : 'bg-[#090e09] border-[#193019]'
+                  ? 'bg-[#082830] border-[#00D4AA]/60 shadow-[0_0_12px_rgba(74,222,128,0.18)]'
+                  : 'bg-[#05121F] border-[#0D2E4A]'
               }`}
             >
               <div className="flex items-center justify-center gap-1.5">
-                <Icon className={`w-3.5 h-3.5 ${done ? 'text-[#4ade80]' : 'text-[#3d5843]'}`} />
-                <span className={`text-[8px] font-black uppercase tracking-wider ${done ? 'text-[#4ade80]' : 'text-[#3d5843]'}`}>
+                <Icon className={`w-3.5 h-3.5 ${done ? 'text-[#00D4AA]' : 'text-[#2A5060]'}`} />
+                <span className={`text-[8px] font-black uppercase tracking-wider ${done ? 'text-[#00D4AA]' : 'text-[#2A5060]'}`}>
                   {d.num} {d.label}
                 </span>
               </div>
-              <p className={`text-[7.5px] leading-tight ${done ? 'text-[#64876b]' : 'text-[#3d5843]'}`}>
+              <p className={`text-[7.5px] leading-tight ${done ? 'text-[#4A8090]' : 'text-[#2A5060]'}`}>
                 {d.sub}
               </p>
-              <div className={`text-[8px] font-bold ${done ? 'text-[#4ade80]' : 'text-[#3d5843]'}`}>
+              <div className={`text-[8px] font-bold ${done ? 'text-[#00D4AA]' : 'text-[#2A5060]'}`}>
                 {done ? '● COMPLETE' : '○ QUEUED'}
               </div>
             </div>
@@ -427,10 +427,10 @@ export const NewScanPage: React.FC = () => {
       </div>
 
       {/* ── 3. HONEST DATA DISCLOSURE ── */}
-      <div className="p-2.5 bg-[#090e09] border border-[#193019] flex items-center gap-2 text-[8.5px] text-[#64876b]">
-        <Database className="w-3 h-3 text-[#4ade80] shrink-0" />
+      <div className="p-2.5 bg-[#05121F] border border-[#0D2E4A] flex items-center gap-2 text-[8.5px] text-[#4A8090]">
+        <Database className="w-3 h-3 text-[#00D4AA] shrink-0" />
         <span>
-          <strong className="text-[#4ade80]">DATA PROVENANCE:</strong>{' '}
+          <strong className="text-[#00D4AA]">DATA PROVENANCE:</strong>{' '}
           Training data — public proxy benchmark: OpenSonarDatasets (4,280 annotated SSS swaths) + SeabedDebris-v2 + synthetic acoustic augmentation.{' '}
           <strong className="text-amber-400">No classified MoES operational survey data used.</strong>{' '}
           Demo pipeline runs on simulated high-fidelity acoustic returns when backend is offline.
@@ -439,12 +439,12 @@ export const NewScanPage: React.FC = () => {
 
       {/* ── 4. MANUAL MODE — PIPELINE STAGE RAIL (visible only in manual mode while analyzing) ── */}
       {pipelineMode === 'manual' && isAnalyzing && (
-        <div className="p-3 bg-[#090e09] border border-[#f59e0b]/40 space-y-2">
-          <div className="flex items-center justify-between pb-1 border-b border-[#193019]">
+        <div className="p-3 bg-[#05121F] border border-[#f59e0b]/40 space-y-2">
+          <div className="flex items-center justify-between pb-1 border-b border-[#0D2E4A]">
             <span className="text-[9px] font-bold text-[#f59e0b] uppercase tracking-wider">
               🖐 MANUAL CONTROL — PIPELINE STAGE RAIL
             </span>
-            <span className="text-[8px] text-[#64876b]">
+            <span className="text-[8px] text-[#4A8090]">
               Click RUN NEXT STAGE to advance
             </span>
           </div>
@@ -459,12 +459,12 @@ export const NewScanPage: React.FC = () => {
                   key={st.id}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 border text-[9px] font-bold transition-all ${
                     isDone
-                      ? 'bg-[#122415] border-[#4ade80]/60 text-[#4ade80]'
+                      ? 'bg-[#082830] border-[#00D4AA]/60 text-[#00D4AA]'
                       : isWaiting
                       ? 'bg-[#141208] border-[#f59e0b] text-[#f59e0b] animate-pulse'
                       : isActive
-                      ? 'bg-[#122415] border-[#4ade80] text-[#4ade80]'
-                      : 'bg-[#090e09] border-[#193019] text-[#3d5843]'
+                      ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA]'
+                      : 'bg-[#05121F] border-[#0D2E4A] text-[#2A5060]'
                   }`}
                 >
                   <span>{isDone ? '✓' : isWaiting ? '⏸' : '○'}</span>
@@ -477,7 +477,7 @@ export const NewScanPage: React.FC = () => {
           {manualWaiting && (
             <button
               onClick={handleManualAdvance}
-              className="flex items-center gap-2 px-4 py-2 bg-[#f59e0b] text-[#070b07] border border-[#f59e0b] font-black text-xs cursor-pointer hover:brightness-110 active:scale-95 transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-[#f59e0b] text-[#030B14] border border-[#f59e0b] font-black text-xs cursor-pointer hover:brightness-110 active:scale-95 transition-all"
             >
               <ChevronRight className="w-3.5 h-3.5" />
               <span>RUN NEXT STAGE</span>
@@ -488,15 +488,15 @@ export const NewScanPage: React.FC = () => {
 
       {/* ── 5. SAMPLE SCANS ── */}
       {!isShowingActiveScanResult && !isAnalyzing && (
-        <div className="p-3.5 bg-[#090e09] border border-[#193019] space-y-2">
+        <div className="p-3.5 bg-[#05121F] border border-[#0D2E4A] space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5 text-[#4ade80] animate-pulse" />
-              <span className="text-[10px] font-black text-[#dcfce7] uppercase tracking-wider">
+              <Zap className="w-3.5 h-3.5 text-[#00D4AA] animate-pulse" />
+              <span className="text-[10px] font-black text-[#E0F7F4] uppercase tracking-wider">
                 SAMPLE SONAR SWATHS — QUICK LOAD
               </span>
             </div>
-            <span className="text-[8px] text-[#64876b]">Click any tile to load & test</span>
+            <span className="text-[8px] text-[#4A8090]">Click any tile to load & test</span>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -504,7 +504,7 @@ export const NewScanPage: React.FC = () => {
               <button
                 key={sample.id}
                 onClick={() => handleSelectSample(sample)}
-                className="p-2.5 bg-[#070b07] border border-[#193019] hover:border-[#4ade80]/60 text-left transition-all cursor-pointer group"
+                className="p-2.5 bg-[#030B14] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-left transition-all cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-1">
                   <span
@@ -517,12 +517,12 @@ export const NewScanPage: React.FC = () => {
                   >
                     {sample.tag}
                   </span>
-                  <span className="text-[7px] text-[#3d5843]">900 kHz</span>
+                  <span className="text-[7px] text-[#2A5060]">900 kHz</span>
                 </div>
-                <p className="text-[9.5px] font-bold text-[#dcfce7] truncate group-hover:text-[#4ade80]">
+                <p className="text-[9.5px] font-bold text-[#E0F7F4] truncate group-hover:text-[#00D4AA]">
                   {sample.name}
                 </p>
-                <p className="text-[7.5px] text-[#64876b] truncate">{sample.region}</p>
+                <p className="text-[7.5px] text-[#4A8090] truncate">{sample.region}</p>
               </button>
             ))}
           </div>
@@ -534,7 +534,7 @@ export const NewScanPage: React.FC = () => {
         <div className="p-3 bg-[#1a0808] border border-[#ef4444]/50 flex items-center gap-2 text-[9.5px]">
           <AlertTriangle className="w-3.5 h-3.5 text-[#ef4444] shrink-0" />
           <span className="text-[#ef4444] font-bold">INFERENCE ERROR:</span>
-          <span className="text-[#dcfce7]">{scanError}</span>
+          <span className="text-[#E0F7F4]">{scanError}</span>
         </div>
       )}
 
@@ -582,15 +582,15 @@ export const NewScanPage: React.FC = () => {
 
           {/* ── 8. ANOMALY DOSSIER CTA — Prominent after pipeline completes ── */}
           {isShowingActiveScanResult && currentScan && (
-            <div className="p-4 bg-[#090e09] border border-[#4ade80]/60 space-y-3 shadow-[0_0_16px_rgba(74,222,128,0.12)]">
-              <div className="pb-2 border-b border-[#193019]">
+            <div className="p-4 bg-[#05121F] border border-[#00D4AA]/60 space-y-3 shadow-[0_0_16px_rgba(74,222,128,0.12)]">
+              <div className="pb-2 border-b border-[#0D2E4A]">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#4ade80]" />
-                  <span className="font-black text-[#4ade80] text-xs uppercase">
+                  <CheckCircle2 className="w-4 h-4 text-[#00D4AA]" />
+                  <span className="font-black text-[#00D4AA] text-xs uppercase">
                     ANOMALY DOSSIER READY
                   </span>
                 </div>
-                <p className="text-[8.5px] text-[#64876b] mt-1 font-mono">
+                <p className="text-[8.5px] text-[#4A8090] mt-1 font-mono">
                   {currentScan.scan_id} · {currentScan.total_detections} confirmed targets ·{' '}
                   {currentScan.false_positives_suppressed} false positives suppressed ·{' '}
                   {(currentScan.inference_ms || 0).toFixed(1)}ms inference
@@ -598,7 +598,7 @@ export const NewScanPage: React.FC = () => {
               </div>
 
               <div className="space-y-2 text-[9.5px]">
-                <p className="text-[#64876b]">
+                <p className="text-[#4A8090]">
                   Structured report with WGS84 geotags, confidence scores, bounding boxes, and
                   noise-filter decisions. (PS Deliverable 3 of 4)
                 </p>
@@ -606,14 +606,14 @@ export const NewScanPage: React.FC = () => {
                 <div className="flex flex-col gap-1.5">
                   <button
                     onClick={() => handleDownloadReport('json')}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#122415] border border-[#4ade80]/60 text-[#4ade80] font-bold hover:brightness-110 cursor-pointer transition-all active:scale-95"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#082830] border border-[#00D4AA]/60 text-[#00D4AA] font-bold hover:brightness-110 cursor-pointer transition-all active:scale-95"
                   >
                     <FileJson className="w-3.5 h-3.5" />
                     <span>DOWNLOAD ANOMALY REPORT (JSON)</span>
                   </button>
                   <button
                     onClick={() => handleDownloadReport('csv')}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#090e09] border border-[#193019] text-[#64876b] font-bold hover:text-[#4ade80] hover:border-[#4ade80]/40 cursor-pointer transition-all"
+                    className="flex items-center gap-2 px-3 py-2 bg-[#05121F] border border-[#0D2E4A] text-[#4A8090] font-bold hover:text-[#00D4AA] hover:border-[#00D4AA]/40 cursor-pointer transition-all"
                   >
                     <FileSpreadsheet className="w-3.5 h-3.5" />
                     <span>DOWNLOAD TARGET REGISTER (CSV)</span>
@@ -623,7 +623,7 @@ export const NewScanPage: React.FC = () => {
 
               <button
                 onClick={handleResetScan}
-                className="flex items-center gap-2 px-3 py-1.5 bg-[#090e09] border border-[#193019] text-[#64876b] text-[9px] font-bold hover:text-[#dcfce7] cursor-pointer transition-all w-full justify-center"
+                className="flex items-center gap-2 px-3 py-1.5 bg-[#05121F] border border-[#0D2E4A] text-[#4A8090] text-[9px] font-bold hover:text-[#E0F7F4] cursor-pointer transition-all w-full justify-center"
               >
                 <UploadCloud className="w-3 h-3" />
                 <span>UPLOAD NEW SONAR SWATH</span>

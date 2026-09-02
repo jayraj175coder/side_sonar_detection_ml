@@ -54,28 +54,28 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
   const currentStageNum = parseInt(currentStageId, 10);
 
   return (
-    <div className="w-56 lg:w-60 bg-[#090e09] border-r border-[#193019] flex flex-col justify-between select-none font-mono text-[11px] shrink-0 overflow-y-auto">
+    <div className="w-56 lg:w-60 bg-[#05121F] border-r border-[#0D2E4A] flex flex-col justify-between select-none font-mono text-[11px] shrink-0 overflow-y-auto">
       <div className="p-2.5 space-y-3">
 
         {/* ── RUN LIVE DEMO / REPLAY BUTTON ── */}
-        <div className="pb-2 border-b border-[#193019]">
+        <div className="pb-2 border-b border-[#0D2E4A]">
           {demoPhase === 'idle' ? (
             <button
               onClick={onRunDemo}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-[#4ade80] text-[#070b07] border border-[#4ade80] font-black text-[11px] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_20px_rgba(74,222,128,0.30)]"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-[#00D4AA] text-[#030B14] border border-[#00D4AA] font-black text-[11px] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_20px_rgba(74,222,128,0.30)]"
             >
               <Zap className="w-4 h-4" />
               <span>▶ RUN LIVE DEMO</span>
             </button>
           ) : demoPhase === 'running' ? (
-            <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-[#122415] border border-[#4ade80]/60 text-[#4ade80] font-bold text-[10px] animate-pulse">
-              <span className="w-2 h-2 rounded-full bg-[#4ade80]" />
+            <div className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-[#082830] border border-[#00D4AA]/60 text-[#00D4AA] font-bold text-[10px] animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-[#00D4AA]" />
               <span>PIPELINE RUNNING…</span>
             </div>
           ) : (
             <button
               onClick={onReset}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-[#0e160e] border border-[#4ade80]/50 text-[#4ade80] font-bold text-[10px] cursor-pointer hover:bg-[#122415] transition-all"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-[#0A1E30] border border-[#00D4AA]/50 text-[#00D4AA] font-bold text-[10px] cursor-pointer hover:bg-[#082830] transition-all"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>↺ REPLAY DEMO</span>
@@ -85,9 +85,9 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
 
         {/* ── PIPELINE RAIL ── */}
         <div>
-          <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#193019]">
-            <span className="text-[9px] font-bold text-[#64876b] uppercase tracking-widest">PIPELINE RAIL</span>
-            <span className="text-[8px] text-[#3d5843]">CLICK TO INSPECT</span>
+          <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#0D2E4A]">
+            <span className="text-[9px] font-bold text-[#4A8090] uppercase tracking-widest">PIPELINE RAIL</span>
+            <span className="text-[8px] text-[#2A5060]">CLICK TO INSPECT</span>
           </div>
 
           <div className="space-y-0.5">
@@ -103,17 +103,17 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
                   onClick={() => onSelectStage(st.id)}
                   className={`w-full text-left px-2 py-1.5 transition-all cursor-pointer flex flex-col ${
                     isActive
-                      ? 'bg-[#122415] border-l-2 border-[#4ade80] text-[#4ade80] font-bold shadow-[inset_0_0_10px_rgba(74,222,128,0.1)]'
+                      ? 'bg-[#082830] border-l-2 border-[#00D4AA] text-[#00D4AA] font-bold shadow-[inset_0_0_10px_rgba(74,222,128,0.1)]'
                       : isCompleted
-                      ? 'border-l-2 border-[#3d5843] text-[#64876b] bg-[#070b07]'
-                      : 'border-l-2 border-transparent text-[#3d5843] hover:text-[#dcfce7] hover:bg-[#0e160e]'
+                      ? 'border-l-2 border-[#2A5060] text-[#4A8090] bg-[#030B14]'
+                      : 'border-l-2 border-transparent text-[#2A5060] hover:text-[#E0F7F4] hover:bg-[#0A1E30]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-bold tracking-wider">
                       {isCompleted && !isActive ? '✓ ' : ''}{st.id} {st.name}
                     </span>
-                    {isActive && <span className="text-[8px] text-[#4ade80] font-bold">ACTIVE</span>}
+                    {isActive && <span className="text-[8px] text-[#00D4AA] font-bold">ACTIVE</span>}
                   </div>
                   <span className="text-[8px] truncate font-normal opacity-70">{st.desc}</span>
                 </button>
@@ -124,9 +124,9 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
 
         {/* ── LAYERS PANEL ── */}
         <div>
-          <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#193019]">
-            <span className="text-[9px] font-bold text-[#64876b] uppercase tracking-widest">LAYERS</span>
-            <span className="text-[8px] text-[#3d5843]">TOGGLE OVERLAYS</span>
+          <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#0D2E4A]">
+            <span className="text-[9px] font-bold text-[#4A8090] uppercase tracking-widest">LAYERS</span>
+            <span className="text-[8px] text-[#2A5060]">TOGGLE OVERLAYS</span>
           </div>
 
           <div className="space-y-0.5 text-[10px]">
@@ -139,14 +139,14 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
                   onClick={() => onToggleLayer(key)}
                   className={`flex items-center gap-2 px-1.5 py-0.5 cursor-pointer transition-colors ${
                     isAvailable
-                      ? 'hover:bg-[#0e160e] text-[#64876b] hover:text-[#dcfce7]'
+                      ? 'hover:bg-[#0A1E30] text-[#4A8090] hover:text-[#E0F7F4]'
                       : 'opacity-30 pointer-events-none'
                   }`}
                 >
-                  <span className={`font-mono text-[9px] font-bold ${isActive ? 'text-[#4ade80]' : 'text-[#3d5843]'}`}>
+                  <span className={`font-mono text-[9px] font-bold ${isActive ? 'text-[#00D4AA]' : 'text-[#2A5060]'}`}>
                     [{isActive ? 'X' : ' '}]
                   </span>
-                  <span className={`text-[9px] ${isActive ? 'text-[#dcfce7]' : 'text-[#64876b]'}`}>
+                  <span className={`text-[9px] ${isActive ? 'text-[#E0F7F4]' : 'text-[#4A8090]'}`}>
                     {label}
                   </span>
                 </label>
@@ -156,8 +156,8 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
         </div>
 
         {/* ── KEYBOARD HINTS ── */}
-        <div className="p-2 border border-[#193019] bg-[#070b07] text-[8px] text-[#3d5843] leading-relaxed">
-          <span className="text-[#64876b] font-bold block mb-0.5">KEYS</span>
+        <div className="p-2 border border-[#0D2E4A] bg-[#030B14] text-[8px] text-[#2A5060] leading-relaxed">
+          <span className="text-[#4A8090] font-bold block mb-0.5">KEYS</span>
           [SPACE] RUN / PAUSE DEMO<br />
           [1-6] JUMP STAGE<br />
           [← / →] STEP FRAME<br />
@@ -166,11 +166,11 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
       </div>
 
       {/* ── BOTTOM SUMMARY TILE ── */}
-      <div className="p-2.5 border-t border-[#193019] bg-[#070b07] space-y-1">
-        <span className="text-[8px] text-[#64876b] uppercase tracking-wider block font-bold">DARK OBJECTS</span>
-        <div className="text-[10px] text-[#dcfce7] leading-tight">
-          <strong className="text-[#4ade80] font-mono">{totalCandidatesCount}</strong> candidates ·{' '}
-          <strong className="text-[#4ade80] font-mono">{confirmedDebrisCount}</strong> confirmed
+      <div className="p-2.5 border-t border-[#0D2E4A] bg-[#030B14] space-y-1">
+        <span className="text-[8px] text-[#4A8090] uppercase tracking-wider block font-bold">DARK OBJECTS</span>
+        <div className="text-[10px] text-[#E0F7F4] leading-tight">
+          <strong className="text-[#00D4AA] font-mono">{totalCandidatesCount}</strong> candidates ·{' '}
+          <strong className="text-[#00D4AA] font-mono">{confirmedDebrisCount}</strong> confirmed
         </div>
         <div className="text-[8px] text-amber-400 font-bold">{hazardsCount} CRITICAL HAZARDS</div>
       </div>

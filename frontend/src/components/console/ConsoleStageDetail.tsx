@@ -1,6 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { AlertTriangle, CheckCircle2, Shield, Info, ArrowDown, Crosshair } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { STAGE_DETAILS, StageId, CandidateItem } from '../../data/consoleData';
+
+// Counts a number from 0 to `target` over `durationMs`
+function useCountUp(target: number, durationMs: number, trigger: string): number {
+  const [val, setVal] = useState<number>(0);
+  const prevTrigger = useRef<string>('');
+  useEffect(() => {
+    if (prevTrigger.current === trigger) return;
+    prevTrigger.current = trigger;
+    setVal(0);
+    const steps = 30;
+    const step = target / steps;
+    const delay = durationMs / steps;
+    let current = 0;
+    const id = setInterval(() => {
+      current += step;
+      if (current >= target) {
+        setVal(target);
+        clearInterval(id);
+      } else {
+        setVal(Math.floor(current));
+      }
+    }, delay);
+    return () => clearInterval(id);
+  }, [trigger, target, durationMs]);
+  return val;
+}
 
 interface ConsoleStageDetailProps {
   currentStageId: StageId;
@@ -20,18 +46,26 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
   onHoverCandidate,
 }) => {
   const stage = STAGE_DETAILS[currentStageId] || STAGE_DETAILS['01'];
-  const [animatedM1, setAnimatedM1] = useState<string>(stage.metric1.value);
-  const [animatedM2, setAnimatedM2] = useState<string>(stage.metric2.value);
-  const [animatedM3, setAnimatedM3] = useState<string>(stage.metric3.value);
 
-  // Smooth metric transition when stage changes
-  useEffect(() => {
-    setAnimatedM1(stage.metric1.value);
-    setAnimatedM2(stage.metric2.value);
-    setAnimatedM3(stage.metric3.value);
-  }, [currentStageId, stage]);
+  // Animated metric counters — only count up on stage change
+  const animM1 = useCountUp(
+    currentStageId === '04' ? 37 : parseFloat(stage.metric1.value) || 0,
+    250, currentStageId
+  );
+  const animM2 = useCountUp(
+    currentStageId === '04' ? 20 : parseFloat(stage.metric2.value) || 0,
+    350, currentStageId
+  );
+  const animM3 = useCountUp(
+    currentStageId === '04' ? 17 : parseFloat(stage.metric3.value) || 0,
+    450, currentStageId
+  );
+
+  // For FILTER stage, show animated numbers; otherwise show raw value strings
+  const isFilter = currentStageId === '04';
 
   const selectedCandidate = candidates.find((c) => c.id === selectedCandidateId) || candidates[0];
+
 
   return (
     <div className="w-80 lg:w-96 bg-[#090e09] border-l border-[#193019] flex flex-col justify-between select-none font-mono text-[11px] shrink-0 overflow-y-auto">
@@ -48,35 +82,59 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
           </span>
         </div>
 
-        {/* 2. Metric Row: 3 Small Stat Tiles Showing Funnel */}
+        {/* 2. Metric Row: 3 Stat Tiles — animated count-up on FILTER stage */}
         <div className="grid grid-cols-3 gap-1.5 text-center">
-          <div className="p-2 border border-[#193019] bg-[#070b07] space-y-0.5 transition-all">
+          {/* RAW / M1 */}
+          <div className={`p-2 border space-y-0.5 transition-all duration-300 ${
+            isFilter ? 'border-[#64876b]/60 bg-[#0e130e]' : 'border-[#193019] bg-[#070b07]'
+          }`}>
             <span className="text-[7.5px] text-[#64876b] uppercase block truncate font-bold">
-              {stage.metric1.label}
+              {isFilter ? 'RAW DETECTIONS' : stage.metric1.label}
             </span>
             <strong className="text-xs font-black text-[#dcfce7] block font-mono">
-              {animatedM1}
+              {isFilter ? animM1 : stage.metric1.value}
             </strong>
           </div>
 
-          <div className="p-2 border border-[#193019] bg-[#070b07] space-y-0.5 transition-all">
-            <span className="text-[7.5px] text-[#64876b] uppercase block truncate font-bold">
-              {stage.metric2.label}
+          {/* REJECTED / M2 */}
+          <div className={`p-2 border space-y-0.5 transition-all duration-300 ${
+            isFilter ? 'border-[#f59e0b]/50 bg-[#130f05]' : 'border-[#193019] bg-[#070b07]'
+          }`}>
+            <span className={`text-[7.5px] uppercase block truncate font-bold ${
+              isFilter ? 'text-[#f59e0b]' : 'text-[#64876b]'
+            }`}>
+              {isFilter ? 'REJECTED (NOISE)' : stage.metric2.label}
             </span>
-            <strong className="text-xs font-black text-[#dcfce7] block font-mono">
-              {animatedM2}
+            <strong className={`text-xs font-black block font-mono ${
+              isFilter ? 'text-[#f59e0b]' : 'text-[#dcfce7]'
+            }`}>
+              {isFilter ? animM2 : stage.metric2.value}
             </strong>
           </div>
 
-          <div className="p-2 border border-[#4ade80]/40 bg-[#0e160e] space-y-0.5 transition-all">
+          {/* CONFIRMED / M3 */}
+          <div className={`p-2 border space-y-0.5 transition-all duration-300 ${
+            isFilter ? 'border-[#4ade80]/60 bg-[#0e1a0e] shadow-[0_0_10px_rgba(74,222,128,0.12)]' : 'border-[#4ade80]/40 bg-[#0e160e]'
+          }`}>
             <span className="text-[7.5px] text-[#4ade80] uppercase block truncate font-bold">
-              {stage.metric3.label}
+              {isFilter ? 'CONFIRMED DEBRIS' : stage.metric3.label}
             </span>
             <strong className="text-xs font-black text-[#4ade80] block font-mono">
-              {animatedM3}
+              {isFilter ? animM3 : stage.metric3.value}
             </strong>
           </div>
         </div>
+
+        {/* FILTER STAGE: visual funnel arrow row */}
+        {isFilter && (
+          <div className="flex items-center justify-center gap-1 text-[8px] text-[#64876b] font-mono py-1">
+            <span className="text-[#dcfce7]">{animM1} raw</span>
+            <span className="text-[#3d5843]">&gt;</span>
+            <span className="text-[#f59e0b]">{animM2} rejected</span>
+            <span className="text-[#3d5843]">&gt;</span>
+            <span className="text-[#4ade80] font-bold">{animM3} confirmed</span>
+          </div>
+        )}
 
         {/* 3. Explanation Paragraph (Plain language stating what filter/rule does the work) */}
         <div className="p-2.5 bg-[#0e160e] border border-[#193019] text-[10px] text-[#64876b] leading-relaxed">

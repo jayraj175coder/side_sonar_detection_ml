@@ -85,7 +85,7 @@ export const Header: React.FC<HeaderProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-black text-[#00D4AA] tracking-[0.2em] uppercase">
-                SONARLINE
+                SONARX
               </span>
               <span className="hidden sm:inline-flex text-[8.5px] font-bold px-1.5 py-0.2 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40">
                 AI MARINE DEBRIS PIPELINE

@@ -3,6 +3,7 @@ import { MissionTopHeader } from '../components/mission/v3/MissionTopHeader';
 import { SurveyTargetQueue } from '../components/mission/v3/SurveyTargetQueue';
 import { LargeSonarViewer } from '../components/mission/v3/LargeSonarViewer';
 import { MissionSubseaMapViewer } from '../components/mission/v3/MissionSubseaMapViewer';
+import { Mission3DSeafloorViewer } from '../components/mission/v3/Mission3DSeafloorViewer';
 import { TargetIntelligencePanel } from '../components/mission/v3/TargetIntelligencePanel';
 import { BottomPipelineTimeline } from '../components/mission/v3/BottomPipelineTimeline';
 import { ImpactTranslationBanner } from '../components/mission/v3/ImpactTranslationBanner';
@@ -21,11 +22,14 @@ export const MissionPage: React.FC = () => {
   const [targets] = useState<MissionV3Target[]>(MISSION_V3_TARGETS);
   const [selectedTargetId, setSelectedTargetId] = useState<string>('SX-T07');
   const [hoveredTargetId, setHoveredTargetId] = useState<string | null>(null);
-  const [isJudgeMode, setIsJudgeMode] = useState<boolean>(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
 
-  // Center Viewport Switcher ('sonar' | 'map')
-  const [centerViewMode, setCenterViewMode] = useState<'sonar' | 'map'>('sonar');
+  // Center Viewport Switcher ('sonar' | 'map' | '3d')
+  const [centerViewMode, setCenterViewMode] = useState<'sonar' | 'map' | '3d'>('sonar');
+
+  // Interactive Filtration State (Confidence Slider & Acoustic Shadow Gate)
+  const [confidenceThreshold, setConfidenceThreshold] = useState<number>(40);
+  const [isShadowGateActive, setIsShadowGateActive] = useState<boolean>(true);
 
   // AI Pipeline & Timeline State
   const [currentStageIndex, setCurrentStageIndex] = useState<number>(6); // Default 07 VERIFY
@@ -43,15 +47,27 @@ export const MissionPage: React.FC = () => {
   const demoTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const frameIntervalRef = useRef<ReturnType<typeof setInterval>[]>([]);
 
+  // ── Dynamic Filtration Logic ──
+  const processedTargets = useMemo(() => {
+    return targets.map((t) => {
+      const isBelowConf = t.confidence * 100 < confidenceThreshold;
+      const failsShadow = isShadowGateActive && t.shadowLength < 0.25;
+      if (isBelowConf || failsShadow) {
+        return { ...t, status: 'FILTERED' as const, priority: 'FILTERED' as const };
+      }
+      return t;
+    });
+  }, [targets, confidenceThreshold, isShadowGateActive]);
+
   // Selected Target object
   const selectedTarget = useMemo(() => {
-    return targets.find((t) => t.id === selectedTargetId) || targets[0];
-  }, [targets, selectedTargetId]);
+    return processedTargets.find((t) => t.id === selectedTargetId) || processedTargets[0];
+  }, [processedTargets, selectedTargetId]);
 
   // Statistics
-  const totalAnomaliesCount = targets.length;
-  const highPriorityCount = targets.filter((t) => t.priority === 'HIGH').length;
-  const filteredCount = targets.filter((t) => t.status === 'FILTERED').length;
+  const totalAnomaliesCount = processedTargets.filter((t) => t.status === 'CONFIRMED').length;
+  const highPriorityCount = processedTargets.filter((t) => t.priority === 'HIGH').length;
+  const filteredCount = processedTargets.filter((t) => t.status === 'FILTERED').length;
 
   // Clear all demo timers
   const clearDemoTimers = useCallback(() => {
@@ -176,7 +192,7 @@ export const MissionPage: React.FC = () => {
     const s8 = setTimeout(() => {
       setCenterViewMode('map');
       sonarAudio.playLockBeep?.();
-      setIsDemoRunning(false); // Demo finishes, remaining in triumphant map view!
+      setIsDemoRunning(false);
     }, 24500);
 
     demoTimeoutsRef.current.push(s1, s2, s3, s4, s5, s6, s7, s8);
@@ -214,7 +230,7 @@ export const MissionPage: React.FC = () => {
   const handleExportReport = useCallback(() => {
     sonarAudio.playLockBeep?.();
     const site = SURVEY_SITES[0];
-    const confirmedTargets = targets.filter((t) => t.status === 'CONFIRMED');
+    const confirmedTargets = processedTargets.filter((t) => t.status === 'CONFIRMED');
 
     const candidateAdapter = confirmedTargets.map((t) => ({
       id: t.id,
@@ -231,15 +247,13 @@ export const MissionPage: React.FC = () => {
       rawY: t.rawY,
     }));
 
-    exportOfficialIncidentReport(site, candidateAdapter, 0.40, true);
-  }, [targets]);
+    exportOfficialIncidentReport(site, candidateAdapter, confidenceThreshold / 100, isShadowGateActive);
+  }, [processedTargets, confidenceThreshold, isShadowGateActive]);
 
   return (
     <div className="flex flex-col h-full w-full bg-[#01050A] text-[#E0F7F4] font-mono overflow-hidden select-none pointer-events-auto">
-      {/* ── TOP HEADER (64–72px) + SECONDARY STATUS BAR ── */}
+      {/* ── TOP HEADER (60–64px) + INTERACTIVE FILTRATION BAR ── */}
       <MissionTopHeader
-        isJudgeMode={isJudgeMode}
-        onToggleJudgeMode={() => setIsJudgeMode((v) => !v)}
         isDemoRunning={isDemoRunning}
         onStartDemo={handleStartDemo}
         onStopDemo={handleStopDemo}
@@ -249,6 +263,10 @@ export const MissionPage: React.FC = () => {
         totalAnomaliesCount={totalAnomaliesCount}
         highPriorityCount={highPriorityCount}
         filteredCount={filteredCount}
+        confidenceThreshold={confidenceThreshold}
+        onChangeConfidenceThreshold={setConfidenceThreshold}
+        isShadowGateActive={isShadowGateActive}
+        onToggleShadowGate={() => setIsShadowGateActive((v) => !v)}
       />
 
       {/* ── IMPACT TRANSLATION BANNER (Translates ML stats to human impact) ── */}
@@ -258,7 +276,7 @@ export const MissionPage: React.FC = () => {
       <div className="flex-1 flex overflow-hidden relative">
         {/* 1. LEFT — Survey + Detection Queue */}
         <SurveyTargetQueue
-          targets={targets}
+          targets={processedTargets}
           selectedTargetId={selectedTargetId}
           onSelectTarget={handleSelectTarget}
           hoveredTargetId={hoveredTargetId}
@@ -266,10 +284,10 @@ export const MissionPage: React.FC = () => {
           onFocusHeroTarget={runHeroSequence}
         />
 
-        {/* 2. CENTER — Dual Mode Hero Viewport (Sonar Waterfall or Closing Subsea Mission Map) */}
+        {/* 2. CENTER — 3-Way Hero Viewport (Sonar Waterfall | Subsea Mission Map | 3D Seafloor) */}
         {centerViewMode === 'sonar' ? (
           <LargeSonarViewer
-            targets={targets}
+            targets={processedTargets}
             selectedTargetId={selectedTargetId}
             onSelectTarget={handleSelectTarget}
             hoveredTargetId={hoveredTargetId}
@@ -278,14 +296,24 @@ export const MissionPage: React.FC = () => {
             demoPhaseStep={demoPhaseStep}
             heroConfidence={heroConfidence}
             onViewMissionMap={() => setCenterViewMode('map')}
+            onView3D={() => setCenterViewMode('3d')}
           />
-        ) : (
+        ) : centerViewMode === 'map' ? (
           <MissionSubseaMapViewer
-            targets={targets}
+            targets={processedTargets}
             selectedTargetId={selectedTargetId}
             onSelectTarget={handleSelectTarget}
             onBackToSonar={() => setCenterViewMode('sonar')}
             onExportReport={handleExportReport}
+            onView3D={() => setCenterViewMode('3d')}
+          />
+        ) : (
+          <Mission3DSeafloorViewer
+            targets={processedTargets}
+            selectedTargetId={selectedTargetId}
+            onSelectTarget={handleSelectTarget}
+            onBackToSonar={() => setCenterViewMode('sonar')}
+            onViewMissionMap={() => setCenterViewMode('map')}
           />
         )}
 

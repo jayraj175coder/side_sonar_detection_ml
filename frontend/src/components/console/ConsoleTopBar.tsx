@@ -31,8 +31,8 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
     <header className="h-11 bg-[#05121F] border-b border-[#0D2E4A] px-3 flex items-center justify-between font-mono text-[11px] select-none shrink-0 z-30">
       {/* Left: Product + node + link */}
       <div className="flex items-center gap-3">
-        <span className="text-xs font-black tracking-[0.22em] text-[#00D4AA] uppercase">
-          SONARLINE
+        <span className="font-bold tracking-wider text-green-400">
+          SONARX
         </span>
         <span className="text-[#2A5060]">|</span>
         <span className="text-[10px] text-[#4A8090] uppercase tracking-wider">ANALYSIS NODE 04</span>

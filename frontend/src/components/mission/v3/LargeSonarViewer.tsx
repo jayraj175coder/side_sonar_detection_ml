@@ -12,6 +12,7 @@ interface LargeSonarViewerProps {
   demoPhaseStep?: number; // 0 to 7
   heroConfidence?: number; // 0 to 94.7
   onViewMissionMap?: () => void;
+  onView3D?: () => void;
 }
 
 export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
@@ -24,6 +25,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
   demoPhaseStep = 7,
   heroConfidence = 94.7,
   onViewMissionMap,
+  onView3D,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [zoomLevel, setZoomLevel] = useState(1.0);
@@ -346,18 +348,33 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           </div>
         </div>
 
-        {/* Compact Toolbar */}
+        {/* Compact Toolbar & 3-Way Viewport Switcher */}
         <div className="flex items-center gap-1.5">
-          {onViewMissionMap && (
+          <div className="flex items-center gap-1 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded-xs mr-2">
             <button
-              onClick={onViewMissionMap}
-              className="flex items-center gap-1 px-2 py-0.5 bg-[#082830] border border-[#00D4AA]/60 text-[#00D4AA] hover:bg-[#00D4AA] hover:text-[#030B14] text-[9px] font-bold rounded-xs cursor-pointer transition-colors shadow-[0_0_8px_rgba(0,212,170,0.2)] mr-1"
-              title="View Subsea Mission Map"
+              className="px-2 py-0.5 bg-[#00D4AA] text-[#030B14] font-bold text-[8.5px] rounded-xs cursor-default shadow-[0_0_8px_rgba(0,212,170,0.3)]"
             >
-              <Map className="w-3 h-3" />
-              <span>VIEW MAP</span>
+              📻 SONAR
             </button>
-          )}
+            {onViewMissionMap && (
+              <button
+                onClick={onViewMissionMap}
+                className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
+                title="View Subsea Mission Map"
+              >
+                🗺️ MAP
+              </button>
+            )}
+            {onView3D && (
+              <button
+                onClick={onView3D}
+                className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
+                title="View 3D Seafloor Bathymetry"
+              >
+                🌐 3D VIEW
+              </button>
+            )}
+          </div>
 
           <button
             onClick={() => setZoomLevel(1.0)}

@@ -253,13 +253,13 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
   return (
     <aside className="w-80 lg:w-96 bg-[#05121F] border-l border-[#0D2E4A] flex flex-col font-mono select-none overflow-y-auto shrink-0 z-20">
       {/* ── 1. HEADER & HERO CONFIDENCE DISPLAY ── */}
-      <div className="p-4 border-b border-[#0D2E4A] bg-[#030B14] space-y-3">
+      <div className="p-3 border-b border-[#0D2E4A] bg-[#030B14] space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-[9.5px] font-bold text-[#4A8090] uppercase tracking-widest">
+          <span className="text-[9px] font-bold text-[#4A8090] uppercase tracking-widest">
             TARGET INTELLIGENCE
           </span>
           <span
-            className={`text-[9px] font-black px-2.5 py-0.5 border uppercase rounded-xs transition-all duration-300 ${
+            className={`text-[8.5px] font-black px-2 py-0.5 border uppercase rounded-xs transition-all duration-300 ${
               isVerified
                 ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] shadow-[0_0_12px_rgba(0,212,170,0.5)] scale-105'
                 : 'bg-[#082830] text-[#4A8090] border-[#0D2E4A]'
@@ -269,18 +269,18 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           </span>
         </div>
 
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between">
           <div>
-            <div className="text-xl font-black text-[#E0F7F4] tracking-tight">
+            <div className="text-base font-black text-[#E0F7F4] tracking-tight">
               {target.id} // {target.label.toUpperCase()}
             </div>
-            <div className="text-[10px] text-[#4A8090]">
+            <div className="text-[9.5px] text-[#4A8090]">
               CATEGORY: <strong className="text-[#00D4AA]">{target.category}</strong>
             </div>
           </div>
 
           <span
-            className={`text-[9px] font-black px-2.5 py-1 border uppercase rounded-xs ${
+            className={`text-[8.5px] font-black px-2 py-0.5 border uppercase rounded-xs ${
               target.priority === 'HIGH'
                 ? 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/50 shadow-[0_0_10px_rgba(239,68,68,0.2)]'
                 : target.priority === 'MEDIUM'
@@ -288,29 +288,29 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                 : 'bg-[#4A8090]/20 text-[#4A8090] border-[#4A8090]/50'
             }`}
           >
-            {target.priority} PRIORITY
+            {target.priority}
           </span>
         </div>
 
         {/* DOMINANT CONFIDENCE NUMBER (ANIMATED COUNT-UP) */}
-        <div className="p-3 bg-[#082830] border border-[#00D4AA]/60 rounded-sm shadow-[0_0_18px_rgba(0,212,170,0.15)] flex items-center justify-between">
+        <div className="p-2.5 bg-[#082830] border border-[#00D4AA]/60 rounded-xs shadow-[0_0_18px_rgba(0,212,170,0.15)] flex items-center justify-between">
           <div>
-            <div className="text-[34px] leading-none font-black text-[#00D4AA] tracking-tighter">
+            <div className="text-[32px] leading-none font-black text-[#00D4AA] tracking-tighter">
               {displayConfidence.toFixed(1)}%
             </div>
-            <div className="text-[9px] text-[#4A8090] font-bold mt-1 uppercase">
+            <div className="text-[8.5px] text-[#4A8090] font-bold mt-1 uppercase">
               AI CONFIDENCE · YOLOv8n ONNX
             </div>
           </div>
 
-          <div className="text-right text-[10px] text-[#E0F7F4] font-semibold space-y-0.5">
+          <div className="text-right text-[9.5px] text-[#E0F7F4] font-semibold space-y-0.5">
             <div>STATUS: <span className="text-[#00D4AA]">CONFIRMED</span></div>
             <div>VERDICT: <span className="text-[#00D4AA]">HIGH CERTAINTY</span></div>
           </div>
         </div>
 
         {/* Animated Confidence Bar */}
-        <div className="w-full h-1.5 bg-[#0A1E30] rounded-xs overflow-hidden">
+        <div className="w-full h-1 bg-[#0A1E30] rounded-xs overflow-hidden">
           <div
             className="h-full bg-[#00D4AA] transition-all duration-300 shadow-[0_0_8px_rgba(0,212,170,0.4)]"
             style={{ width: `${displayConfidence}%` }}

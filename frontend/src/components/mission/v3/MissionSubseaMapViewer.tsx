@@ -8,6 +8,7 @@ interface MissionSubseaMapViewerProps {
   onSelectTarget: (id: string) => void;
   onBackToSonar: () => void;
   onExportReport: () => void;
+  onView3D?: () => void;
 }
 
 export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
@@ -16,6 +17,7 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
   onSelectTarget,
   onBackToSonar,
   onExportReport,
+  onView3D,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [hoveredTarget, setHoveredTarget] = useState<MissionV3Target | null>(null);
@@ -180,13 +182,31 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
       {/* Top Map Header & Controls */}
       <div className="h-10 px-4 bg-[#030B14] border-b border-[#0D2E4A] flex items-center justify-between z-10">
         <div className="flex items-center gap-3">
-          <button
-            onClick={onBackToSonar}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#00D4AA] text-[10px] font-bold cursor-pointer rounded-xs transition-colors"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>RETURN TO SONAR</span>
-          </button>
+          {/* 3-Way Viewport Switcher */}
+          <div className="flex items-center gap-1 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded-xs">
+            <button
+              onClick={onBackToSonar}
+              className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
+              title="Return to Sonar Waterfall"
+            >
+              📻 SONAR
+            </button>
+            <button
+              className="px-2 py-0.5 bg-[#00D4AA] text-[#030B14] font-bold text-[8.5px] rounded-xs cursor-default shadow-[0_0_8px_rgba(0,212,170,0.3)]"
+            >
+              🗺️ MAP
+            </button>
+            {onView3D && (
+              <button
+                onClick={onView3D}
+                className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
+                title="View 3D Seafloor Bathymetry"
+              >
+                🌐 3D VIEW
+              </button>
+            )}
+          </div>
+
           <span className="text-[#2A5060]">|</span>
           <span className="text-xs font-black tracking-wider text-[#E0F7F4] uppercase flex items-center gap-1.5">
             <span>SUBSEA MISSION MAP</span>
@@ -248,7 +268,7 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
 
           <button
             onClick={onExportReport}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00D4AA] text-[#030B14] font-black text-xs cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_12px_rgba(0,212,170,0.3)] rounded-xs"
+            className="shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00D4AA] text-[#030B14] font-black text-xs cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_12px_rgba(0,212,170,0.3)] rounded-xs"
           >
             <FileText className="w-3.5 h-3.5" />
             <span>EXPORT INCIDENT DOSSIER</span>

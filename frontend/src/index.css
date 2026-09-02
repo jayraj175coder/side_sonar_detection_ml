@@ -1,42 +1,51 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @layer base {
   :root {
-    /* Exact Killer Redesign Design Tokens */
-    --bg-abyss: #03070B;
-    --bg-primary: #081118;
-    --bg-secondary: #0C171E;
-    --border-main: #16303B;
-    --border-glow: rgba(50, 230, 209, 0.35);
+    /* Phosphor Green Intelligence Console Tokens */
+    --bg-abyss: #070b07;
+    --bg-primary: #0a0f0a;
+    --bg-secondary: #0e160e;
+    --bg-elevated: #131e13;
     
-    --text-primary: #E4F2F5;
-    --text-secondary: #6F8992;
-    --text-muted: #4A636C;
+    --border-main: #193019;
+    --border-bright: #2d552d;
+    --border-glow: rgba(74, 222, 128, 0.35);
     
-    --sonar-cyan: #32E6D1;
-    --ocean-blue: #29B6F6;
-    --warning: #FFB547;
-    --critical: #FF5D5D;
-    --success: #65D391;
-
-    /* Legacy Backward-Compatibility Variables */
-    --surface-console: #03070B;
-    --surface-panel: #081118;
-    --surface-panel-raised: #0C171E;
-    --surface-border: #16303B;
-    --signal-live: #32E6D1;
-    --signal-forensic: #65D391;
-    --contact-confidence-high: #32E6D1;
-    --contact-confidence-med: #FFB547;
-    --contact-confidence-low: #6F8992;
+    --text-primary: #dcfce7;
+    --text-secondary: #64876b;
+    --text-muted: #3d5843;
+    
+    --phosphor-green: #4ade80;
+    --phosphor-dim: #22c55e;
+    --phosphor-bright: #86efac;
+    
+    --amber-warning: #f59e0b;
+    --amber-bright: #fbbf24;
+    --red-reject: #ef4444;
+    --cyan-ocean: #38bdf8;
+    
+    /* Legacy Backward-Compatibility */
+    --surface-console: #070b07;
+    --surface-panel: #0a0f0a;
+    --surface-panel-raised: #0e160e;
+    --surface-border: #193019;
+    --sonar-cyan: #4ade80;
+    --signal-live: #4ade80;
+    --signal-forensic: #4ade80;
+    --contact-confidence-high: #4ade80;
+    --contact-confidence-med: #f59e0b;
+    --contact-confidence-low: #64876b;
+    --warning: #f59e0b;
+    --critical: #ef4444;
+    --success: #4ade80;
   }
 
   body {
-    background: radial-gradient(circle at 50% 0%, #0C171E 0%, #081118 45%, #03070B 100%);
-    background-color: #03070B;
-    color: #E4F2F5;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #070b07;
+    color: #dcfce7;
+    font-family: 'JetBrains Mono', monospace;
     min-height: 100vh;
     overflow-x: hidden;
     letter-spacing: -0.01em;
@@ -47,114 +56,61 @@
   }
 }
 
-.toolbar-btn {
+/* Phosphor Screen Scanlines Overlay (Subtle) */
+.scanlines-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Phosphor Terminal Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #070b07;
+}
+::-webkit-scrollbar-thumb {
+  background: #193019;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4ade80;
+}
+
+/* Instrument button */
+.panel-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.35rem 0.55rem;
-  border-radius: 0.5rem;
-  background-color: #081118;
-  border: 1px solid #16303B;
-  color: #6F8992;
+  padding: 0.25rem 0.5rem;
+  background-color: #0e160e;
+  border: 1px solid #193019;
+  color: #64876b;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.65rem;
   font-weight: 700;
-  transition: all 0.15s ease;
+  text-transform: uppercase;
+  transition: all 0.1s ease;
   cursor: pointer;
+  border-radius: 0px;
 }
-.toolbar-btn:hover {
-  color: #32E6D1;
-  border-color: rgba(50, 230, 209, 0.4);
-  background-color: rgba(50, 230, 209, 0.08);
+.panel-btn:hover {
+  color: #4ade80;
+  border-color: #4ade80;
+  background-color: rgba(74, 222, 128, 0.08);
 }
-
-/* Background Acoustic Grid Pattern */
-.bg-acoustic-grid {
-  background-image: 
-    linear-gradient(to right, rgba(50, 230, 209, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(50, 230, 209, 0.04) 1px, transparent 1px);
-  background-size: 32px 32px;
-}
-
-.bg-acoustic-dots {
-  background-image: radial-gradient(rgba(50, 230, 209, 0.12) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* Premium Scientific Glass Panels */
-.glass-panel {
-  background: linear-gradient(135deg, rgba(8, 17, 24, 0.92) 0%, rgba(12, 23, 30, 0.95) 100%);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(22, 48, 59, 0.9);
-  box-shadow: 0 10px 30px -10px rgba(3, 7, 11, 0.8), 0 0 20px -5px rgba(50, 230, 209, 0.05);
-}
-
-.ocean-card {
-  background: linear-gradient(135deg, #081118 0%, #0C171E 100%);
-  border: 1px solid #16303B;
-  border-radius: 1rem;
-  transition: all 0.25s ease;
-}
-.ocean-card:hover {
-  border-color: rgba(50, 230, 209, 0.35);
-  box-shadow: 0 8px 25px -8px rgba(50, 230, 209, 0.12);
-}
-
-.glass-panel-hover {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.glass-panel-hover:hover {
-  background: linear-gradient(135deg, rgba(12, 23, 30, 0.95) 0%, rgba(8, 17, 24, 0.98) 100%);
-  border-color: rgba(50, 230, 209, 0.4);
-  box-shadow: 
-    0 16px 45px -5px rgba(0, 0, 0, 0.7),
-    0 0 25px 0 rgba(50, 230, 209, 0.15);
-  transform: translateY(-2px);
-}
-
-/* Custom Tactical Scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #03070B;
-}
-::-webkit-scrollbar-thumb {
-  background: #16303B;
-  border-radius: 9999px;
-  border: 1px solid rgba(50, 230, 209, 0.15);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #32E6D1;
-  box-shadow: 0 0 10px rgba(50, 230, 209, 0.5);
-}
-
-/* Animations & Keyframes */
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse-cyan {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(50, 230, 209, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(50, 230, 209, 0.6);
-  }
-}
-
-.animate-slide-up {
-  animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.pulse-glow-cyan {
-  animation: pulse-cyan 2s infinite ease-in-out;
+.panel-btn-active {
+  color: #070b07;
+  background-color: #4ade80;
+  border-color: #4ade80;
 }

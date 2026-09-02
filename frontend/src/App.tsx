@@ -51,15 +51,17 @@ export const App: React.FC = () => {
 
   return (
     <MissionProvider>
-      <div className="flex h-screen bg-[#060913] text-slate-100 overflow-hidden font-sans select-none">
-        {/* Fixed Left Sidebar */}
-        <Sidebar
-          isMobileOpen={isMobileMenuOpen}
-          onCloseMobile={() => setIsMobileMenuOpen(false)}
-        />
+      <div className="flex h-screen bg-[#070b07] text-[#dcfce7] overflow-hidden font-mono select-none">
+        {/* Fixed Left Sidebar (hidden in full-screen mission console mode) */}
+        {!isMissionFullscreen && (
+          <Sidebar
+            isMobileOpen={isMobileMenuOpen}
+            onCloseMobile={() => setIsMobileMenuOpen(false)}
+          />
+        )}
 
         {/* Main Content Viewport */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden pb-16 md:pb-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Header (hidden in full-screen mission mode) */}
           {!isMissionFullscreen && (
             <Header
@@ -71,7 +73,7 @@ export const App: React.FC = () => {
 
           {/* Page content */}
           {isMissionFullscreen ? (
-            // Mission page gets full screen
+            // Mission page gets full screen instrument console
             <div className="flex-1 overflow-hidden">
               <MissionPage />
             </div>

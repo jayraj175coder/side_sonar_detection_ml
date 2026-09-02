@@ -34,7 +34,7 @@ export const ConsoleBottomTimeline: React.FC<ConsoleBottomTimelineProps> = ({
   const logContainerRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState<boolean>(false);
 
-  // Autoscroll logs to bottom
+  // Auto-scroll logs to bottom whenever new lines appear
   useEffect(() => {
     if (logContainerRef.current) {
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
@@ -48,11 +48,11 @@ export const ConsoleBottomTimeline: React.FC<ConsoleBottomTimelineProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Generate sparkline bar heights
+  // Acoustic backscatter density sparkline data
   const sparklineData = [2, 4, 1, 6, 8, 12, 14, 9, 5, 8, 17, 12, 6, 3, 1, 4, 7, 10, 5, 2];
 
   return (
-    <div className="h-40 bg-[#090e09] border-t border-[#193019] grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#193019] select-none font-mono text-[10px] shrink-0 z-20">
+    <div className="h-38 bg-[#090e09] border-t border-[#193019] grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#193019] select-none font-mono text-[10px] shrink-0 z-20">
       {/* 1. LEFT HALF: TIMELINE SCRUBBER & CONTROLS */}
       <div className="p-3 flex flex-col justify-between space-y-2">
         <div className="flex items-center justify-between">
@@ -60,7 +60,7 @@ export const ConsoleBottomTimeline: React.FC<ConsoleBottomTimelineProps> = ({
             <span className="text-[9px] font-bold text-[#64876b] uppercase tracking-widest">
               SURVEY TIMELINE
             </span>
-            <span className="text-[8px] text-[#4ade80] font-bold">
+            <span className="text-[8.5px] text-[#4ade80] font-bold">
               FRAME {String(currentFrame).padStart(3, '0')} / {totalFrames}
             </span>
           </div>
@@ -84,8 +84,8 @@ export const ConsoleBottomTimeline: React.FC<ConsoleBottomTimelineProps> = ({
           </div>
         </div>
 
-        {/* Rolling Sparkline Area Representation */}
-        <div className="h-6 w-full flex items-end gap-1 px-1 opacity-70">
+        {/* Rolling Density Sparkline */}
+        <div className="h-5 w-full flex items-end gap-1 px-1 opacity-70">
           {sparklineData.map((val, idx) => {
             const isCurrent = Math.floor((idx / sparklineData.length) * totalFrames) <= currentFrame;
             return (
@@ -100,9 +100,9 @@ export const ConsoleBottomTimeline: React.FC<ConsoleBottomTimelineProps> = ({
           })}
         </div>
 
-        {/* Range Scrubber Bar */}
+        {/* Real Interactive Range Scrubber */}
         <div className="flex items-center gap-2">
-          <span className="text-[8px] text-[#64876b]">T0</span>
+          <span className="text-[8px] text-[#64876b] font-mono">T0</span>
           <input
             type="range"
             min={1}
@@ -111,7 +111,7 @@ export const ConsoleBottomTimeline: React.FC<ConsoleBottomTimelineProps> = ({
             onChange={(e) => onSeekFrame(Number(e.target.value))}
             className="flex-1 h-1 bg-[#193019] appearance-none cursor-pointer accent-[#4ade80]"
           />
-          <span className="text-[8px] text-[#64876b]">T+{totalFrames}</span>
+          <span className="text-[8px] text-[#64876b] font-mono">T+{totalFrames}</span>
         </div>
 
         {/* Playback Transport Buttons */}
@@ -163,19 +163,25 @@ export const ConsoleBottomTimeline: React.FC<ConsoleBottomTimelineProps> = ({
           </button>
         </div>
 
-        {/* Scrollable Terminal Stream */}
+        {/* Scrollable Terminal Stream with Fade-in and Typewriter Animation for Newest Line */}
         <div
           ref={logContainerRef}
           className="flex-1 bg-[#070b07] border border-[#193019] p-2 overflow-y-auto space-y-1 font-mono text-[9px] shadow-inner"
         >
           {logs.map((item, idx) => {
+            const isLatest = idx === logs.length - 1;
             let color = 'text-[#dcfce7]';
             if (item.level === 'success') color = 'text-[#4ade80] font-bold';
             if (item.level === 'reject') color = 'text-[#ef4444]';
             if (item.level === 'warn') color = 'text-amber-400';
 
             return (
-              <div key={idx} className="flex items-start gap-2 leading-tight">
+              <div
+                key={idx}
+                className={`flex items-start gap-2 leading-tight transition-all duration-200 ${
+                  isLatest ? 'animate-fade-in text-[#86efac]' : ''
+                }`}
+              >
                 <span className="text-[#3d5843] shrink-0">{item.time}</span>
                 <span className="text-[#64876b] font-bold shrink-0">{item.tag.padEnd(4)}</span>
                 <span className={`flex-1 break-words ${color}`}>{item.text}</span>

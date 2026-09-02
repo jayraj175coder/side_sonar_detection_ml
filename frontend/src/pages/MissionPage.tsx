@@ -14,14 +14,16 @@ import {
   INITIAL_EVENT_LOGS,
 } from '../data/consoleData';
 import { sonarAudio } from '../utils/sonarAudio';
+import { api } from '../services/api';
 
 export const MissionPage: React.FC = () => {
   const [activeSite, setActiveSite] = useState<SurveySite>(SURVEY_SITES[0]);
   const [currentStageId, setCurrentStageId] = useState<StageId>('04'); // Default to FILTER stage for hero impact
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>('SX-T07');
+  const [hoveredCandidateId, setHoveredCandidateId] = useState<string | null>(null);
   const [candidatesList, setCandidatesList] = useState<CandidateItem[]>(CANDIDATE_ITEMS);
 
-  // Layers state
+  // Layers state (every checkbox actively draws/removes canvas elements)
   const [layers, setLayers] = useState<LayerState>({
     rawSonar: true,
     denoisedSonar: true,
@@ -45,7 +47,6 @@ export const MissionPage: React.FC = () => {
   // Keyboard Shortcuts: [1-6], [Space], [←/→], [R]
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Avoid firing when typing in inputs/selects
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
 
       if (e.key >= '1' && e.key <= '6') {
@@ -67,12 +68,11 @@ export const MissionPage: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [totalFrames]);
 
-  // Handle stage selection (The core interaction)
+  // Handle stage selection (Core Interaction)
   const handleSelectStage = useCallback((id: StageId) => {
     setCurrentStageId(id);
     sonarAudio.playTargetBeep();
 
-    // Append stage change event log
     const now = new Date();
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const stageInfo = STAGE_DETAILS[id];
@@ -82,7 +82,7 @@ export const MissionPage: React.FC = () => {
       {
         time: timeStr,
         tag: id === '01' ? 'ING' : id === '02' ? 'DEN' : id === '03' ? 'DET' : id === '04' ? 'GATE' : id === '05' ? 'CLS' : 'REP',
-        text: `switched to stage ${id} ${stageInfo.name} · ${stageInfo.shortDesc}`,
+        text: `stage ${id} ${stageInfo.name} active · ${stageInfo.shortDesc}`,
         level: id === '04' || id === '05' ? 'success' : 'info',
       },
     ]);
@@ -152,6 +152,7 @@ export const MissionPage: React.FC = () => {
     setCurrentFrame(1);
     setIsPlaying(false);
     setSelectedCandidateId('SX-T07');
+    setHoveredCandidateId(null);
     setEventLogs(INITIAL_EVENT_LOGS);
     sonarAudio.playDepthPulse();
   };
@@ -161,7 +162,7 @@ export const MissionPage: React.FC = () => {
   const hazardsCount = 4;
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#070b07] text-[#dcfce7] font-mono select-none overflow-hidden scanlines-overlay">
+    <div className="flex flex-col h-full w-full bg-[#070b07] text-[#dcfce7] font-mono select-none overflow-hidden scanlines-overlay">
       {/* 1. TOP STATUS BAR */}
       <ConsoleTopBar
         activeSite={activeSite}
@@ -185,7 +186,7 @@ export const MissionPage: React.FC = () => {
           hazardsCount={hazardsCount}
         />
 
-        {/* Center Column: Sonar Viewer Canvas with Coordinate Labels & Overlays */}
+        {/* Center Column: Sonar Viewer Canvas with Coordinate Labels & Interactive Reticles */}
         <ConsoleSonarCanvas
           currentStageId={currentStageId}
           activeSite={activeSite}
@@ -193,6 +194,9 @@ export const MissionPage: React.FC = () => {
           candidates={candidatesList}
           selectedCandidateId={selectedCandidateId}
           onSelectCandidate={setSelectedCandidateId}
+          hoveredCandidateId={hoveredCandidateId}
+          onHoverCandidate={setHoveredCandidateId}
+          currentFrame={currentFrame}
         />
 
         {/* Right Column: Stage Detail (Funnel, Plain Explanation, Table, Epistemic Caution) */}
@@ -201,6 +205,8 @@ export const MissionPage: React.FC = () => {
           candidates={candidatesList}
           selectedCandidateId={selectedCandidateId}
           onSelectCandidate={setSelectedCandidateId}
+          hoveredCandidateId={hoveredCandidateId}
+          onHoverCandidate={setHoveredCandidateId}
         />
       </div>
 

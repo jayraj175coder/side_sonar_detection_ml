@@ -21,6 +21,9 @@ import {
   Eye,
   Radio,
   Filter,
+  ArrowRight,
+  Server,
+  Compass,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useMission } from '../context/MissionContext';
@@ -41,15 +44,15 @@ import {
 
 export const OverviewPage: React.FC = () => {
   const { setActiveTab } = useApp();
-  const { startGuidedDemo, toggleJudgeMode, isJudgeMode, setSelectedTargetId } = useMission();
+  const { startGuidedDemo, setSelectedTargetId } = useMission();
 
   const heroTarget = MISSION_TARGETS.find((t) => t.id === 'SX-T07') || MISSION_TARGETS[0];
 
   const debrisDistribution = [
-    { name: 'Ghost Nets (ALDFG)', value: 6, color: '#32E6D1' },
-    { name: 'Lost Trawl Gear', value: 4, color: '#FFB547' },
-    { name: 'Anthropogenic Debris', value: 4, color: '#29B6F6' },
-    { name: 'Pipeline Hazards', value: 3, color: '#65D391' },
+    { name: 'Ghost Nets (ALDFG)', value: 6, color: '#4ade80' },
+    { name: 'Lost Trawl Gear', value: 4, color: '#f59e0b' },
+    { name: 'Anthropogenic Debris', value: 4, color: '#38bdf8' },
+    { name: 'Pipeline Hazards', value: 3, color: '#86efac' },
   ];
 
   const surveySwathTrend = [
@@ -60,246 +63,194 @@ export const OverviewPage: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-slide-up font-mono select-none">
+    <div className="space-y-6 animate-slide-up font-mono select-none text-[11px] text-[#dcfce7]">
       {/* 1. Hero Scientific Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#081118] via-[#0C171E] to-[#081118] border border-[#16303B] p-6 md:p-8 shadow-2xl">
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#32E6D1]/10 border border-[#32E6D1]/30 text-[#32E6D1] text-[10px] font-bold">
+      <div className="relative overflow-hidden bg-[#090e09] border border-[#193019] p-6 md:p-7 shadow-xl">
+        <div className="relative z-10 max-w-3xl space-y-2.5">
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-[#122415] border border-[#4ade80]/40 text-[#4ade80] text-[9.5px] font-bold">
             <Radio className="w-3.5 h-3.5 animate-pulse" />
-            <span>AI-POWERED MARINE DEBRIS & ANOMALY DETECTION</span>
+            <span>AI-POWERED MARINE DEBRIS & ANOMALY DETECTION PIPELINE</span>
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-black text-[#E4F2F5] tracking-tight font-sans">
+          <h1 className="text-xl md:text-2xl font-black text-[#dcfce7] tracking-tight uppercase">
             Transforming side-scan sonar imagery into explainable, geotagged marine intelligence.
           </h1>
 
-          <p className="text-xs text-[#6F8992] font-sans leading-relaxed">
-            SonarX automatically analyzes side-scan sonar imagery, detects suspicious marine debris and anomalies, filters natural acoustic formations, scores detections by confidence, geotags targets, and presents them for human verification.
+          <p className="text-[10px] text-[#64876b] leading-relaxed">
+            Automated acoustic perception for the Ministry of Earth Sciences: Ingests raw side-scan sonar imagery, applies bilateral noise suppression and CLAHE contrast enhancement, runs YOLOv8n ONNX perception, rejects natural geological formations, attaches WGS84 coordinates, and compiles structured dossiers.
           </p>
 
           {/* Call to Actions */}
-          <div className="flex flex-wrap items-center gap-3 pt-2">
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
             <button
               onClick={() => {
                 setActiveTab('mission');
                 startGuidedDemo();
               }}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#32E6D1] to-[#29B6F6] text-[#03070B] font-black text-xs font-mono flex items-center gap-2 shadow-lg shadow-[#32E6D1]/25 hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+              className="panel-btn flex items-center gap-2 px-3.5 py-1.5 bg-[#4ade80] text-[#070b07] border-[#4ade80] font-black text-xs hover:brightness-110 active:scale-95"
             >
-              <Play className="w-4 h-4 fill-current" />
-              <span>START DEMO MISSION (MX-026)</span>
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>RUN LIVE DEMO MISSION</span>
             </button>
 
             <button
               onClick={() => setActiveTab('scan')}
-              className="px-4 py-2.5 rounded-xl bg-[#0C171E] hover:bg-[#16303B] border border-[#16303B] text-[#E4F2F5] font-bold text-xs font-mono flex items-center gap-2 transition-all cursor-pointer"
+              className="panel-btn flex items-center gap-2 px-3.5 py-1.5 hover:text-[#4ade80]"
             >
-              <UploadCloud className="w-4 h-4 text-[#32E6D1]" />
-              <span>Upload & Analyze</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setActiveTab('mission');
-                toggleJudgeMode();
-              }}
-              className={`px-3.5 py-2.5 rounded-xl border font-bold text-xs font-mono flex items-center gap-2 transition-all cursor-pointer ${
-                isJudgeMode
-                  ? 'bg-[#FFB547]/20 border-[#FFB547] text-[#FFB547]'
-                  : 'bg-[#0C171E] border-[#16303B] text-[#6F8992] hover:text-[#E4F2F5]'
-              }`}
-            >
-              <Scale className="w-4 h-4" />
-              <span>Judge Mode</span>
+              <UploadCloud className="w-3.5 h-3.5" />
+              <span>UPLOAD & ANALYZE IMAGE</span>
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Acoustic Sonar Radial Wave Graphic in Background */}
-        <div className="absolute top-1/2 -translate-y-1/2 right-8 w-60 h-60 hidden xl:flex items-center justify-center pointer-events-none opacity-20">
-          <div className="w-56 h-56 rounded-full border border-[#32E6D1] animate-ping" />
-          <div className="w-40 h-40 rounded-full border border-[#32E6D1]/60 absolute" />
-          <div className="w-24 h-24 rounded-full border border-[#32E6D1]/80 absolute" />
-          <div className="w-8 h-8 rounded-full bg-[#32E6D1] absolute" />
+      {/* 2. Scalability & Fleet Deployment Path (SIH Criteria Requirement) */}
+      <div className="p-4 bg-[#090e09] border border-[#193019] space-y-3">
+        <div className="flex items-center justify-between pb-1 border-b border-[#193019]">
+          <span className="text-[9.5px] font-bold text-[#64876b] uppercase tracking-widest">
+            SCALABILITY & FLEET DEPLOYMENT ROADMAP (SIH EVALUATION PATH)
+          </span>
+          <span className="text-[8px] text-[#4ade80] font-bold">4-STAGE FLEET READINESS</span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2.5 text-[9.5px]">
+          {/* Stage 1 */}
+          <div className="p-3 bg-[#070b07] border border-[#4ade80]/40 space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[8px] font-bold text-[#4ade80] px-1 bg-[#122415] border border-[#4ade80]/40">
+                STAGE 01 · ACTIVE NOW
+              </span>
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#4ade80]" />
+            </div>
+            <strong className="text-[#dcfce7] block font-bold">ANALYST CONSOLE DEMO</strong>
+            <p className="text-[#64876b]">
+              Browser-based interactive verification interface for MoES hydrographic officers and survey teams.
+            </p>
+          </div>
+
+          {/* Stage 2 */}
+          <div className="p-3 bg-[#070b07] border border-[#193019] space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[8px] font-bold text-[#64876b] px-1 bg-[#0e160e] border border-[#193019]">
+                STAGE 02 · EDGE AUV
+              </span>
+              <Cpu className="w-3.5 h-3.5 text-[#64876b]" />
+            </div>
+            <strong className="text-[#dcfce7] block font-bold">ONBOARD JETSON INFERENCE</strong>
+            <p className="text-[#64876b]">
+              YOLOv8n ONNX model quantized to INT8 running real-time 10.4ms inference on submerged tow-bodies.
+            </p>
+          </div>
+
+          {/* Stage 3 */}
+          <div className="p-3 bg-[#070b07] border border-[#193019] space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[8px] font-bold text-[#64876b] px-1 bg-[#0e160e] border border-[#193019]">
+                STAGE 03 · FLEET SYNC
+              </span>
+              <Server className="w-3.5 h-3.5 text-[#64876b]" />
+            </div>
+            <strong className="text-[#dcfce7] block font-bold">FLEET SYNC TO MoES HUB</strong>
+            <p className="text-[#64876b]">
+              Acoustic modem / satellite telemetry synchronization streaming geotagged anomaly dossiers to central servers.
+            </p>
+          </div>
+
+          {/* Stage 4 */}
+          <div className="p-3 bg-[#070b07] border border-[#193019] space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[8px] font-bold text-[#64876b] px-1 bg-[#0e160e] border border-[#193019]">
+                STAGE 04 · NATIONAL
+              </span>
+              <Compass className="w-3.5 h-3.5 text-[#64876b]" />
+            </div>
+            <strong className="text-[#dcfce7] block font-bold">NATIONAL DEBRIS DENSITY MAP</strong>
+            <p className="text-[#64876b]">
+              Longitudinal GIS heatmaps and automated salvage vessel routing for Indian EEZ environmental remediation.
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* 2. Executive SIH KPI Cards (Clean, Large, Uncluttered) */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3 font-mono">
-        <div className="p-4 rounded-2xl bg-[#081118] border border-[#16303B] space-y-1 text-center">
-          <span className="text-[10px] text-[#6F8992] uppercase block">Total Anomalies</span>
-          <span className="text-2xl font-extrabold text-[#E4F2F5]">17</span>
+      {/* 3. Executive KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-2.5 text-center font-mono">
+        <div className="p-3 bg-[#090e09] border border-[#193019] space-y-0.5">
+          <span className="text-[8px] text-[#64876b] uppercase block">Total Anomalies</span>
+          <span className="text-xl font-bold text-[#dcfce7]">17</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#081118] border border-[#FF5D5D]/30 space-y-1 text-center">
-          <span className="text-[10px] text-[#FF5D5D] uppercase block font-bold">High Priority</span>
-          <span className="text-2xl font-extrabold text-[#FF5D5D]">4</span>
+        <div className="p-3 bg-[#090e09] border border-[#ef4444]/40 space-y-0.5">
+          <span className="text-[8px] text-[#ef4444] uppercase block font-bold">High Priority</span>
+          <span className="text-xl font-bold text-[#ef4444]">4</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#081118] border border-[#32E6D1]/30 space-y-1 text-center">
-          <span className="text-[10px] text-[#32E6D1] uppercase block font-bold">Top Confidence</span>
-          <span className="text-2xl font-extrabold text-[#32E6D1]">94.7%</span>
+        <div className="p-3 bg-[#090e09] border border-[#4ade80]/40 space-y-0.5">
+          <span className="text-[8px] text-[#4ade80] uppercase block font-bold">Top Confidence</span>
+          <span className="text-xl font-bold text-[#4ade80]">94.7%</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#081118] border border-[#65D391]/30 space-y-1 text-center">
-          <span className="text-[10px] text-[#65D391] uppercase block font-bold">Rocks Filtered</span>
-          <span className="text-2xl font-extrabold text-[#65D391]">20</span>
+        <div className="p-3 bg-[#090e09] border border-[#4ade80]/40 space-y-0.5">
+          <span className="text-[8px] text-[#4ade80] uppercase block font-bold">Rocks Filtered</span>
+          <span className="text-xl font-bold text-[#4ade80]">20</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#081118] border border-[#16303B] space-y-1 text-center">
-          <span className="text-[10px] text-[#6F8992] uppercase block">Surveyed Area</span>
-          <span className="text-2xl font-extrabold text-[#E4F2F5]">12.84 km²</span>
+        <div className="p-3 bg-[#090e09] border border-[#193019] space-y-0.5">
+          <span className="text-[8px] text-[#64876b] uppercase block">Surveyed Area</span>
+          <span className="text-xl font-bold text-[#dcfce7]">12.84 km²</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#081118] border border-[#16303B] space-y-1 text-center">
-          <span className="text-[10px] text-[#6F8992] uppercase block">Edge Latency</span>
-          <span className="text-2xl font-extrabold text-[#29B6F6]">10.4 ms</span>
+        <div className="p-3 bg-[#090e09] border border-[#193019] space-y-0.5">
+          <span className="text-[8px] text-[#64876b] uppercase block">Edge Latency</span>
+          <span className="text-xl font-bold text-[#38bdf8]">10.4 ms</span>
         </div>
       </div>
 
-      {/* 3. Hero Target Spotlight Card */}
-      <div className="p-5 md:p-6 rounded-3xl bg-[#081118] border border-[#32E6D1]/40 space-y-4 shadow-xl">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2.5">
-            <span className="text-xs font-black px-2 py-0.5 rounded bg-[#32E6D1] text-[#03070B] font-mono">
-              FEATURED DETECTION: {heroTarget.id}
+      {/* 4. Target Spotlight & Debris Distribution */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+        {/* Hero Target Card */}
+        <div className="lg:col-span-7 p-4 bg-[#090e09] border border-[#193019] space-y-3">
+          <div className="flex items-center justify-between pb-1 border-b border-[#193019]">
+            <span className="text-[9px] font-bold text-[#64876b] uppercase tracking-widest">
+              PRIMARY ANOMALY SPOTLIGHT // SX-T07
             </span>
-            <h3 className="text-base font-bold text-[#E4F2F5] font-sans">
-              {heroTarget.class} — High-Priority ALDFG Entanglement Hazard
-            </h3>
+            <span className="text-[8px] text-[#4ade80] font-bold px-1.5 py-0.2 bg-[#122415] border border-[#4ade80]/40">
+              94.7% CONFIDENCE
+            </span>
           </div>
 
-          <button
-            onClick={() => {
-              setSelectedTargetId('SX-T07');
-              setActiveTab('mission');
-            }}
-            className="px-3.5 py-1.5 rounded-xl bg-[#32E6D1]/15 hover:bg-[#32E6D1]/25 border border-[#32E6D1]/40 text-[#32E6D1] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
-          >
-            <span>Inspect in Mission Control</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs font-mono">
-          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
-            <span className="text-[9px] text-[#6F8992] uppercase block">AI Confidence</span>
-            <strong className="text-base font-bold text-[#32E6D1]">94.7%</strong>
-          </div>
-
-          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
-            <span className="text-[9px] text-[#6F8992] uppercase block">Dimensions</span>
-            <strong className="text-sm font-bold text-[#E4F2F5]">12.4m × 3.2m</strong>
-          </div>
-
-          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
-            <span className="text-[9px] text-[#6F8992] uppercase block">Acoustic Shadow</span>
-            <strong className="text-sm font-bold text-[#32E6D1]">2.31m Relief</strong>
-          </div>
-
-          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
-            <span className="text-[9px] text-[#6F8992] uppercase block">Depth</span>
-            <strong className="text-sm font-bold text-[#E4F2F5]">43.1 m</strong>
-          </div>
-
-          <div className="p-3 rounded-xl bg-[#0C171E] border border-[#16303B]">
-            <span className="text-[9px] text-[#6F8992] uppercase block">Coordinates</span>
-            <strong className="text-xs font-bold text-[#E4F2F5] truncate block">18.9217°N, 72.8214°E</strong>
+          <div className="space-y-1.5 text-[10px]">
+            <div className="flex items-center justify-between">
+              <strong className="text-sm text-[#4ade80]">{heroTarget.class}</strong>
+              <span className="text-[#64876b]">{heroTarget.length}m x {heroTarget.width}m</span>
+            </div>
+            <p className="text-[#64876b]">{heroTarget.operatorCaveat}</p>
+            <div className="p-2 bg-[#070b07] border border-[#193019] text-[9px] text-[#64876b] flex items-center justify-between">
+              <span>LAT: {heroTarget.lat}°N</span>
+              <span>LON: {heroTarget.lon}°E</span>
+              <span>DEPTH: {heroTarget.depth}m</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* 4. Scientific Charts (Debris Classification & Noise Reduction Ratio) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left: Debris Class Breakdown (6 cols) */}
-        <div className="lg:col-span-6 p-5 rounded-3xl bg-[#081118] border border-[#16303B] space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold text-[#E4F2F5] uppercase tracking-wider font-sans">
-              MARINE DEBRIS CLASSIFICATION
-            </h4>
-            <span className="text-[9px] text-[#6F8992]">17 Valid Anomalies</span>
+        {/* Debris Class Breakdown Chart */}
+        <div className="lg:col-span-5 p-4 bg-[#090e09] border border-[#193019] space-y-3">
+          <div className="flex items-center justify-between pb-1 border-b border-[#193019]">
+            <span className="text-[9px] font-bold text-[#64876b] uppercase tracking-widest">
+              DEBRIS TAXONOMY DISTRIBUTION
+            </span>
+            <span className="text-[8px] text-[#64876b]">17 TARGETS</span>
           </div>
 
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={debrisDistribution}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={45}
-                  outerRadius={75}
-                  paddingAngle={4}
-                  dataKey="value"
-                >
-                  {debrisDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0C171E',
-                    borderColor: '#16303B',
-                    borderRadius: '0.75rem',
-                    color: '#E4F2F5',
-                    fontSize: '11px',
-                    fontFamily: 'JetBrains Mono',
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-[10px]">
-            {debrisDistribution.map((item) => (
-              <div key={item.name} className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full" style={{ background: item.color }} />
-                <span className="text-[#6F8992]">{item.name}</span>
-                <strong className="text-[#E4F2F5] ml-auto">{item.value}</strong>
+          <div className="space-y-1.5 text-[9.5px]">
+            {debrisDistribution.map((d, i) => (
+              <div key={i} className="flex items-center justify-between p-1.5 bg-[#070b07] border border-[#193019]">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2" style={{ backgroundColor: d.color }} />
+                  <span className="text-[#dcfce7]">{d.name}</span>
+                </div>
+                <strong className="font-mono" style={{ color: d.color }}>{d.value} items</strong>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Right: Noise Filtering & Candidate Funnel Per Trackline (6 cols) */}
-        <div className="lg:col-span-6 p-5 rounded-3xl bg-[#081118] border border-[#16303B] space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold text-[#E4F2F5] uppercase tracking-wider font-sans">
-              NOISE FILTERING FUNNEL BY TRACKLINE
-            </h4>
-            <span className="text-[9px] text-[#65D391]">20 Rocks Suppressed</span>
-          </div>
-
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={surveySwathTrend} barGap={4}>
-                <XAxis dataKey="track" stroke="#6F8992" fontSize={10} tickLine={false} />
-                <YAxis stroke="#6F8992" fontSize={10} tickLine={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0C171E',
-                    borderColor: '#16303B',
-                    borderRadius: '0.75rem',
-                    color: '#E4F2F5',
-                    fontSize: '11px',
-                    fontFamily: 'JetBrains Mono',
-                  }}
-                />
-                <Bar dataKey="filtered" fill="#FF5D5D" name="Filtered Natural Noise" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="valid" fill="#32E6D1" name="Valid Debris Targets" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="flex items-center justify-between text-[10px] text-[#6F8992] pt-1 border-t border-[#16303B]">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded bg-[#FF5D5D]" />
-              <span>Natural Formations Filtered</span>
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded bg-[#32E6D1]" />
-              <span>Valid Debris Targets</span>
-            </span>
           </div>
         </div>
       </div>

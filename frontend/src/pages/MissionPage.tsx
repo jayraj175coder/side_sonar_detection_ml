@@ -16,6 +16,7 @@ import {
 import { sonarAudio } from '../utils/sonarAudio';
 import { exportOfficialIncidentReport } from '../utils/incidentReportGenerator';
 import { SURVEY_SITES } from '../data/consoleData';
+import { LiveDemoSequence } from '../components/console/LiveDemoSequence';
 
 export const MissionPage: React.FC = () => {
   // ── State Management ──
@@ -26,6 +27,9 @@ export const MissionPage: React.FC = () => {
 
   // Center Viewport Switcher ('sonar' | 'map' | '3d')
   const [centerViewMode, setCenterViewMode] = useState<'sonar' | 'map' | '3d'>('sonar');
+
+  // Full-Screen Cinematic Story Demo Mode for Judges
+  const [showCinematicDemo, setShowCinematicDemo] = useState<boolean>(false);
 
   // Interactive Filtration State (Confidence Slider & Acoustic Shadow Gate)
   const [confidenceThreshold, setConfidenceThreshold] = useState<number>(40);
@@ -257,6 +261,7 @@ export const MissionPage: React.FC = () => {
         isDemoRunning={isDemoRunning}
         onStartDemo={handleStartDemo}
         onStopDemo={handleStopDemo}
+        onOpenCinematicDemo={() => setShowCinematicDemo(true)}
         onOpenUpload={() => setIsUploadModalOpen(true)}
         onExportReport={handleExportReport}
         activePhaseName={PIPELINE_STAGES_V3[currentStageIndex]?.name}
@@ -349,6 +354,13 @@ export const MissionPage: React.FC = () => {
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
       />
+
+      {/* ── FULL-SCREEN CINEMATIC STORY DEMO FOR JUDGES ── */}
+      {showCinematicDemo && (
+        <div className="fixed inset-0 z-50 bg-[#01050A] flex flex-col pointer-events-auto">
+          <LiveDemoSequence onComplete={() => setShowCinematicDemo(false)} />
+        </div>
+      )}
     </div>
   );
 };

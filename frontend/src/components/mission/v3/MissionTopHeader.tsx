@@ -1,10 +1,11 @@
 import React from 'react';
-import { Play, Square, UploadCloud, FileText, CheckCircle2, ShieldAlert, Cpu, Sliders, ShieldCheck, Filter } from 'lucide-react';
+import { Play, Square, UploadCloud, FileText, CheckCircle2, ShieldAlert, Cpu, Sliders, ShieldCheck, Filter, Film } from 'lucide-react';
 
 interface MissionTopHeaderProps {
   isDemoRunning: boolean;
   onStartDemo: () => void;
   onStopDemo: () => void;
+  onOpenCinematicDemo?: () => void;
   onOpenUpload: () => void;
   onExportReport: () => void;
   activePhaseName?: string;
@@ -21,6 +22,7 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
   isDemoRunning,
   onStartDemo,
   onStopDemo,
+  onOpenCinematicDemo,
   onOpenUpload,
   onExportReport,
   activePhaseName,
@@ -88,7 +90,19 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
 
         {/* Right: Streamlined Action Buttons */}
         <div className="flex items-center gap-2">
-          {/* START / STOP LIVE DEMO */}
+          {/* CINEMATIC STORY DEMO FOR JUDGES */}
+          {onOpenCinematicDemo && (
+            <button
+              onClick={onOpenCinematicDemo}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#082830] border border-[#00D4AA]/60 hover:border-[#00D4AA] text-[#00D4AA] hover:bg-[#00D4AA] hover:text-[#030B14] text-[10px] font-black cursor-pointer rounded-xs transition-all shadow-[0_0_10px_rgba(0,212,170,0.2)] active:scale-95"
+              title="Open full-screen 8-scene Cinematic Guided Story Demo for Judges"
+            >
+              <Film className="w-3.5 h-3.5" />
+              <span>CINEMATIC DEMO</span>
+            </button>
+          )}
+
+          {/* START / STOP LIVE WORKSTATION DEMO */}
           {isDemoRunning ? (
             <button
               onClick={onStopDemo}

@@ -18,6 +18,7 @@ import {
 } from '../data/consoleData';
 import { sonarAudio } from '../utils/sonarAudio';
 import { useMission } from '../context/MissionContext';
+import { exportOfficialIncidentReport } from '../utils/incidentReportGenerator';
 
 type DemoPhase = 'idle' | 'running' | 'done';
 
@@ -69,6 +70,13 @@ export const MissionPage: React.FC = () => {
   const [currentStageId, setCurrentStageId] = useState<StageId>('06');
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>('SX-T07');
   const [hoveredCandidateId, setHoveredCandidateId] = useState<string | null>(null);
+
+  // Drift projection state (INCOIS / SARAT)
+  const [projectDriftCandidateId, setProjectDriftCandidateId] = useState<string | null>('SX-T07');
+
+  const handleToggleProjectDrift = useCallback((id: string) => {
+    setProjectDriftCandidateId((prev) => (prev === id ? null : id));
+  }, []);
 
   // Dynamic filter state
   const [confidenceThreshold, setConfidenceThreshold] = useState<number>(0.40);
@@ -350,6 +358,12 @@ export const MissionPage: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportIncidentReport = useCallback(() => {
+    sonarAudio.playLockBeep?.();
+    const confirmedOnly = dynamicCandidates.filter((c) => c.status === 'CONFIRMED');
+    exportOfficialIncidentReport(activeSite, confirmedOnly, confidenceThreshold, shadowFilterEnabled);
+  }, [activeSite, dynamicCandidates, confidenceThreshold, shadowFilterEnabled]);
+
   return (
     <>
       {/* ── LIVE DEMO SEQUENCE OVERLAY ───────────────────────────────────── */}
@@ -367,6 +381,7 @@ export const MissionPage: React.FC = () => {
             onReset={handleReset}
             demoPhase={demoPhase}
             onRunDemo={handleRunDemo}
+            onExportIncidentReport={handleExportIncidentReport}
           />
 
           <div className="flex-1 flex overflow-hidden relative">
@@ -397,6 +412,7 @@ export const MissionPage: React.FC = () => {
               demoPhase={demoPhase}
               stageProgress={stageProgress}
               selectedCategory={selectedCategory}
+              projectDriftCandidateId={projectDriftCandidateId}
             />
 
             <ConsoleStageDetail
@@ -416,6 +432,9 @@ export const MissionPage: React.FC = () => {
               rawCount={rawCount}
               rejectedCount={rejectedCount}
               confirmedCount={confirmedCount}
+              projectDriftCandidateId={projectDriftCandidateId}
+              onToggleProjectDrift={handleToggleProjectDrift}
+              onExportIncidentReport={handleExportIncidentReport}
             />
           </div>
 

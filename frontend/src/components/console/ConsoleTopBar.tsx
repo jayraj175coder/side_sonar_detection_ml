@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, Download, RotateCcw, Zap } from 'lucide-react';
+import { Play, Pause, Download, RotateCcw, Zap, FileText } from 'lucide-react';
 import { SURVEY_SITES, SurveySite } from '../../data/consoleData';
 
 type DemoPhase = 'idle' | 'running' | 'done';
@@ -13,6 +13,7 @@ interface ConsoleTopBarProps {
   onReset: () => void;
   demoPhase: DemoPhase;
   onRunDemo: () => void;
+  onExportIncidentReport?: () => void;
 }
 
 export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
@@ -24,6 +25,7 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
   onReset,
   demoPhase,
   onRunDemo,
+  onExportIncidentReport,
 }) => {
   return (
     <header className="h-11 bg-[#05121F] border-b border-[#0D2E4A] px-3 flex items-center justify-between font-mono text-[11px] select-none shrink-0 z-30">
@@ -118,6 +120,17 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
           <Download className="w-3 h-3" />
           <span className="hidden sm:inline">EXPORT DOSSIER</span>
         </button>
+
+        {onExportIncidentReport && (
+          <button
+            onClick={onExportIncidentReport}
+            className="panel-btn flex items-center gap-1 border-[#38bdf8]/50 text-[#38bdf8] hover:bg-[#38bdf8] hover:text-[#030B14] transition-all"
+            title="Generate official Ministry of Earth Sciences marine pollution incident advisory"
+          >
+            <FileText className="w-3 h-3" />
+            <span className="hidden sm:inline">INCIDENT REPORT</span>
+          </button>
+        )}
 
         <button
           onClick={onReset}

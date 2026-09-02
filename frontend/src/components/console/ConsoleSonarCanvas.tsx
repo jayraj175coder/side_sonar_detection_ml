@@ -3,6 +3,7 @@ import { ZoomIn, ZoomOut, RotateCcw, Crosshair } from 'lucide-react';
 import { CandidateItem, StageId, SurveySite } from '../../data/consoleData';
 import { LayerState } from './ConsoleLeftRail';
 import { sonarAudio } from '../../utils/sonarAudio';
+import { calculateDriftProjection } from '../../utils/driftProjection';
 
 type DemoPhase = 'idle' | 'running' | 'done';
 
@@ -32,6 +33,7 @@ interface ConsoleSonarCanvasProps {
   demoPhase: DemoPhase;
   stageProgress: number;
   selectedCategory?: string;
+  projectDriftCandidateId?: string | null;
 }
 
 export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
@@ -48,6 +50,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
   demoPhase,
   stageProgress,
   selectedCategory = 'ALL',
+  projectDriftCandidateId,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [zoomLevel, setZoomLevel] = useState(1.0);
@@ -291,6 +294,107 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
             ctx.fillText(`${cand.lat.toFixed(4)}°N`, cx - 36, cy - 38);
             ctx.fillText(`${cand.lon.toFixed(4)}°E`, cx - 36, cy - 30);
           }
+
+          // ── FEATURE 1: DRIFT PROJECTION TRAJECTORY (SARAT / INCOIS) ──
+          if (projectDriftCandidateId === cand.id && isConfirmed) {
+            const drift = calculateDriftProjection(cand);
+            const vecLength = 150;
+            const rad = ((drift.bearingDeg - 90) * Math.PI) / 180;
+            const dx = Math.cos(rad) * vecLength;
+            const dy = Math.sin(rad) * vecLength;
+
+            ctx.save();
+            ctx.shadowBlur = 0;
+
+            // 1. Animated dashed vector line
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 4]);
+            ctx.lineDashOffset = -((currentFrame * 2) % 10);
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + dx, cy + dy);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 2. Directional Arrowhead
+            const arrowAngle = Math.atan2(dy, dx);
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.moveTo(cx + dx, cy + dy);
+            ctx.lineTo(
+              cx + dx - 10 * Math.cos(arrowAngle - Math.PI / 6),
+              cy + dy - 10 * Math.sin(arrowAngle - Math.PI / 6)
+            );
+            ctx.lineTo(
+              cx + dx - 10 * Math.cos(arrowAngle + Math.PI / 6),
+              cy + dy - 10 * Math.sin(arrowAngle + Math.PI / 6)
+            );
+            ctx.closePath();
+            ctx.fill();
+
+            // 3. Three Labeled Points: T+24h, T+48h, T+72h
+            drift.nodes.forEach((node, idx) => {
+              const frac = (idx + 1) / 3;
+              const nx = cx + dx * frac;
+              const ny = cy + dy * frac;
+
+              // Node dot
+              ctx.fillStyle = '#030B14';
+              ctx.strokeStyle = '#38bdf8';
+              ctx.lineWidth = 1.8;
+              ctx.beginPath();
+              ctx.arc(nx, ny, 4, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.stroke();
+
+              // Inner pulse
+              ctx.fillStyle = node.hours === 48 ? '#00D4AA' : '#38bdf8';
+              ctx.beginPath();
+              ctx.arc(nx, ny, 2, 0, Math.PI * 2);
+              ctx.fill();
+
+              // Labeled node badge
+              const tagText = `${node.timeLabel} (+${node.driftNm}nm)`;
+              ctx.font = 'bold 7.5px monospace';
+              const textW = ctx.measureText(tagText).width + 8;
+
+              ctx.fillStyle = 'rgba(5, 18, 31, 0.95)';
+              ctx.fillRect(nx + 6, ny - 8, textW, 16);
+              ctx.strokeStyle = node.hours === 48 ? '#00D4AA' : '#38bdf8';
+              ctx.lineWidth = 0.8;
+              ctx.strokeRect(nx + 6, ny - 8, textW, 16);
+
+              ctx.fillStyle = node.hours === 48 ? '#00D4AA' : '#38bdf8';
+              ctx.fillText(tagText, nx + 10, ny + 3);
+            });
+
+            // 4. Actionable recommendation caption
+            const boxW = 270;
+            const boxH = 34;
+            const boxX = Math.min(Math.max(cx + dx * 0.45 - boxW / 2, 10), W - boxW - 10);
+            const boxY = Math.min(Math.max(cy + dy * 0.45 + 16, 20), H - boxH - 20);
+
+            ctx.fillStyle = 'rgba(3, 11, 20, 0.95)';
+            ctx.fillRect(boxX, boxY, boxW, boxH);
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = 'bold 8px monospace';
+            ctx.fillText(
+              `⚡ RECOM INTERCEPT: [${drift.recommendedInterceptWindow}] near ${drift.recommendedInterceptCoords}`,
+              boxX + 6,
+              boxY + 14
+            );
+
+            ctx.fillStyle = '#4A8090';
+            ctx.font = '7px monospace';
+            ctx.fillText(drift.disclaimer, boxX + 6, boxY + 26);
+
+            ctx.restore();
+          }
         } else if (!isConfirmed && layers.noiseRejected) {
           // 3. Rejected dashed wireframe (controlled by layers.noiseRejected)
           ctx.strokeStyle = 'rgba(239,68,68,0.65)';
@@ -387,6 +491,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
     demoPhase,
     stageProgress,
     selectedCategory,
+    projectDriftCandidateId,
   ]);
 
   const stageNum = parseInt(currentStageId, 10);

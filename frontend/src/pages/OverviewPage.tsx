@@ -254,6 +254,15 @@ export const OverviewPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Interoperability note with national marine litter tracking */}
+      <div className="p-3 bg-[#030B14] border border-[#0D2E4A] flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[8.5px] text-[#4A8090]">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA]" />
+          <span>Designed to interoperate with national marine litter tracking initiatives such as NIRMAL Sagar (INCOIS).</span>
+        </div>
+        <span className="text-[#2A5060] uppercase">MoES Ocean Perception Stack</span>
+      </div>
     </div>
   );
 };

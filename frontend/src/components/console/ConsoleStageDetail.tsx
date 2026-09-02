@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Sliders, ShieldCheck, Download, Filter, FileSpreadsheet } from 'lucide-react';
+import { Sliders, ShieldCheck, Download, Filter, FileSpreadsheet, Compass, FileText } from 'lucide-react';
 import { STAGE_DETAILS, StageId, CandidateItem } from '../../data/consoleData';
+import { calculateDriftProjection } from '../../utils/driftProjection';
 
 interface ConsoleStageDetailProps {
   currentStageId: StageId;
@@ -19,6 +20,9 @@ interface ConsoleStageDetailProps {
   rawCount: number;
   rejectedCount: number;
   confirmedCount: number;
+  projectDriftCandidateId?: string | null;
+  onToggleProjectDrift?: (id: string) => void;
+  onExportIncidentReport?: () => void;
 }
 
 // ── Quick ~200ms Count-up / Count-down Component ─────────────────────────────
@@ -71,6 +75,9 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
   rawCount,
   rejectedCount,
   confirmedCount,
+  projectDriftCandidateId,
+  onToggleProjectDrift,
+  onExportIncidentReport,
 }) => {
   const stage = STAGE_DETAILS[currentStageId] || STAGE_DETAILS['01'];
 
@@ -166,6 +173,12 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
     { id: 'BARRELS', label: 'BARRELS' },
     { id: 'NOISE',   label: 'NOISE' },
   ];
+
+  // Calculate drift projection for the selected candidate if confirmed
+  const driftData = useMemo(() => {
+    if (!selectedCandidate || selectedCandidate.status !== 'CONFIRMED') return null;
+    return calculateDriftProjection(selectedCandidate);
+  }, [selectedCandidate]);
 
   return (
     <div className="w-80 lg:w-96 bg-[#05121F] border-l border-[#0D2E4A] flex flex-col justify-between select-none font-mono text-[11px] shrink-0 overflow-y-auto">
@@ -316,7 +329,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
           </div>
         </div>
 
-        {/* 4. Candidate Register (Sorted by Verdict) */}
+        {/* 4. Candidate Register (Sorted by Verdict with Drift Action) */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-[8.5px] text-[#4A8090] font-bold uppercase tracking-wider">
             <span>CANDIDATE REGISTER</span>
@@ -342,6 +355,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                   <th className="py-1 px-1.5 font-normal text-right">ASPECT</th>
                   <th className="py-1 px-1.5 font-normal text-right">SHADOW</th>
                   <th className="py-1 px-1.5 font-normal text-right">VERDICT</th>
+                  <th className="py-1 px-1 font-normal text-right">DRIFT</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#0D2E4A]">
@@ -349,6 +363,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                   const isSelected = selectedCandidateId === item.id;
                   const isHovered = hoveredCandidateId === item.id;
                   const isConfirmed = item.status === 'CONFIRMED';
+                  const isDriftActive = projectDriftCandidateId === item.id;
 
                   let confBadgeClass = 'bg-[#00D4AA]/20 text-[#00D4AA] border-[#00D4AA]/40';
                   if (item.confidence < 0.4) {
@@ -397,6 +412,26 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                           {item.status}
                         </span>
                       </td>
+                      <td className="py-1 px-1 text-right">
+                        {isConfirmed ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onToggleProjectDrift && onToggleProjectDrift(item.id);
+                            }}
+                            className={`px-1 py-0.2 text-[7px] font-bold border transition-all cursor-pointer ${
+                              isDriftActive
+                                ? 'bg-[#38bdf8] text-[#030B14] border-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]'
+                                : 'bg-[#05121F] text-[#38bdf8] border-[#38bdf8]/40 hover:bg-[#38bdf8]/20'
+                            }`}
+                            title="Project drift vector (SARAT / INCOIS)"
+                          >
+                            {isDriftActive ? 'ON' : 'DRIFT'}
+                          </button>
+                        ) : (
+                          <span className="text-[#2A5060] text-[7px]">—</span>
+                        )}
+                      </td>
                     </tr>
                   );
                 })}
@@ -405,9 +440,9 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
           </div>
         </div>
 
-        {/* 5. Selected Candidate Focused Dossier with Dynamic "Why" Explanation */}
+        {/* 5. Selected Candidate Focused Dossier with Drift & Action Directives */}
         {selectedCandidate && (
-          <div className="p-2.5 bg-[#0A1E30] border border-[#0D2E4A] text-[8.5px] space-y-1.5">
+          <div className="p-2.5 bg-[#0A1E30] border border-[#0D2E4A] text-[8.5px] space-y-2">
             <div className="flex items-center justify-between text-[#00D4AA] font-bold">
               <span>TARGET DOSSIER: {selectedCandidate.id}</span>
               <span className="text-[#E0F7F4]">{selectedCandidate.dimensions}</span>
@@ -436,13 +471,75 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
               </div>
             </div>
 
-            <button
-              onClick={() => handleExportSingleTarget(selectedCandidate)}
-              className="w-full flex items-center justify-center gap-1.5 py-1 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#00D4AA] text-[8px] font-bold cursor-pointer transition-colors"
-            >
-              <Download className="w-2.5 h-2.5" />
-              <span>EXPORT SINGLE TARGET DOSSIER (JSON)</span>
-            </button>
+            {/* Feature 1: DRIFT PROJECTION (SARAT / INCOIS Intercept Section) */}
+            {selectedCandidate.status === 'CONFIRMED' && driftData && (
+              <div className="p-2 bg-[#040E1A] border border-[#38bdf8]/50 space-y-1.5 shadow-[0_0_12px_rgba(56,189,248,0.1)]">
+                <div className="flex items-center justify-between text-[8px] font-bold">
+                  <div className="flex items-center gap-1 text-[#38bdf8]">
+                    <Compass className="w-3 h-3 text-[#38bdf8]" />
+                    <span>DRIFT PROJECTION (SARAT / INCOIS)</span>
+                  </div>
+                  <button
+                    onClick={() => onToggleProjectDrift && onToggleProjectDrift(selectedCandidate.id)}
+                    className={`px-1.5 py-0.5 text-[7px] font-bold border transition-all cursor-pointer ${
+                      projectDriftCandidateId === selectedCandidate.id
+                        ? 'bg-[#38bdf8] text-[#030B14] border-[#38bdf8]'
+                        : 'bg-[#05121F] text-[#38bdf8] border-[#38bdf8]/60 hover:bg-[#38bdf8]/20'
+                    }`}
+                  >
+                    {projectDriftCandidateId === selectedCandidate.id ? 'HIDE MAP VECTOR' : 'PROJECT ON MAP'}
+                  </button>
+                </div>
+
+                {/* 24h / 48h / 72h Table */}
+                <div className="grid grid-cols-3 gap-1 text-[7.5px] text-center font-mono">
+                  {driftData.nodes.map((node) => (
+                    <div
+                      key={node.hours}
+                      className={`p-1 border ${
+                        node.hours === 48
+                          ? 'border-[#38bdf8] bg-[#0c2538] shadow-[0_0_8px_rgba(56,189,248,0.2)]'
+                          : 'border-[#152e4d] bg-[#06101c]'
+                      }`}
+                    >
+                      <div className="text-[#38bdf8] font-bold">{node.timeLabel} (+{node.driftNm}nm)</div>
+                      <div className="text-[#E0F7F4]">{node.lat}°N</div>
+                      <div className="text-[#E0F7F4]">{node.lon}°E</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Actionable Intercept Callout */}
+                <div className="p-1.5 bg-[#061e2e] border-l-2 border-[#38bdf8] text-[7.5px] text-[#38bdf8] leading-tight">
+                  <strong>Recommended Intercept Window:</strong> [{driftData.recommendedInterceptWindow}] near {driftData.recommendedInterceptCoords}
+                </div>
+
+                <div className="text-[6.5px] text-[#4A8090]">
+                  * {driftData.disclaimer}
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons: JSON Export + Official Incident Report */}
+            <div className="space-y-1 pt-1">
+              <button
+                onClick={() => handleExportSingleTarget(selectedCandidate)}
+                className="w-full flex items-center justify-center gap-1.5 py-1 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#00D4AA] text-[8px] font-bold cursor-pointer transition-colors"
+              >
+                <Download className="w-2.5 h-2.5" />
+                <span>EXPORT SINGLE TARGET DOSSIER (JSON)</span>
+              </button>
+
+              {onExportIncidentReport && (
+                <button
+                  onClick={onExportIncidentReport}
+                  className="w-full flex items-center justify-center gap-1.5 py-1 bg-[#0c2538] border border-[#38bdf8]/60 hover:bg-[#38bdf8] hover:text-[#030b14] text-[#38bdf8] text-[8px] font-bold cursor-pointer transition-colors shadow-[0_0_10px_rgba(56,189,248,0.2)]"
+                >
+                  <FileText className="w-2.5 h-2.5" />
+                  <span>EXPORT OFFICIAL INCIDENT REPORT (MoES / INCOIS)</span>
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>

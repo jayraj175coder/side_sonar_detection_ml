@@ -133,7 +133,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </nav>
           </div>
 
-          {/* Advanced / Secondary Analysis */}
+          {/* Advanced / Secondary Analysis (Commented out) */}
+          {/*
           <div>
             {!isSidebarCollapsed && (
               <p className="px-3 text-[9px] font-bold text-[#6F8992] uppercase tracking-widest mb-2">
@@ -173,6 +174,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               })}
             </nav>
           </div>
+          */}
         </div>
 
         {/* Footer Diagnostics Strip */}

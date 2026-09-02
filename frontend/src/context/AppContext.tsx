@@ -37,7 +37,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [activeTab, setActiveTab] = useState<TabType>('mission');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
   const [currentScan, setCurrentScan] = useState<PredictionResponse | null>(null);

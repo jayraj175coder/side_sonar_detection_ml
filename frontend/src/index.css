@@ -53,16 +53,89 @@
   body {
     background-color: #030B14;
     color: #E0F7F4;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', system-ui, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
-    letter-spacing: -0.01em;
+    line-height: 1.6;
   }
 
-  code, pre, .font-mono {
-    font-family: 'JetBrains Mono', monospace;
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.015em;
+  }
+
+  code, pre, .font-mono, .mono {
+    font-family: 'IBM Plex Mono', 'JetBrains Mono', monospace;
   }
 }
+
+/* ── Smooth Scroll Reveal Animations ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Refined Buttons ── */
+.btn-primary {
+  background-color: #00D4AA;
+  color: #030B14;
+  padding: 11px 20px;
+  border-radius: 2px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  box-shadow: 0 0 15px rgba(0, 212, 170, 0.25);
+}
+.btn-primary:hover {
+  background-color: #5EFFD8;
+  box-shadow: 0 0 20px rgba(0, 212, 170, 0.4);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background-color: rgba(5, 18, 31, 0.6);
+  backdrop-filter: blur(8px);
+  color: #E0F7F4;
+  padding: 11px 20px;
+  border-radius: 2px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  font-size: 14.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+.btn-secondary:hover {
+  border-color: rgba(0, 212, 170, 0.6);
+  color: #00D4AA;
+  background-color: rgba(8, 40, 48, 0.5);
+  transform: translateY(-1px);
+}
+
 
 /* Ocean Sonar Scanlines Overlay */
 .scanlines-overlay {

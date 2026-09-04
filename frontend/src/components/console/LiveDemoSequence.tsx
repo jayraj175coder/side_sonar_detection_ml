@@ -688,9 +688,9 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
           <span>MoES SIH 2026 // PROBLEM STATEMENT</span>
         </div>
 
-        <h1 className="text-2xl md:text-4xl font-black text-[#E0F7F4] leading-tight tracking-tight">
+        <h1 className="text-2xl md:text-4xl font-black text-[#E0F7F4] leading-tight tracking-tight drop-shadow-lg">
           GHOST NETS: ABANDONED FISHING GEAR<br />
-          <span className="text-[#00D4AA] drop-shadow-[0_0_20px_rgba(0,212,170,0.5)]">
+          <span className="text-[#00D4AA] drop-shadow-[0_0_25px_rgba(0,212,170,0.8)] animate-pulse inline-block">
             KILLING MARINE LIFE,
           </span><br />
           INVISIBLE TO EVERY SENSOR EXCEPT SONAR.
@@ -871,14 +871,44 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         {scene === 0 && renderScene0()}
 
         {needsCanvas && (
-          <div className="flex-1 relative overflow-hidden bg-[#01050A]">
-            <canvas
-              ref={canvasRef}
-              width={840}
-              height={480}
-              className="w-full h-full object-contain"
-            />
-            {scene === 2 && renderScene2Overlay()}
+          <div className="flex-1 relative overflow-hidden bg-[#01050A] flex items-center justify-center">
+            <div 
+              className="relative w-full max-w-[1200px] aspect-[7/4] transition-transform duration-[4000ms] ease-[cubic-bezier(0.25,0.1,0.25,1)]"
+              style={{
+                transformOrigin: '34% 42%',
+                transform: scene === 6 ? 'scale(2.5)' : 'scale(1)'
+              }}
+            >
+              <canvas
+                ref={canvasRef}
+                width={840}
+                height={480}
+                className="w-full h-full object-contain"
+              />
+              {scene === 2 && renderScene2Overlay()}
+            </div>
+            
+            {/* Cinematic Scan Line (Scene 4 & 5) */}
+            {(scene === 4 || scene === 5) && (
+              <div 
+                className="absolute left-0 right-0 h-1 bg-[#00D4AA] shadow-[0_0_20px_4px_#00D4AA] opacity-80"
+                style={{
+                  top: '-10%',
+                  animation: 'sweepDown 3.8s linear forwards'
+                }}
+              />
+            )}
+            <style>{`
+              @keyframes sweepDown {
+                0% { top: -10%; opacity: 0; }
+                10% { opacity: 0.8; }
+                90% { opacity: 0.8; }
+                100% { top: 110%; opacity: 0; }
+              }
+            `}</style>
+            {/* CRT Scanlines */}
+            <div className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,1)_50%)] bg-[length:100%_4px] mix-blend-overlay" />
+            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_100px_rgba(0,0,0,0.9)]" />
           </div>
         )}
 

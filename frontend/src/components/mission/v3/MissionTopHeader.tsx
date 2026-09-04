@@ -98,21 +98,7 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
 
         {/* Right: Streamlined Action Buttons */}
         <div className="flex items-center gap-2">
-          {/* JUDGE MODE TOGGLE */}
-          {onToggleJudgeMode && (
-            <button
-              onClick={onToggleJudgeMode}
-              className={`flex items-center gap-1.5 px-3 py-1.5 border text-[10px] font-black cursor-pointer rounded-xs transition-all ${
-                isJudgeMode
-                  ? 'bg-[#F59E0B] text-[#030B14] border-[#F59E0B] shadow-[0_0_12px_rgba(245,158,11,0.4)]'
-                  : 'bg-[#05121F] border-[#0D2E4A] hover:border-[#F59E0B]/60 text-[#F59E0B]'
-              }`}
-              title="Toggle 20-second simplified Judge Mode presentation"
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>{isJudgeMode ? 'JUDGE MODE: ON' : 'JUDGE MODE'}</span>
-            </button>
-          )}
+          {/* JUDGE MODE TOGGLE (Removed as requested) */}
 
           {/* CINEMATIC STORY DEMO FOR JUDGES */}
           {onOpenCinematicDemo && (

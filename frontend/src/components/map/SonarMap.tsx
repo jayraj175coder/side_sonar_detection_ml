@@ -387,8 +387,8 @@ export const SonarMap: React.FC = () => {
               {/* Action: Jump to Flagship Mission Control / Sonar Viewer */}
               <div className="space-y-2 pt-1">
                 <button
-                  onClick={() => setActiveTab('sonar')}
-                  className="w-full hidden sm:flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#4CD9E8] text-[#080B11] font-black text-xs hover:bg-[#29B6F6] transition-all shadow-[0_0_20px_rgba(76,217,232,0.3)] cursor-pointer active:scale-98"
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#4CD9E8]/30 text-[#080B11]/50 font-black text-xs cursor-not-allowed opacity-50"
                 >
                   <Eye className="w-4 h-4" />
                   <span>INSPECT IN SONAR STUDIO</span>

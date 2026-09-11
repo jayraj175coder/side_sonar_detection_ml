@@ -41,7 +41,6 @@ export const App: React.FC = () => {
   const mobileNavItems: { id: TabType; label: string; icon: React.ComponentType<any> }[] = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'mission',  label: 'Mission',  icon: Crosshair },
-    { id: 'sonar',    label: 'Sonar',    icon: Eye },
     { id: 'map',      label: 'Map',      icon: MapPin },
     { id: 'reports',  label: 'Reports',  icon: FileText },
   ];

@@ -48,7 +48,7 @@ export const AnalyticsPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto font-mono select-none">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto font-sans select-none">
       {/* Page header */}
       <div className="flex items-start justify-between">
         <div>

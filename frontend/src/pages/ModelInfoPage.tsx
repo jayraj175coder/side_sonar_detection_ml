@@ -16,7 +16,7 @@ export const ModelInfoPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'architecture' | 'dataset' | 'benchmarks' | 'limitations'>('architecture');
 
   return (
-    <div className="space-y-6 font-mono select-none text-[11px] text-[#E0F7F4]">
+    <div className="space-y-6 font-sans select-none text-xs text-[#E0F7F4]">
       {/* 1. Top Header Banner */}
       <div className="p-5 bg-[#05121F] border border-[#0D2E4A] space-y-2">
         <div className="flex items-center gap-2">

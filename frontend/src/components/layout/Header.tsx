@@ -88,10 +88,10 @@ export const Header: React.FC<HeaderProps> = ({
                 SONARX
               </span>
               <span className="hidden sm:inline-flex text-[8.5px] font-bold px-1.5 py-0.2 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40">
-                AI MARINE DEBRIS PIPELINE
+                MoES // GOVT. OF INDIA PIPELINE
               </span>
               <span className="text-[9px] text-[#4A8090] hidden md:inline">
-                · Mission: <strong className="text-[#E0F7F4]">MX-026</strong>
+                · NIOT/INCOIS Survey Track: <strong className="text-[#E0F7F4]">MX-026 (EEZ)</strong>
               </span>
             </div>
           </div>

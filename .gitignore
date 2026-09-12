@@ -57,6 +57,7 @@ Thumbs.db
 # Training Artifacts
 runs/
 dataset_sih_v2/
+dataset_sih_v3/
 *.pt
 
 # Note: backend/models/best.onnx and marine_sonar_v2.onnx are tracked for live model deployment

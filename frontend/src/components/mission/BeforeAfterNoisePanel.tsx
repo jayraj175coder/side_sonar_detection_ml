@@ -6,7 +6,8 @@ interface BeforeAfterNoisePanelProps {
   filteredNoiseDescription: string;
   contrastImprovementDb: number;
   scenarioSeed?: number;
-  isDenoisedActive: boolean;
+  isDenoisedActive?: boolean;
+  imageUrl?: string;
 }
 
 export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
@@ -15,6 +16,7 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
   contrastImprovementDb,
   scenarioSeed = 1,
   isDenoisedActive = true,
+  imageUrl,
 }) => {
   const rawCanvasRef = useRef<HTMLCanvasElement>(null);
   const filteredCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -31,80 +33,105 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
     const filteredCtx = filteredCanvas.getContext('2d');
     if (!rawCtx || !filteredCtx) return;
 
-    const W = rawCanvas.width;
-    const H = rawCanvas.height;
+    const W = rawCanvas.width || 320;
+    const H = rawCanvas.height || 160;
 
-    // 1. RENDER RAW SONAR (With High Acoustic Speckle Noise & Ambient Clutter)
-    rawCtx.fillStyle = '#050D14';
-    rawCtx.fillRect(0, 0, W, H);
+    const renderSyntheticSonar = () => {
+      // 1. RENDER RAW SONAR (With High Acoustic Speckle Noise & Ambient Clutter)
+      rawCtx.fillStyle = '#030810';
+      rawCtx.fillRect(0, 0, W, H);
 
-    for (let x = 0; x < W; x += 2) {
-      for (let y = 0; y < H; y += 2) {
-        // High speckle noise + surface reverberation wave
-        const speckle = Math.random() * 0.45;
-        const wave = Math.sin(y * 0.08 + x * 0.04) * 0.25;
-        const v = Math.floor((speckle + wave + 0.2) * 90);
-        rawCtx.fillStyle = `rgb(${v}, ${Math.floor(v * 1.2)}, ${Math.floor(v * 1.1)})`;
-        rawCtx.fillRect(x, y, 2, 2);
+      for (let x = 0; x < W; x += 3) {
+        for (let y = 0; y < H; y += 3) {
+          // High speckle noise + surface reverberation wave
+          const speckle = Math.random() * 0.45;
+          const wave = Math.sin(y * 0.08 + x * 0.04) * 0.25;
+          const v = Math.floor((speckle + wave + 0.2) * 110);
+          rawCtx.fillStyle = `rgb(${Math.floor(v * 0.2)}, ${Math.floor(v * 1.1)}, ${Math.floor(v * 0.9)})`;
+          rawCtx.fillRect(x, y, 3, 3);
+        }
       }
-    }
 
-    // Raw Ghost Net return (blurred, low contrast)
-    rawCtx.fillStyle = 'rgba(180, 240, 230, 0.4)';
-    rawCtx.beginPath();
-    rawCtx.ellipse(W * 0.38, H * 0.45, 34, 18, 0.4, 0, Math.PI * 2);
-    rawCtx.fill();
+      // Raw Ghost Net return (blurred, low contrast)
+      rawCtx.fillStyle = 'rgba(180, 240, 230, 0.45)';
+      rawCtx.beginPath();
+      rawCtx.ellipse(W * 0.38, H * 0.45, 34, 18, 0.4, 0, Math.PI * 2);
+      rawCtx.fill();
 
-    // Raw diffuse shadow (washed out by ambient clutter)
-    rawCtx.fillStyle = 'rgba(20, 35, 45, 0.7)';
-    rawCtx.beginPath();
-    rawCtx.moveTo(W * 0.45, H * 0.42);
-    rawCtx.lineTo(W * 0.7, H * 0.38);
-    rawCtx.lineTo(W * 0.68, H * 0.55);
-    rawCtx.lineTo(W * 0.45, H * 0.48);
-    rawCtx.closePath();
-    rawCtx.fill();
+      // Raw diffuse shadow (washed out by ambient clutter)
+      rawCtx.fillStyle = 'rgba(10, 20, 30, 0.75)';
+      rawCtx.beginPath();
+      rawCtx.moveTo(W * 0.45, H * 0.42);
+      rawCtx.lineTo(W * 0.72, H * 0.38);
+      rawCtx.lineTo(W * 0.70, H * 0.58);
+      rawCtx.lineTo(W * 0.45, H * 0.50);
+      rawCtx.closePath();
+      rawCtx.fill();
 
-    // 2. RENDER PREPROCESSED & CLAHE FILTERED SONAR (Clean, High Contrast, Sharp Shadow)
-    filteredCtx.fillStyle = '#03070B';
-    filteredCtx.fillRect(0, 0, W, H);
+      // 2. RENDER PREPROCESSED & CLAHE FILTERED SONAR (Clean, High Contrast, Sharp Shadow)
+      filteredCtx.fillStyle = '#020509';
+      filteredCtx.fillRect(0, 0, W, H);
 
-    for (let x = 0; x < W; x += 2) {
-      for (let y = 0; y < H; y += 2) {
-        // Smooth sediment backscatter without high frequency speckle
-        const sediment = (Math.sin(x * 0.02) * 0.1 + Math.sin(y * 0.03) * 0.08 + 0.15) * 60;
-        const v = Math.floor(sediment);
-        filteredCtx.fillStyle = `rgb(${Math.floor(v * 0.2)}, ${Math.floor(v * 0.9)}, ${Math.floor(v * 0.8)})`;
-        filteredCtx.fillRect(x, y, 2, 2);
+      for (let x = 0; x < W; x += 3) {
+        for (let y = 0; y < H; y += 3) {
+          // Smooth sediment backscatter without high frequency speckle
+          const sediment = (Math.sin(x * 0.02) * 0.08 + Math.sin(y * 0.03) * 0.06 + 0.12) * 70;
+          const v = Math.floor(sediment);
+          filteredCtx.fillStyle = `rgb(${Math.floor(v * 0.15)}, ${Math.floor(v * 1.0)}, ${Math.floor(v * 0.85)})`;
+          filteredCtx.fillRect(x, y, 3, 3);
+        }
       }
+
+      // High-contrast clean netting target (CLAHE enhanced)
+      filteredCtx.save();
+      filteredCtx.fillStyle = '#00D4AA';
+      filteredCtx.shadowColor = '#00D4AA';
+      filteredCtx.shadowBlur = 16;
+      filteredCtx.beginPath();
+      filteredCtx.ellipse(W * 0.38, H * 0.45, 32, 16, 0.4, 0, Math.PI * 2);
+      filteredCtx.fill();
+      filteredCtx.restore();
+
+      // Distinct, sharp acoustic shadow corridor
+      filteredCtx.fillStyle = '#010306';
+      filteredCtx.beginPath();
+      filteredCtx.moveTo(W * 0.44, H * 0.4);
+      filteredCtx.lineTo(W * 0.76, H * 0.35);
+      filteredCtx.lineTo(W * 0.74, H * 0.60);
+      filteredCtx.lineTo(W * 0.44, H * 0.52);
+      filteredCtx.closePath();
+      filteredCtx.fill();
+
+      // Calibrated scale line
+      filteredCtx.fillStyle = '#00D4AA';
+      filteredCtx.fillRect(15, H - 15, 35, 2);
+      filteredCtx.font = '9px "JetBrains Mono", monospace';
+      filteredCtx.fillText('1.0m SCALE', 55, H - 11);
+    };
+
+    if (imageUrl) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        // Draw raw image on raw canvas with noise
+        rawCtx.drawImage(img, 0, 0, W, H);
+        // Draw enhanced image on filtered canvas
+        filteredCtx.drawImage(img, 0, 0, W, H);
+        filteredCtx.fillStyle = 'rgba(0, 212, 170, 0.08)';
+        filteredCtx.fillRect(0, 0, W, H);
+        filteredCtx.fillStyle = '#00D4AA';
+        filteredCtx.fillRect(15, H - 15, 35, 2);
+        filteredCtx.font = '9px "JetBrains Mono", monospace';
+        filteredCtx.fillText('1.0m SCALE', 55, H - 11);
+      };
+      img.onerror = () => {
+        renderSyntheticSonar();
+      };
+      img.src = imageUrl;
+    } else {
+      renderSyntheticSonar();
     }
-
-    // High-contrast clean netting target (CLAHE enhanced)
-    filteredCtx.save();
-    filteredCtx.fillStyle = '#32E6D1';
-    filteredCtx.shadowColor = '#32E6D1';
-    filteredCtx.shadowBlur = 14;
-    filteredCtx.beginPath();
-    filteredCtx.ellipse(W * 0.38, H * 0.45, 32, 16, 0.4, 0, Math.PI * 2);
-    filteredCtx.fill();
-    filteredCtx.restore();
-
-    // Distinct, sharp acoustic shadow corridor
-    filteredCtx.fillStyle = '#010306';
-    filteredCtx.beginPath();
-    filteredCtx.moveTo(W * 0.44, H * 0.4);
-    filteredCtx.lineTo(W * 0.75, H * 0.35);
-    filteredCtx.lineTo(W * 0.73, H * 0.58);
-    filteredCtx.lineTo(W * 0.44, H * 0.5);
-    filteredCtx.closePath();
-    filteredCtx.fill();
-
-    // Calibrated scale line
-    filteredCtx.fillStyle = '#32E6D1';
-    filteredCtx.fillRect(15, H - 15, 30, 2);
-    filteredCtx.font = '8px "JetBrains Mono", monospace';
-    filteredCtx.fillText('1.0m SCALE', 50, H - 12);
-  }, [scenarioSeed]);
+  }, [scenarioSeed, viewMode, imageUrl]);
 
   return (
     <div className="w-full bg-[#081118] border border-[#16303B] rounded-2xl p-3.5 shadow-xl font-mono select-none flex flex-col space-y-2.5">

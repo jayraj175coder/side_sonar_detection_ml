@@ -347,200 +347,167 @@ export const NewScanPage: React.FC = () => {
   const pipelineComplete = currentStage >= 4 || isShowingActiveScanResult;
 
   return (
-    <div className="space-y-4 select-none font-mono text-[11px]">
-      {/* ── 1. TOP ACTION BAR: Title + AUTO/MANUAL toggle ── */}
-      <div className="p-4 bg-[#05121F] border border-[#0D2E4A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="space-y-0.5">
-          <div className="flex items-center gap-2">
-            <Radio className="w-3.5 h-3.5 text-[#00D4AA] animate-pulse" />
-            <span className="text-sm font-black text-[#00D4AA] uppercase tracking-wider">
-              MARINE DEBRIS INSPECTOR
-            </span>
-            <span className="text-[8.5px] px-1.5 py-0.2 bg-[#082830] border border-[#00D4AA]/40 text-[#00D4AA] font-bold">
-              MoES SIH 2026
-            </span>
+    <div className="space-y-4 select-none font-sans text-xs">
+      {/* ── 1. COMPACT TOP ACTION BAR: Title + Auto/Manual Mode + Deliverable Status Pills ── */}
+      <div className="p-3.5 bg-[#050B14] border border-[#102436] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-lg">
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="w-7 h-7 rounded-lg bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+            <Radio className="w-4 h-4 animate-pulse" />
           </div>
-          <p className="text-[9.5px] text-[#4A8090]">
-            Upload raw side-scan sonar swath imagery → AI detection → noise filter → geotag → download dossier.
-          </p>
-        </div>
-
-        {/* AUTO / MANUAL MODE TOGGLE */}
-        <div className="flex items-center gap-1 shrink-0">
-          <span className="text-[8.5px] text-[#4A8090] mr-1">PIPELINE MODE:</span>
-          <button
-            onClick={() => setPipelineMode('auto')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 border text-[9.5px] font-bold transition-all cursor-pointer ${
-              pipelineMode === 'auto'
-                ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA]'
-                : 'bg-[#0A1E30] text-[#4A8090] border-[#0D2E4A] hover:text-[#E0F7F4]'
-            }`}
-            title="Pipeline stages fire automatically one after another"
-          >
-            <Bot className="w-3.5 h-3.5" />
-            <span>AUTO</span>
-          </button>
-          <button
-            onClick={() => setPipelineMode('manual')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 border text-[9.5px] font-bold transition-all cursor-pointer ${
-              pipelineMode === 'manual'
-                ? 'bg-[#f59e0b] text-[#030B14] border-[#f59e0b]'
-                : 'bg-[#0A1E30] text-[#4A8090] border-[#0D2E4A] hover:text-[#E0F7F4]'
-            }`}
-            title="Click RUN NEXT STAGE to advance each step manually"
-          >
-            <Hand className="w-3.5 h-3.5" />
-            <span>MANUAL</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ── 2. SIH PS DELIVERABLES BANNER (4 boxes, glow when complete) ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {PS_DELIVERABLES.map((d) => {
-          const done = pipelineComplete || currentStage >= d.stageMin;
-          const Icon = d.icon;
-          return (
-            <div
-              key={d.num}
-              className={`p-3 border text-center space-y-1 transition-all duration-500 ${
-                done
-                  ? 'bg-[#082830] border-[#00D4AA]/60 shadow-[0_0_12px_rgba(74,222,128,0.18)]'
-                  : 'bg-[#05121F] border-[#0D2E4A]'
-              }`}
-            >
-              <div className="flex items-center justify-center gap-1.5">
-                <Icon className={`w-3.5 h-3.5 ${done ? 'text-[#00D4AA]' : 'text-[#2A5060]'}`} />
-                <span className={`text-[8px] font-black uppercase tracking-wider ${done ? 'text-[#00D4AA]' : 'text-[#2A5060]'}`}>
-                  {d.num} {d.label}
-                </span>
-              </div>
-              <p className={`text-[7.5px] leading-tight ${done ? 'text-[#4A8090]' : 'text-[#2A5060]'}`}>
-                {d.sub}
-              </p>
-              <div className={`text-[8px] font-bold ${done ? 'text-[#00D4AA]' : 'text-[#2A5060]'}`}>
-                {done ? '● COMPLETE' : '○ QUEUED'}
-              </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-extrabold text-white uppercase tracking-wide">
+                MARINE DEBRIS INSPECTOR
+              </span>
+              <span className="text-[9px] font-mono px-2 py-0.5 bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-bold rounded">
+                MoES SIH 26057
+              </span>
             </div>
-          );
-        })}
-      </div>
-
-      {/* ── 3. HONEST DATA DISCLOSURE ── */}
-      <div className="p-2.5 bg-[#05121F] border border-[#0D2E4A] flex items-center gap-2 text-[8.5px] text-[#4A8090]">
-        <Database className="w-3 h-3 text-[#00D4AA] shrink-0" />
-        <span>
-          <strong className="text-[#00D4AA]">DATA PROVENANCE:</strong>{' '}
-          Training data — public proxy benchmark: OpenSonarDatasets (4,280 annotated SSS swaths) + SeabedDebris-v2 + synthetic acoustic augmentation.{' '}
-          <strong className="text-amber-400">No classified MoES operational survey data used.</strong>{' '}
-          Demo pipeline runs on simulated high-fidelity acoustic returns when backend is offline.
-        </span>
-      </div>
-
-      {/* ── 4. MANUAL MODE — PIPELINE STAGE RAIL (visible only in manual mode while analyzing) ── */}
-      {pipelineMode === 'manual' && isAnalyzing && (
-        <div className="p-3 bg-[#05121F] border border-[#f59e0b]/40 space-y-2">
-          <div className="flex items-center justify-between pb-1 border-b border-[#0D2E4A]">
-            <span className="text-[9px] font-bold text-[#f59e0b] uppercase tracking-wider">
-              🖐 MANUAL CONTROL — PIPELINE STAGE RAIL
-            </span>
-            <span className="text-[8px] text-[#4A8090]">
-              Click RUN NEXT STAGE to advance
-            </span>
+            <p className="text-[11px] text-slate-400 font-medium">
+              Side-scan sonar swath ingestion → YOLOv8s perception → noise gate → WGS84 geotag dossier.
+            </p>
           </div>
+        </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            {PIPELINE_STAGES.map((st, i) => {
-              const isActive = currentStage === st.id;
-              const isDone = currentStage > st.id;
-              const isWaiting = isActive && manualWaiting;
+        {/* DELIVERABLES & AUTO/MANUAL TOGGLE */}
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+          {/* Deliverables Status Pills */}
+          <div className="hidden xl:flex items-center gap-1.5 font-mono text-[10px]">
+            {PS_DELIVERABLES.map((d) => {
+              const done = pipelineComplete || currentStage >= d.stageMin;
               return (
                 <div
-                  key={st.id}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 border text-[9px] font-bold transition-all ${
-                    isDone
-                      ? 'bg-[#082830] border-[#00D4AA]/60 text-[#00D4AA]'
-                      : isWaiting
-                      ? 'bg-[#141208] border-[#f59e0b] text-[#f59e0b] animate-pulse'
-                      : isActive
-                      ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA]'
-                      : 'bg-[#05121F] border-[#0D2E4A] text-[#2A5060]'
+                  key={d.num}
+                  className={`px-2 py-1 rounded border ${
+                    done
+                      ? 'bg-cyan-950/80 border-cyan-500/40 text-cyan-300 font-bold'
+                      : 'bg-slate-900/60 border-slate-800 text-slate-500'
                   }`}
+                  title={d.sub}
                 >
-                  <span>{isDone ? '✓' : isWaiting ? '⏸' : '○'}</span>
-                  <span>{st.label}</span>
+                  <span>{d.num} {d.label}</span>
                 </div>
               );
             })}
           </div>
 
-          {manualWaiting && (
+          {/* AUTO / MANUAL MODE TOGGLE */}
+          <div className="flex items-center gap-1 bg-[#091522] p-1 rounded-xl border border-[#102436]">
             <button
-              onClick={handleManualAdvance}
-              className="flex items-center gap-2 px-4 py-2 bg-[#f59e0b] text-[#030B14] border border-[#f59e0b] font-black text-xs cursor-pointer hover:brightness-110 active:scale-95 transition-all"
+              onClick={() => setPipelineMode('auto')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                pipelineMode === 'auto'
+                  ? 'bg-cyan-400 text-slate-950 shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
             >
-              <ChevronRight className="w-3.5 h-3.5" />
-              <span>RUN NEXT STAGE</span>
+              <Bot className="w-3.5 h-3.5" />
+              <span>AUTO</span>
             </button>
-          )}
+            <button
+              onClick={() => setPipelineMode('manual')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                pipelineMode === 'manual'
+                  ? 'bg-amber-400 text-slate-950 shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Hand className="w-3.5 h-3.5" />
+              <span>MANUAL</span>
+            </button>
+          </div>
         </div>
-      )}
+      </div>
 
-      {/* ── 5. SAMPLE SCANS ── */}
+      {/* ── 2. QUICK LOAD SAMPLE SWATHS (Compact Horizontal Strip) ── */}
       {!isShowingActiveScanResult && !isAnalyzing && (
-        <div className="p-3.5 bg-[#05121F] border border-[#0D2E4A] space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5 text-[#00D4AA] animate-pulse" />
-              <span className="text-[10px] font-black text-[#E0F7F4] uppercase tracking-wider">
-                SAMPLE SONAR SWATHS — QUICK LOAD
-              </span>
-            </div>
-            <span className="text-[8px] text-[#4A8090]">Click any tile to load & test</span>
+        <div className="p-3 bg-[#050B14] border border-[#102436] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-2 shadow-md">
+          <div className="flex items-center gap-2 shrink-0">
+            <Zap className="w-4 h-4 text-cyan-400 animate-pulse" />
+            <span className="text-xs font-bold text-white uppercase tracking-wide">
+              QUICK-LOAD SAMPLES:
+            </span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1">
             {SAMPLE_SONAR_SCANS.map((sample) => (
               <button
                 key={sample.id}
                 onClick={() => handleSelectSample(sample)}
-                className="p-2.5 bg-[#030B14] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-left transition-all cursor-pointer group"
+                className="px-3 py-1.5 bg-[#091522] border border-[#102436] hover:border-cyan-500/50 rounded-xl text-left transition-all cursor-pointer group flex items-center justify-between"
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span
-                    className="text-[8px] font-bold px-1 py-0.2 border"
-                    style={{
-                      background: `${sample.color}18`,
-                      color: sample.color,
-                      borderColor: `${sample.color}50`,
-                    }}
-                  >
-                    {sample.tag}
-                  </span>
-                  <span className="text-[7px] text-[#2A5060]">900 kHz</span>
-                </div>
-                <p className="text-[9.5px] font-bold text-[#E0F7F4] truncate group-hover:text-[#00D4AA]">
-                  {sample.name}
-                </p>
-                <p className="text-[7.5px] text-[#4A8090] truncate">{sample.region}</p>
+                <span className="text-xs font-bold text-slate-200 truncate group-hover:text-cyan-300">
+                  {sample.tag}
+                </span>
+                <span className="text-[10px] font-mono text-cyan-400 font-bold shrink-0 ml-1">LOAD</span>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* ── 6. ERROR ── */}
-      {scanError && (
-        <div className="p-3 bg-[#1a0808] border border-[#ef4444]/50 flex items-center gap-2 text-[9.5px]">
-          <AlertTriangle className="w-3.5 h-3.5 text-[#ef4444] shrink-0" />
-          <span className="text-[#ef4444] font-bold">INFERENCE ERROR:</span>
-          <span className="text-[#E0F7F4]">{scanError}</span>
+      {/* ── 3. MANUAL MODE PIPELINE RAIL (Visible only in manual mode while analyzing) ── */}
+      {pipelineMode === 'manual' && isAnalyzing && (
+        <div className="p-3 bg-[#050B14] border border-amber-500/40 rounded-2xl space-y-2">
+          <div className="flex items-center justify-between pb-1 border-b border-[#102436]">
+            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+              🖐 MANUAL CONTROL — PIPELINE STAGE RAIL
+            </span>
+            <span className="text-xs text-slate-400">Click RUN NEXT STAGE to advance step-by-step</span>
+          </div>
+
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              {PIPELINE_STAGES.map((st) => {
+                const isActive = currentStage === st.id;
+                const isDone = currentStage > st.id;
+                const isWaiting = isActive && manualWaiting;
+                return (
+                  <div
+                    key={st.id}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${
+                      isDone
+                        ? 'bg-cyan-950 border-cyan-500/60 text-cyan-300'
+                        : isWaiting
+                        ? 'bg-amber-950/80 border-amber-400 text-amber-300 animate-pulse'
+                        : isActive
+                        ? 'bg-cyan-950 border-cyan-400 text-cyan-300'
+                        : 'bg-[#091522] border-[#102436] text-slate-500'
+                    }`}
+                  >
+                    <span>{isDone ? '✓' : isWaiting ? '⏸' : '○'}</span>
+                    <span>{st.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {manualWaiting && (
+              <button
+                onClick={handleManualAdvance}
+                className="flex items-center gap-2 px-4 py-2 bg-amber-400 text-slate-950 rounded-xl font-bold text-xs cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-lg"
+              >
+                <ChevronRight className="w-4 h-4" />
+                <span>RUN NEXT STAGE</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
 
-      {/* ── 7. MAIN DUAL COLUMN WORKSPACE ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        <div className="lg:col-span-8 space-y-4">
+      {/* ── 4. INFERENCE ERROR BANNER ── */}
+      {scanError && (
+        <div className="p-3 bg-red-950/60 border border-red-500/50 rounded-xl flex items-center gap-2 text-xs">
+          <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+          <span className="text-red-400 font-bold">INFERENCE ERROR:</span>
+          <span className="text-slate-200">{scanError}</span>
+        </div>
+      )}
+
+      {/* ── 5. MAIN SIDE-BY-SIDE WORKSPACE LAYOUT (2-COLUMN GRID) ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* LEFT COLUMN (7/12 Width): DropZone or Detection Overlay Viewer */}
+        <div className="lg:col-span-7 space-y-4">
           {isShowingActiveScanResult ? (
             <DetectionViewer
               scan={currentScan!}
@@ -562,7 +529,8 @@ export const NewScanPage: React.FC = () => {
           {isAnalyzing && <ProcessingState currentStage={currentStage} />}
         </div>
 
-        <div className="lg:col-span-4 space-y-4">
+        {/* RIGHT COLUMN (5/12 Width): Inference Controls & Anomaly Dossier Results */}
+        <div className="lg:col-span-5 space-y-4">
           <ConfigPanel
             confidence={confidence}
             setConfidence={setConfidence}
@@ -580,42 +548,55 @@ export const NewScanPage: React.FC = () => {
             hasFile={!!selectedFile || !!previewUrl}
           />
 
-          {/* ── 8. ANOMALY DOSSIER CTA — Prominent after pipeline completes ── */}
+          {/* ANOMALY DOSSIER READY CARD — Displays directly next to the image when analysis finishes */}
           {isShowingActiveScanResult && currentScan && (
-            <div className="p-4 bg-[#05121F] border border-[#00D4AA]/60 space-y-3 shadow-[0_0_16px_rgba(74,222,128,0.12)]">
-              <div className="pb-2 border-b border-[#0D2E4A]">
+            <div className="p-4 bg-[#050B14] border border-cyan-500/50 rounded-2xl space-y-3 shadow-xl">
+              <div className="pb-3 border-b border-[#102436]">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#00D4AA]" />
-                  <span className="font-black text-[#00D4AA] text-xs uppercase">
+                  <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+                  <span className="font-extrabold text-white text-sm uppercase tracking-wide">
                     ANOMALY DOSSIER READY
                   </span>
                 </div>
-                <p className="text-[8.5px] text-[#4A8090] mt-1 font-mono">
-                  {currentScan.scan_id} · {currentScan.total_detections} confirmed targets ·{' '}
-                  {currentScan.false_positives_suppressed} false positives suppressed ·{' '}
+                <p className="text-xs text-slate-400 mt-1 font-mono">
+                  {currentScan.scan_id} · {currentScan.total_detections} confirmed target(s) ·{' '}
                   {(currentScan.inference_ms || 0).toFixed(1)}ms inference
                 </p>
               </div>
 
-              <div className="space-y-2 text-[9.5px]">
-                <p className="text-[#4A8090]">
-                  Structured report with WGS84 geotags, confidence scores, bounding boxes, and
-                  noise-filter decisions. (PS Deliverable 3 of 4)
-                </p>
+              <div className="space-y-3">
+                <div className="p-3 rounded-xl bg-[#091522] border border-[#102436] space-y-1.5 text-xs">
+                  <div className="flex justify-between text-slate-300 font-semibold">
+                    <span>Ghost Net / ALDFG:</span>
+                    <span className="text-cyan-400 font-bold">{currentScan.ghost_net_count}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-300 font-semibold">
+                    <span>Anthropogenic Debris:</span>
+                    <span className="text-amber-400 font-bold">{currentScan.debris_count}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-300 font-semibold">
+                    <span>Pipeline Hazards:</span>
+                    <span className="text-blue-400 font-bold">{currentScan.pipeline_count}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-300 font-semibold">
+                    <span>Seafloor Anomalies:</span>
+                    <span className="text-teal-400 font-bold">{currentScan.anomaly_count}</span>
+                  </div>
+                </div>
 
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2">
                   <button
                     onClick={() => handleDownloadReport('json')}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#082830] border border-[#00D4AA]/60 text-[#00D4AA] font-bold hover:brightness-110 cursor-pointer transition-all active:scale-95"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-cyan-400 text-slate-950 font-extrabold text-xs rounded-xl hover:brightness-110 cursor-pointer transition-all shadow-md"
                   >
-                    <FileJson className="w-3.5 h-3.5" />
-                    <span>DOWNLOAD ANOMALY REPORT (JSON)</span>
+                    <FileJson className="w-4 h-4" />
+                    <span>DOWNLOAD DOSSIER (JSON)</span>
                   </button>
                   <button
                     onClick={() => handleDownloadReport('csv')}
-                    className="flex items-center gap-2 px-3 py-2 bg-[#05121F] border border-[#0D2E4A] text-[#4A8090] font-bold hover:text-[#00D4AA] hover:border-[#00D4AA]/40 cursor-pointer transition-all"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#091522] border border-[#102436] text-slate-300 font-bold text-xs rounded-xl hover:text-white hover:border-cyan-500/40 cursor-pointer transition-all"
                   >
-                    <FileSpreadsheet className="w-3.5 h-3.5" />
+                    <FileSpreadsheet className="w-4 h-4" />
                     <span>DOWNLOAD TARGET REGISTER (CSV)</span>
                   </button>
                 </div>
@@ -623,9 +604,9 @@ export const NewScanPage: React.FC = () => {
 
               <button
                 onClick={handleResetScan}
-                className="flex items-center gap-2 px-3 py-1.5 bg-[#05121F] border border-[#0D2E4A] text-[#4A8090] text-[9px] font-bold hover:text-[#E0F7F4] cursor-pointer transition-all w-full justify-center"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-[#091522] border border-[#102436] text-slate-400 text-xs font-semibold rounded-xl hover:text-white cursor-pointer transition-all w-full mt-2"
               >
-                <UploadCloud className="w-3 h-3" />
+                <UploadCloud className="w-4 h-4" />
                 <span>UPLOAD NEW SONAR SWATH</span>
               </button>
             </div>

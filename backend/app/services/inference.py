@@ -68,7 +68,7 @@ class SonarInferenceService:
         if self.v2_model_path.exists() and self.v2_model_path.is_file():
             self.active_path = self.v2_model_path
             self.model_version = "v2"
-            self.model_name = "YOLOv8n-SIH-Marine-Debris-V2"
+            self.model_name = "YOLOv8s-SIH-Marine-Debris-V2"
         elif self.baseline_model_path.exists() and self.baseline_model_path.is_file():
             self.active_path = self.baseline_model_path
             self.model_version = "baseline"
@@ -76,7 +76,7 @@ class SonarInferenceService:
         else:
             self.active_path = self.v2_model_path
             self.model_version = "v2"
-            self.model_name = "YOLOv8n-SIH-Marine-Debris-V2"
+            self.model_name = "YOLOv8s-SIH-Marine-Debris-V2"
 
         self.session: Optional[Any] = None
         self.input_name: Optional[str] = None
@@ -150,7 +150,7 @@ class SonarInferenceService:
             target = resolve_model_path("marine_sonar_v2.onnx")
             if target.exists() and target.is_file():
                 self.model_version = "v2"
-                self.model_name = "YOLOv8n-SIH-Marine-Debris-V2"
+                self.model_name = "YOLOv8s-SIH-Marine-Debris-V2"
                 self.v2_model_path = target
                 return self._load_session(target)
         return False

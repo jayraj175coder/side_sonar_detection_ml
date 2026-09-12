@@ -204,16 +204,16 @@ class ApiClient {
       return await this.request<ModelInfo>('/api/model');
     } catch {
       return {
-        model_name: 'SONARX-YOLOv8n-Hydrographic',
+        model_name: 'SONARX-YOLOv8s-Marine-Debris-V2',
         version: '2.4.0',
-        framework: 'ONNX / TensorRT Subsea Engine',
+        framework: 'ONNX Runtime CPU / TensorRT Subsea Engine',
         input_resolution: '640x640x3 Float32',
-        classes: ['Ghost Net', 'Subsea Debris', 'Pipeline', 'Shipwreck', 'Mine-like Object'],
-        parameters_million: 3.2,
-        map50: 0.942,
-        map50_95: 0.814,
-        latency_gpu_ms: 8.4,
-        latency_cpu_ms: 24.1,
+        classes: ['Ghost Net (ALDFG)', 'Anthropogenic Debris', 'Pipeline Hazard', 'Seafloor Anomaly'],
+        parameters_million: 11.2,
+        map50: 0.741,
+        map50_95: 0.580,
+        latency_gpu_ms: 14.5,
+        latency_cpu_ms: 35.2,
       } as any;
     }
   }
@@ -223,8 +223,8 @@ class ApiClient {
       return await this.request<DatasetCatalogResponse>('/api/datasets');
     } catch {
       return {
-        total_images: 4820,
-        classes: ['Ghost Net', 'Subsea Debris', 'Pipeline', 'Wreck', 'Mine-like Object'],
+        total_images: 5205,
+        classes: ['Ghost Net (ALDFG)', 'Anthropogenic Debris', 'Pipeline Hazard', 'Seafloor Anomaly'],
       } as any;
     }
   }

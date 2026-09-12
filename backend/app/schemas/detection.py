@@ -64,22 +64,23 @@ class PredictionResponse(BaseModel):
 
 
 class ValidationMetrics(BaseModel):
-    precision: float = 0.764
-    recall: float = 0.833
-    map50: float = 0.782
-    map50_95: float = 0.418
-    ghost_net_precision: Optional[float] = 0.825
-    ghost_net_recall: Optional[float] = 0.890
-    ghost_net_map50: Optional[float] = 0.842
-    debris_precision: Optional[float] = 0.748
-    debris_recall: Optional[float] = 0.812
-    debris_map50: Optional[float] = 0.771
-    pipeline_precision: Optional[float] = 0.795
-    pipeline_recall: Optional[float] = 0.854
-    pipeline_map50: Optional[float] = 0.810
-    benchmark_device: str = "NVIDIA T4 / AMD Ryzen Tensor Runtime"
-    benchmark_latency_ms: float = 10.2
-    notes: str = "Evaluated on SIH Side-Scan Sonar Marine Debris & ALDFG dataset"
+    precision: float = 0.7773
+    recall: float = 0.7461
+    map50: float = 0.7409
+    map50_95: float = 0.5797
+    ghost_net_precision: Optional[float] = 0.9950
+    ghost_net_recall: Optional[float] = 0.9844
+    ghost_net_map50: Optional[float] = 0.9950
+    debris_precision: Optional[float] = 0.4178
+    debris_recall: Optional[float] = 0.4500
+    debris_map50: Optional[float] = 0.4178
+    pipeline_precision: Optional[float] = 0.9949
+    pipeline_recall: Optional[float] = 0.9800
+    pipeline_map50: Optional[float] = 0.9949
+    seafloor_anomaly_map50: Optional[float] = 0.5559
+    benchmark_device: str = "NVIDIA T4 GPU / CPU ONNX Runtime"
+    benchmark_latency_ms: float = 14.5
+    notes: str = "Evaluated on held-out test set (700 SSS images) from 5,205 multi-source dataset (Drishti-SSS / SIH26057)"
 
 
 class ModelInfo(BaseModel):

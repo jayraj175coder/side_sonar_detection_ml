@@ -51,7 +51,7 @@ export const App: React.FC = () => {
   return (
     <GeospatialConfigProvider>
       <MissionProvider>
-        <div className="flex h-screen bg-[#070b07] text-[#dcfce7] overflow-hidden font-mono select-none">
+        <div className="flex h-screen bg-[#030B14] text-[#E0F7F4] overflow-hidden font-sans select-none">
         {/* Fixed Left Sidebar */}
         <Sidebar
           isMobileOpen={isMobileMenuOpen}

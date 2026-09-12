@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-14 bg-[#05121F] border-b border-[#0D2E4A] px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 font-mono select-none">
+    <header className="h-16 bg-[#050B14] border-b border-[#102436] px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 font-sans select-none shadow-md">
       {/* 1. Left: Brand + Mission MX-026 + Identity Tag */}
       <div className="flex items-center gap-3">
         {/* Desktop Sidebar Toggle Button */}

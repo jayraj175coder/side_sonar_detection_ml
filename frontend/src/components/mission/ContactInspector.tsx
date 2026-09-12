@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Crosshair,
   CheckCircle2,
+  XCircle,
   ChevronRight,
   Info,
   Ruler,
@@ -15,6 +16,7 @@ import {
   MapPin,
   ShieldCheck,
   AlertTriangle,
+  UserCheck,
 } from 'lucide-react';
 import { useMission } from '../../context/MissionContext';
 import { getTargetById, MISSION_TARGETS } from '../../data/targets';
@@ -31,10 +33,18 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
 
   const thumbnailCanvasRef = useRef<HTMLCanvasElement>(null);
   const [downloadSuccess, setDownloadSuccess] = useState<boolean>(false);
+  const [reviewMap, setReviewMap] = useState<Record<string, 'CONFIRMED' | 'REJECTED'>>({});
 
   const target = selectedTargetId
     ? (activeTargets.find((t) => t.id === selectedTargetId) || getTargetById(selectedTargetId))
     : MISSION_TARGETS[0];
+
+  const currentReviewStatus = target ? (reviewMap[target.id] || target.reviewStatus || 'UNREVIEWED') : 'UNREVIEWED';
+
+  const handleSetReview = (status: 'CONFIRMED' | 'REJECTED') => {
+    if (!target) return;
+    setReviewMap((prev) => ({ ...prev, [target.id]: status }));
+  };
 
   // Render high-resolution acoustic snippet thumbnail
   useEffect(() => {
@@ -314,7 +324,59 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
           </div>
         </div>
 
-        {/* 6. Action Buttons */}
+        {/* 6. HUMAN ANALYST REVIEW & AUDIT LOG QUEUE */}
+        <div className="p-3 rounded-2xl bg-[#0C171E] border border-[#16303B] space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-black text-[#E4F2F5] uppercase tracking-wider flex items-center gap-1.5 font-sans">
+              <UserCheck className="w-3.5 h-3.5 text-[#32E6D1]" />
+              <span>HUMAN ANALYST AUDIT QUEUE</span>
+            </span>
+
+            <span
+              className={`text-[8.5px] font-extrabold px-2 py-0.5 rounded border ${
+                currentReviewStatus === 'CONFIRMED'
+                  ? 'bg-[#65D391]/20 text-[#65D391] border-[#65D391]/40'
+                  : currentReviewStatus === 'REJECTED'
+                  ? 'bg-[#FF5D5D]/20 text-[#FF5D5D] border-[#FF5D5D]/40'
+                  : 'bg-[#6F8992]/20 text-[#6F8992] border-[#6F8992]/40'
+              }`}
+            >
+              {currentReviewStatus === 'CONFIRMED'
+                ? 'VERIFIED TARGET'
+                : currentReviewStatus === 'REJECTED'
+                ? 'REJECTED FALSE ALARM'
+                : 'PENDING REVIEW'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-[10px]">
+            <button
+              onClick={() => handleSetReview('CONFIRMED')}
+              className={`py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                currentReviewStatus === 'CONFIRMED'
+                  ? 'bg-[#65D391] text-[#03070B] border-[#65D391] shadow-[0_0_12px_rgba(101,211,145,0.4)]'
+                  : 'bg-[#081118] text-[#65D391] border-[#65D391]/40 hover:bg-[#65D391]/15'
+              }`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Confirm Target</span>
+            </button>
+
+            <button
+              onClick={() => handleSetReview('REJECTED')}
+              className={`py-2 px-2.5 rounded-xl font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                currentReviewStatus === 'REJECTED'
+                  ? 'bg-[#FF5D5D] text-[#03070B] border-[#FF5D5D] shadow-[0_0_12px_rgba(255,93,93,0.4)]'
+                  : 'bg-[#081118] text-[#FF5D5D] border-[#FF5D5D]/40 hover:bg-[#FF5D5D]/15'
+              }`}
+            >
+              <XCircle className="w-3.5 h-3.5" />
+              <span>Reject False Alarm</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 7. Action Buttons */}
         <div className="grid grid-cols-2 gap-2 pt-1">
           <button
             onClick={() => setFocusedPanel(focusedPanel === 'seabed' ? null : 'seabed')}

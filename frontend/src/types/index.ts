@@ -218,6 +218,7 @@ export interface MissionTarget {
   color: string;
   evidence: TargetEvidence;
   detectionEvidence: string[];
+  reviewStatus?: 'UNREVIEWED' | 'CONFIRMED' | 'REJECTED';
 }
 
 export interface TrackPoint {

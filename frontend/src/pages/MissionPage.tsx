@@ -259,7 +259,7 @@ export const MissionPage: React.FC = () => {
   }, [processedTargets, confidenceThreshold, isShadowGateActive]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#01050A] text-[#E0F7F4] font-mono overflow-hidden select-none pointer-events-auto">
+    <div className="flex flex-col h-full w-full bg-[#01050A] text-[#E0F7F4] font-sans overflow-hidden select-none pointer-events-auto">
       {/* ── TOP HEADER (60–64px) + INTERACTIVE FILTRATION BAR ── */}
       <MissionTopHeader
         isDemoRunning={isDemoRunning}
@@ -278,6 +278,8 @@ export const MissionPage: React.FC = () => {
         onChangeConfidenceThreshold={setConfidenceThreshold}
         isShadowGateActive={isShadowGateActive}
         onToggleShadowGate={() => setIsShadowGateActive((v) => !v)}
+        centerViewMode={centerViewMode}
+        onSelectCenterViewMode={setCenterViewMode}
       />
 
       {/* ── IMPACT TRANSLATION BANNER (Translates ML stats to human impact) ── */}

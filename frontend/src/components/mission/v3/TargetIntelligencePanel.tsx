@@ -251,7 +251,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
   }, [activeGeoTab, target]);
 
   return (
-    <aside className="w-80 lg:w-96 bg-[#05121F] border-l border-[#0D2E4A] flex flex-col font-mono select-none overflow-y-auto shrink-0 z-20">
+    <aside className="w-80 lg:w-96 bg-[#05121F] border-l border-[#0D2E4A] flex flex-col font-sans select-none overflow-y-auto shrink-0 z-20">
       {/* ── 1. HEADER & HERO CONFIDENCE DISPLAY ── */}
       <div className="p-3 border-b border-[#0D2E4A] bg-[#030B14] space-y-2">
         <div className="flex items-center justify-between">

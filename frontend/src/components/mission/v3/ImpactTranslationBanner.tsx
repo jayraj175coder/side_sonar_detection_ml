@@ -25,7 +25,7 @@ export const ImpactTranslationBanner: React.FC<ImpactTranslationBannerProps> = (
   }, [isDemoRunning]);
 
   return (
-    <div className="bg-[#030B14] border-b border-[#0D2E4A] px-4 py-2 select-none font-mono">
+    <div className="bg-[#030B14] border-b border-[#0D2E4A] px-4 py-2 select-none font-sans">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {/* Card 1: Debris Sites & Tonnage */}
         <div className="px-3 py-1.5 bg-[#05121F] border border-[#0D2E4A] rounded-sm flex items-center justify-between">

@@ -40,7 +40,7 @@ export const BottomPipelineTimeline: React.FC<BottomPipelineTimelineProps> = ({
   ];
 
   return (
-    <div className="shrink-0 bg-[#030B14] border-t border-[#0D2E4A] font-mono select-none z-30">
+    <div className="shrink-0 bg-[#030B14] border-t border-[#0D2E4A] font-sans select-none z-30">
       {/* ── EXPANDABLE EVENT LOG DRAWER ── */}
       {showEventLog && (
         <div className="bg-[#05121F] border-b border-[#0D2E4A] p-3 max-h-36 overflow-y-auto">

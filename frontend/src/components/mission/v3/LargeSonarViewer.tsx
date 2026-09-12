@@ -371,7 +371,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#01050A] relative overflow-hidden font-mono select-none">
+    <div className="flex-1 flex flex-col bg-[#01050A] relative overflow-hidden font-sans select-none">
       {/* ── VIEWER HEADER BAR ── */}
       <div className="h-10 px-4 bg-[#030B14] border-b border-[#0D2E4A] flex items-center justify-between z-10 relative">
         <div className="flex items-center gap-3">

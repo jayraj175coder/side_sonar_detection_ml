@@ -159,6 +159,52 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
           </div>
         </div>
 
+        {/* ── MODEL TRAINING METRICS (SIH 2026 PS 26057) ── */}
+        <div className="p-2 border border-[#0D2E4A] bg-[#030B14] space-y-1.5 font-mono text-[8px]">
+          <div className="flex items-center justify-between border-b border-[#0D2E4A] pb-1">
+            <span className="text-[8.5px] font-bold text-[#00D4AA] tracking-wider">// MODEL TRAINING METRICS</span>
+            <span className="text-[7.5px] text-[#3FD98A] font-bold px-1 bg-[#3FD98A]/10 border border-[#3FD98A]/30">120 EPOCHS</span>
+          </div>
+
+          <div className="text-[#4A8090] space-y-0.5 text-[8px]">
+            <div className="flex justify-between"><span className="text-[#6F8992]">ARCH:</span><strong className="text-[#E0F7F4]">YOLOv8s (11.2M)</strong></div>
+            <div className="flex justify-between"><span className="text-[#6F8992]">DATASET:</span><strong className="text-[#E0F7F4]">5,205 SSS Tiles</strong></div>
+            <div className="flex justify-between"><span className="text-[#6F8992]">mAP@50:</span><strong className="text-[#00D4AA] font-bold">74.09% (0.7409)</strong></div>
+            <div className="flex justify-between"><span className="text-[#6F8992]">PRECISION:</span><strong className="text-[#38BDF8] font-bold">77.73% (0.7773)</strong></div>
+          </div>
+
+          {/* SVG Sparkline Training Loss Curves */}
+          <div className="space-y-1 pt-1 border-t border-[#0D2E4A]/80">
+            <span className="text-[7.5px] text-[#4A8090] uppercase block font-bold">LOSS PROGRESSION (EPOCHS 1-120)</span>
+            
+            {/* Box Loss */}
+            <div className="space-y-0.5">
+              <div className="flex justify-between text-[7px] text-[#6F8992]">
+                <span>box_loss</span>
+                <span>1.382 &rarr; 0.785</span>
+              </div>
+              <div className="h-2 w-full bg-[#05121F] border border-[#0D2E4A] relative overflow-hidden">
+                <svg className="w-full h-full stroke-[#00D4AA]" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0,9 Q20,8 40,5 T80,3 T100,2" fill="none" strokeWidth="1.5" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Class Loss */}
+            <div className="space-y-0.5">
+              <div className="flex justify-between text-[7px] text-[#6F8992]">
+                <span>cls_loss</span>
+                <span>2.092 &rarr; 0.612</span>
+              </div>
+              <div className="h-2 w-full bg-[#05121F] border border-[#0D2E4A] relative overflow-hidden">
+                <svg className="w-full h-full stroke-[#38BDF8]" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0,9.5 Q15,7 35,4 T75,2 T100,1.5" fill="none" strokeWidth="1.5" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* ── KEYBOARD HINTS ── */}
         <div className="p-2 border border-[#0D2E4A] bg-[#030B14] text-[8px] text-[#2A5060] leading-relaxed">
           <span className="text-[#4A8090] font-bold block mb-0.5">KEYS</span>

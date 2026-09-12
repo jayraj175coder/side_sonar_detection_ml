@@ -31,27 +31,39 @@ import {
 import { useApp } from '../../context/AppContext';
 import { useGeospatialConfig } from '../../context/GeospatialConfigContext';
 
-// Custom Tactical Pin for Indian Maritime Sectors
+// Custom Tactical Pin for Indian Maritime Sectors with Debris-Wise Color Coding
 const createSectorPin = (sector: IndiaMaritimeSector, isSelected: boolean) => {
-  const isCritical = sector.status === 'HIGH ALERT' || sector.criticalThreats >= 4;
-  const isSelectedStyle = isSelected ? 'transform: scale(1.25); z-index: 99;' : '';
+  const isSelectedStyle = isSelected ? 'transform: scale(1.3); z-index: 99;' : '';
 
-  const pinColor = isCritical ? '#F04438' : sector.status === 'ACTIVE SURVEY' ? '#4CD9E8' : '#3FD98A';
-  const glowColor = isCritical ? 'rgba(240, 68, 56, 0.45)' : 'rgba(76, 217, 232, 0.45)';
+  // Debris-Wise Color Mapping
+  let pinColor = '#00D4AA'; // Default Emerald
+  const clsLower = sector.primaryClass.toLowerCase();
+
+  if (clsLower.includes('ghost') || clsLower.includes('net') || clsLower.includes('reef') || clsLower.includes('aldfg')) {
+    pinColor = '#10B981'; // Ghost Net / ALDFG (Emerald Green)
+  } else if (clsLower.includes('debris') || clsLower.includes('steel') || clsLower.includes('container') || clsLower.includes('plastic')) {
+    pinColor = '#F59E0B'; // Anthropogenic Debris (Electric Amber Orange)
+  } else if (clsLower.includes('pipeline') || clsLower.includes('subsea') || clsLower.includes('anchorage')) {
+    pinColor = '#06B6D4'; // Pipeline Hazard (Subsea Cyan)
+  } else if (clsLower.includes('ordnance') || clsLower.includes('anomaly') || clsLower.includes('trench') || clsLower.includes('volcanic')) {
+    pinColor = '#A855F7'; // Seafloor Anomaly (Electric Magenta)
+  }
+
+  const glowColor = `${pinColor}80`;
 
   const html = `
-    <div style="position: relative; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; ${isSelectedStyle} transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+    <div style="position: relative; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; ${isSelectedStyle} transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
       <!-- Radar Pulse Wave -->
-      <div style="position: absolute; width: 42px; height: 42px; border-radius: 50%; background: ${pinColor}; opacity: 0.25;" class="animate-ping"></div>
+      <div style="position: absolute; width: 44px; height: 44px; border-radius: 50%; background: ${pinColor}; opacity: 0.3;" class="animate-ping"></div>
       
       <!-- Middle Tactical Ring -->
-      <div style="position: absolute; width: 28px; height: 28px; border-radius: 50%; background: #080B11; border: 2px solid ${pinColor}; box-shadow: 0 0 16px ${glowColor};"></div>
+      <div style="position: absolute; width: 30px; height: 30px; border-radius: 50%; background: #050B14; border: 2.5px solid ${pinColor}; box-shadow: 0 0 18px ${glowColor}; flex: items-center; justify-content: center;"></div>
       
       <!-- Inner Core Dot -->
-      <div style="width: 10px; height: 10px; border-radius: 50%; background: ${pinColor};"></div>
+      <div style="width: 12px; height: 12px; border-radius: 50%; background: ${pinColor}; shadow: 0 0 8px ${pinColor};"></div>
 
       <!-- Sector Code Pill -->
-      <div style="position: absolute; bottom: -10px; padding: 2px 6px; border-radius: 6px; background: #080B11; border: 1px solid ${pinColor}; font-size: 8px; font-family: 'JetBrains Mono', monospace; font-weight: 900; color: ${pinColor}; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.9);">
+      <div style="position: absolute; bottom: -12px; padding: 2px 7px; border-radius: 6px; background: #050B14; border: 1px solid ${pinColor}; font-size: 9px; font-family: 'JetBrains Mono', monospace; font-weight: 900; color: ${pinColor}; white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,0.95);">
         ${sector.id.replace('SEC-', '')} · ${sector.contactsLogged}C
       </div>
     </div>
@@ -60,8 +72,8 @@ const createSectorPin = (sector: IndiaMaritimeSector, isSelected: boolean) => {
   return L.divIcon({
     className: 'custom-sector-marker',
     html,
-    iconSize: [44, 44],
-    iconAnchor: [22, 22],
+    iconSize: [48, 48],
+    iconAnchor: [24, 24],
   });
 };
 

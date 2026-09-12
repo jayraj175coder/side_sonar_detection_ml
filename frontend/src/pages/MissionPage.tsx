@@ -8,6 +8,9 @@ import { TargetIntelligencePanel } from '../components/mission/v3/TargetIntellig
 import { BottomPipelineTimeline } from '../components/mission/v3/BottomPipelineTimeline';
 import { ImpactTranslationBanner } from '../components/mission/v3/ImpactTranslationBanner';
 import { UploadClassifyModal } from '../components/mission/UploadClassifyModal';
+import { HazardAlertDrawer } from '../components/mission/v3/HazardAlertDrawer';
+import { RovDispatchModal } from '../components/mission/v3/RovDispatchModal';
+import { exportGeoJsonDossier } from '../utils/gisExporter';
 import {
   MISSION_V3_TARGETS,
   MissionV3Target,
@@ -25,6 +28,8 @@ export const MissionPage: React.FC = () => {
   const [selectedTargetId, setSelectedTargetId] = useState<string>('SX-T07');
   const [hoveredTargetId, setHoveredTargetId] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
+  const [isAlertDrawerOpen, setIsAlertDrawerOpen] = useState<boolean>(false);
+  const [dispatchTarget, setDispatchTarget] = useState<MissionV3Target | null>(null);
 
   // Judge Mode (20-Second Simplified Proof View)
   const [isJudgeMode, setIsJudgeMode] = useState<boolean>(false);
@@ -270,6 +275,9 @@ export const MissionPage: React.FC = () => {
         onOpenCinematicDemo={() => setShowCinematicDemo(true)}
         onOpenUpload={() => setIsUploadModalOpen(true)}
         onExportReport={handleExportReport}
+        onExportGeoJson={() => exportGeoJsonDossier(processedTargets)}
+        onToggleAlertDrawer={() => setIsAlertDrawerOpen((v) => !v)}
+        alertCount={processedTargets.filter((t) => t.priority === 'HIGH' || t.status === 'CONFIRMED').length}
         activePhaseName={PIPELINE_STAGES_V3[currentStageIndex]?.name}
         totalAnomaliesCount={totalAnomaliesCount}
         highPriorityCount={highPriorityCount}
@@ -280,6 +288,15 @@ export const MissionPage: React.FC = () => {
         onToggleShadowGate={() => setIsShadowGateActive((v) => !v)}
         centerViewMode={centerViewMode}
         onSelectCenterViewMode={setCenterViewMode}
+      />
+
+      {/* ── HAZARD ALERT DRAWER (REAL-TIME NOTIFICATION BELL) ── */}
+      <HazardAlertDrawer
+        targets={processedTargets}
+        isOpen={isAlertDrawerOpen}
+        onClose={() => setIsAlertDrawerOpen(false)}
+        onSelectTarget={handleSelectTarget}
+        onOpenDispatch={(t) => setDispatchTarget(t)}
       />
 
       {/* ── IMPACT TRANSLATION BANNER (Translates ML stats to human impact) ── */}
@@ -348,6 +365,7 @@ export const MissionPage: React.FC = () => {
           isDemoRunning={isDemoRunning}
           heroConfidence={heroConfidence}
           explainabilityStep={explainabilityStep}
+          onOpenDispatch={(t) => setDispatchTarget(t)}
         />
         </div>
       )}
@@ -374,6 +392,15 @@ export const MissionPage: React.FC = () => {
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
       />
+
+      {/* ── ROV / DIVERS REMEDIATION DISPATCH MODAL ── */}
+      {dispatchTarget && (
+        <RovDispatchModal
+          target={dispatchTarget}
+          isOpen={!!dispatchTarget}
+          onClose={() => setDispatchTarget(null)}
+        />
+      )}
 
       {/* ── FULL-SCREEN CINEMATIC STORY DEMO FOR JUDGES ── */}
       {showCinematicDemo && (

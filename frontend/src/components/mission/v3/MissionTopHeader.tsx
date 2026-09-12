@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Square, UploadCloud, FileText, ShieldCheck, Film, Radio, Map, Box } from 'lucide-react';
+import { Play, Square, UploadCloud, FileText, ShieldCheck, Film, Radio, Map, Box, Bell, Download, ShieldAlert } from 'lucide-react';
 
 interface MissionTopHeaderProps {
   isDemoRunning: boolean;
@@ -10,6 +10,9 @@ interface MissionTopHeaderProps {
   onOpenCinematicDemo?: () => void;
   onOpenUpload: () => void;
   onExportReport: () => void;
+  onExportGeoJson?: () => void;
+  onToggleAlertDrawer?: () => void;
+  alertCount?: number;
   activePhaseName?: string;
   totalAnomaliesCount: number;
   highPriorityCount: number;
@@ -29,6 +32,9 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
   onOpenCinematicDemo,
   onOpenUpload,
   onExportReport,
+  onExportGeoJson,
+  onToggleAlertDrawer,
+  alertCount = 4,
   activePhaseName,
   totalAnomaliesCount,
   highPriorityCount,
@@ -105,6 +111,22 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
 
         {/* Right: Streamlined Action Buttons */}
         <div className="flex items-center gap-2">
+          {/* LIVE HAZARD ALERTS BELL BUTTON */}
+          {onToggleAlertDrawer && (
+            <button
+              onClick={onToggleAlertDrawer}
+              className="relative p-2 bg-[#05121F] border border-[#0D2E4A] hover:border-[#EF4444] text-[#EF4444] rounded-md cursor-pointer transition-colors"
+              title="View Critical Hazard Alerts"
+            >
+              <Bell className="w-4 h-4 animate-bounce" />
+              {alertCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#EF4444] text-[9px] font-bold text-white shadow-[0_0_8px_rgba(239,68,68,0.8)]">
+                  {alertCount}
+                </span>
+              )}
+            </button>
+          )}
+
           {/* CINEMATIC STORY DEMO */}
           {onOpenCinematicDemo && (
             <button
@@ -144,6 +166,18 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
             <UploadCloud className="w-3.5 h-3.5 text-[#00D4AA]" />
             <span className="hidden sm:inline">UPLOAD SWATH</span>
           </button>
+
+          {/* GIS GEOJSON EXPORT */}
+          {onExportGeoJson && (
+            <button
+              onClick={onExportGeoJson}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#082830] border border-[#00D4AA]/40 hover:border-[#00D4AA] text-[#00D4AA] text-xs font-semibold cursor-pointer rounded-md transition-colors"
+              title="Export WGS84 GeoJSON for QGIS / ArcGIS"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">GIS GEOJSON</span>
+            </button>
+          )}
 
           {/* EXPORT REPORT */}
           <button

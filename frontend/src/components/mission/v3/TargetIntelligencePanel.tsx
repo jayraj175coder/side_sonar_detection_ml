@@ -28,6 +28,7 @@ interface TargetIntelligencePanelProps {
   isDemoRunning?: boolean;
   heroConfidence?: number;
   explainabilityStep?: number; // 0 to 4 rows visible
+  onOpenDispatch?: (target: MissionV3Target) => void;
 }
 
 export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = ({
@@ -36,6 +37,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
   isDemoRunning = false,
   heroConfidence = 94.7,
   explainabilityStep = 4,
+  onOpenDispatch,
 }) => {
   const { provider, status, openModal } = useGeospatialConfig();
   const [activeGeoTab, setActiveGeoTab] = useState<'map' | '3d'>('map');
@@ -389,12 +391,30 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
             <div className="text-sm font-bold text-[#00D4AA]">{target.shadowLength.toFixed(2)} m RELIEF</div>
           </div>
           <div className="p-2 bg-[#05121F] border border-[#0D2E4A]">
+            <div className="text-[#4A8090] text-[8.5px] uppercase">VOLUMETRIC FOOTPRINT</div>
+            <div className="text-sm font-bold text-[#00D4AA]">{(target.length * target.width * target.shadowLength * 0.5).toFixed(1)} m³</div>
+          </div>
+          <div className="p-2 bg-[#05121F] border border-[#0D2E4A]">
+            <div className="text-[#4A8090] text-[8.5px] uppercase">MICROPLASTIC PREVENTION</div>
+            <div className="text-xs font-bold text-[#38BDF8]">{(target.length * target.width * 14.2).toFixed(0)} kg PLASTIC</div>
+          </div>
+          <div className="p-2 bg-[#05121F] border border-[#0D2E4A]">
             <div className="text-[#4A8090] text-[8.5px] uppercase">WGS84 POSITION</div>
             <div className="text-[9.5px] font-bold text-[#E0F7F4]">
               {target.latitude.toFixed(4)}° N<br />{target.longitude.toFixed(4)}° E
             </div>
           </div>
         </div>
+
+        {onOpenDispatch && (
+          <button
+            onClick={() => onOpenDispatch(target)}
+            className="w-full mt-2 py-2 bg-[#00D4AA] text-[#030B14] font-black text-xs rounded-md cursor-pointer hover:brightness-110 shadow-[0_0_12px_rgba(0,212,170,0.3)] transition-all flex items-center justify-center gap-1.5"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>DISPATCH REMEDIATION ROV UNIT</span>
+          </button>
+        )}
       </div>
 
       {/* ── 4. VISUAL SENSOR GEOTAGGING PIPELINE ── */}

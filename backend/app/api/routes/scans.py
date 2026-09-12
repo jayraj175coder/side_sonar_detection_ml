@@ -9,6 +9,8 @@ from app.schemas.detection import (
 )
 from app.storage.repository import scan_repository
 
+from fastapi.responses import HTMLResponse
+
 router = APIRouter(tags=["Scans & Reports"])
 
 
@@ -111,3 +113,136 @@ def generate_scan_report(scan_id: str) -> ReportResponse:
             and scan.location.longitude is not None,
         },
     )
+
+
+@router.get("/scans/{scan_id}/report/html", response_class=HTMLResponse)
+def get_printable_html_report(scan_id: str):
+    """
+    Generates a publication-ready, printable HTML/PDF intelligence dossier for a scan.
+    Designed for print (Ctrl+P / Save to PDF) and executive presentation.
+    """
+    scan = scan_repository.get(scan_id)
+    if not scan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Scan with ID '{scan_id}' not found.",
+        )
+
+    report_data = generate_scan_report(scan_id)
+
+    detections_rows = ""
+    for idx, d in enumerate(scan.detections, 1):
+        x1, y1, x2, y2 = d.bbox.x1, d.bbox.y1, d.bbox.x2, d.bbox.y2
+        tier = d.confidence_tier or ("HIGH" if d.confidence >= 0.70 else "MEDIUM")
+        detections_rows += f"""
+        <tr>
+            <td><strong>#0{idx}</strong></td>
+            <td><code>{d.type}</code></td>
+            <td><strong style="color: #0d9488;">{d.confidence * 100:.1f}%</strong></td>
+            <td><span class="badge {tier.lower()}">{tier}</span></td>
+            <td>({x1}, {y1}) &rarr; ({x2}, {y2})</td>
+        </tr>
+        """
+
+    if not detections_rows:
+        detections_rows = "<tr><td colspan='5' style='text-align: center; color: #64748b;'>No targets detected above confidence threshold.</td></tr>"
+
+    lat_str = f"{scan.location.latitude:.4f}&deg;N" if scan.location.latitude else "N/A"
+    lon_str = f"{scan.location.longitude:.4f}&deg;E" if scan.location.longitude else "N/A"
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SONARX Intelligence Dossier - {scan.scan_id}</title>
+    <style>
+        body {{ font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 30px; background: #0f172a; color: #f8fafc; line-height: 1.5; }}
+        .card {{ background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); }}
+        .header {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0d9488; padding-bottom: 16px; margin-bottom: 20px; }}
+        .title {{ font-size: 20px; font-weight: 800; color: #2dd4bf; letter-spacing: 1px; }}
+        .subtitle {{ font-size: 11px; color: #94a3b8; text-transform: uppercase; margin-top: 4px; }}
+        .grid {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }}
+        .metric-box {{ background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; font-family: monospace; }}
+        .metric-label {{ font-size: 10px; color: #94a3b8; text-transform: uppercase; }}
+        .metric-val {{ font-size: 18px; font-weight: bold; color: #2dd4bf; margin-top: 4px; }}
+        table {{ width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px; }}
+        th {{ background: #0f172a; text-align: left; padding: 10px; border-bottom: 2px solid #334155; color: #cbd5e1; text-transform: uppercase; font-size: 10px; }}
+        td {{ padding: 10px; border-bottom: 1px solid #334155; }}
+        .badge {{ padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }}
+        .badge.high {{ background: rgba(45,212,191,0.2); color: #2dd4bf; border: 1px solid #2dd4bf; }}
+        .badge.medium {{ background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid #fb923c; }}
+        .footer {{ font-size: 10px; color: #64748b; margin-top: 30px; text-align: center; border-top: 1px solid #334155; padding-top: 16px; }}
+        @media print {{
+            body {{ background: white; color: black; padding: 0; }}
+            .card {{ background: white; border: 1px solid #ccc; color: black; box-shadow: none; }}
+            .metric-box {{ background: #f8fafc; border: 1px solid #ccc; color: black; }}
+            .metric-val {{ color: #0f766e; }}
+            th {{ background: #f1f5f9; color: black; }}
+            td {{ border-bottom: 1px solid #ddd; }}
+        }}
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <div>
+                <div class="title">SONARX // SUBSEA INTELLIGENCE DOSSIER</div>
+                <div class="subtitle">Ministry of Earth Sciences (MoES) · NIOT PS 26057</div>
+            </div>
+            <div style="text-align: right; font-family: monospace; font-size: 11px; color: #94a3b8;">
+                <div>DOSSIER ID: <strong>{scan.scan_id}</strong></div>
+                <div>DATE: {report_data.generated_at}</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="metric-box">
+                <div class="metric-label">Target File</div>
+                <div class="metric-val" style="font-size: 13px; color: #f8fafc;">{scan.filename}</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">Detections Found</div>
+                <div class="metric-val">{scan.total_detections}</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">Peak Confidence</div>
+                <div class="metric-val">{scan.highest_confidence * 100:.1f}%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">Geospatial Fix</div>
+                <div class="metric-val" style="font-size: 12px;">{lat_str}, {lon_str}</div>
+            </div>
+        </div>
+
+        <div style="background: #0f172a; padding: 14px; border-radius: 8px; border-left: 4px solid #2dd4bf; font-size: 12px; margin-bottom: 20px;">
+            <strong style="color: #2dd4bf; text-transform: uppercase; font-size: 10px; display: block; margin-bottom: 4px;">Executive Analyst Summary</strong>
+            {report_data.analyst_summary}
+        </div>
+
+        <div style="font-size: 12px; font-weight: bold; color: #f8fafc; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+            Target Contact Inventory
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Contact ID</th>
+                    <th>Target Class</th>
+                    <th>Confidence</th>
+                    <th>Tier</th>
+                    <th>Bounding Coordinates</th>
+                </tr>
+            </thead>
+            <tbody>
+                {detections_rows}
+            </tbody>
+        </table>
+
+        <div class="footer">
+            {report_data.disclaimer}<br>
+            Powered by SONARX YOLOv8s ONNX Engine · Evaluated on 5,205 Multi-Source Side-Scan Sonar Tiles (74.1% mAP50)
+        </div>
+    </div>
+</body>
+</html>"""
+
+    return HTMLResponse(content=html_content)

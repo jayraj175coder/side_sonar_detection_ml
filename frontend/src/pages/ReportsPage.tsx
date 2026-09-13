@@ -131,7 +131,7 @@ export const ReportsPage: React.FC = () => {
 
   const scanId = activeScan?.scan_id || 'MX-026-DEFAULT';
   const filename = activeScan?.filename || 'mumbai_shelf_swath_0900khz.png';
-  const modelName = activeScan?.model_name || 'YOLOv8s Drishti V2 Model';
+  const modelName = activeScan?.model_name || 'YOLOv8s Marine V2 Model (SIH-MoES)';
   const totalDetections = activeScan ? activeScan.total_detections : detectionList.length;
   const inferenceMs = activeScan ? activeScan.inference_ms : 10.4;
   const createdAt = activeScan?.created_at ? new Date(activeScan.created_at).toLocaleDateString() : '2026-09-12';

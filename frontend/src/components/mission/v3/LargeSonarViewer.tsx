@@ -240,20 +240,26 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           }
 
           // ── C. BOUNDING BOX & HERO LABEL ──
+          const isHighPriority = target.priority === 'HIGH' || target.status === 'CONFIRMED';
+
           if (isFiltered) {
-            // Only show FILTER label if Phase >= 3
-            if (!isDemoRunning || demoPhaseStep >= 3) {
-              ctx.strokeStyle = 'rgba(239, 68, 68, 0.45)';
-              ctx.setLineDash([3, 3]);
-              ctx.strokeRect(cx - objW / 2 - 4, ty - objH / 2 - 4, objW + 8, objH + 8);
-              ctx.setLineDash([]);
+            // Only persistently show subtle dashed box; text label appears ON HOVER / SELECTION ONLY
+            ctx.strokeStyle = (isHovered || isSelected) ? 'rgba(239, 68, 68, 0.9)' : 'rgba(239, 68, 68, 0.25)';
+            ctx.lineWidth = (isHovered || isSelected) ? 1.5 : 0.8;
+            ctx.setLineDash([2, 3]);
+            ctx.strokeRect(cx - objW / 2 - 3, ty - objH / 2 - 3, objW + 6, objH + 6);
+            ctx.setLineDash([]);
+
+            if (isHovered || isSelected) {
+              ctx.fillStyle = '#05121F';
+              ctx.fillRect(cx - 30, ty - objH / 2 - 16, 60, 13);
+              ctx.strokeStyle = '#EF4444';
+              ctx.strokeRect(cx - 30, ty - objH / 2 - 16, 60, 13);
               ctx.fillStyle = '#EF4444';
               ctx.font = 'bold 8px monospace';
-              ctx.fillText(`✕ NOISE`, cx - objW / 2, ty - objH / 2 - 6);
-            } else {
-              ctx.strokeStyle = col;
-              ctx.lineWidth = 1;
-              ctx.strokeRect(cx - objW / 2 - 2, ty - objH / 2 - 2, objW + 4, objH + 4);
+              ctx.textAlign = 'center';
+              ctx.fillText(`✕ NOISE`, cx, ty - objH / 2 - 7);
+              ctx.textAlign = 'left';
             }
           } else if (isSelected) {
             ctx.strokeStyle = '#00D4AA';
@@ -278,7 +284,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             ctx.textAlign = 'center';
             ctx.fillText(target.label.toUpperCase(), cx, labelY + 13);
 
-            ctx.fillStyle = '#7C98A6';
+            ctx.fillStyle = '#94A3B8';
             ctx.font = 'bold 8.5px monospace';
             ctx.fillText(target.id, cx, labelY + 25);
 
@@ -287,9 +293,10 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             ctx.font = '900 10.5px monospace';
             ctx.fillText(`${displayConf}% CONFIDENCE`, cx, labelY + 39);
             ctx.textAlign = 'left';
-          } else {
+          } else if (isHighPriority) {
+            // Persistently label confirmed/high-priority targets
             ctx.strokeStyle = col;
-            ctx.lineWidth = 1;
+            ctx.lineWidth = 1.5;
             ctx.strokeRect(cx - objW / 2 - 2, ty - objH / 2 - 2, objW + 4, objH + 4);
             ctx.fillStyle = '#05121F';
             ctx.fillRect(cx - 20, ty - objH / 2 - 15, 40, 12);
@@ -298,6 +305,21 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             ctx.fillStyle = col;
             ctx.font = 'bold 7.5px monospace';
             ctx.fillText(`${target.id} ${(target.confidence * 100).toFixed(0)}%`, cx - 18, ty - objH / 2 - 6);
+          } else {
+            // Low-confidence non-selected target: box only, label on HOVER ONLY
+            ctx.strokeStyle = isHovered ? col : 'rgba(124, 152, 166, 0.4)';
+            ctx.lineWidth = isHovered ? 1.5 : 0.8;
+            ctx.strokeRect(cx - objW / 2 - 2, ty - objH / 2 - 2, objW + 4, objH + 4);
+
+            if (isHovered) {
+              ctx.fillStyle = '#05121F';
+              ctx.fillRect(cx - 20, ty - objH / 2 - 15, 40, 12);
+              ctx.strokeStyle = col;
+              ctx.strokeRect(cx - 20, ty - objH / 2 - 15, 40, 12);
+              ctx.fillStyle = col;
+              ctx.font = 'bold 7.5px monospace';
+              ctx.fillText(`${target.id} ${(target.confidence * 100).toFixed(0)}%`, cx - 18, ty - objH / 2 - 6);
+            }
           }
 
           ctx.restore();
@@ -335,6 +357,31 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
     animFrameId = requestAnimationFrame(render);
     return () => cancelAnimationFrame(animFrameId);
   }, [targets, selectedTargetId, hoveredTargetId, showTargetsToggle, contrastEnhanced, measureActive, measurePoints, isDemoRunning, demoPhaseStep, heroConfidence]);
+
+  const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !onHoverTarget) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
+    const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
+
+    let nearestId: string | null = null;
+    let minDist = 38;
+
+    targets.forEach((t) => {
+      const tx = (t.rawX / 100) * canvas.width;
+      const ty = (t.rawY / 100) * canvas.height;
+      const d = Math.hypot(tx - x, ty - y);
+      if (d < minDist) {
+        minDist = d;
+        nearestId = t.id;
+      }
+    });
+
+    if (nearestId !== hoveredTargetId) {
+      onHoverTarget(nearestId);
+    }
+  };
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -457,6 +504,8 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             width={960}
             height={540}
             onClick={handleCanvasClick}
+            onMouseMove={handleCanvasMouseMove}
+            onMouseLeave={() => onHoverTarget && onHoverTarget(null)}
             className="w-full h-full object-contain cursor-crosshair shadow-[0_0_50px_rgba(0,0,0,0.8)]"
           />
         </div>

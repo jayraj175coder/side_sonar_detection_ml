@@ -33,14 +33,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     label: string;
     icon: React.ComponentType<any>;
     badge?: string;
+    tooltip?: string;
   }[] = [
     { id: 'overview',  label: 'Overview',         icon: LayoutDashboard },
-    { id: 'scan',      label: 'Upload & Analyze',  icon: UploadCloud, badge: 'ONNX' },
-    { id: 'mission',   label: 'Mission Control',  icon: Crosshair, badge: 'HERO' },
+    { id: 'scan',      label: 'Upload & Analyze', icon: UploadCloud, badge: 'ONNX', tooltip: 'ONNX Runtime: Accelerated CPU/GPU Tensor Inference Engine' },
+    { id: 'mission',   label: 'Mission Control',  icon: Crosshair, badge: 'HERO', tooltip: 'Guided Subsea Survey & Hero Target Identification' },
     { id: 'map',       label: 'Subsea Map',       icon: MapPin },
     { id: 'analytics', label: 'Analytics',        icon: BarChart2 },
     { id: 'reports',   label: 'Reports Dossier',  icon: FileText },
-    { id: 'model',     label: 'Model Intel',      icon: Cpu, badge: 'YOLOv8s' },
+    { id: 'model',     label: 'Model Intel',      icon: Cpu, badge: 'YOLOv8s', tooltip: 'YOLOv8s Vision Backbone & Physical Validation Benchmarks' },
   ];
 
   const handleNavClick = (id: TabType) => {
@@ -70,21 +71,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="h-16 border-b border-[#102436] px-4 flex items-center justify-between shrink-0 bg-[#07111D]/80">
           {!isSidebarCollapsed ? (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+              <div className="w-8 h-8 rounded-lg bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_15px_rgba(0,212,170,0.25)]">
                 <Radio className="w-4 h-4 animate-pulse" />
               </div>
               <div>
                 <div className="text-base font-extrabold text-white tracking-wider flex items-center gap-2">
                   <span>SONARX</span>
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 rounded">
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded">
                     SIH 26057
                   </span>
                 </div>
-                <div className="text-[10px] text-slate-400 font-medium">MoES Subsea Perception</div>
+                <div className="text-[10px] text-[#94A3B8] font-medium">MoES Subsea Perception</div>
               </div>
             </div>
           ) : (
-            <div className="mx-auto w-9 h-9 rounded-lg bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.25)]">
+            <div className="mx-auto w-9 h-9 rounded-lg bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_15px_rgba(0,212,170,0.25)]">
               <Radio className="w-5 h-5 animate-pulse" />
             </div>
           )}
@@ -94,7 +95,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="flex-1 overflow-y-auto px-3 py-5 space-y-6">
           <div>
             {!isSidebarCollapsed && (
-              <p className="px-3 text-[10px] font-bold text-cyan-400/80 uppercase tracking-widest mb-3">
+              <p className="px-3 text-[10px] font-bold text-[#00D4AA] uppercase tracking-widest mb-3">
                 PERCEPTION NAVIGATION
               </p>
             )}
@@ -106,21 +107,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
-                    title={isSidebarCollapsed ? item.label : undefined}
-                    className={`w-full relative flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer group ${
+                    title={item.tooltip || item.label}
+                    className={`w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer group ${
                       isActive
-                        ? 'bg-gradient-to-r from-cyan-500/20 via-teal-500/10 to-transparent border border-cyan-500/40 text-white font-bold shadow-[0_0_20px_rgba(6,182,212,0.15)]'
-                        : 'text-slate-400 hover:text-slate-100 hover:bg-[#0A1926]'
+                        ? 'bg-[#082830] border border-[#00D4AA]/40 text-white font-bold shadow-[0_0_20px_rgba(0,212,170,0.15)]'
+                        : 'text-[#94A3B8] hover:text-white hover:bg-[#0A1926]'
                     } ${isSidebarCollapsed ? 'justify-center px-0' : ''}`}
                   >
                     {/* Active Left Indicator Bar */}
                     {isActive && (
-                      <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-cyan-400 rounded-r shadow-[0_0_10px_#06b6d4]" />
+                      <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#00D4AA] rounded-r shadow-[0_0_10px_#00D4AA]" />
                     )}
 
                     <Icon
-                      className={`w-5 h-5 shrink-0 transition-transform group-hover:scale-110 ${
-                        isActive ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]' : 'text-slate-400 group-hover:text-slate-200'
+                      className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
+                        isActive ? 'text-[#00D4AA] drop-shadow-[0_0_8px_rgba(0,212,170,0.6)]' : 'text-[#94A3B8] group-hover:text-slate-200'
                       }`}
                     />
                     {!isSidebarCollapsed && (
@@ -128,10 +129,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     )}
                     {!isSidebarCollapsed && item.badge && (
                       <span
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded-md font-bold uppercase tracking-wider ${
+                        title={item.tooltip}
+                        className={`text-[9.5px] font-mono px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
                           isActive
-                            ? 'bg-cyan-400 text-slate-950 shadow-sm'
-                            : 'bg-slate-900 border border-slate-800 text-slate-400'
+                            ? 'bg-[#00D4AA] text-[#030B14] shadow-sm'
+                            : 'bg-[#082830] border border-[#0D2E4A] text-[#94A3B8] group-hover:border-[#00D4AA]/40 group-hover:text-[#00D4AA]'
                         }`}
                       >
                         {item.badge}

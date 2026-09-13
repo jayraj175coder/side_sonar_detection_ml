@@ -1,8 +1,58 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
-import type { MissionStatus, PlaybackSpeed, MissionTarget } from '../types';
+import type { MissionStatus, PlaybackSpeed, MissionTarget, TabType } from '../types';
 import { MISSION_TARGETS, getTargetById } from '../data/targets';
 import { MISSION_DURATION_SECONDS, MISSION_DATA } from '../data/mission';
 import { sonarAudio } from '../utils/sonarAudio';
+import { useApp } from './AppContext';
+
+export interface GuidedDemoStep {
+  step: 1 | 2 | 3 | 4;
+  pageTab: TabType;
+  stepCode: 'UPLOAD' | 'DETECT' | 'VERIFY' | 'REPORT';
+  title: string;
+  badge: string;
+  caption: string;
+  durationMs: number;
+}
+
+export const GUIDED_DEMO_STEPS: GuidedDemoStep[] = [
+  {
+    step: 1,
+    pageTab: 'scan',
+    stepCode: 'UPLOAD',
+    title: 'RAW SONAR STREAM INGESTION',
+    badge: '1. INGESTION (SCAN)',
+    caption: 'Dual-frequency 900 kHz side-scan sonar acoustic stream loaded · 75m Swath · Preparing AI inference',
+    durationMs: 4500,
+  },
+  {
+    step: 2,
+    pageTab: 'mission',
+    stepCode: 'DETECT',
+    title: 'AI PERCEPTION & NOISE SUPPRESSION',
+    badge: '2. DETECTION (AI)',
+    caption: 'Deep ONNX perception proposed 37 candidates · 20 natural rocks and shadow artifacts filtered',
+    durationMs: 4800,
+  },
+  {
+    step: 3,
+    pageTab: 'mission',
+    stepCode: 'VERIFY',
+    title: 'HERO TARGET VERIFICATION & EVIDENCE',
+    badge: '3. VERIFICATION (EVIDENCE)',
+    caption: 'Target #07 locked: Ghost Net (ALDFG) at 94.7% confidence · Acoustic shadow 2.31m · Geotagged',
+    durationMs: 5000,
+  },
+  {
+    step: 4,
+    pageTab: 'reports',
+    stepCode: 'REPORT',
+    title: 'MISSION ANOMALY DOSSIER & EXPORT',
+    badge: '4. DOSSIER (REPORTS)',
+    caption: 'Mission MX-026 verified · 12.84 km² surveyed · MoES Marine Debris Compliance Dossier ready for export',
+    durationMs: 6500,
+  },
+];
 
 export interface DemoLogEntry {
   timestamp: string;
@@ -126,6 +176,13 @@ interface MissionContextType {
   manualPrevStage: () => void;
   setStageDirectly: (stageIndex: number) => void;
 
+  // 4-Step Cross-Page Guided Demo Flow
+  guidedStepIndex: number;
+  guidedStepInfo: GuidedDemoStep;
+  nextGuidedStep: () => void;
+  prevGuidedStep: () => void;
+  goToGuidedStep: (stepIndex: number) => void;
+
   // Demo Walkthrough state
   isDemoRunning: boolean;
   demoStage: number;
@@ -162,6 +219,8 @@ interface MissionContextType {
 const MissionContext = createContext<MissionContextType | undefined>(undefined);
 
 export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { setActiveTab } = useApp();
+
   // Default selected target is the Hero: SX-T07 (Ghost Net 94.7%)
   const [selectedTargetId, setSelectedTargetIdState] = useState<string | null>('SX-T07');
   const [missionStatus, setMissionStatus] = useState<MissionStatus>('nominal');
@@ -180,6 +239,7 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Demo walkthrough state
   const [isDemoRunning, setIsDemoRunning] = useState<boolean>(false);
+  const [guidedStepIndex, setGuidedStepIndex] = useState<number>(0);
   const [demoStage, setDemoStage] = useState<number>(0);
   const [demoLog, setDemoLog] = useState<DemoLogEntry[]>([]);
   const demoTimerRef = useRef<any>(null);
@@ -212,6 +272,7 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const demoStageInfo = GUIDED_DEMO_STAGES[demoStage] || GUIDED_DEMO_STAGES[0];
+  const guidedStepInfo = GUIDED_DEMO_STEPS[guidedStepIndex] || GUIDED_DEMO_STEPS[0];
 
   // Helper to add to demo log
   const addLog = useCallback((stage: string, message: string, type: DemoLogEntry['type'] = 'info') => {
@@ -258,49 +319,104 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [addLog]);
 
-  // Step next / prev
-  const manualNextStage = useCallback(() => {
-    if (demoStage < GUIDED_DEMO_STAGES.length - 1) {
-      setStageDirectly(demoStage + 1);
+  // Go to 4-step guided demo step across pages
+  const goToGuidedStep = useCallback((stepIndex: number) => {
+    const clamped = Math.max(0, Math.min(stepIndex, GUIDED_DEMO_STEPS.length - 1));
+    setGuidedStepIndex(clamped);
+    const step = GUIDED_DEMO_STEPS[clamped];
+    setActiveTab(step.pageTab);
+
+    if (clamped === 0) {
+      setDemoStage(0);
+      setPlaybackTime(100);
+      setMissionStatus('deploying');
+      sonarAudio.playSonarPing();
+      addLog('INGEST', 'Dual-frequency 900 kHz side-scan sonar stream loaded (75m swath)', 'info');
+    } else if (clamped === 1) {
+      setDemoStage(2);
+      setPlaybackTime(500);
+      setMissionStatus('surveying');
+      sonarAudio.playSonarPing();
+      addLog('DETECT', 'YOLOv8 ONNX candidate detection active · 20 rock formations filtered', 'filter');
+    } else if (clamped === 2) {
+      setDemoStage(5);
+      setSelectedTargetIdState('SX-T07');
+      setPlaybackTime(620);
+      setMissionStatus('surveying');
+      sonarAudio.playTargetBeep();
+      addLog('VERIFY', 'Target #07 (Ghost Net ALDFG) locked with 94.7% confidence', 'contact');
+    } else if (clamped === 3) {
+      setDemoStage(7);
+      setMissionStatus('complete');
+      sonarAudio.playLockBeep();
+      addLog('REPORT', 'Mission MX-026 verified · MoES Marine Debris Dossier compiled & export ready', 'complete');
     }
-  }, [demoStage, setStageDirectly]);
+  }, [addLog, setActiveTab]);
+
+  const resetGuidedDemo = useCallback(() => {
+    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
+    setIsDemoRunning(false);
+    setGuidedStepIndex(0);
+    setDemoStage(0);
+    setSelectedTargetIdState('SX-T07');
+    setPlaybackTime(620);
+    setMissionStatus('nominal');
+    setDemoLog([]);
+  }, []);
+
+  const nextGuidedStep = useCallback(() => {
+    if (guidedStepIndex < GUIDED_DEMO_STEPS.length - 1) {
+      goToGuidedStep(guidedStepIndex + 1);
+    } else {
+      resetGuidedDemo();
+    }
+  }, [guidedStepIndex, goToGuidedStep, resetGuidedDemo]);
+
+  const prevGuidedStep = useCallback(() => {
+    if (guidedStepIndex > 0) {
+      goToGuidedStep(guidedStepIndex - 1);
+    }
+  }, [guidedStepIndex, goToGuidedStep]);
+
+  // Step next / prev for legacy
+  const manualNextStage = useCallback(() => {
+    nextGuidedStep();
+  }, [nextGuidedStep]);
 
   const manualPrevStage = useCallback(() => {
-    if (demoStage > 0) {
-      setStageDirectly(demoStage - 1);
-    }
-  }, [demoStage, setStageDirectly]);
+    prevGuidedStep();
+  }, [prevGuidedStep]);
 
-  // Automatic Step Transition Timer
+  // Automatic Step Transition Timer across 4 macro steps
   useEffect(() => {
     if (!isDemoRunning) {
       if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
       return;
     }
 
-    const currentInfo = GUIDED_DEMO_STAGES[demoStage];
-    if (!currentInfo) return;
+    const currentStep = GUIDED_DEMO_STEPS[guidedStepIndex];
+    if (!currentStep) return;
 
     demoTimerRef.current = setTimeout(() => {
-      if (demoStage < GUIDED_DEMO_STAGES.length - 1) {
-        setStageDirectly(demoStage + 1);
+      if (guidedStepIndex < GUIDED_DEMO_STEPS.length - 1) {
+        goToGuidedStep(guidedStepIndex + 1);
       } else {
         setIsDemoRunning(false);
       }
-    }, currentInfo.durationMs);
+    }, currentStep.durationMs);
 
     return () => {
       if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
     };
-  }, [isDemoRunning, demoStage, setStageDirectly]);
+  }, [isDemoRunning, guidedStepIndex, goToGuidedStep]);
 
   // Demo Control Handlers
   const startGuidedDemo = useCallback(() => {
     sonarAudio.playSonarPing();
     setDemoLog([]);
     setIsDemoRunning(true);
-    setStageDirectly(0);
-  }, [setStageDirectly]);
+    goToGuidedStep(0);
+  }, [goToGuidedStep]);
 
   const pauseGuidedDemo = useCallback(() => {
     setIsDemoRunning(false);
@@ -309,16 +425,6 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const resumeGuidedDemo = useCallback(() => {
     setIsDemoRunning(true);
-  }, []);
-
-  const resetGuidedDemo = useCallback(() => {
-    if (demoTimerRef.current) clearTimeout(demoTimerRef.current);
-    setIsDemoRunning(false);
-    setDemoStage(0);
-    setSelectedTargetIdState('SX-T07');
-    setPlaybackTime(620);
-    setMissionStatus('nominal');
-    setDemoLog([]);
   }, []);
 
   const addCustomTarget = useCallback((targetData: Partial<MissionTarget>) => {
@@ -395,6 +501,11 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         manualPrevStage,
         setStageDirectly,
         isDemoRunning,
+        guidedStepIndex,
+        guidedStepInfo,
+        nextGuidedStep,
+        prevGuidedStep,
+        goToGuidedStep,
         demoStage,
         demoStageInfo,
         demoLog,

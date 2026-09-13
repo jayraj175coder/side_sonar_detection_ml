@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Radio,
-  RefreshCw,
-  Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Menu,
+  Play,
   Volume2,
   VolumeX,
-  Play,
-  Pause,
-  RotateCcw,
   UploadCloud,
   FileText,
-  Crosshair,
+  MoreVertical,
+  Cpu,
+  Download,
+  ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useMission } from '../../context/MissionContext';
@@ -24,124 +24,174 @@ interface HeaderProps {
   onToggleMobileMenu?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
-  onToggleMobileMenu,
-}) => {
+export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   const {
     activeTab,
     setActiveTab,
     isSidebarCollapsed,
     toggleSidebar,
+    isBackendConnected,
   } = useApp();
 
-  const {
-    isDemoRunning,
-    startGuidedDemo,
-    pauseGuidedDemo,
-    resumeGuidedDemo,
-    resetGuidedDemo,
-    demoStageInfo,
-  } = useMission();
+  const { isDemoRunning, startGuidedDemo } = useMission();
 
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(sonarAudio.isMuted);
+  const [isOverflowOpen, setIsOverflowOpen] = useState<boolean>(false);
+  const overflowRef = useRef<HTMLDivElement>(null);
 
   const handleToggleAudio = () => {
     const muted = sonarAudio.toggleMute();
     setIsAudioMuted(muted);
   };
 
+  // Close overflow menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (overflowRef.current && !overflowRef.current.contains(event.target as Node)) {
+        setIsOverflowOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <header className="h-16 bg-[#050B14] border-b border-[#102436] px-4 md:px-6 flex items-center justify-between sticky top-0 z-30 font-sans select-none shadow-md">
-      {/* 1. Left: Brand + Mission MX-026 + Identity Tag */}
+    <header className="h-12 bg-[#050B14]/90 backdrop-blur-md border-b border-[#102436] px-4 flex items-center justify-between sticky top-0 z-30 font-sans select-none shadow-md transition-all">
+      {/* 1. Left: Sidebar Toggle + Logo + Current Survey ID + Live Dot */}
       <div className="flex items-center gap-3">
-        {/* Desktop Sidebar Toggle Button */}
         <button
           onClick={toggleSidebar}
-          className="hidden md:flex p-1.5 bg-[#0A1E30] border border-[#0D2E4A] text-[#4A8090] hover:text-[#00D4AA] hover:border-[#00D4AA]/40 transition-all cursor-pointer"
+          className="hidden md:flex p-1 bg-[#0A1E30] border border-[#0D2E4A] text-[#94A3B8] hover:text-[#00D4AA] hover:border-[#00D4AA]/40 rounded transition-all cursor-pointer"
           title={isSidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
         >
           {isSidebarCollapsed ? (
-            <PanelLeftOpen className="w-4 h-4 text-[#00D4AA]" />
+            <PanelLeftOpen className="w-3.5 h-3.5 text-[#00D4AA]" />
           ) : (
-            <PanelLeftClose className="w-4 h-4" />
+            <PanelLeftClose className="w-3.5 h-3.5" />
           )}
         </button>
 
         {onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}
-            className="md:hidden p-1.5 bg-[#0A1E30] border border-[#0D2E4A] text-[#E0F7F4] hover:text-[#00D4AA] cursor-pointer"
+            className="md:hidden p-1 bg-[#0A1E30] border border-[#0D2E4A] text-[#E0F7F4] hover:text-[#00D4AA] rounded cursor-pointer"
             title="Open Menu"
           >
             <Menu className="w-4 h-4" />
           </button>
         )}
 
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shrink-0">
-            <Radio className="w-4 h-4 animate-pulse" />
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-[#082830] border border-[#00D4AA]/40 rounded flex items-center justify-center text-[#00D4AA] shrink-0">
+            <Radio className="w-3.5 h-3.5 animate-pulse" />
           </div>
 
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-black text-[#00D4AA] tracking-[0.2em] uppercase">
-                SONARX
-              </span>
-              <span className="hidden sm:inline-flex text-[8.5px] font-bold px-1.5 py-0.2 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40">
-                MoES // GOVT. OF INDIA PIPELINE
-              </span>
-              <span className="text-[9px] text-[#4A8090] hidden md:inline">
-                · NIOT/INCOIS Survey Track: <strong className="text-[#E0F7F4]">MX-026 (EEZ)</strong>
-              </span>
-            </div>
+          <span className="text-sm font-black text-[#00D4AA] tracking-[0.15em] uppercase">
+            SONARX
+          </span>
+
+          {/* Survey ID Pill */}
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 tracking-wide">
+            MX-026
+          </span>
+
+          {/* Live Status Dot */}
+          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-[#05121F] border border-[#0D2E4A] rounded text-[9px] font-bold text-[#00D4AA]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] animate-ping" />
+            <span className="text-[#94A3B8] uppercase">{isBackendConnected ? 'ONLINE' : 'ACTIVE'}</span>
           </div>
         </div>
       </div>
 
-      {/* 2. Center/Right: Prominent Actions */}
-      <div className="flex items-center gap-2 text-xs">
-        {/* START LIVE DEMO BUTTON */}
+      {/* 2. Right: Single Primary CTA + Kebab Overflow Menu */}
+      <div className="flex items-center gap-2">
+        {/* PRIMARY CTA BUTTON: START LIVE DEMO */}
         <button
           onClick={() => {
             setActiveTab('mission');
             startGuidedDemo();
           }}
-          className="panel-btn flex items-center gap-1.5 bg-[#00D4AA] text-[#030B14] border-[#00D4AA] font-black hover:brightness-110 shadow-[0_0_15px_rgba(0,212,170,0.3)]"
-          title="Start 8-scene guided cinematic live demo sequence"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00D4AA] hover:bg-[#00c098] text-[#030B14] font-black text-xs rounded-md shadow-[0_0_12px_rgba(0,212,170,0.3)] transition-all cursor-pointer active:scale-95"
+          title="Start interactive guided survey demo"
         >
           <Play className="w-3 h-3 fill-current" />
           <span>START LIVE DEMO</span>
         </button>
 
-        {/* UPLOAD & ANALYZE */}
-        <button
-          onClick={() => setActiveTab('scan')}
-          className={`panel-btn flex items-center gap-1.5 ${
-            activeTab === 'scan'
-              ? 'bg-[#082830] text-[#00D4AA] border-[#00D4AA]'
-              : 'hover:text-[#E0F7F4]'
-          }`}
-          title="Upload side-scan sonar image (.png, .jpg, .xtf) for real-time inference"
-        >
-          <UploadCloud className="w-3.5 h-3.5" />
-          <span>UPLOAD & ANALYZE</span>
-        </button>
+        {/* KEBAB OVERFLOW MENU (...) */}
+        <div className="relative" ref={overflowRef}>
+          <button
+            onClick={() => setIsOverflowOpen(!isOverflowOpen)}
+            className={`p-1.5 rounded-md border transition-all cursor-pointer ${
+              isOverflowOpen
+                ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA]'
+                : 'bg-[#0A1E30] border-[#0D2E4A] text-[#94A3B8] hover:text-[#E0F7F4] hover:border-[#00D4AA]/40'
+            }`}
+            title="Secondary Actions & Settings"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
 
-        {/* Audio Ping Sound Toggle */}
-        <button
-          onClick={handleToggleAudio}
-          className={`panel-btn p-1.5 ${
-            !isAudioMuted ? 'text-[#00D4AA] border-[#00D4AA]/50' : 'text-[#4A8090]'
-          }`}
-          title="Toggle Sonar Audio Feedback"
-        >
-          {!isAudioMuted ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-        </button>
+          {/* Dropdown Menu Panel */}
+          {isOverflowOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-[#05121F] border border-[#0D2E4A] rounded-xl shadow-2xl py-1.5 text-xs text-[#E0F7F4] z-50 divide-y divide-[#0D2E4A]">
+              <div className="py-1">
+                <button
+                  onClick={() => {
+                    setActiveTab('scan');
+                    setIsOverflowOpen(false);
+                  }}
+                  className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                >
+                  <UploadCloud className="w-3.5 h-3.5 text-[#00D4AA]" />
+                  <span>Upload & Analyze Swath</span>
+                </button>
 
-        {/* System Online Status */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2 py-1 bg-[#0A1E30] border border-[#0D2E4A] text-[9px] font-bold text-[#00D4AA]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] animate-pulse" />
-          <span>NODE 04 ONLINE</span>
+                <button
+                  onClick={() => {
+                    setActiveTab('reports');
+                    setIsOverflowOpen(false);
+                  }}
+                  className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  <span>Export Reports Dossier</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setActiveTab('model');
+                    setIsOverflowOpen(false);
+                  }}
+                  className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                >
+                  <Cpu className="w-3.5 h-3.5 text-[#F59E0B]" />
+                  <span>Model Intel (YOLOv8s)</span>
+                </button>
+              </div>
+
+              <div className="py-1">
+                <button
+                  onClick={() => {
+                    handleToggleAudio();
+                  }}
+                  className="w-full px-3.5 py-2 flex items-center justify-between hover:bg-[#082830] transition-colors text-left cursor-pointer"
+                >
+                  <div className="flex items-center gap-2.5">
+                    {!isAudioMuted ? (
+                      <Volume2 className="w-3.5 h-3.5 text-[#00D4AA]" />
+                    ) : (
+                      <VolumeX className="w-3.5 h-3.5 text-[#94A3B8]" />
+                    )}
+                    <span>Sonar Audio Feedback</span>
+                  </div>
+                  <span className={`text-[10px] font-mono font-bold ${!isAudioMuted ? 'text-[#00D4AA]' : 'text-[#94A3B8]'}`}>
+                    {!isAudioMuted ? 'ON' : 'MUTED'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

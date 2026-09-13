@@ -618,7 +618,7 @@ export const OverviewPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="text-center font-mono text-xs text-[#4A8090] -mt-6">
+      <div className="text-center font-mono text-xs text-[#94A3B8] -mt-6">
         Team DEAD BRAINCELLS — Smart India Hackathon 2026
       </div>
     </div>

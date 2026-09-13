@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   FileText,
   Printer,
@@ -13,53 +13,121 @@ import {
   Check,
   ShieldCheck,
   Zap,
+  ArrowUpDown,
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { MISSION_TARGETS } from '../data/targets';
+
+type SortField = 'id' | 'class' | 'confidence' | 'depth' | 'risk';
+type SortOrder = 'asc' | 'desc';
 
 export const ReportsPage: React.FC = () => {
   const { currentScan, scans, isBackendConnected } = useApp();
   const [downloadJsonSuccess, setDownloadJsonSuccess] = useState<boolean>(false);
   const [downloadCsvSuccess, setDownloadCsvSuccess] = useState<boolean>(false);
 
+  // Sorting, Filtering & Pagination State
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [sortField, setSortField] = useState<SortField>('confidence');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 10;
+
+  const CATEGORIES = ['ALL', 'DEBRIS', 'GHOST NET', 'FISHING GEAR', 'ANOMALY', 'PIPELINE'];
+
   // Active scan resolution: use currentScan if available, or first item from scans list, or fallback
   const activeScan = currentScan || (scans && scans.length > 0 ? scans[0] : null);
 
   // Format detection list dynamically from activeScan or fallback to MISSION_TARGETS
-  const detectionList = activeScan?.detections && activeScan.detections.length > 0
-    ? activeScan.detections.map((d, i) => {
-        const xLen = Math.abs(d.bbox.x2 - d.bbox.x1) / 10;
-        const yLen = Math.abs(d.bbox.y2 - d.bbox.y1) / 10;
-        const lat = activeScan.location?.latitude || (18.9217 + i * 0.005);
-        const lon = activeScan.location?.longitude || (72.8214 + i * 0.005);
-        return {
-          id: d.id || `DET-${String(i + 1).padStart(2, '0')}`,
-          class: d.type === 'ghost_net_aldfg' ? 'Ghost Net (ALDFG)' :
-                 d.type === 'anthropogenic_debris' ? 'Anthropogenic Debris' :
-                 d.type === 'pipeline_hazard' ? 'Pipeline Hazard' :
-                 d.type === 'seafloor_anomaly' ? 'Seafloor Anomaly' : d.type,
-          confidence: d.confidence,
-          lat,
-          lon,
-          depth: 35.5 + i * 2.1,
-          length: xLen > 0 ? xLen.toFixed(1) : '2.4',
-          width: yLen > 0 ? yLen.toFixed(1) : '1.2',
-          shadowLength: (Math.max(xLen, yLen) * 0.8).toFixed(1),
-          risk: d.confidence >= 0.85 ? 'CRITICAL' : d.confidence >= 0.70 ? 'HIGH' : 'MEDIUM',
-        };
-      })
-    : MISSION_TARGETS.map((t) => ({
-        id: t.id,
-        class: t.class,
-        confidence: t.confidence,
-        lat: t.lat,
-        lon: t.lon,
-        depth: t.depth,
-        length: String(t.length),
-        width: String(t.width),
-        shadowLength: String(t.shadowLength),
-        risk: t.risk,
-      }));
+  const detectionList = useMemo(() => {
+    return activeScan?.detections && activeScan.detections.length > 0
+      ? activeScan.detections.map((d, i) => {
+          const xLen = Math.abs(d.bbox.x2 - d.bbox.x1) / 10;
+          const yLen = Math.abs(d.bbox.y2 - d.bbox.y1) / 10;
+          const lat = activeScan.location?.latitude || (18.9217 + i * 0.005);
+          const lon = activeScan.location?.longitude || (72.8214 + i * 0.005);
+          return {
+            id: d.id || `DET-${String(i + 1).padStart(2, '0')}`,
+            class: d.type === 'ghost_net_aldfg' ? 'Ghost Net (ALDFG)' :
+                   d.type === 'anthropogenic_debris' ? 'Anthropogenic Debris' :
+                   d.type === 'pipeline_hazard' ? 'Pipeline Hazard' :
+                   d.type === 'seafloor_anomaly' ? 'Seafloor Anomaly' : d.type,
+            confidence: d.confidence,
+            lat,
+            lon,
+            depth: 35.5 + i * 2.1,
+            length: xLen > 0 ? xLen.toFixed(1) : '2.4',
+            width: yLen > 0 ? yLen.toFixed(1) : '1.2',
+            shadowLength: (Math.max(xLen, yLen) * 0.8).toFixed(1),
+            risk: d.confidence >= 0.85 ? 'CRITICAL' : d.confidence >= 0.70 ? 'HIGH' : 'MEDIUM',
+          };
+        })
+      : MISSION_TARGETS.map((t) => ({
+          id: t.id,
+          class: t.class,
+          confidence: t.confidence,
+          lat: t.lat,
+          lon: t.lon,
+          depth: t.depth,
+          length: String(t.length),
+          width: String(t.width),
+          shadowLength: String(t.shadowLength),
+          risk: t.risk,
+        }));
+  }, [activeScan]);
+
+  // Filter and Sort Target Register
+  const filteredAndSortedList = useMemo(() => {
+    let result = [...detectionList];
+
+    // Filter by Category
+    if (selectedCategory !== 'ALL') {
+      result = result.filter((t) => {
+        const cls = t.class.toUpperCase();
+        if (selectedCategory === 'GHOST NET') return cls.includes('NET') || cls.includes('ALDFG');
+        if (selectedCategory === 'DEBRIS') return cls.includes('DEBRIS');
+        if (selectedCategory === 'FISHING GEAR') return cls.includes('GEAR') || cls.includes('TRAWL');
+        if (selectedCategory === 'PIPELINE') return cls.includes('PIPE') || cls.includes('CABLE');
+        if (selectedCategory === 'ANOMALY') return cls.includes('ANOMALY') || cls.includes('WRECK') || cls.includes('MILCO');
+        return true;
+      });
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      let valA: any = a[sortField];
+      let valB: any = b[sortField];
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return result;
+  }, [detectionList, selectedCategory, sortField, sortOrder]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredAndSortedList.length / pageSize));
+  const paginatedList = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredAndSortedList.slice(start, start + pageSize);
+  }, [filteredAndSortedList, currentPage, pageSize]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
+    }
+    setCurrentPage(1);
+  };
 
   const scanId = activeScan?.scan_id || 'MX-026-DEFAULT';
   const filename = activeScan?.filename || 'mumbai_shelf_swath_0900khz.png';
@@ -120,78 +188,80 @@ export const ReportsPage: React.FC = () => {
     downloadAnchor.remove();
 
     setDownloadJsonSuccess(true);
-    setTimeout(() => setDownloadJsonSuccess(false), 2500);
+    setTimeout(() => setDownloadJsonSuccess(false), 3000);
   };
 
   const handleDownloadCsv = () => {
-    const headers = ['Target_ID', 'Class', 'Confidence', 'Latitude', 'Longitude', 'Depth_M', 'Size', 'Priority_Risk'];
+    const headers = ['ID', 'CLASS', 'CONFIDENCE', 'LATITUDE', 'LONGITUDE', 'DEPTH_M', 'LENGTH_M', 'WIDTH_M', 'SHADOW_M', 'RISK'];
     const rows = detectionList.map((t) => [
       t.id,
-      `"${t.class}"`,
+      t.class,
       (t.confidence * 100).toFixed(1) + '%',
-      t.lat.toFixed(4),
-      t.lon.toFixed(4),
-      t.depth,
-      `"${t.length}m x ${t.width}m"`,
+      typeof t.lat === 'number' ? t.lat.toFixed(4) : t.lat,
+      typeof t.lon === 'number' ? t.lon.toFixed(4) : t.lon,
+      typeof t.depth === 'number' ? t.depth.toFixed(1) : t.depth,
+      t.length,
+      t.width,
+      t.shadowLength,
       t.risk,
-    ].join(','));
+    ]);
 
-    const csvContent = `${headers.join(',')}\n${rows.join('\n')}`;
-    const dataStr = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `SONARX_TargetRegister_${scanId}.csv`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `SONARX_TargetRegister_${scanId}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
 
     setDownloadCsvSuccess(true);
-    setTimeout(() => setDownloadCsvSuccess(false), 2500);
+    setTimeout(() => setDownloadCsvSuccess(false), 3000);
   };
 
   return (
-    <div className="space-y-6 font-sans select-none text-xs text-slate-200">
-      {/* 1. Dynamic Action Toolbar */}
-      <div className="print:hidden p-4 bg-[#050B14] border border-[#102436] rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-xl">
+    <div className="space-y-6 font-sans select-none text-xs text-[#E0F7F4]">
+      {/* 1. Header Toolbar */}
+      <div className="p-4 bg-[#05121F] border border-[#0D2E4A] rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
-            <FileText className="w-4 h-4" />
+          <div className="w-10 h-10 rounded-lg bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_15px_rgba(0,212,170,0.25)]">
+            <FileText className="w-5 h-5" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-extrabold text-white uppercase tracking-wide">
-                DOSSIER: {scanId}
-              </span>
-              <span className="text-[9px] font-mono px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-500/40 rounded font-bold">
-                {activeScan ? 'DYNAMIC ACTIVE SCAN' : 'REPOS DRAFT'}
-              </span>
-            </div>
-            <p className="text-xs text-slate-400">File: {filename}</p>
+            <h1 className="text-base font-black text-[#E0F7F4] uppercase tracking-wider">
+              REPORTS & ANOMALY DOSSIER
+            </h1>
+            <p className="text-[10px] text-[#94A3B8]">
+              Ministry of Earth Sciences (MoES) Formal Survey Compliance Report · Scan {scanId}
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 flex-wrap text-xs">
           <button
-            onClick={handleDownloadCsv}
-            className="px-3.5 py-2 bg-[#091522] border border-[#102436] hover:border-cyan-500/40 text-xs font-bold text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer rounded-xl"
+            onClick={handleDownloadJson}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A1E30] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#E0F7F4] hover:text-[#00D4AA] transition-colors cursor-pointer"
+            title="Download target register as structured JSON"
           >
-            {downloadCsvSuccess ? <Check className="w-4 h-4 text-emerald-400" /> : <FileSpreadsheet className="w-4 h-4 text-cyan-400" />}
-            <span>EXPORT CSV</span>
+            {downloadJsonSuccess ? <Check className="w-3.5 h-3.5 text-[#00D4AA]" /> : <Download className="w-3.5 h-3.5" />}
+            <span>JSON</span>
           </button>
 
           <button
-            onClick={handleDownloadJson}
-            className="px-3.5 py-2 bg-[#091522] border border-[#102436] hover:border-cyan-500/40 text-xs font-bold text-slate-200 flex items-center gap-1.5 transition-all cursor-pointer rounded-xl"
+            onClick={handleDownloadCsv}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A1E30] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#E0F7F4] hover:text-[#00D4AA] transition-colors cursor-pointer"
+            title="Download target register as CSV spreadsheet"
           >
-            {downloadJsonSuccess ? <Check className="w-4 h-4 text-emerald-400" /> : <Download className="w-4 h-4 text-cyan-400" />}
-            <span>EXPORT JSON</span>
+            {downloadCsvSuccess ? <Check className="w-3.5 h-3.5 text-[#00D4AA]" /> : <FileSpreadsheet className="w-3.5 h-3.5" />}
+            <span>CSV</span>
           </button>
 
           <button
             onClick={handlePrint}
-            className="px-4 py-2 bg-cyan-400 text-slate-950 font-extrabold text-xs flex items-center gap-1.5 transition-all hover:brightness-110 active:scale-95 cursor-pointer rounded-xl shadow-md"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#00D4AA] text-[#030B14] font-black hover:bg-[#00c098] transition-all cursor-pointer shadow-[0_0_12px_rgba(0,212,170,0.3)] active:scale-95"
           >
-            <Printer className="w-4 h-4" />
+            <Printer className="w-3.5 h-3.5" />
             <span>PRINT / PDF DOSSIER</span>
           </button>
         </div>
@@ -203,149 +273,250 @@ export const ReportsPage: React.FC = () => {
         <div className="border-b border-[#102436] pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="text-xl font-extrabold text-white tracking-wider uppercase print:text-black">
-                SONAR<span className="text-cyan-400">X</span>
+              <span className="text-xl font-black text-white tracking-wider uppercase print:text-black">
+                SONAR<span className="text-[#00D4AA]">X</span>
               </span>
-              <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-cyan-950 text-cyan-300 font-bold border border-cyan-500/40 print:border-black print:text-black">
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[#082830] text-[#00D4AA] font-bold border border-[#00D4AA]/40 print:border-black print:text-black">
                 MoES SIH 26057 SPEC
               </span>
             </div>
-            <h2 className="text-base font-extrabold text-cyan-400 uppercase print:text-black">
+            <h2 className="text-base font-black text-[#00D4AA] uppercase print:text-black">
               SUBSEA MARINE DEBRIS ANOMALY DOSSIER
             </h2>
-            <p className="text-xs text-slate-400 print:text-gray-600">
+            <p className="text-xs text-[#94A3B8] print:text-gray-600">
               Ministry of Earth Sciences · WGS84 Automated Perception Report
             </p>
           </div>
 
           {/* Mission & Sensor Specifications */}
-          <div className="text-right text-xs font-mono space-y-1 text-slate-400 print:text-gray-600">
+          <div className="text-right text-xs font-mono space-y-1 text-[#94A3B8] print:text-gray-600">
             <p>Scan ID: <strong className="text-white print:text-black">{scanId}</strong></p>
-            <p>File Swath: <span className="text-cyan-300 print:text-black">{filename}</span></p>
+            <p>File Swath: <span className="text-[#00D4AA] print:text-black">{filename}</span></p>
             <p>Date: <span className="text-white print:text-black">{createdAt}</span></p>
-            <p>Model: <strong className="text-emerald-400 print:text-black">{modelName}</strong></p>
-            <p>Latency: <span className="text-cyan-400 print:text-black">{inferenceMs.toFixed(1)} ms</span></p>
+            <p>Model: <strong className="text-[#00D4AA] print:text-black">{modelName}</strong></p>
+            <p>Latency: <span className="text-[#38BDF8] print:text-black">{inferenceMs.toFixed(1)} ms</span></p>
           </div>
         </div>
 
         {/* Dynamic Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center font-mono">
           <div className="p-3.5 bg-[#091522] border border-[#102436] rounded-xl print:border-gray-300">
-            <span className="text-[10px] text-slate-400 uppercase block font-bold">TOTAL TARGETS</span>
+            <span className="text-[10px] text-[#94A3B8] uppercase block font-bold">TOTAL TARGETS</span>
             <strong className="text-2xl font-black text-white print:text-black">{totalDetections}</strong>
-            <span className="text-[10px] text-cyan-400 block font-sans">YOLOv8s detections</span>
+            <span className="text-[10px] text-[#00D4AA] block font-sans">YOLOv8s detections</span>
           </div>
 
           <div className="p-3.5 bg-[#091522] border border-[#102436] rounded-xl print:border-gray-300">
-            <span className="text-[10px] text-emerald-400 uppercase block font-bold">GHOST NETS</span>
-            <strong className="text-2xl font-black text-emerald-400 print:text-black">
+            <span className="text-[10px] text-[#00D4AA] uppercase block font-bold">GHOST NETS</span>
+            <strong className="text-2xl font-black text-[#00D4AA] print:text-black">
               {activeScan ? activeScan.ghost_net_count : 1}
             </strong>
-            <span className="text-[10px] text-slate-400 block font-sans">ALDFG Net Meshes</span>
+            <span className="text-[10px] text-[#94A3B8] block font-sans">ALDFG Net Meshes</span>
           </div>
 
           <div className="p-3.5 bg-[#091522] border border-[#102436] rounded-xl print:border-gray-300">
-            <span className="text-[10px] text-amber-400 uppercase block font-bold">ANTHROPOGENIC DEBRIS</span>
-            <strong className="text-2xl font-black text-amber-400 print:text-black">
+            <span className="text-[10px] text-[#F59E0B] uppercase block font-bold">ANTHROPOGENIC DEBRIS</span>
+            <strong className="text-2xl font-black text-[#F59E0B] print:text-black">
               {activeScan ? activeScan.debris_count : 1}
             </strong>
-            <span className="text-[10px] text-slate-400 block font-sans">Tires / Drums / Containers</span>
+            <span className="text-[10px] text-[#94A3B8] block font-sans">Tires / Drums / Metal</span>
           </div>
 
           <div className="p-3.5 bg-[#091522] border border-[#102436] rounded-xl print:border-gray-300">
-            <span className="text-[10px] text-cyan-400 uppercase block font-bold">PIPELINE HAZARDS</span>
-            <strong className="text-2xl font-black text-cyan-400 print:text-black">
+            <span className="text-[10px] text-[#38BDF8] uppercase block font-bold">PIPELINE HAZARDS</span>
+            <strong className="text-2xl font-black text-[#38BDF8] print:text-black">
               {activeScan ? activeScan.pipeline_count : 0}
             </strong>
-            <span className="text-[10px] text-slate-400 block font-sans">Subsea Spans</span>
+            <span className="text-[10px] text-[#94A3B8] block font-sans">Subsea Spans</span>
           </div>
         </div>
 
         {/* Flagship Hero Target Spotlight */}
-        <div className="p-4 bg-[#091522] border border-cyan-500/40 rounded-xl space-y-3 print:border-gray-300">
+        <div className="p-4 bg-[#091522] border border-[#00D4AA]/40 rounded-xl space-y-3 print:border-gray-300">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-extrabold px-2.5 py-1 rounded-lg bg-cyan-400 text-slate-950 uppercase">
+              <span className="text-xs font-black px-2.5 py-1 rounded bg-[#00D4AA] text-slate-950 uppercase">
                 PRIMARY TARGET: {heroTarget.id}
               </span>
-              <h3 className="text-sm font-extrabold text-white uppercase print:text-black">
+              <h3 className="text-sm font-black text-white uppercase print:text-black">
                 {heroTarget.class}
               </h3>
             </div>
-            <span className="text-sm font-extrabold text-cyan-400 font-mono print:text-black">
+            <span className="text-sm font-black text-[#00D4AA] font-mono print:text-black">
               {(heroTarget.confidence * 100).toFixed(1)}% CONFIDENCE
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div className="space-y-1.5 bg-[#050B14] p-3 rounded-xl border border-[#102436] font-mono print:border-gray-300">
-              <span className="text-[10px] text-slate-400 uppercase block font-bold font-sans">GEOLOCATION & DIMENSIONS</span>
+              <span className="text-[10px] text-[#94A3B8] uppercase block font-bold font-sans">GEOLOCATION & DIMENSIONS</span>
               <p>Coordinates: <strong className="text-white print:text-black">{typeof heroTarget.lat === 'number' ? heroTarget.lat.toFixed(4) : heroTarget.lat}° N, {typeof heroTarget.lon === 'number' ? heroTarget.lon.toFixed(4) : heroTarget.lon}° E (WGS-84)</strong></p>
               <p>Seabed Depth: <strong className="text-white print:text-black">{heroTarget.depth} m</strong></p>
               <p>Target Dimensions: <strong className="text-white print:text-black">{heroTarget.length}m (L) × {heroTarget.width}m (W)</strong></p>
-              <p>Acoustic Shadow: <strong className="text-cyan-400 print:text-black">{heroTarget.shadowLength} m relief</strong></p>
+              <p>Acoustic Shadow: <strong className="text-[#00D4AA] print:text-black">{heroTarget.shadowLength} m relief</strong></p>
             </div>
 
             <div className="space-y-1.5 bg-[#050B14] p-3 rounded-xl border border-[#102436] font-mono print:border-gray-300">
-              <span className="text-[10px] text-slate-400 uppercase block font-bold font-sans">EVIDENCE SCORES</span>
-              <p>YOLO BBox Precision: <strong className="text-cyan-400 print:text-black">{(heroTarget.confidence * 100).toFixed(1)}%</strong></p>
-              <p>Acoustic Shadow Relief: <strong className="text-cyan-400 print:text-black">96% Verified</strong></p>
-              <p>Backscatter Signature: <strong className="text-cyan-400 print:text-black">94% Matched</strong></p>
+              <span className="text-[10px] text-[#94A3B8] uppercase block font-bold font-sans">EVIDENCE SCORES</span>
+              <p>YOLO BBox Precision: <strong className="text-[#00D4AA] print:text-black">{(heroTarget.confidence * 100).toFixed(1)}%</strong></p>
+              <p>Acoustic Shadow Relief: <strong className="text-[#00D4AA] print:text-black">96% Verified</strong></p>
+              <p>Backscatter Signature: <strong className="text-[#00D4AA] print:text-black">94% Matched</strong></p>
             </div>
           </div>
         </div>
 
-        {/* Complete Survey Target Register Table */}
-        <div className="space-y-2.5">
-          <h4 className="text-xs font-extrabold text-white uppercase tracking-wider print:text-black">
-            SURVEY TARGET REGISTER ({detectionList.length} DETECTIONS)
-          </h4>
+        {/* ── COMPLETE SURVEY TARGET REGISTER TABLE WITH SORTING & FILTER CHIPS ── */}
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h4 className="text-xs font-black text-white uppercase tracking-wider print:text-black">
+              SURVEY TARGET REGISTER ({filteredAndSortedList.length} OF {detectionList.length} TARGETS)
+            </h4>
+
+            {/* Category Filter Chips */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+              <span className="text-[10px] font-bold text-[#94A3B8] uppercase mr-1">FILTER:</span>
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    setCurrentPage(1);
+                  }}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    selectedCategory === cat
+                      ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_10px_rgba(0,212,170,0.3)]'
+                      : 'bg-[#091522] border border-[#102436] text-[#94A3B8] hover:text-[#E0F7F4] hover:border-[#00D4AA]/40'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="overflow-x-auto rounded-xl border border-[#102436] bg-[#050B14] print:border-gray-300">
             <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-[#091522] text-slate-400 border-b border-[#102436] print:bg-gray-100 print:text-black">
+              <thead className="bg-[#091522] text-[#94A3B8] border-b border-[#102436] print:bg-gray-100 print:text-black select-none">
                 <tr>
-                  <th className="py-2.5 px-3">ID</th>
-                  <th className="py-2.5 px-3">CLASS</th>
-                  <th className="py-2.5 px-3 text-right">CONFIDENCE</th>
+                  <th
+                    onClick={() => handleSort('id')}
+                    className="py-2.5 px-3 cursor-pointer hover:text-[#00D4AA] transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>ID</span>
+                      {sortField === 'id' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleSort('class')}
+                    className="py-2.5 px-3 cursor-pointer hover:text-[#00D4AA] transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>CLASS</span>
+                      {sortField === 'class' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleSort('confidence')}
+                    className="py-2.5 px-3 text-right cursor-pointer hover:text-[#00D4AA] transition-colors"
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>CONFIDENCE</span>
+                      {sortField === 'confidence' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                    </div>
+                  </th>
                   <th className="py-2.5 px-3">LATITUDE</th>
                   <th className="py-2.5 px-3">LONGITUDE</th>
-                  <th className="py-2.5 px-3 text-right">DEPTH</th>
+                  <th
+                    onClick={() => handleSort('depth')}
+                    className="py-2.5 px-3 text-right cursor-pointer hover:text-[#00D4AA] transition-colors"
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      <span>DEPTH</span>
+                      {sortField === 'depth' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                    </div>
+                  </th>
                   <th className="py-2.5 px-3">SIZE</th>
-                  <th className="py-2.5 px-3">PRIORITY</th>
+                  <th
+                    onClick={() => handleSort('risk')}
+                    className="py-2.5 px-3 cursor-pointer hover:text-[#00D4AA] transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>PRIORITY</span>
+                      {sortField === 'risk' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#102436] print:divide-gray-200">
-                {detectionList.map((t) => (
-                  <tr key={t.id} className="hover:bg-[#091522] transition-colors">
-                    <td className="py-2.5 px-3 font-bold text-cyan-400 print:text-black">{t.id}</td>
-                    <td className="py-2.5 px-3 text-white font-sans font-semibold print:text-black">{t.class}</td>
-                    <td className="py-2.5 px-3 text-right font-bold text-cyan-300 print:text-black">
-                      {(t.confidence * 100).toFixed(1)}%
-                    </td>
-                    <td className="py-2.5 px-3 text-slate-400 print:text-black">{typeof t.lat === 'number' ? t.lat.toFixed(4) : t.lat}° N</td>
-                    <td className="py-2.5 px-3 text-slate-400 print:text-black">{typeof t.lon === 'number' ? t.lon.toFixed(4) : t.lon}° E</td>
-                    <td className="py-2.5 px-3 text-right text-slate-400 print:text-black">{typeof t.depth === 'number' ? t.depth.toFixed(1) : t.depth}m</td>
-                    <td className="py-2.5 px-3 text-slate-400 print:text-black">{t.length}m × {t.width}m</td>
-                    <td className="py-2.5 px-3 font-bold">
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded-md font-mono ${
-                          t.risk === 'CRITICAL' || t.risk === 'HIGH'
-                            ? 'bg-red-950 text-red-400 border border-red-500/40'
-                            : 'bg-emerald-950 text-emerald-400 border border-emerald-500/40'
-                        }`}
-                      >
-                        {t.risk}
-                      </span>
+                {paginatedList.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-6 text-center text-[#94A3B8]">
+                      No contacts found matching filter "{selectedCategory}".
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  paginatedList.map((t) => (
+                    <tr key={t.id} className="hover:bg-[#091522] transition-colors">
+                      <td className="py-2.5 px-3 font-bold text-[#00D4AA] print:text-black">{t.id}</td>
+                      <td className="py-2.5 px-3 text-white font-sans font-semibold print:text-black">{t.class}</td>
+                      <td className="py-2.5 px-3 text-right font-bold text-[#38BDF8] print:text-black">
+                        {(t.confidence * 100).toFixed(1)}%
+                      </td>
+                      <td className="py-2.5 px-3 text-[#94A3B8] print:text-black">{typeof t.lat === 'number' ? t.lat.toFixed(4) : t.lat}° N</td>
+                      <td className="py-2.5 px-3 text-[#94A3B8] print:text-black">{typeof t.lon === 'number' ? t.lon.toFixed(4) : t.lon}° E</td>
+                      <td className="py-2.5 px-3 text-right text-[#94A3B8] print:text-black">{typeof t.depth === 'number' ? t.depth.toFixed(1) : t.depth}m</td>
+                      <td className="py-2.5 px-3 text-[#94A3B8] print:text-black">{t.length}m × {t.width}m</td>
+                      <td className="py-2.5 px-3 font-bold">
+                        <span
+                          className={`text-[10px] px-2 py-0.5 rounded font-mono ${
+                            t.risk === 'CRITICAL' || t.risk === 'HIGH'
+                              ? 'bg-red-950 text-red-400 border border-red-500/40'
+                              : 'bg-emerald-950 text-emerald-400 border border-emerald-500/40'
+                          }`}
+                        >
+                          {t.risk}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-2 px-1 text-xs text-[#94A3B8]">
+              <div>
+                Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredAndSortedList.length)} of {filteredAndSortedList.length} targets
+              </div>
+
+              <div className="flex items-center gap-1">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="p-1 rounded bg-[#091522] border border-[#102436] hover:border-[#00D4AA] disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-[#E0F7F4]"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                <div className="px-2 font-mono font-bold text-[#00D4AA]">
+                  Page {currentPage} of {totalPages}
+                </div>
+
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="p-1 rounded bg-[#091522] border border-[#102436] hover:border-[#00D4AA] disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-[#E0F7F4]"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
-

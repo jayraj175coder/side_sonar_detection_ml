@@ -252,3 +252,54 @@ export const INDIA_EEZ_POLYGON: [number, number][] = [
   [22.5, 69.5],
   [23.5, 68.0],
 ];
+
+// Active High-Resolution Survey Tracklines along EEZ corridors (with live vessel pings)
+export const ACTIVE_SURVEY_TRACKLINES: { id: string; name: string; color: string; path: [number, number][] }[] = [
+  {
+    id: 'TRACK-MUM',
+    name: 'Mumbai High Deep Channel Transect',
+    color: '#00D4AA',
+    path: [
+      [19.6500, 71.1200],
+      [19.5200, 71.2400],
+      [19.3850, 71.3620],
+      [19.2100, 71.5100],
+      [19.0400, 71.6800],
+    ],
+  },
+  {
+    id: 'TRACK-GOM',
+    name: 'Gulf of Mannar Coral Biosphere Swath',
+    color: '#10B981',
+    path: [
+      [9.3500, 78.9800],
+      [9.2600, 79.0900],
+      [9.1420, 79.2180],
+      [9.0200, 79.3500],
+      [8.9100, 79.4800],
+    ],
+  },
+  {
+    id: 'TRACK-VIZAG',
+    name: 'Visakhapatnam Subsea Pipeline Transect',
+    color: '#38BDF8',
+    path: [
+      [17.4800, 83.1200],
+      [17.5800, 83.2100],
+      [17.6920, 83.2980],
+      [17.8200, 83.4100],
+      [17.9500, 83.5400],
+    ],
+  },
+  {
+    id: 'TRACK-LAK',
+    name: 'Lakshadweep Kavaratti Lagoon Survey Track',
+    color: '#F59E0B',
+    path: [
+      [10.3500, 72.4800],
+      [10.4600, 72.5600],
+      [10.5720, 72.6480],
+      [10.6800, 72.7400],
+    ],
+  },
+];

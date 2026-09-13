@@ -18,8 +18,8 @@
     --border-glow:    rgba(0, 212, 170, 0.35);  /* teal glow */
 
     --text-primary:   #E0F7F4;   /* bright text (seafoam white) */
-    --text-secondary: #4A8090;   /* dim text (ocean mist) */
-    --text-muted:     #2A5060;   /* faint text (deep sea) */
+    --text-secondary: #94A3B8;   /* high contrast gray (WCAG AA > 4.5:1) */
+    --text-muted:     #64748B;   /* legible muted slate */
 
     --teal-primary:   #00D4AA;   /* bioluminescent teal — primary accent */
     --teal-dim:       #00A882;   /* dimmer teal */
@@ -213,4 +213,16 @@
 }
 .dot-active {
   animation: dot-pulse 1.2s ease-in-out infinite;
+}
+
+/* Animated Survey Trackline */
+@keyframes surveyTrackPulse {
+  0%   { stroke-dashoffset: 0; opacity: 0.7; }
+  50%  { opacity: 1; }
+  100% { stroke-dashoffset: -36; opacity: 0.7; }
+}
+
+.animated-survey-track {
+  stroke-dasharray: 8, 8 !important;
+  animation: surveyTrackPulse 2s linear infinite !important;
 }

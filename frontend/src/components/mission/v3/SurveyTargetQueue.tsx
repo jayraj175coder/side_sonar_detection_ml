@@ -6,6 +6,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Target,
   Sliders,
   Sparkles,
@@ -37,6 +39,7 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [isPipelineExpanded, setIsPipelineExpanded] = useState<boolean>(false);
 
   const CATEGORIES = ['ALL', 'DEBRIS', 'GHOST NET', 'FISHING GEAR', 'ANOMALY', 'FILTERED'];
 
@@ -62,38 +65,50 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
 
   return (
     <aside className="w-72 lg:w-80 bg-[#05121F] border-r border-[#0D2E4A] flex flex-col font-sans select-none overflow-hidden shrink-0 z-20">
-      {/* ── 1. PIPELINE STAGES PROGRESSION (SECTION 5 REQUIREMENT) ── */}
-      <div className="p-3 border-b border-[#0D2E4A] bg-[#030B14] space-y-1.5">
-        <div className="flex items-center justify-between text-[9px] font-bold text-[#7C98A6] uppercase tracking-wider">
-          <span>AI PIPELINE PROGRESSION</span>
-          <span className="text-[#00D4AA] font-bold">
-            STAGE 0{currentStageIndex + 1} / 08
-          </span>
-        </div>
+      {/* ── 1. PIPELINE STAGES PROGRESSION (COLLAPSIBLE) ── */}
+      <div className="border-b border-[#0D2E4A] bg-[#030B14]">
+        <button
+          onClick={() => setIsPipelineExpanded(!isPipelineExpanded)}
+          className="w-full p-2.5 flex items-center justify-between text-[9px] font-bold text-[#94A3B8] hover:text-[#E0F7F4] uppercase tracking-wider cursor-pointer"
+        >
+          <div className="flex items-center gap-1.5">
+            <span>PIPELINE:</span>
+            <span className="text-[#00D4AA]">
+              STAGE 0{currentStageIndex + 1} ({PIPELINE_STAGES_V3[currentStageIndex]?.name || 'COMPLETE'})
+            </span>
+          </div>
+          <div className="flex items-center gap-1 text-[8px] text-[#94A3B8]">
+            {isPipelineExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </div>
+        </button>
 
-        <div className="grid grid-cols-2 gap-1 text-[8.5px]">
-          {PIPELINE_STAGES_V3.slice(0, 7).map((stg, idx) => {
-            const isDone = idx < currentStageIndex;
-            const isCurrent = idx === currentStageIndex;
-            return (
-              <div
-                key={stg.number}
-                className={`px-1.5 py-0.5 rounded-xs flex items-center gap-1 border transition-all ${
-                  isCurrent
-                    ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA] font-bold shadow-[0_0_8px_rgba(0,212,170,0.2)]'
-                    : isDone
-                    ? 'bg-[#05121F] border-[#0D2E4A] text-[#E0F7F4]'
-                    : 'bg-[#02070D] border-transparent text-[#4A8090]'
-                }`}
-              >
-                <span className={isCurrent ? 'text-[#00D4AA] animate-pulse' : isDone ? 'text-[#00D4AA]' : 'text-[#4A8090]'}>
-                  {isDone ? '✓' : isCurrent ? '●' : '○'}
-                </span>
-                <span className="truncate">{stg.number} {stg.name}</span>
-              </div>
-            );
-          })}
-        </div>
+        {isPipelineExpanded && (
+          <div className="px-3 pb-2.5 space-y-1.5 animate-in fade-in duration-200">
+            <div className="grid grid-cols-2 gap-1 text-[8.5px]">
+              {PIPELINE_STAGES_V3.slice(0, 7).map((stg, idx) => {
+                const isDone = idx < currentStageIndex;
+                const isCurrent = idx === currentStageIndex;
+                return (
+                  <div
+                    key={stg.number}
+                    className={`px-1.5 py-0.5 rounded flex items-center gap-1 border transition-all ${
+                      isCurrent
+                        ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA] font-bold shadow-[0_0_8px_rgba(0,212,170,0.2)]'
+                        : isDone
+                        ? 'bg-[#05121F] border-[#0D2E4A] text-[#E0F7F4]'
+                        : 'bg-[#02070D] border-transparent text-[#94A3B8]'
+                    }`}
+                  >
+                    <span className={isCurrent ? 'text-[#00D4AA] animate-pulse' : isDone ? 'text-[#00D4AA]' : 'text-[#4A8090]'}>
+                      {isDone ? '✓' : isCurrent ? '●' : '○'}
+                    </span>
+                    <span className="truncate">{stg.number} {stg.name}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── 2. DEDICATED ACOUSTIC NOISE FILTER PANEL (SECTION 6 REQUIREMENT) ── */}

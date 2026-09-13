@@ -25,6 +25,7 @@ import {
   INDIA_MARITIME_SECTORS,
   HYDROGRAPHIC_VESSELS,
   INDIA_EEZ_POLYGON,
+  ACTIVE_SURVEY_TRACKLINES,
   IndiaMaritimeSector,
   HydrographicVessel,
 } from '../../data/indiaMapData';
@@ -119,6 +120,8 @@ export const SonarMap: React.FC = () => {
 
   // Layer Toggles
   const [showEEZ, setShowEEZ] = useState<boolean>(true);
+  const [showTracklines, setShowTracklines] = useState<boolean>(true);
+  const [showBathymetry, setShowBathymetry] = useState<boolean>(true);
   const [showVessels, setShowVessels] = useState<boolean>(true);
   const [showSectors, setShowSectors] = useState<boolean>(true);
 
@@ -177,7 +180,7 @@ export const SonarMap: React.FC = () => {
                 2.37M KM² EEZ MONITORED
               </span>
             </div>
-            <p className="text-[9px] text-[#7C8AA0]">
+            <p className="text-[9px] text-[#94A3B8]">
               National Hydrographic Office (NHO) & MoES Multi-Beam Side-Scan Sonar Telemetry
             </p>
           </div>
@@ -202,7 +205,7 @@ export const SonarMap: React.FC = () => {
               className={`px-2.5 py-1 rounded-lg text-[8px] font-black transition-all ${
                 activeRegionFilter === tab.id
                   ? 'bg-[#4CD9E8]/20 text-[#4CD9E8] border border-[#4CD9E8]/50 shadow-[0_0_10px_rgba(76,217,232,0.2)]'
-                  : 'text-[#7C8AA0] hover:text-[#EAEFF5]'
+                  : 'text-[#94A3B8] hover:text-[#EAEFF5]'
               }`}
             >
               {tab.label}
@@ -230,6 +233,15 @@ export const SonarMap: React.FC = () => {
               url={activeTileUrl}
             />
 
+            {/* Ocean Bathymetry & Seabed Depth Shading Layer */}
+            {showBathymetry && (
+              <TileLayer
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}"
+                attribution="Esri Ocean Bathymetric Reference / GEBCO"
+                opacity={0.45}
+              />
+            )}
+
             {/* India Exclusive Economic Zone (EEZ) Boundary Polygon */}
             {showEEZ && (
               <Polygon
@@ -243,6 +255,21 @@ export const SonarMap: React.FC = () => {
                 }}
               />
             )}
+
+            {/* Animated High-Resolution Survey Tracklines along EEZ Corridors */}
+            {showTracklines &&
+              ACTIVE_SURVEY_TRACKLINES.map((track) => (
+                <Polyline
+                  key={track.id}
+                  positions={track.path}
+                  pathOptions={{
+                    color: track.color,
+                    weight: 3,
+                    dashArray: '8, 8',
+                    className: 'animated-survey-track',
+                  }}
+                />
+              ))}
 
             {/* Hydrographic Survey Sectors */}
             {showSectors &&
@@ -275,13 +302,13 @@ export const SonarMap: React.FC = () => {
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
             {/* Search Input */}
             <div className="relative flex items-center w-64">
-              <Search className="w-3.5 h-3.5 text-[#7C8AA0] absolute left-3 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 text-[#94A3B8] absolute left-3 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search sector, port, or vessel..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#080B11]/90 border border-[#1B2330] rounded-xl pl-8 pr-3 py-1.5 text-[9px] text-[#EAEFF5] placeholder-[#7C8AA0] focus:outline-none focus:border-[#4CD9E8]/60 backdrop-blur-md shadow-xl"
+                className="w-full bg-[#080B11]/90 border border-[#1B2330] rounded-xl pl-8 pr-3 py-1.5 text-[9px] text-[#EAEFF5] placeholder-[#94A3B8] focus:outline-none focus:border-[#4CD9E8]/60 backdrop-blur-md shadow-xl"
               />
             </div>
 
@@ -292,17 +319,37 @@ export const SonarMap: React.FC = () => {
                 className={`px-2 py-1 rounded-lg font-bold transition-all ${
                   showEEZ
                     ? 'bg-[#4CD9E8]/20 text-[#4CD9E8] border border-[#4CD9E8]/40'
-                    : 'text-[#7C8AA0]'
+                    : 'text-[#94A3B8]'
                 }`}
               >
                 EEZ BOUNDARY
+              </button>
+              <button
+                onClick={() => setShowTracklines(!showTracklines)}
+                className={`px-2 py-1 rounded-lg font-bold transition-all ${
+                  showTracklines
+                    ? 'bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/40'
+                    : 'text-[#94A3B8]'
+                }`}
+              >
+                SURVEY TRACKS
+              </button>
+              <button
+                onClick={() => setShowBathymetry(!showBathymetry)}
+                className={`px-2 py-1 rounded-lg font-bold transition-all ${
+                  showBathymetry
+                    ? 'bg-[#38BDF8]/20 text-[#38BDF8] border border-[#38BDF8]/40'
+                    : 'text-[#94A3B8]'
+                }`}
+              >
+                BATHYMETRY
               </button>
               <button
                 onClick={() => setShowSectors(!showSectors)}
                 className={`px-2 py-1 rounded-lg font-bold transition-all ${
                   showSectors
                     ? 'bg-[#4CD9E8]/20 text-[#4CD9E8] border border-[#4CD9E8]/40'
-                    : 'text-[#7C8AA0]'
+                    : 'text-[#94A3B8]'
                 }`}
               >
                 8 SECTORS
@@ -312,7 +359,7 @@ export const SonarMap: React.FC = () => {
                 className={`px-2 py-1 rounded-lg font-bold transition-all ${
                   showVessels
                     ? 'bg-[#29B6F6]/20 text-[#29B6F6] border border-[#29B6F6]/40'
-                    : 'text-[#7C8AA0]'
+                    : 'text-[#94A3B8]'
                 }`}
               >
                 4 VESSELS
@@ -358,26 +405,26 @@ export const SonarMap: React.FC = () => {
                 <h3 className="text-sm font-black text-[#EAEFF5] leading-snug">
                   {selectedSector.name}
                 </h3>
-                <p className="text-[9px] text-[#7C8AA0]">
+                <p className="text-[9px] text-[#94A3B8]">
                   {selectedSector.subName} · {selectedSector.fleetCommand}
                 </p>
 
                 {/* Telemetry Metrics Grid */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#1B2330] text-[9px]">
                   <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
-                    <span className="text-[7px] text-[#7C8AA0] uppercase block">BATHYMETRY DEPTH</span>
+                    <span className="text-[7px] text-[#94A3B8] uppercase block">BATHYMETRY DEPTH</span>
                     <strong className="text-[#29B6F6] font-bold">{selectedSector.depthRangeM}</strong>
                   </div>
                   <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
-                    <span className="text-[7px] text-[#7C8AA0] uppercase block">TOTAL CONTACTS</span>
+                    <span className="text-[7px] text-[#94A3B8] uppercase block">TOTAL CONTACTS</span>
                     <strong className="text-[#4CD9E8] font-bold">{selectedSector.contactsLogged} Cataloged</strong>
                   </div>
                   <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
-                    <span className="text-[7px] text-[#7C8AA0] uppercase block">HIGH-RISK THREATS</span>
+                    <span className="text-[7px] text-[#94A3B8] uppercase block">HIGH-RISK THREATS</span>
                     <strong className="text-[#F04438] font-bold">{selectedSector.criticalThreats} Critical</strong>
                   </div>
                   <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
-                    <span className="text-[7px] text-[#7C8AA0] uppercase block">ASSIGNED VESSEL</span>
+                    <span className="text-[7px] text-[#94A3B8] uppercase block">ASSIGNED VESSEL</span>
                     <strong className="text-[#EAEFF5] font-bold">{selectedSector.assignedVessel}</strong>
                   </div>
                 </div>
@@ -385,7 +432,7 @@ export const SonarMap: React.FC = () => {
 
               {/* Sector Environmental & Hydrographic Findings */}
               <div className="p-3.5 rounded-xl bg-[#080B11] border border-[#1B2330] space-y-1.5 text-[9px]">
-                <span className="text-[8px] font-bold text-[#7C8AA0] uppercase tracking-wider block">
+                <span className="text-[8px] font-bold text-[#94A3B8] uppercase tracking-wider block">
                   SURVEY INTELLIGENCE & THREAT SUMMARY
                 </span>
                 <p className="text-[#EAEFF5] leading-relaxed">
@@ -428,24 +475,24 @@ export const SonarMap: React.FC = () => {
 
               <div>
                 <h3 className="text-sm font-black text-[#EAEFF5]">{selectedVessel.name}</h3>
-                <p className="text-[9px] text-[#7C8AA0]">{selectedVessel.type} · {selectedVessel.operator}</p>
+                <p className="text-[9px] text-[#94A3B8]">{selectedVessel.type} · {selectedVessel.operator}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[9px]">
                 <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
-                  <span className="text-[7px] text-[#7C8AA0] block uppercase">HEADING</span>
+                  <span className="text-[7px] text-[#94A3B8] block uppercase">HEADING</span>
                   <strong className="text-[#4CD9E8] font-bold">{selectedVessel.headingDeg}° TRUE</strong>
                 </div>
                 <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
-                  <span className="text-[7px] text-[#7C8AA0] block uppercase">SPEED</span>
+                  <span className="text-[7px] text-[#94A3B8] block uppercase">SPEED</span>
                   <strong className="text-[#EAEFF5] font-bold">{selectedVessel.speedKts} KTS</strong>
                 </div>
                 <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
-                  <span className="text-[7px] text-[#7C8AA0] block uppercase">SWATH WIDTH</span>
+                  <span className="text-[7px] text-[#94A3B8] block uppercase">SWATH WIDTH</span>
                   <strong className="text-[#29B6F6] font-bold">{selectedVessel.swathWidthM} Meters</strong>
                 </div>
                 <div className="p-2 rounded bg-[#161C26] border border-[#1B2330]">
-                  <span className="text-[7px] text-[#7C8AA0] block uppercase">SECTOR</span>
+                  <span className="text-[7px] text-[#94A3B8] block uppercase">SECTOR</span>
                   <strong className="text-[#EAEFF5] font-bold">{selectedVessel.currentSector}</strong>
                 </div>
               </div>
@@ -454,7 +501,7 @@ export const SonarMap: React.FC = () => {
 
           {/* Quick List of All 8 Indian Sectors */}
           <div className="pt-2 border-t border-[#1B2330] space-y-2">
-            <span className="text-[8px] font-bold text-[#7C8AA0] uppercase tracking-wider block">
+            <span className="text-[8px] font-bold text-[#94A3B8] uppercase tracking-wider block">
               ALL INDIAN SECTORS REGISTER
             </span>
             <div className="space-y-1 max-h-48 overflow-y-auto">
@@ -465,7 +512,7 @@ export const SonarMap: React.FC = () => {
                   className={`w-full flex items-center justify-between p-2 rounded-lg border text-left transition-all ${
                     selectedSector?.id === s.id
                       ? 'bg-[#4CD9E8]/15 border-[#4CD9E8]/50 text-[#4CD9E8]'
-                      : 'bg-[#080B11] border-[#1B2330] text-[#7C8AA0] hover:border-[#4CD9E8]/30 hover:text-[#EAEFF5]'
+                      : 'bg-[#080B11] border-[#1B2330] text-[#94A3B8] hover:border-[#4CD9E8]/30 hover:text-[#EAEFF5]'
                   }`}
                 >
                   <span className="text-[9px] font-bold truncate max-w-[170px]">{s.name}</span>

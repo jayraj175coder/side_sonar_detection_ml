@@ -13,6 +13,7 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import { MissionProvider } from './context/MissionContext';
 import { GeospatialConfigProvider } from './context/GeospatialConfigContext';
 import { GeospatialConfigModal } from './components/common/GeospatialConfigModal';
+import { FloatingDemoController } from './components/common/FloatingDemoController';
 import { useApp } from './context/AppContext';
 import {
   LayoutDashboard, ScanLine, History, MapPin, FileText, Cpu, Crosshair, Eye, BarChart2,
@@ -111,6 +112,7 @@ export const App: React.FC = () => {
             );
           })}
         </div>
+        <FloatingDemoController />
       </div>
       <GeospatialConfigModal />
     </MissionProvider>

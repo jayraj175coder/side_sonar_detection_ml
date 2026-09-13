@@ -60,7 +60,7 @@ export const GeospatialConfigModal: React.FC = () => {
           </div>
           <button
             onClick={closeModal}
-            className="text-[#4A8090] hover:text-[#EF4444] transition-colors cursor-pointer"
+            className="text-[#94A3B8] hover:text-[#EF4444] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -81,7 +81,7 @@ export const GeospatialConfigModal: React.FC = () => {
 
           {/* Provider Selector */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold text-[#4A8090] uppercase block">
+            <label className="text-[10px] font-bold text-[#94A3B8] uppercase block">
               MAP / GEOCODING PROVIDER
             </label>
             <select
@@ -105,7 +105,7 @@ export const GeospatialConfigModal: React.FC = () => {
           {requiresKey ? (
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-[10px] font-bold text-[#4A8090] uppercase block">
+                <label className="text-[10px] font-bold text-[#94A3B8] uppercase block">
                   API TOKEN / KEY
                 </label>
                 <button
@@ -132,12 +132,12 @@ export const GeospatialConfigModal: React.FC = () => {
                   className="w-full px-3 py-2 bg-[#0A1E30] border border-[#0D2E4A] text-[#E0F7F4] text-xs font-mono focus:outline-none focus:border-[#00D4AA]/60 rounded-xs"
                 />
               </div>
-              <div className="text-[8.5px] text-[#4A8090]">
+              <div className="text-[8.5px] text-[#94A3B8]">
                 API keys are kept in your local session and can also be permanently configured via <code className="text-[#00D4AA]">.env</code> (<code className="text-[#E0F7F4]">VITE_MAPBOX_TOKEN</code>).
               </div>
             </div>
           ) : (
-            <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded text-[9.5px] text-[#4A8090] flex items-center gap-2">
+            <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded text-[9.5px] text-[#94A3B8] flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-[#00D4AA] shrink-0" />
               <span>
                 Selected provider operates completely standalone without external keys or network calls.
@@ -164,7 +164,7 @@ export const GeospatialConfigModal: React.FC = () => {
           )}
 
           {/* Judge-Friendly Fallback Callout */}
-          <div className="p-3 bg-[#030B14] border border-[#152E4D] rounded text-[8.5px] text-[#4A8090] space-y-1">
+          <div className="p-3 bg-[#030B14] border border-[#152E4D] rounded text-[8.5px] text-[#94A3B8] space-y-1">
             <div className="font-bold text-[#38BDF8] flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
               <span>JUDGE DEMO NOTE</span>
@@ -188,7 +188,7 @@ export const GeospatialConfigModal: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={closeModal}
-              className="px-3 py-1.5 text-xs text-[#4A8090] hover:text-[#E0F7F4] cursor-pointer"
+              className="px-3 py-1.5 text-xs text-[#94A3B8] hover:text-[#E0F7F4] cursor-pointer"
             >
               CANCEL
             </button>

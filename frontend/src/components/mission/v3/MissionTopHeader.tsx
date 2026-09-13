@@ -1,5 +1,18 @@
-import React from 'react';
-import { Play, Square, UploadCloud, FileText, ShieldCheck, Film, Radio, Map, Box, Bell, Download, ShieldAlert } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Play,
+  Square,
+  UploadCloud,
+  FileText,
+  ShieldCheck,
+  Film,
+  Radio,
+  Map,
+  Box,
+  Bell,
+  Download,
+  MoreVertical,
+} from 'lucide-react';
 
 interface MissionTopHeaderProps {
   isDemoRunning: boolean;
@@ -46,158 +59,199 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
   centerViewMode,
   onSelectCenterViewMode,
 }) => {
+  const [isOverflowOpen, setIsOverflowOpen] = useState(false);
+  const overflowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (overflowRef.current && !overflowRef.current.contains(e.target as Node)) {
+        setIsOverflowOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <header className="shrink-0 bg-[#030B14] border-b border-[#0D2E4A] font-sans select-none z-30">
-      {/* ── TOP PRIMARY BAR (56–60px) ── */}
-      <div className="h-14 px-4 flex items-center justify-between gap-4">
-        {/* Left: Product branding & mission */}
+    <header className="shrink-0 bg-[#030B14] border-b border-[#0D2E4A] font-sans select-none z-30 sticky top-0">
+      {/* ── CONSOLIDATED PRIMARY CONTEXT BAR (48px) ── */}
+      <div className="h-12 px-4 flex items-center justify-between gap-4">
+        {/* Left: Logo + Survey ID + Live Dot */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-[#082830] border border-[#00D4AA]/60 flex items-center justify-center shadow-[0_0_12px_rgba(0,212,170,0.25)]">
-            <span className="text-[#00D4AA] font-black text-xs tracking-wider">SX</span>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-black tracking-wider text-[#E0F7F4] uppercase">
-                SONAR<span className="text-[#00D4AA]">X</span>
-              </span>
-              <span className="text-[10px] font-semibold px-2 py-0.5 bg-[#082830] border border-[#00D4AA]/40 text-[#00D4AA] rounded-md">
-                MoES MX-026
-              </span>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded bg-[#082830] border border-[#00D4AA]/60 flex items-center justify-center text-[#00D4AA] font-black text-xs">
+              SX
             </div>
-            <div className="text-[10.5px] text-[#4A8090] tracking-wide font-medium">
-              AI Marine Debris & Sonar Detection Unit
+            <span className="text-sm font-black tracking-wider text-[#E0F7F4] uppercase">
+              SONAR<span className="text-[#00D4AA]">X</span>
+            </span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#082830] border border-[#00D4AA]/40 text-[#00D4AA] rounded">
+              MX-026
+            </span>
+            <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 bg-[#05121F] border border-[#0D2E4A] rounded text-[9px] font-bold text-[#00D4AA]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] animate-ping" />
+              <span className="text-[#94A3B8]">LIVE</span>
             </div>
           </div>
         </div>
 
-        {/* Center: Prominent Viewport Switcher Controls */}
-        <div className="flex items-center gap-1.5 bg-[#05121F] border border-[#0D2E4A] p-1 rounded-lg">
+        {/* Center: Viewport Switcher (SONAR / MAP / 3D) */}
+        <div className="flex items-center gap-1 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded-lg">
           <button
             onClick={() => onSelectCenterViewMode('sonar')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
               centerViewMode === 'sonar'
-                ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_12px_rgba(0,212,170,0.35)]'
-                : 'text-[#7C98A6] hover:text-[#E0F7F4] hover:bg-[#082830]'
+                ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_10px_rgba(0,212,170,0.3)]'
+                : 'text-[#94A3B8] hover:text-[#E0F7F4] hover:bg-[#082830]'
             }`}
           >
             <Radio className="w-3.5 h-3.5" />
-            <span>SONAR WATERFALL</span>
+            <span className="hidden sm:inline">SONAR</span>
           </button>
 
           <button
             onClick={() => onSelectCenterViewMode('map')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
               centerViewMode === 'map'
-                ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_12px_rgba(0,212,170,0.35)]'
-                : 'text-[#7C98A6] hover:text-[#E0F7F4] hover:bg-[#082830]'
+                ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_10px_rgba(0,212,170,0.3)]'
+                : 'text-[#94A3B8] hover:text-[#E0F7F4] hover:bg-[#082830]'
             }`}
           >
             <Map className="w-3.5 h-3.5" />
-            <span>SUBSEA MAP</span>
+            <span className="hidden sm:inline">MAP</span>
           </button>
 
           <button
             onClick={() => onSelectCenterViewMode('3d')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all cursor-pointer ${
               centerViewMode === '3d'
-                ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_12px_rgba(0,212,170,0.35)]'
-                : 'text-[#7C98A6] hover:text-[#E0F7F4] hover:bg-[#082830]'
+                ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_10px_rgba(0,212,170,0.3)]'
+                : 'text-[#94A3B8] hover:text-[#E0F7F4] hover:bg-[#082830]'
             }`}
           >
             <Box className="w-3.5 h-3.5" />
-            <span>3D SEAFLOOR</span>
+            <span className="hidden sm:inline">3D</span>
           </button>
         </div>
 
-        {/* Right: Streamlined Action Buttons */}
+        {/* Right: Primary CTA + Alert Bell + Kebab Overflow */}
         <div className="flex items-center gap-2">
-          {/* LIVE HAZARD ALERTS BELL BUTTON */}
+          {/* LIVE HAZARD ALERTS BELL */}
           {onToggleAlertDrawer && (
             <button
               onClick={onToggleAlertDrawer}
-              className="relative p-2 bg-[#05121F] border border-[#0D2E4A] hover:border-[#EF4444] text-[#EF4444] rounded-md cursor-pointer transition-colors"
-              title="View Critical Hazard Alerts"
+              className="relative p-1.5 bg-[#05121F] border border-[#0D2E4A] hover:border-[#EF4444] text-[#EF4444] rounded cursor-pointer transition-colors"
+              title="Hazard Alerts"
             >
-              <Bell className="w-4 h-4 animate-bounce" />
+              <Bell className="w-4 h-4" />
               {alertCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#EF4444] text-[9px] font-bold text-white shadow-[0_0_8px_rgba(239,68,68,0.8)]">
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#EF4444] text-[9px] font-bold text-white shadow-[0_0_6px_rgba(239,68,68,0.8)]">
                   {alertCount}
                 </span>
               )}
             </button>
           )}
 
-          {/* CINEMATIC STORY DEMO */}
-          {onOpenCinematicDemo && (
-            <button
-              onClick={onOpenCinematicDemo}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#082830] border border-[#00D4AA]/60 hover:border-[#00D4AA] text-[#00D4AA] hover:bg-[#00D4AA] hover:text-[#030B14] text-xs font-bold cursor-pointer rounded-md transition-all shadow-[0_0_10px_rgba(0,212,170,0.2)] active:scale-95"
-              title="Open full-screen guided story demo"
-            >
-              <Film className="w-3.5 h-3.5" />
-              <span>CINEMATIC DEMO</span>
-            </button>
-          )}
-
-          {/* START / STOP LIVE DEMO */}
+          {/* PRIMARY CTA BUTTON: START / STOP DEMO */}
           {isDemoRunning ? (
             <button
               onClick={onStopDemo}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#EF4444] text-white border border-[#EF4444] text-xs font-bold cursor-pointer hover:brightness-110 shadow-[0_0_15px_rgba(239,68,68,0.4)] rounded-md transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EF4444] text-white text-xs font-bold rounded cursor-pointer hover:brightness-110 shadow-[0_0_12px_rgba(239,68,68,0.4)] transition-all"
             >
-              <Square className="w-3.5 h-3.5 fill-current" />
+              <Square className="w-3 h-3 fill-current" />
               <span>STOP DEMO</span>
             </button>
           ) : (
             <button
               onClick={onStartDemo}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-[#00D4AA] text-[#030B14] border border-[#00D4AA] text-xs font-black cursor-pointer hover:brightness-110 shadow-[0_0_15px_rgba(0,212,170,0.4)] rounded-md transition-all active:scale-95"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00D4AA] text-[#030B14] text-xs font-black rounded cursor-pointer hover:bg-[#00c098] shadow-[0_0_12px_rgba(0,212,170,0.3)] transition-all active:scale-95"
             >
-              <Play className="w-3.5 h-3.5 fill-current" />
+              <Play className="w-3 h-3 fill-current" />
               <span>START LIVE DEMO</span>
             </button>
           )}
 
-          {/* UPLOAD & ANALYZE */}
-          <button
-            onClick={onOpenUpload}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#E0F7F4] hover:text-[#00D4AA] text-xs font-semibold cursor-pointer rounded-md transition-colors"
-          >
-            <UploadCloud className="w-3.5 h-3.5 text-[#00D4AA]" />
-            <span className="hidden sm:inline">UPLOAD SWATH</span>
-          </button>
-
-          {/* GIS GEOJSON EXPORT */}
-          {onExportGeoJson && (
+          {/* KEBAB OVERFLOW MENU (...) */}
+          <div className="relative" ref={overflowRef}>
             <button
-              onClick={onExportGeoJson}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#082830] border border-[#00D4AA]/40 hover:border-[#00D4AA] text-[#00D4AA] text-xs font-semibold cursor-pointer rounded-md transition-colors"
-              title="Export WGS84 GeoJSON for QGIS / ArcGIS"
+              onClick={() => setIsOverflowOpen(!isOverflowOpen)}
+              className={`p-1.5 rounded border transition-all cursor-pointer ${
+                isOverflowOpen
+                  ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA]'
+                  : 'bg-[#05121F] border-[#0D2E4A] text-[#94A3B8] hover:text-[#E0F7F4] hover:border-[#00D4AA]/40'
+              }`}
+              title="More Actions & Exports"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">GIS GEOJSON</span>
+              <MoreVertical className="w-4 h-4" />
             </button>
-          )}
 
-          {/* EXPORT REPORT */}
-          <button
-            onClick={onExportReport}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#E0F7F4] hover:text-[#00D4AA] text-xs font-semibold cursor-pointer rounded-md transition-colors"
-          >
-            <FileText className="w-3.5 h-3.5 text-[#00D4AA]" />
-            <span className="hidden sm:inline">EXPORT REPORT</span>
-          </button>
+            {isOverflowOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-[#05121F] border border-[#0D2E4A] rounded-xl shadow-2xl py-1.5 text-xs text-[#E0F7F4] z-50 divide-y divide-[#0D2E4A]">
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      onOpenUpload();
+                      setIsOverflowOpen(false);
+                    }}
+                    className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                  >
+                    <UploadCloud className="w-3.5 h-3.5 text-[#00D4AA]" />
+                    <span>Upload Sonar Swath</span>
+                  </button>
+
+                  {onExportGeoJson && (
+                    <button
+                      onClick={() => {
+                        onExportGeoJson();
+                        setIsOverflowOpen(false);
+                      }}
+                      className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5 text-[#38BDF8]" />
+                      <span>Export GIS GeoJSON</span>
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      onExportReport();
+                      setIsOverflowOpen(false);
+                    }}
+                    className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-[#F59E0B]" />
+                    <span>Export MoES Dossier</span>
+                  </button>
+                </div>
+
+                {onOpenCinematicDemo && (
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        onOpenCinematicDemo();
+                        setIsOverflowOpen(false);
+                      }}
+                      className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                    >
+                      <Film className="w-3.5 h-3.5 text-[#A855F7]" />
+                      <span>Cinematic Story Walkthrough</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* ── SECONDARY STATUS & INTERACTIVE FILTRATION BAR ── */}
-      <div className="h-8 px-4 bg-[#05121F] border-t border-[#0D2E4A] flex items-center justify-between text-xs text-[#7C98A6]">
+      {/* ── SECONDARY STATUS & INTERACTIVE FILTRATION BAR (32px) ── */}
+      <div className="h-8 px-4 bg-[#05121F] border-t border-[#0D2E4A] flex items-center justify-between text-xs text-[#94A3B8]">
         {/* Left: Interactive Filtration Controls */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-[#00D4AA] font-bold">
             <span className="w-2 h-2 rounded-full bg-[#00D4AA] animate-ping" />
             <span className="text-xs">
-              {isDemoRunning ? `LIVE SCAN: ${activePhaseName || 'RUNNING'}` : 'MISSION SYSTEM ONLINE'}
+              {isDemoRunning ? `LIVE SCAN: ${activePhaseName || 'RUNNING'}` : 'SYSTEM ONLINE'}
             </span>
           </div>
 
@@ -205,16 +259,16 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
 
           {/* Live Confidence Threshold Slider */}
           <div className="flex items-center gap-2">
-            <span className="text-[#E0F7F4] font-medium text-xs">CONFIDENCE CUTOFF:</span>
+            <span className="text-[#E0F7F4] font-medium text-xs">CONFIDENCE:</span>
             <input
               type="range"
               min="10"
               max="90"
               value={confidenceThreshold}
               onChange={(e) => onChangeConfidenceThreshold(Number(e.target.value))}
-              className="w-24 h-1.5 bg-[#0A1E30] accent-[#00D4AA] cursor-pointer rounded-lg"
+              className="w-20 h-1.5 bg-[#0A1E30] accent-[#00D4AA] cursor-pointer rounded-lg"
             />
-            <span className="text-[#00D4AA] font-bold text-xs w-8">{confidenceThreshold}%</span>
+            <span className="text-[#00D4AA] font-bold text-xs w-7">{confidenceThreshold}%</span>
           </div>
 
           <div className="h-3 w-px bg-[#0D2E4A]" />
@@ -222,10 +276,10 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
           {/* Acoustic Shadow Verification Toggle */}
           <button
             onClick={onToggleShadowGate}
-            className={`flex items-center gap-1.5 px-2 py-0.5 border text-xs font-semibold cursor-pointer rounded-md transition-colors ${
+            className={`flex items-center gap-1.5 px-2 py-0.5 border text-xs font-semibold cursor-pointer rounded transition-colors ${
               isShadowGateActive
                 ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA]'
-                : 'bg-[#030B14] border-[#0D2E4A] text-[#7C98A6]'
+                : 'bg-[#030B14] border-[#0D2E4A] text-[#94A3B8]'
             }`}
           >
             <ShieldCheck className="w-3 h-3" />
@@ -234,28 +288,20 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
         </div>
 
         {/* Right: Live Filter Counters */}
-        <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-3">
-            <span>
-              <strong className="text-[#00D4AA] font-bold">{totalAnomaliesCount}</strong> ANOMALIES
-            </span>
-            <span>·</span>
-            <span>
-              <strong className="text-[#EF4444] font-bold">{highPriorityCount}</strong> HIGH PRIORITY
-            </span>
-            <span>·</span>
-            <span>
-              <strong className="text-[#F59E0B] font-bold">{filteredCount}</strong> FILTERED
-            </span>
-          </div>
-
+        <div className="flex items-center gap-3 text-xs">
+          <span>
+            <strong className="text-[#00D4AA] font-bold">{totalAnomaliesCount}</strong> ANOMALIES
+          </span>
+          <span>·</span>
+          <span>
+            <strong className="text-[#EF4444] font-bold">{highPriorityCount}</strong> HIGH PRIORITY
+          </span>
+          <span>·</span>
+          <span>
+            <strong className="text-[#F59E0B] font-bold">{filteredCount}</strong> FILTERED
+          </span>
           <div className="h-3 w-px bg-[#0D2E4A]" />
-
-          <div className="flex items-center gap-2 text-[#7C98A6]">
-            <span>ENGINE: <strong className="text-[#E0F7F4] font-semibold">YOLOv8 ONNX</strong></span>
-            <span>·</span>
-            <span>LATENCY: <strong className="text-[#00D4AA] font-semibold">42 ms</strong></span>
-          </div>
+          <span>ENGINE: <strong className="text-[#E0F7F4] font-semibold">YOLOv8s ONNX</strong></span>
         </div>
       </div>
     </header>

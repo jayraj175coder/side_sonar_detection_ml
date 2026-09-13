@@ -4,7 +4,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Menu,
-  Play,
   Volume2,
   VolumeX,
   UploadCloud,
@@ -15,7 +14,6 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { useMission } from '../../context/MissionContext';
 import { sonarAudio } from '../../utils/sonarAudio';
 
 interface HeaderProps {
@@ -32,8 +30,6 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     toggleSidebar,
     isBackendConnected,
   } = useApp();
-
-  const { isDemoRunning, startGuidedDemo } = useMission();
 
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(sonarAudio.isMuted);
   const [isOverflowOpen, setIsOverflowOpen] = useState<boolean>(false);
@@ -103,21 +99,8 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         </div>
       </div>
 
-      {/* 2. Right: Single Primary CTA + Kebab Overflow Menu */}
+      {/* 2. Right: Kebab Overflow Menu */}
       <div className="flex items-center gap-2">
-        {/* PRIMARY CTA BUTTON: START LIVE DEMO */}
-        <button
-          onClick={() => {
-            setActiveTab('mission');
-            startGuidedDemo();
-          }}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00D4AA] hover:bg-[#00c098] text-[#030B14] font-black text-xs rounded-md shadow-[0_0_12px_rgba(0,212,170,0.3)] transition-all cursor-pointer active:scale-95"
-          title="Start interactive guided survey demo"
-        >
-          <Play className="w-3 h-3 fill-current" />
-          <span>START LIVE DEMO</span>
-        </button>
-
         {/* KEBAB OVERFLOW MENU (...) */}
         <div className="relative" ref={overflowRef}>
           <button

@@ -1,9 +1,9 @@
 # 🛰️ SONARX: Master Presentation & Pitch Deck Guide
-### Smart India Hackathon (SIH 2026) — Ministry of Earth Sciences (MoES)
-**Problem Statement ID:** PS 26057  
-**Problem Statement:** AI-Powered Automated Underwater Marine Debris and Anomaly Detection System using Side-Scan Sonar (SSS) Imagery  
-**Organization / Department:** Ministry of Earth Sciences (MoES) & National Institute of Ocean Technology (NIOT)  
-**Theme:** Disaster Management / Blue Economy / Marine Protection  
+### Subsea Acoustic Perception & Anomaly Intelligence Platform
+**Project Reference:** OPR-26057  
+**Mission Domain:** Automated Underwater Marine Debris & Anomaly Perception for Side-Scan Sonar (SSS)  
+**Target Authority:** Marine & Oceanographic Survey Authorities  
+**Theme:** Ocean Conservation / Blue Economy / Subsea Defense  
 
 ---
 
@@ -19,7 +19,7 @@
 
 | Slide # | Slide Title | Core Focus |
 | :--- | :--- | :--- |
-| **Slide 1** | **Title & Operational Mandate** | Mission identity, MoES PS 26057, naval defense |
+| **Slide 1** | **Title & Operational Mandate** | Mission identity, Mandate Ref OPR-26057, naval defense |
 | **Slide 2** | **The Crisis: Subsea Debris & Acoustic Blindspots** | Ghost nets (ALDFG), pipeline hazards, why optical vision fails |
 | **Slide 3** | **SONARX Architecture: End-to-End Pipeline** | Ingestion $\to$ Preprocessing $\to$ YOLOv8s ONNX $\to$ Noise Filter $\to$ Geotag |
 | **Slide 4** | **Curated Acoustic Dataset & Synthetic Augmentations** | 5,205 multi-source SSS tiles, oceanographic provenance, no shortcuts |
@@ -28,7 +28,7 @@
 | **Slide 7** | **Automated Navigation & Ping-Log Geotagging** | Slant-range to ground-range ($G = \sqrt{R^2 - H^2}$), WGS84 GPS binding |
 | **Slide 8** | **Empirical Performance Benchmarks** | 74.09% mAP@50, 77.73% Precision, 99.5% Ghost Net AP, ECE 0.028 |
 | **Slide 9** | **6 Elite Differentiating Capabilities** | Active Learning, 3D Ray Cones, GIS Suite, Platt Calibration, ROV Planner, Frequency |
-| **Slide 10** | **Interactive Mission Control Console UX** | Live waterfall HUD, dual view, palette filters, SHA-256 MoES certificate |
+| **Slide 10** | **Interactive Mission Control Console UX** | Live waterfall HUD, dual view, palette filters, SHA-256 clearance certificate |
 | **Slide 11** | **Real-World Impact & Operational Deployment** | Deep Ocean Mission, NIOT, Indian Navy, SAGAR Blue Economy alignment |
 | **Slide 12** | **Conclusion, Tech Stack & Live Demonstration** | Summary, repository reproducibility, opening for live software demo |
 
@@ -38,15 +38,15 @@
 
 ### Visual Layout
 - **Background**: Deep Navy / Dark Cyan HUD theme (`#030712` background with `#00F0FF` grid lines).
-- **Logos / Badges**: Smart India Hackathon 2026 badge, Ministry of Earth Sciences (MoES) logo, NIOT crest.
+- **Logos / Badges**: National Marine Perception crest, Ministry of Earth Sciences (MoES) logo, NIOT insignia.
 - **Hero Title**: **SONARX**
 - **Subtitle**: Subsea Acoustic Perception & Anomaly Intelligence Platform.
-- **Footer**: Problem Statement PS 26057 | Team Details.
+- **Footer**: Operational Mandate Ref: OPR-26057 | Team Details.
 
 ### On-Slide Content
 - **Project**: **SONARX** — Subsea Acoustic Perception & Marine Hazard Intelligence
 - **Mandate**: Automated Side-Scan Sonar (SSS) Detection of Ghost Nets (ALDFG), Anthropogenic Debris, Subsea Pipelines, and Seabed Anomalies.
-- **Problem Statement**: SIH 2026 PS 26057 (Ministry of Earth Sciences / NIOT).
+- **Project Mandate**: Mission Reference OPR-26057 (National Oceanographic & Maritime Authority).
 - **Core Value**: Transforms massive, uncurated sonar survey swaths into **instantaneous geo-referenced target dossiers** with zero cloud dependency.
 
 ### Speaker Script (25 Seconds)

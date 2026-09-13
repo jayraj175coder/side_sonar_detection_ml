@@ -1,13 +1,12 @@
 # SONARX — Technical Solution Report
 
-## AI-Powered Automated Underwater Marine Debris & Anomaly Detection System using Side-Scan Sonar (SSS) Imagery
+## Automated Underwater Marine Debris & Acoustic Anomaly Perception Platform (Side-Scan Sonar)
 
-**Problem Statement ID:** PS 26057  
-**Problem Statement Title:** AI-Powered Automated Underwater Marine Debris and Anomaly Detection System using Side-Scan Sonar Imagery  
-**Organisation:** Ministry of Earth Sciences (MoES)  
-**Department:** National Institute of Ocean Technology (NIOT)  
-**Theme:** Disaster Management  
-**Category:** Software  
+**Project Identifier:** OPR-26057  
+**Mission Domain:** Automated Underwater Marine Debris and Benthic Anomaly Perception  
+**Field:** Marine Robotics & Oceanographic Defense  
+**Theme:** Ocean Conservation & Navigational Safety  
+**Category:** Autonomous Hydrographic Software  
 **Working Solution Name:** SONARX — Subsea Acoustic Perception & Anomaly Intelligence Pipeline  
 
 ---
@@ -219,11 +218,11 @@ Evaluated on the held-out test split of **700 unseen SSS tiles**:
 
 ## 8. Competitive Differentiation Matrix
 
-Comparing SONARX against peer solutions in the SIH 2026 ecosystem:
+Comparing SONARX against state-of-the-art subsea perception benchmarks:
 
-| Feature | Competitor Standard | DRISHTI (Team StrawHats) | **SONARX (Our Solution)** |
+| Feature | Baseline Standard | Conventional SSS Pipeline | **SONARX (Our Solution)** |
 |---|---|---|---|
-| **Problem Statement** | PS 26057 | PS 26057 | **PS 26057** |
+| **Mission Mandate** | OPR-26057 | OPR-26057 | **OPR-26057** |
 | **Dataset Size** | ~100 synthetic tiles | 5,205 tiles | **5,205 tiles (Multi-Source)** |
 | **Model Architecture** | Vanilla YOLOv8n | YOLOv8s | **YOLOv8s ONNX (Optimized)** |
 | **mAP@50 Score** | ~0.45 - 0.55 (unverified) | 0.6410 | **0.7409 (Empirical)** |

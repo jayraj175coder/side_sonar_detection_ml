@@ -1,9 +1,9 @@
 """
 ========================================================================================
-SIH Marine Debris & Ghost Net AI Detection Model — Enhanced Dataset & YOLOv8 Trainer
+Marine Debris & Ghost Net AI Detection Model — Enhanced Dataset & YOLOv8 Trainer
 ========================================================================================
-Aligns with Ministry of Earth Sciences (MoES) Problem Statement:
-"AI-Powered Automated Underwater Marine Debris and Anomaly Detection System using Side-Scan Sonar Imagery"
+Operational Reference: OPR-26057
+"Autonomous Marine Debris & Seabed Anomaly Perception System using Side-Scan Sonar Imagery"
 
 Target Classes:
   0: ghost_net_aldfg      - Abandoned/Lost/Discarded Fishing Gear (ALDFG) & entangled nets

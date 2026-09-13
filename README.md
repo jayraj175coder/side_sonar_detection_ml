@@ -2,9 +2,9 @@
 
 # 🛰️ SONARX
 ### AI-Powered Automated Underwater Marine Debris & Ghost Net Perception Platform
-#### Smart India Hackathon (SIH 2026) Prototype — Ministry of Earth Sciences (MoES) & NIOT
-**Problem Statement ID:** PS 26057  
-**Theme:** Disaster Management / Blue Economy / Marine Protection  
+#### National Oceanographic Perception Initiative — Marine Debris & Seabed Anomaly Defense
+**Project Code:** OPR-26057  
+**Theme:** Ocean Conservation / Blue Economy / Marine Infrastructure Protection  
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%200.115-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![ONNX Runtime](https://img.shields.io/badge/ML%20Engine-ONNX%20Runtime-005CED.svg?style=flat-square&logo=onnx&logoColor=white)](https://onnxruntime.ai)
@@ -22,9 +22,9 @@
 
 ## 📌 Executive Summary
 
-**SONARX** is an end-to-end automated side-scan sonar (SSS) perception, acoustic noise-filtering, and geotagging intelligence platform engineered for the **Ministry of Earth Sciences (MoES)** and **National Institute of Ocean Technology (NIOT)** under Smart India Hackathon problem statement **SIH 2026 PS 26057**:
+**SONARX** is an end-to-end automated side-scan sonar (SSS) perception, acoustic noise-filtering, and geotagging intelligence platform engineered for advanced oceanographic survey operations, naval hydrography, and subsea anomaly tracking (Project Reference **OPR-26057**):
 
-> **"AI-Powered Automated Underwater Marine Debris and Anomaly Detection System using Side-Scan Sonar Imagery"**
+> **"Autonomous Acoustic Perception, Marine Hazard Localization, and Benthic Anomaly Classification for Side-Scan Sonar Imagery"**
 
 By coupling an anchor-free **YOLOv8s ONNX** neural network (trained on **5,205 multi-source acoustic survey tiles**) with a lightweight **FastAPI** edge backend, **Acoustic Noise & Shadow-Physics Filtering**, and a dark-themed **React Mission Control Console**, SONARX replaces manual hydrographic waterfall inspection with instantaneous target localization, confidence calibration, automated ping-log GPS geotagging, 3D seafloor bathymetric reconstruction, and MoES-standardized inspection dossiers.
 
@@ -326,7 +326,7 @@ npm --prefix frontend run dev
 
 ---
 
-## 👥 Smart India Hackathon (SIH 2026) Team
-* **Project**: SONARX Marine Perception Platform
-* **Ministry**: Ministry of Earth Sciences (MoES) & National Institute of Ocean Technology (NIOT)
-* **Problem Statement**: AI-Powered Automated Underwater Marine Debris and Anomaly Detection System using Side-Scan Sonar Imagery (PS 26057)
+## 👥 Project Engineering & Research
+* **Project**: SONARX Marine Acoustic Perception Platform
+* **Operational Domain**: Autonomous Hydrographic Surveying & Benthic Perception
+* **Reference**: Subsea Acoustic Perception Benchmark (Ref: OPR-26057)

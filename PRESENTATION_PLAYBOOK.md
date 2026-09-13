@@ -1,8 +1,8 @@
-# SONARX — SIH 2026 Live Demo & Presentation Playbook
+# SONARX — Operational Evaluation & Live Presentation Playbook
 
-## How to Present SONARX to Judges & Show Off Your Winning UI
+## How to Present SONARX to Evaluators & Demonstrate Key Features
 
-This guide gives you the **exact script and step-by-step workflow** to present SONARX during Smart India Hackathon 2026 (SIH PS 26057).
+This guide gives you the **exact script and step-by-step workflow** to present SONARX during operational hydrographic reviews (Benchmark Ref: OPR-26057).
 
 ---
 

@@ -80,7 +80,7 @@ class ValidationMetrics(BaseModel):
     seafloor_anomaly_map50: Optional[float] = 0.5559
     benchmark_device: str = "NVIDIA T4 GPU / CPU ONNX Runtime"
     benchmark_latency_ms: float = 14.5
-    notes: str = "Evaluated on held-out test set (700 SSS images) from 5,205 multi-source acoustic survey dataset (SIH-MoES PS26057)"
+    notes: str = "Evaluated on held-out test set (700 SSS images) from 5,205 multi-source acoustic survey dataset (Ref: OPR-26057)"
 
 
 class ModelInfo(BaseModel):

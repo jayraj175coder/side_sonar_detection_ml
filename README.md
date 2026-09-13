@@ -47,36 +47,36 @@ By coupling an anchor-free **YOLOv8s ONNX** neural network (trained on **5,205 m
 ```mermaid
 flowchart TD
     subgraph Ingestion ["1. Multi-Modal Ingestion"]
-        Image[Raw SSS Waterfall Image JPG/PNG/WebP/TIFF]
-        Log[Companion Ping Navigation Log CSV/JSON/XTF]
+        Image["Raw SSS Waterfall Image (JPG / PNG / WebP / TIFF)"]
+        Log["Companion Ping Navigation Log (CSV / JSON / XTF)"]
     end
 
     subgraph Preprocessing ["2. Acoustic Signal Processing"]
-        Pre[Letterbox 640x640 Bilinear Rescaling]
-        Slant[Slant-Range to Ground-Range Correction G = √(R² - H²)]
-        Lee[Lee Speckle Filter 7x7 Rayleigh Attenuation]
+        Pre["Letterbox 640x640 Bilinear Rescaling"]
+        Slant["Slant-Range to Ground-Range Correction: G = sqrt(R^2 - H^2)"]
+        Lee["Lee Speckle Filter (7x7 Rayleigh Attenuation)"]
     end
 
     subgraph Backend ["3. FastAPI Edge Backend"]
-        Parser[Automated Ping-Log Geotagging Engine]
-        ONNX[ONNX Runtime Session CPU/CUDA Latency: ~35.2 ms]
-        NMS[IoU Non-Maximum Suppression]
-        NoiseFilter[Physics Shadow & Aspect-Ratio Filter L = h·G/(H-h)]
-        Platt[Platt Probability Calibration ECE: 0.028]
-        Repo[(Survey Scan Archive In-Memory / JSON)]
+        Parser["Automated Ping-Log Geotagging Engine"]
+        ONNX["ONNX Runtime Session (CPU Latency: ~35.2 ms)"]
+        NMS["IoU Non-Maximum Suppression"]
+        NoiseFilter["Physics Shadow and Aspect-Ratio Filter"]
+        Platt["Platt Probability Calibration (ECE: 0.028)"]
+        Repo[("Survey Scan Archive (In-Memory / JSON)")]
     end
 
     subgraph Flagship_Model ["4. ONNX Neural Artifacts"]
-        V2Weights["marine_sonar_v2.onnx ~44.7 MB (Flagship YOLOv8s: 4 MoES Target Classes)"]
+        V2Weights["marine_sonar_v2.onnx (YOLOv8s 44.7 MB)"]
     end
 
     subgraph Client ["5. Mission Control Console (React 19 + Vite + Leaflet)"]
-        Canvas[Interactive Sonar Waterfall HUD & Palette Filters]
-        Queue[Verified Target Queue & Active Learning Triage]
-        Mesh3D[Interactive 3D Seafloor & Ray Cone Visualizer]
-        Map[Geospatial Maritime GIS Map Kochi / Mumbai / Vizag]
-        ROV[Autonomous ROV Salvage Flight Planner]
-        Report[MoES SHA-256 Clearance Certificate & PDF Export]
+        Canvas["Interactive Sonar Waterfall HUD and Palette Filters"]
+        Queue["Verified Target Queue and Active Learning Triage"]
+        Mesh3D["Interactive 3D Seafloor and Ray Cone Visualizer"]
+        Map["Geospatial Maritime GIS Map (Kochi / Mumbai / Vizag)"]
+        ROV["Autonomous ROV Salvage Flight Planner"]
+        Report["MoES SHA-256 Clearance Certificate and PDF Export"]
     end
 
     Image --> Pre --> Slant --> Lee --> ONNX

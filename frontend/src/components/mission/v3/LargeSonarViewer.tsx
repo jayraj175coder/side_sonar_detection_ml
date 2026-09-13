@@ -33,7 +33,14 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
   const [contrastEnhanced, setContrastEnhanced] = useState(false);
   const [acousticPalette, setAcousticPalette] = useState<'amber' | 'emerald' | 'cobalt' | 'grayscale'>('amber');
   const [isSrcActive, setIsSrcActive] = useState(false);
+  const [sonarFrequency, setSonarFrequency] = useState<450 | 900 | 1200>(900);
   const [measureActive, setMeasureActive] = useState(false);
+
+  const FREQUENCY_PROFILES: Record<number, { swathM: number; lambdaMm: number; alphaDbM: number; resCm: number }> = {
+    450: { swathM: 150, lambdaMm: 3.33, alphaDbM: 0.08, resCm: 5.2 },
+    900: { swathM: 75, lambdaMm: 1.67, alphaDbM: 0.28, resCm: 2.6 },
+    1200: { swathM: 35, lambdaMm: 1.25, alphaDbM: 0.49, resCm: 1.4 },
+  };
   const [measurePoints, setMeasurePoints] = useState<{ x: number; y: number }[]>([]);
   const [cinematicTransform, setCinematicTransform] = useState({ scale: 1, x: 0, y: 0 });
 
@@ -446,9 +453,50 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           </span>
           <span className="text-[#2A5060]">|</span>
           <div className="text-[10px] text-[#4A8090] flex items-center gap-2">
-            <span><strong className="text-[#E0F7F4]">900</strong> kHz</span>
+            {/* Interactive Frequency Mode Selector */}
+            <div className="flex items-center gap-0.5 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded text-[8px] font-mono">
+              <span className="text-[#94A3B8] px-1 uppercase hidden md:inline">FREQ:</span>
+              <button
+                onClick={() => setSonarFrequency(450)}
+                className={`px-1.5 py-0.5 rounded-xs font-bold transition-all cursor-pointer ${
+                  sonarFrequency === 450
+                    ? 'bg-[#38BDF8] text-[#030B14] shadow-sm font-black'
+                    : 'text-[#94A3B8] hover:text-white'
+                }`}
+                title="450 kHz (150m Swath · Deep Ocean Search · λ=3.33mm)"
+              >
+                450k
+              </button>
+              <button
+                onClick={() => setSonarFrequency(900)}
+                className={`px-1.5 py-0.5 rounded-xs font-bold transition-all cursor-pointer ${
+                  sonarFrequency === 900
+                    ? 'bg-[#00D4AA] text-[#030B14] shadow-sm font-black'
+                    : 'text-[#94A3B8] hover:text-white'
+                }`}
+                title="900 kHz (75m Swath · Tactical Profiling · λ=1.67mm)"
+              >
+                900k
+              </button>
+              <button
+                onClick={() => setSonarFrequency(1200)}
+                className={`px-1.5 py-0.5 rounded-xs font-bold transition-all cursor-pointer ${
+                  sonarFrequency === 1200
+                    ? 'bg-[#A855F7] text-white shadow-sm font-black'
+                    : 'text-[#94A3B8] hover:text-white'
+                }`}
+                title="1200 kHz (35m Swath · Ultra-High Res Micro-Debris · λ=1.25mm)"
+              >
+                1200k
+              </button>
+            </div>
+
             <span>·</span>
-            <span><strong className="text-[#E0F7F4]">75</strong> m SWATH</span>
+            <span><strong className="text-[#E0F7F4]">{FREQUENCY_PROFILES[sonarFrequency].swathM}</strong> m SWATH</span>
+            <span>·</span>
+            <span title="Acoustic Wavelength λ = c/f (c=1500m/s in seawater)">
+              <strong className="text-[#00D4AA]">λ={FREQUENCY_PROFILES[sonarFrequency].lambdaMm}</strong> mm
+            </span>
             <span>·</span>
             <span className="flex items-center gap-1">
               STATUS: <strong className={isDemoRunning ? 'text-[#00D4AA] animate-pulse' : 'text-[#E0F7F4]'}>

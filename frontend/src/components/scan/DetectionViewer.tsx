@@ -49,6 +49,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   const [hoveredDetId, setHoveredDetId] = useState<string | null>(null);
   const [selectedDetId, setSelectedDetId] = useState<string | null>(null);
   const [acousticPalette, setAcousticPalette] = useState<'amber' | 'emerald' | 'cobalt' | 'grayscale'>('amber');
+  const [transducerFreq, setTransducerFreq] = useState<450 | 900 | 1200>(900);
 
   const PALETTE_FILTERS: Record<string, string> = {
     amber: 'sepia(0.85) hue-rotate(-12deg) saturate(2.1) contrast(1.15)',
@@ -298,6 +299,47 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               <Tag className="w-3.5 h-3.5" />
               <span>Labels</span>
             </button>
+
+            {/* Acoustic Frequency Selector */}
+            <div className="flex items-center gap-1 bg-[#091522] border border-[#102436] rounded-xl p-1">
+              <span className="text-[9px] font-mono text-slate-500 uppercase px-1 hidden sm:inline">FREQ:</span>
+              <button
+                type="button"
+                onClick={() => setTransducerFreq(450)}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                  transducerFreq === 450
+                    ? 'bg-[#38BDF8] text-[#030B14] shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="450 kHz (Deep Swath Search)"
+              >
+                450k
+              </button>
+              <button
+                type="button"
+                onClick={() => setTransducerFreq(900)}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                  transducerFreq === 900
+                    ? 'bg-[#00D4AA] text-[#030B14] shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="900 kHz (Tactical Profiling)"
+              >
+                900k
+              </button>
+              <button
+                type="button"
+                onClick={() => setTransducerFreq(1200)}
+                className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                  transducerFreq === 1200
+                    ? 'bg-[#A855F7] text-white shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="1200 kHz (Ultra-High Resolution Micro-Debris)"
+              >
+                1200k
+              </button>
+            </div>
 
             {/* Palette Switcher */}
             <div className="flex items-center gap-1 bg-[#091522] border border-[#102436] rounded-xl p-1">

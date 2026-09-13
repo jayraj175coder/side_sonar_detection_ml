@@ -22,6 +22,8 @@ import { SURVEY_SITES } from '../data/consoleData';
 import { LiveDemoSequence } from '../components/console/LiveDemoSequence';
 import { JudgeModeProofView } from '../components/mission/v3/JudgeModeProofView';
 import { MoESClearanceCertificateModal } from '../components/mission/v3/MoESClearanceCertificateModal';
+import { RovSalvagePlannerModal } from '../components/mission/v3/RovSalvagePlannerModal';
+import { exportToKML, exportToIHOS44CSV } from '../utils/gisExport';
 
 export const MissionPage: React.FC = () => {
   // ── State Management ──
@@ -31,6 +33,7 @@ export const MissionPage: React.FC = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
   const [isAlertDrawerOpen, setIsAlertDrawerOpen] = useState<boolean>(false);
   const [isCertificateModalOpen, setIsCertificateModalOpen] = useState<boolean>(false);
+  const [isRovPlannerOpen, setIsRovPlannerOpen] = useState<boolean>(false);
   const [dispatchTarget, setDispatchTarget] = useState<MissionV3Target | null>(null);
 
   // Judge Mode (20-Second Simplified Proof View)
@@ -278,7 +281,10 @@ export const MissionPage: React.FC = () => {
         onOpenUpload={() => setIsUploadModalOpen(true)}
         onExportReport={handleExportReport}
         onExportGeoJson={() => exportGeoJsonDossier(processedTargets)}
+        onExportKml={() => exportToKML(processedTargets)}
+        onExportIhoCsv={() => exportToIHOS44CSV(processedTargets)}
         onOpenCertificate={() => setIsCertificateModalOpen(true)}
+        onOpenRovPlanner={() => setIsRovPlannerOpen(true)}
         onToggleAlertDrawer={() => setIsAlertDrawerOpen((v) => !v)}
         alertCount={processedTargets.filter((t) => t.priority === 'HIGH' || t.status === 'CONFIRMED').length}
         activePhaseName={PIPELINE_STAGES_V3[currentStageIndex]?.name}
@@ -418,6 +424,14 @@ export const MissionPage: React.FC = () => {
         onClose={() => setIsCertificateModalOpen(false)}
         target={selectedTarget}
       />
+
+      {/* ── AUTONOMOUS ROV SALVAGE ROUTE PLANNER MODAL ── */}
+      {isRovPlannerOpen && (
+        <RovSalvagePlannerModal
+          targets={processedTargets}
+          onClose={() => setIsRovPlannerOpen(false)}
+        />
+      )}
     </div>
   );
 };

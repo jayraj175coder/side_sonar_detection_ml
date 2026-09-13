@@ -13,6 +13,9 @@ import {
   Download,
   MoreVertical,
   Award,
+  Navigation,
+  Globe,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 interface MissionTopHeaderProps {
@@ -25,7 +28,10 @@ interface MissionTopHeaderProps {
   onOpenUpload: () => void;
   onExportReport: () => void;
   onExportGeoJson?: () => void;
+  onExportKml?: () => void;
+  onExportIhoCsv?: () => void;
   onOpenCertificate?: () => void;
+  onOpenRovPlanner?: () => void;
   onToggleAlertDrawer?: () => void;
   alertCount?: number;
   activePhaseName?: string;
@@ -48,7 +54,10 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
   onOpenUpload,
   onExportReport,
   onExportGeoJson,
+  onExportKml,
+  onExportIhoCsv,
   onOpenCertificate,
+  onOpenRovPlanner,
   onToggleAlertDrawer,
   alertCount = 4,
   activePhaseName,
@@ -202,6 +211,19 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
                     <span>Upload Sonar Swath</span>
                   </button>
 
+                  {onOpenRovPlanner && (
+                    <button
+                      onClick={() => {
+                        onOpenRovPlanner();
+                        setIsOverflowOpen(false);
+                      }}
+                      className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                    >
+                      <Navigation className="w-3.5 h-3.5 text-[#00D4AA]" />
+                      <span>ROV Salvage Flight Planner</span>
+                    </button>
+                  )}
+
                   {onExportGeoJson && (
                     <button
                       onClick={() => {
@@ -212,6 +234,32 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
                     >
                       <Download className="w-3.5 h-3.5 text-[#38BDF8]" />
                       <span>Export GIS GeoJSON</span>
+                    </button>
+                  )}
+
+                  {onExportKml && (
+                    <button
+                      onClick={() => {
+                        onExportKml();
+                        setIsOverflowOpen(false);
+                      }}
+                      className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                    >
+                      <Globe className="w-3.5 h-3.5 text-[#38BDF8]" />
+                      <span>Export Google Earth (.KML)</span>
+                    </button>
+                  )}
+
+                  {onExportIhoCsv && (
+                    <button
+                      onClick={() => {
+                        onExportIhoCsv();
+                        setIsOverflowOpen(false);
+                      }}
+                      className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                    >
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-[#3FD98A]" />
+                      <span>Export IHO S-44 Sounding Log</span>
                     </button>
                   )}
 

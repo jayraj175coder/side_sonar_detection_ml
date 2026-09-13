@@ -18,6 +18,6 @@ def get_health() -> HealthResponse:
         model_name=inference_service.model_name,
         model_version=inference_service.model_version,
         model_loaded=is_loaded,
-        model_path=str(settings.resolved_model_path),
+        model_path=str(inference_service.active_path),
         timestamp=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     )

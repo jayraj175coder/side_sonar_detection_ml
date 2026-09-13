@@ -39,6 +39,9 @@ async def predict_sonar_scan(
     noise_filtering_enabled: Optional[bool] = Form(
         True, description="Enable post-NMS acoustic geometry & shadow false-positive suppression"
     ),
+    noise_filtering: Optional[bool] = Form(
+        None, description="Alias for noise_filtering_enabled"
+    ),
 ) -> PredictionResponse:
     """
     Executes deep learning inference on side-scan sonar waterfall imagery.
@@ -84,7 +87,11 @@ async def predict_sonar_scan(
             heading=heading,
             geotag_source=geotag_source,
             model_version=model_version or "v2",
-            noise_filtering_enabled=noise_filtering_enabled if noise_filtering_enabled is not None else True,
+            noise_filtering_enabled=(
+                noise_filtering
+                if noise_filtering is not None
+                else (noise_filtering_enabled if noise_filtering_enabled is not None else True)
+            ),
         )
     except FileNotFoundError as fnf_err:
         raise HTTPException(

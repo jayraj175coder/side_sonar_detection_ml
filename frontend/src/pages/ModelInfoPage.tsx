@@ -11,22 +11,35 @@ import {
   Layers,
   Sparkles,
 } from 'lucide-react';
+import { useApp } from '../context/AppContext';
 
 export const ModelInfoPage: React.FC = () => {
+  const { modelInfo, isBackendConnected } = useApp();
   const [activeTab, setActiveTab] = useState<'architecture' | 'dataset' | 'benchmarks' | 'limitations'>('architecture');
+
+  const map50 = modelInfo?.metrics?.map50 ? (modelInfo.metrics.map50 * 100).toFixed(1) + '%' : '74.1%';
+  const precision = modelInfo?.metrics?.precision ? (modelInfo.metrics.precision * 100).toFixed(1) + '%' : '77.7%';
+  const recall = modelInfo?.metrics?.recall ? (modelInfo.metrics.recall * 100).toFixed(1) + '%' : '74.6%';
+  const modelName = modelInfo?.name || 'YOLOv8s-SIH-Marine-Debris-V2';
+  const latency = modelInfo?.metrics?.benchmark_latency_ms ? `${modelInfo.metrics.benchmark_latency_ms} ms` : '14.5 ms';
 
   return (
     <div className="space-y-6 font-sans select-none text-xs text-[#E0F7F4]">
       {/* 1. Top Header Banner */}
       <div className="p-5 bg-[#05121F] border border-[#0D2E4A] space-y-2">
-        <div className="flex items-center gap-2">
-          <Cpu className="w-4 h-4 text-[#00D4AA]" />
-          <span className="text-sm font-black tracking-wider text-[#00D4AA] uppercase">
-            NEURAL MODEL SPECIFICATIONS // HONEST VALIDATION BENCHMARK
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Cpu className="w-4 h-4 text-[#00D4AA]" />
+            <span className="text-sm font-black tracking-wider text-[#00D4AA] uppercase">
+              NEURAL MODEL SPECIFICATIONS // {modelName}
+            </span>
+          </div>
+          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${isBackendConnected ? 'bg-[#00D4AA]/20 text-[#00D4AA] border border-[#00D4AA]' : 'bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]'}`}>
+            {isBackendConnected ? 'LIVE ONNX RUNTIME' : 'OFFLINE SPEC'}
           </span>
         </div>
         <p className="text-[10px] text-[#4A8090] leading-relaxed">
-          Technical specifications, training dataset provenance, quantitative mAP / precision / recall validation curves, and physical acoustic failure modes for the YOLOv8n ONNX perception model.
+          Technical specifications, training dataset provenance, quantitative mAP / precision / recall validation curves, and physical acoustic failure modes for the trained YOLOv8 ONNX perception model.
         </p>
       </div>
 
@@ -34,26 +47,26 @@ export const ModelInfoPage: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="p-3 bg-[#05121F] border border-[#0D2E4A] space-y-1 text-center">
           <span className="text-[8px] text-[#4A8090] uppercase block font-bold">mAP@0.5 SCORE</span>
-          <strong className="text-xl font-black text-[#00D4AA] font-mono">84.6%</strong>
-          <span className="text-[7.5px] text-[#2A5060] block">IOU THRESHOLD 0.50</span>
+          <strong className="text-xl font-black text-[#00D4AA] font-mono">{map50}</strong>
+          <span className="text-[7.5px] text-[#2A5060] block">HELD-OUT TEST SET (700 SSS TILES)</span>
         </div>
 
         <div className="p-3 bg-[#05121F] border border-[#0D2E4A] space-y-1 text-center">
           <span className="text-[8px] text-[#4A8090] uppercase block font-bold">PRECISION / RECALL</span>
-          <strong className="text-xl font-black text-[#E0F7F4] font-mono">88.2% / 81.4%</strong>
-          <span className="text-[7.5px] text-[#2A5060] block">F1 SCORE 0.847</span>
+          <strong className="text-xl font-black text-[#E0F7F4] font-mono">{precision} / {recall}</strong>
+          <span className="text-[7.5px] text-[#2A5060] block">F1 OPTIMAL POINT</span>
         </div>
 
         <div className="p-3 bg-[#05121F] border border-[#0D2E4A] space-y-1 text-center">
           <span className="text-[8px] text-[#4A8090] uppercase block font-bold">INFERENCE LATENCY</span>
-          <strong className="text-xl font-black text-[#00D4AA] font-mono">10.4 ms</strong>
-          <span className="text-[7.5px] text-[#2A5060] block">ONNX RUNTIME (CPU)</span>
+          <strong className="text-xl font-black text-[#00D4AA] font-mono">{latency}</strong>
+          <span className="text-[7.5px] text-[#2A5060] block">ONNX RUNTIME (CPU/GPU)</span>
         </div>
 
         <div className="p-3 bg-[#05121F] border border-[#0D2E4A] space-y-1 text-center">
-          <span className="text-[8px] text-[#4A8090] uppercase block font-bold">QUANTIZED FOOTPRINT</span>
-          <strong className="text-xl font-black text-[#E0F7F4] font-mono">6.2 MB</strong>
-          <span className="text-[7.5px] text-[#2A5060] block">INT8 / FP16 EDGE READY</span>
+          <span className="text-[8px] text-[#4A8090] uppercase block font-bold">MODEL FOOTPRINT</span>
+          <strong className="text-xl font-black text-[#E0F7F4] font-mono">11.2M</strong>
+          <span className="text-[7.5px] text-[#2A5060] block">PARAMETERS (FP32 ONNX)</span>
         </div>
       </div>
 

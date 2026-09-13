@@ -352,20 +352,25 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
         </div>
 
         {/* Right: Live Filter Counters */}
-        <div className="flex items-center gap-3 text-xs">
+        <div className="flex items-center gap-2.5 text-[11px] shrink-0">
           <span>
             <strong className="text-[#00D4AA] font-bold">{totalAnomaliesCount}</strong> ANOMALIES
           </span>
           <span>·</span>
           <span>
-            <strong className="text-[#EF4444] font-bold">{highPriorityCount}</strong> HIGH PRIORITY
+            <strong className="text-[#EF4444] font-bold">{highPriorityCount}</strong> HIGH
           </span>
           <span>·</span>
           <span>
             <strong className="text-[#F59E0B] font-bold">{filteredCount}</strong> FILTERED
           </span>
           <div className="h-3 w-px bg-[#0D2E4A]" />
-          <span>ENGINE: <strong className="text-[#E0F7F4] font-semibold">YOLOv8s ONNX</strong></span>
+          <span className="hidden xl:inline">
+            ENGINE: <strong className="text-[#E0F7F4] font-semibold">YOLOv8s ONNX</strong>
+          </span>
+          <span className="xl:hidden">
+            <strong className="text-[#00D4AA] font-semibold">YOLOv8s</strong>
+          </span>
         </div>
       </div>
     </header>

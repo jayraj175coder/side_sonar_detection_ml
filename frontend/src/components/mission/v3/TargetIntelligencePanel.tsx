@@ -431,7 +431,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
   }, [activeTab, activeGeoTab, yaw, pitch, autoRotate, isDragging3D, target]);
 
   return (
-    <aside className="w-80 lg:w-96 bg-[#05121F] border-l border-[#0D2E4A] flex flex-col font-sans select-none overflow-y-auto shrink-0 z-20">
+    <aside className="w-72 xl:w-80 2xl:w-88 bg-[#05121F] border-l border-[#0D2E4A] flex flex-col font-sans select-none overflow-y-auto shrink-0 z-20">
       {/* ── 1. HEADER & HERO CONFIDENCE DISPLAY ── */}
       <div className="p-3 border-b border-[#0D2E4A] bg-[#030B14] space-y-2">
         <div className="flex items-center justify-between">
@@ -485,7 +485,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
 
           <div className="text-right text-[10px] text-[#E0F7F4] font-semibold space-y-0.5">
             <div>STATUS: <span className="text-[#00D4AA]">CONFIRMED</span></div>
-            <div>VERDICT: <span className="text-[#00D4AA]">HIGH CERTAINTY</span></div>
+            <div>VERDICT: <span className="text-[#00D4AA] font-bold">CERTAIN</span></div>
           </div>
         </div>
 
@@ -500,9 +500,9 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
         {/* Human-in-the-Loop Analyst Triage & Active Learning Strip */}
         <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded-lg space-y-1.5 font-mono text-[9px]">
           <div className="flex items-center justify-between">
-            <span className="text-slate-400 font-bold uppercase flex items-center gap-1">
+            <span className="text-slate-400 font-bold uppercase flex items-center gap-1 text-[8.5px]">
               <Cpu className="w-3 h-3 text-[#00D4AA]" />
-              HUMAN TRIAGE & ACTIVE LEARNING
+              HUMAN TRIAGE / ACTIVE LEARNING
             </span>
             <span
               className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
@@ -520,36 +520,36 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           <div className="grid grid-cols-3 gap-1 pt-0.5">
             <button
               onClick={() => setTriageMap((m) => ({ ...m, [target.id]: 'CONFIRMED' }))}
-              className={`py-1 rounded border text-[8.5px] font-bold flex items-center justify-center gap-0.5 transition-all cursor-pointer ${
+              className={`py-1 px-1 rounded border text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
                 currentTriage === 'CONFIRMED'
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 shadow-sm'
                   : 'bg-[#0A1A2E] text-slate-400 border-[#102E4A] hover:text-white'
               }`}
             >
               <Check className="w-2.5 h-2.5" />
-              CONFIRM
+              <span>CONFIRM</span>
             </button>
             <button
               onClick={() => setTriageMap((m) => ({ ...m, [target.id]: 'REJECTED' }))}
-              className={`py-1 rounded border text-[8.5px] font-bold flex items-center justify-center gap-0.5 transition-all cursor-pointer ${
+              className={`py-1 px-1 rounded border text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
                 currentTriage === 'REJECTED'
                   ? 'bg-red-500/20 text-red-300 border-red-500/60 shadow-sm'
                   : 'bg-[#0A1A2E] text-slate-400 border-[#102E4A] hover:text-white'
               }`}
             >
               <X className="w-2.5 h-2.5" />
-              REJECT
+              <span>REJECT</span>
             </button>
             <button
               onClick={() => setTriageMap((m) => ({ ...m, [target.id]: 'RECLASSIFIED' }))}
-              className={`py-1 rounded border text-[8.5px] font-bold flex items-center justify-center gap-0.5 transition-all cursor-pointer ${
+              className={`py-1 px-1 rounded border text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
                 currentTriage === 'RECLASSIFIED'
                   ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-sm'
                   : 'bg-[#0A1A2E] text-slate-400 border-[#102E4A] hover:text-white'
               }`}
             >
               <RefreshCw className="w-2.5 h-2.5" />
-              RE-CLASS
+              <span>RE-CLASS</span>
             </button>
           </div>
 
@@ -558,7 +558,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
             className="w-full py-1 bg-[#0A1A2E] hover:bg-[#00D4AA]/15 border border-[#0D2E4A] hover:border-[#00D4AA]/40 text-[#00D4AA] rounded text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer"
           >
             <Download className="w-2.5 h-2.5" />
-            EXPORT ACTIVE LEARNING BATCH (YOLO)
+            <span>EXPORT ACTIVE LEARNING (YOLO)</span>
           </button>
         </div>
       </div>
@@ -567,7 +567,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
       <div className="flex items-center border-b border-[#0D2E4A] bg-[#030B14] text-xs font-bold shrink-0">
         <button
           onClick={() => setActiveTab('evidence')}
-          className={`flex-1 py-2 text-center transition-all cursor-pointer border-b-2 ${
+          className={`flex-1 py-1.5 px-1 text-center transition-all cursor-pointer border-b-2 text-[10px] font-mono font-bold truncate ${
             activeTab === 'evidence'
               ? 'border-[#00D4AA] text-[#00D4AA] bg-[#082830]/50'
               : 'border-transparent text-[#94A3B8] hover:text-[#E0F7F4]'
@@ -577,7 +577,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
         </button>
         <button
           onClick={() => setActiveTab('specs')}
-          className={`flex-1 py-2 text-center transition-all cursor-pointer border-b-2 ${
+          className={`flex-1 py-1.5 px-1 text-center transition-all cursor-pointer border-b-2 text-[10px] font-mono font-bold truncate ${
             activeTab === 'specs'
               ? 'border-[#00D4AA] text-[#00D4AA] bg-[#082830]/50'
               : 'border-transparent text-[#94A3B8] hover:text-[#E0F7F4]'
@@ -587,7 +587,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
         </button>
         <button
           onClick={() => setActiveTab('geotag')}
-          className={`flex-1 py-2 text-center transition-all cursor-pointer border-b-2 ${
+          className={`flex-1 py-1.5 px-1 text-center transition-all cursor-pointer border-b-2 text-[10px] font-mono font-bold truncate ${
             activeTab === 'geotag'
               ? 'border-[#00D4AA] text-[#00D4AA] bg-[#082830]/50'
               : 'border-transparent text-[#94A3B8] hover:text-[#E0F7F4]'
@@ -1018,7 +1018,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           className="w-full py-2 bg-[#0D2640] border border-[#00D4AA]/60 hover:bg-[#00D4AA]/15 text-[#00D4AA] font-mono font-bold text-[10.5px] rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(0,212,170,0.15)]"
         >
           <Award className="w-3.5 h-3.5 text-[#00D4AA]" />
-          <span>MoES CLEARANCE CERTIFICATE (SHA-256)</span>
+          <span>MoES CERTIFICATE (SHA-256)</span>
         </button>
       </div>
 

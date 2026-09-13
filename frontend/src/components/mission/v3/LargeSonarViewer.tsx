@@ -506,32 +506,8 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           </div>
         </div>
 
-        {/* Compact Toolbar & 3-Way Viewport Switcher */}
-        <div className="flex items-center gap-1.5">
-          <div className="flex items-center gap-1 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded-xs mr-2">
-            <button className="px-2 py-0.5 bg-[#00D4AA] text-[#030B14] font-bold text-[8.5px] rounded-xs cursor-default shadow-[0_0_8px_rgba(0,212,170,0.3)]">
-              📻 SONAR
-            </button>
-            {onViewMissionMap && (
-              <button
-                onClick={onViewMissionMap}
-                className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
-                title="View Subsea Mission Map"
-              >
-                🗺️ MAP
-              </button>
-            )}
-            {onView3D && (
-              <button
-                onClick={onView3D}
-                className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
-                title="View 3D Seafloor Bathymetry"
-              >
-                🌐 3D VIEW
-              </button>
-            )}
-          </div>
-
+        {/* Compact Toolbar Controls */}
+        <div className="flex items-center gap-1.5 shrink-0">
           <button onClick={() => setZoomLevel(1.0)} className="panel-btn hover:text-[#00D4AA]" title="Fit to Screen">FIT</button>
           <button onClick={() => setZoomLevel((z) => Math.min(2.0, z + 0.2))} className="panel-btn hover:text-[#00D4AA]" title="Zoom In"><ZoomIn className="w-3 h-3" /></button>
           <button onClick={() => setZoomLevel((z) => Math.max(0.6, z - 0.2))} className="panel-btn hover:text-[#00D4AA]" title="Zoom Out"><ZoomOut className="w-3 h-3" /></button>
@@ -548,18 +524,23 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           </button>
 
           <button onClick={() => setContrastEnhanced((v) => !v)} className={`panel-btn ${contrastEnhanced ? 'text-[#00D4AA] border-[#00D4AA]/60 bg-[#082830]' : 'text-[#4A8090]'}`} title="Toggle Raw Sonar vs Bilateral CLAHE Denoised Sonar">
-            <Sliders className="w-3 h-3 mr-1" /><span>{contrastEnhanced ? 'DENOISED' : 'RAW/DENOISED'}</span>
+            <Sliders className="w-3 h-3 mr-1" /><span>{contrastEnhanced ? 'DENOISED' : 'RAW'}</span>
           </button>
+        </div>
+      </div>
 
-          {/* Acoustic False-Color Palette Switcher */}
-          <div className="flex items-center gap-0.5 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded text-[8px] font-bold">
-            <span className="text-[7.5px] text-[#94A3B8] px-1 font-mono uppercase">PALETTE:</span>
+      {/* ── SONAR VIEWER CANVAS WORKSPACE (VISUAL HERO) ── */}
+      <div className="flex-1 relative overflow-hidden bg-[#01050A] flex items-center justify-center perspective-[1000px]">
+        {/* Floating Acoustic HUD: Palette Switcher & SRC Ground Rectification */}
+        <div className="absolute top-3 left-3 bg-[#030914]/90 backdrop-blur-md border border-[#0D2E4A] px-2 py-1 rounded-xl flex items-center gap-2 shadow-2xl z-20 pointer-events-auto">
+          <div className="flex items-center gap-1">
+            <span className="text-[7.5px] font-mono font-bold text-[#94A3B8] uppercase">PALETTE:</span>
             <button
               onClick={() => setAcousticPalette('amber')}
-              className={`px-1.5 py-0.5 rounded-xs transition-all cursor-pointer ${
+              className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
                 acousticPalette === 'amber'
-                  ? 'bg-[#F59E0B] text-[#030B14] font-black shadow-[0_0_8px_rgba(245,158,11,0.5)]'
-                  : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+                  ? 'bg-[#F59E0B] text-[#030B14] font-black shadow-md'
+                  : 'text-slate-400 hover:text-white'
               }`}
               title="Kongsberg Copper / Amber Palette (Hydrographic Standard)"
             >
@@ -567,10 +548,10 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             </button>
             <button
               onClick={() => setAcousticPalette('emerald')}
-              className={`px-1.5 py-0.5 rounded-xs transition-all cursor-pointer ${
+              className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
                 acousticPalette === 'emerald'
-                  ? 'bg-[#10B981] text-[#030B14] font-black shadow-[0_0_8px_rgba(16,185,129,0.5)]'
-                  : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+                  ? 'bg-[#10B981] text-[#030B14] font-black shadow-md'
+                  : 'text-slate-400 hover:text-white'
               }`}
               title="Naval Submarine Phosphor Green"
             >
@@ -578,10 +559,10 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             </button>
             <button
               onClick={() => setAcousticPalette('cobalt')}
-              className={`px-1.5 py-0.5 rounded-xs transition-all cursor-pointer ${
+              className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
                 acousticPalette === 'cobalt'
-                  ? 'bg-[#38BDF8] text-[#030B14] font-black shadow-[0_0_8px_rgba(56,189,248,0.5)]'
-                  : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+                  ? 'bg-[#38BDF8] text-[#030B14] font-black shadow-md'
+                  : 'text-slate-400 hover:text-white'
               }`}
               title="EdgeTech Deep-Sea Cyan"
             >
@@ -589,10 +570,10 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             </button>
             <button
               onClick={() => setAcousticPalette('grayscale')}
-              className={`px-1.5 py-0.5 rounded-xs transition-all cursor-pointer ${
+              className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
                 acousticPalette === 'grayscale'
-                  ? 'bg-[#E2E8F0] text-[#030B14] font-black shadow-[0_0_8px_rgba(226,232,240,0.5)]'
-                  : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+                  ? 'bg-[#E2E8F0] text-[#030B14] font-black shadow-md'
+                  : 'text-slate-400 hover:text-white'
               }`}
               title="Inverted Scientific Paper Grayscale"
             >
@@ -600,24 +581,22 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             </button>
           </div>
 
-          {/* Slant-Range Correction (SRC) Button */}
+          <div className="h-3 w-px bg-[#0D2E4A]" />
+
           <button
             onClick={() => setIsSrcActive((v) => !v)}
-            className={`panel-btn flex items-center gap-1 cursor-pointer transition-all ${
+            className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
               isSrcActive
-                ? 'text-[#00D4AA] border-[#00D4AA]/60 bg-[#082830] font-bold shadow-[0_0_8px_rgba(0,212,170,0.3)]'
-                : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+                ? 'bg-[#00D4AA] text-[#030B14] font-black shadow-[0_0_8px_rgba(0,212,170,0.4)]'
+                : 'bg-[#082830] text-[#94A3B8] border border-[#0D2E4A] hover:text-white'
             }`}
             title="Slant-to-Ground Range Rectification (Compensates Nadir Water Column)"
           >
-            <span>{isSrcActive ? 'SRC: GROUND' : 'SLANT RANGE'}</span>
+            {isSrcActive ? 'SRC: GROUND' : 'SRC: SLANT'}
           </button>
         </div>
-      </div>
 
-      {/* ── SONAR VIEWER CANVAS WORKSPACE (VISUAL HERO) ── */}
-      <div className="flex-1 relative overflow-hidden bg-[#01050A] flex items-center justify-center perspective-[1000px]">
-        {/* Slant-Range Correction (SRC) Active Indicator */}
+        {/* Slant-Range Correction (SRC) Active Watermark Indicator */}
         {isSrcActive && (
           <div className="absolute top-3 right-3 bg-[#05121F]/90 border border-[#00D4AA]/50 px-2.5 py-1 rounded-md text-[9px] font-mono font-bold text-[#00D4AA] flex items-center gap-1.5 shadow-[0_0_12px_rgba(0,212,170,0.25)] z-20 pointer-events-none">
             <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] animate-ping" />

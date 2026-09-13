@@ -69,13 +69,13 @@ export const BottomPipelineTimeline: React.FC<BottomPipelineTimelineProps> = ({
       )}
 
       {/* ── 1. HORIZONTAL AI PIPELINE (8 CLEAN STAGES) ── */}
-      <div className="h-11 px-4 border-b border-[#0D2E4A] flex items-center justify-between gap-1 overflow-x-auto">
-        <div className="text-[9px] font-black tracking-wider text-[#4A8090] uppercase shrink-0 mr-2 flex items-center gap-1.5">
+      <div className="h-10 px-3 sm:px-4 border-b border-[#0D2E4A] flex items-center justify-between gap-1 overflow-x-auto">
+        <div className="text-[9px] font-black tracking-wider text-[#4A8090] uppercase shrink-0 mr-1.5 flex items-center gap-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA]" />
-          <span>AI PIPELINE:</span>
+          <span className="hidden sm:inline">AI PIPELINE:</span>
         </div>
 
-        <div className="flex items-center gap-1.5 flex-1 min-w-0">
+        <div className="flex items-center gap-1 flex-1 min-w-0">
           {PIPELINE_STAGES_V3.map((st, idx) => {
             const isCurrent = currentStageIndex === idx;
             const isCompleted = currentStageIndex > idx;
@@ -84,7 +84,7 @@ export const BottomPipelineTimeline: React.FC<BottomPipelineTimelineProps> = ({
               <button
                 key={st.number}
                 onClick={() => onSelectStageIndex(idx)}
-                className={`flex-1 py-1 px-2 border transition-all cursor-pointer rounded-xs flex items-center justify-between min-w-[92px] ${
+                className={`flex-1 py-0.5 px-1 sm:px-1.5 border transition-all cursor-pointer rounded-xs flex items-center justify-between min-w-[68px] xl:min-w-[82px] ${
                   isCurrent
                     ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA] font-bold shadow-[0_0_10px_rgba(0,212,170,0.25)]'
                     : isCompleted
@@ -92,18 +92,18 @@ export const BottomPipelineTimeline: React.FC<BottomPipelineTimelineProps> = ({
                     : 'bg-[#02070D] border-[#0A1E30] text-[#2A5060] hover:text-[#4A8090]'
                 }`}
               >
-                <span className="text-[8.5px] font-mono">
+                <span className="text-[8px] sm:text-[8.5px] font-mono truncate mr-0.5">
                   {st.number} {st.name}
                 </span>
 
                 {isCurrent ? (
-                  <span className="text-[7.5px] px-1 bg-[#00D4AA] text-[#030B14] font-black rounded-xs animate-pulse">
+                  <span className="text-[7px] px-0.5 bg-[#00D4AA] text-[#030B14] font-black rounded-xs animate-pulse">
                     ●
                   </span>
                 ) : isCompleted ? (
-                  <Check className="w-3 h-3 text-[#00D4AA]" />
+                  <Check className="w-2.5 h-2.5 text-[#00D4AA] shrink-0" />
                 ) : (
-                  <Circle className="w-2.5 h-2.5 text-[#2A5060]" />
+                  <Circle className="w-2 h-2 text-[#2A5060] shrink-0" />
                 )}
               </button>
             );
@@ -112,7 +112,7 @@ export const BottomPipelineTimeline: React.FC<BottomPipelineTimelineProps> = ({
       </div>
 
       {/* ── 2. MISSION TIMELINE SCRUBBER & CONTROLS ── */}
-      <div className="h-10 px-4 flex items-center justify-between text-[10px] text-[#4A8090] gap-4">
+      <div className="h-9 px-3 sm:px-4 flex items-center justify-between text-[10px] text-[#4A8090] gap-2">
         {/* Playback Controls */}
         <div className="flex items-center gap-2 shrink-0">
           <button

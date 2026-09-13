@@ -64,7 +64,7 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
   }, [targets, selectedCategory, searchTerm]);
 
   return (
-    <aside className="w-72 lg:w-80 bg-[#05121F] border-r border-[#0D2E4A] flex flex-col font-sans select-none overflow-hidden shrink-0 z-20">
+    <aside className="w-64 xl:w-72 bg-[#05121F] border-r border-[#0D2E4A] flex flex-col font-sans select-none overflow-hidden shrink-0 z-20">
       {/* ── 1. PIPELINE STAGES PROGRESSION (COLLAPSIBLE) ── */}
       <div className="border-b border-[#0D2E4A] bg-[#030B14]">
         <button

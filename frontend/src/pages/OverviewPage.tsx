@@ -31,6 +31,7 @@ import {
   Maximize2,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { MarineSurveyHero } from '../components/overview/MarineSurveyHero';
 
 const GithubIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -65,133 +66,10 @@ export const OverviewPage: React.FC = () => {
   return (
     <div ref={rootRef} className="space-y-16 pb-20 font-body select-none text-[15px] text-[#E0F7F4]">
       {/* ═══════════════════════════════════════════════════════════════════
-          HERO SECTION — HIGH-CONTRAST EDITORIAL WITH SONAR WATERFALL
+          HERO SECTION — SEE BENEATH THE SURFACE & OPERATIONAL MODE SELECTOR
+          SURVEY VESSEL + TOW CABLE + TOWFISH + ACOUSTIC BEAM + MARINE WILDLIFE
           ═══════════════════════════════════════════════════════════════════ */}
-      <header className="relative bg-[#05121F] border border-[#0D2E4A] rounded-xs overflow-hidden shadow-2xl">
-        <div className="p-8 md:p-12 lg:p-14 max-w-4xl space-y-6">
-          {/* Kicker */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#082830] border border-[#00D4AA]/40 text-[#00D4AA] text-xs font-mono font-medium rounded-xs">
-            <Radio className="w-3.5 h-3.5 animate-pulse" />
-            <span>Smart India Hackathon 2026 · Ministry of Earth Sciences (MoES)</span>
-          </div>
-
-          {/* Main Headline */}
-          <h1 className="font-display font-semibold text-3xl sm:text-4xl lg:text-5xl text-[#FFFFFF] leading-[1.14] tracking-[-0.02em]">
-            Marine debris goes undetected because nobody has time to watch the sonar.
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-lg md:text-[19px] text-[#A6C0CE] leading-[1.6] max-w-3xl">
-            <strong className="text-[#00D4AA] font-semibold">SONARX</strong> automatically detects, classifies, and geotags debris and seabed anomalies from side-scan sonar data — turning a slow, manual review job into a live dashboard.
-          </p>
-
-          {/* Call to Actions */}
-          <div className="flex flex-wrap items-center gap-3.5 pt-2">
-            <button
-              onClick={() => setActiveTab('mission')}
-              className="btn-primary cursor-pointer"
-            >
-              <span>See it in action</span>
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('scan')}
-              className="btn-secondary cursor-pointer"
-            >
-              <UploadCloud className="w-4 h-4 text-[#00D4AA]" />
-              <span>Upload & Analyze</span>
-            </button>
-
-            <a
-              href="https://github.com/jayraj175coder/side_sonar_detection_ml"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary"
-            >
-              <GithubIcon className="w-4 h-4 text-[#A6C0CE]" />
-              <span>View the repo</span>
-            </a>
-          </div>
-        </div>
-
-        {/* ── SONAR WATERFALL SVG PANEL ── */}
-        <div className="relative h-[220px] md:h-[260px] border-t border-[#0D2E4A] bg-[#02070D] overflow-hidden">
-          <svg viewBox="0 0 1080 260" preserveAspectRatio="none" className="w-full h-full block">
-            <defs>
-              <filter id="sonar-noise" x="-20%" y="-20%" width="140%" height="140%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.012 0.09" numOctaves="3" seed="7" result="noise" />
-                <feColorMatrix
-                  in="noise"
-                  type="matrix"
-                  values="0 0 0 0 0.00
-                          0 0 0 0 0.22
-                          0 0 0 0 0.35
-                          0 0 0 0.85 0"
-                />
-              </filter>
-              <linearGradient id="sonar-fade" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#05121F" stopOpacity="0.1" />
-                <stop offset="100%" stopColor="#02070D" stopOpacity="0.85" />
-              </linearGradient>
-            </defs>
-
-            {/* Base seabed layer */}
-            <rect width="1080" height="260" fill="#02070D" />
-            <rect width="1080" height="260" filter="url(#sonar-noise)">
-              <animateTransform attributeName="transform" type="translate" from="0 0" to="-260 0" dur="14s" repeatCount="indefinite" />
-            </rect>
-            <rect width="1080" height="260" fill="url(#sonar-fade)" />
-
-            {/* Central Nadir Void Line */}
-            <rect x="520" y="0" width="40" height="260" fill="#010408" opacity="0.9" />
-            <line x1="520" y1="0" x2="520" y2="260" stroke="#00D4AA" strokeWidth="1" opacity="0.3" />
-            <line x1="560" y1="0" x2="560" y2="260" stroke="#00D4AA" strokeWidth="1" opacity="0.3" />
-
-            {/* Sweeping Sonar Acoustic Scan Line */}
-            <line x1="0" y1="0" x2="1080" y2="0" stroke="#00D4AA" strokeWidth="1.6" opacity="0.75">
-              <animate attributeName="y1" values="0;260;0" dur="6s" repeatCount="indefinite" />
-              <animate attributeName="y2" values="0;260;0" dur="6s" repeatCount="indefinite" />
-            </line>
-
-            {/* Contact Markers (Ghost Net, Debris, Pipeline) */}
-            <g>
-              <circle cx="210" cy="85" r="5" fill="none" stroke="#00D4AA" strokeWidth="1.8" />
-              <circle cx="210" cy="85" r="12" fill="none" stroke="#00D4AA" strokeWidth="1" opacity="0.4">
-                <animate attributeName="r" values="5;20;5" dur="3s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.8;0;0.8" dur="3s" repeatCount="indefinite" />
-              </circle>
-              <text x="228" y="89" fill="#00D4AA" fontSize="10" fontFamily="'IBM Plex Mono', monospace" fontWeight="600">SX-T07 · GHOST NET (94.7%)</text>
-            </g>
-
-            <g>
-              <circle cx="720" cy="155" r="4.5" fill="none" stroke="#F59E0B" strokeWidth="1.8" />
-              <text x="736" y="159" fill="#F59E0B" fontSize="10" fontFamily="'IBM Plex Mono', monospace" fontWeight="600">SX-T14 · LOST TRAWL GEAR</text>
-            </g>
-
-            <g>
-              <circle cx="890" cy="65" r="4" fill="none" stroke="#38BDF8" strokeWidth="1.6" />
-              <text x="906" y="69" fill="#38BDF8" fontSize="10" fontFamily="'IBM Plex Mono', monospace" fontWeight="600">SX-T03 · PIPELINE FREE-SPAN</text>
-            </g>
-          </svg>
-
-          {/* Real Sonar Telemetry Readout */}
-          <div className="absolute left-6 right-6 bottom-3 font-mono text-[11.5px] text-[#7C98A6] flex items-center justify-between flex-wrap gap-3 z-10">
-            <div className="flex items-center gap-4 flex-wrap">
-              <span>MODEL: <strong className="text-[#E0F7F4] font-medium">YOLOv8n · ONNX (12.3 MB)</strong></span>
-              <span>·</span>
-              <span>INFERENCE: <strong className="text-[#00D4AA] font-medium">~9.8ms GPU / ~42ms CPU</strong></span>
-              <span>·</span>
-              <span>CLASSES: <strong className="text-[#E0F7F4] font-medium">ALDFG · Debris · Pipeline · Anomaly</strong></span>
-            </div>
-            <span className="text-[10px] text-[#00D4AA] font-bold px-2 py-0.5 bg-[#082830] border border-[#00D4AA]/40 rounded-xs">
-              LIVE TELEMETRY
-            </span>
-          </div>
-        </div>
-      </header>
+      <MarineSurveyHero />
 
       {/* ═══════════════════════════════════════════════════════════════════
           SECTION 1 — THE PROBLEM: EASY TO COLLECT, HARD TO READ IN TIME

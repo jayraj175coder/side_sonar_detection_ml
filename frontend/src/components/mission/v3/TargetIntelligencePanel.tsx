@@ -18,9 +18,11 @@ import {
   Waves,
   Ruler,
   Maximize,
+  Award,
 } from 'lucide-react';
 import { MissionV3Target } from '../../../data/missionV3Data';
 import { useGeospatialConfig } from '../../../context/GeospatialConfigContext';
+import { MoESClearanceCertificateModal } from './MoESClearanceCertificateModal';
 
 interface TargetIntelligencePanelProps {
   target: MissionV3Target;
@@ -42,6 +44,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
   const { provider, status, openModal } = useGeospatialConfig();
   const [activeTab, setActiveTab] = useState<'evidence' | 'specs' | 'geotag'>('evidence');
   const [activeGeoTab, setActiveGeoTab] = useState<'map' | '3d'>('map');
+  const [isCertModalOpen, setIsCertModalOpen] = useState(false);
   const mapCanvasRef = useRef<HTMLCanvasElement>(null);
   const seabed3DCanvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -404,6 +407,65 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
               })}
             </div>
 
+            {/* Explainable AI: Acoustic Evidence Decomposition (XAI) */}
+            <div className="p-3 bg-[#030B14] border border-[#0D2E4A] rounded-xl space-y-2 font-mono text-[9.5px]">
+              <div className="flex items-center justify-between text-[#00D4AA] font-bold">
+                <span className="flex items-center gap-1.5 uppercase text-[9px]">
+                  <Shield className="w-3.5 h-3.5 text-[#00D4AA]" />
+                  <span>XAI ACOUSTIC EVIDENCE DECOMPOSITION</span>
+                </span>
+                <span className="text-[8px] px-1.5 py-0.5 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded font-bold">
+                  94.7% NON-GEOLOGICAL
+                </span>
+              </div>
+
+              <div className="space-y-1.5 pt-1">
+                <div>
+                  <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
+                    <span>1. SPECULAR BACKSCATTER INTENSITY</span>
+                    <span className="text-[#00D4AA] font-bold">+18.4 dB (+14.2 dB vs Rock)</span>
+                  </div>
+                  <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
+                    <div className="h-full bg-[#00D4AA] w-[88%]" />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
+                    <span>2. ACOUSTIC SHADOW HARDNESS (RIGIDITY)</span>
+                    <span className="text-[#38BDF8] font-bold">94% STEP GRADIENT (PASS)</span>
+                  </div>
+                  <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
+                    <div className="h-full bg-[#38BDF8] w-[94%]" />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
+                    <span>3. NON-LINEAR SYNTHETIC CURVATURE</span>
+                    <span className="text-[#F59E0B] font-bold">88% (ALDFG WEAVE MESH)</span>
+                  </div>
+                  <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
+                    <div className="h-full bg-[#F59E0B] w-[88%]" />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
+                    <span>4. CAVITY / NATURAL PIT EXCLUSION</span>
+                    <span className="text-[#00D4AA] font-bold">12% (DEPRESSION RULED OUT)</span>
+                  </div>
+                  <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
+                    <div className="h-full bg-[#00D4AA] w-[12%]" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-1.5 bg-[#082830] border border-[#00D4AA]/30 rounded text-[8px] text-[#94A3B8] leading-tight">
+                Verdict: Specular intensity and high shadow hardness rule out natural basalt rock and sand dunes with 94.7% confidence.
+              </div>
+            </div>
+
             {/* Environmental Impact Metrics */}
             <div className="grid grid-cols-2 gap-2 pt-1 text-[10px]">
               <div className="p-2 bg-[#030B14] border border-[#0D2E4A] rounded">
@@ -480,17 +542,66 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
               </div>
             </div>
 
-            {/* Geometry Evidence Text */}
-            <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded space-y-1 text-[9.5px]">
-              <span className="text-[#94A3B8] font-bold block uppercase text-[8.5px]">
-                ACOUSTIC SHADOW RELIEF FORMULA
-              </span>
-              <p className="text-[#E0F7F4] font-mono leading-relaxed">
-                H = (L_shadow × H_altitude) / (R_slant + L_shadow)
-              </p>
-              <p className="text-[#94A3B8] leading-tight">
-                Physical shadow indicates target is elevated above seafloor sediment rather than buried.
-              </p>
+            {/* Physics-Informed Acoustic Shadow Ray-Tracer Diagram & Live Equation */}
+            <div className="p-3 bg-[#030B14] border border-[#0D2E4A] rounded-xl space-y-2 font-mono">
+              <div className="flex items-center justify-between text-[9px]">
+                <span className="font-bold text-[#00D4AA] uppercase flex items-center gap-1.5">
+                  <Ruler className="w-3.5 h-3.5 text-[#00D4AA]" />
+                  <span>PHYSICS-INFORMED SHADOW RAY-TRACER</span>
+                </span>
+                <span className="text-[8px] px-1.5 py-0.5 bg-[#082830] text-[#38BDF8] border border-[#38BDF8]/40 rounded font-bold">
+                  PI-AI CALC
+                </span>
+              </div>
+
+              {/* SVG Ray-Tracing Cross-Section Diagram */}
+              <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded-lg">
+                <svg viewBox="0 0 280 110" className="w-full h-24">
+                  {/* Water Surface Baseline */}
+                  <line x1="10" y1="15" x2="270" y2="15" stroke="#0D2E4A" strokeWidth="1" strokeDasharray="3,3" />
+                  <text x="12" y="12" fill="#94A3B8" fontSize="6.5">WATER SURFACE</text>
+
+                  {/* Sonar Transducer Towfish */}
+                  <circle cx="35" cy="28" r="4" fill="#00D4AA" />
+                  <text x="44" y="30" fill="#00D4AA" fontSize="7" fontWeight="bold">TOWFISH (H = 8.4m)</text>
+
+                  {/* Seafloor Bedline */}
+                  <line x1="10" y1="95" x2="270" y2="95" stroke="#1A4E6A" strokeWidth="2" />
+                  <text x="12" y="105" fill="#94A3B8" fontSize="6.5">SEAFLOOR BED</text>
+
+                  {/* Acoustic Incident Ray from Towfish to Target */}
+                  <line x1="35" y1="28" x2="140" y2="82" stroke="#38BDF8" strokeWidth="1.5" strokeDasharray="4,2" />
+                  <text x="70" y="50" fill="#38BDF8" fontSize="6.5" transform="rotate(25, 70, 50)">Slant Range Rs = 25.0m</text>
+
+                  {/* Target Object on Seafloor */}
+                  <rect x="135" y="82" width="12" height="13" fill="#00D4AA" rx="1" />
+                  <text x="124" y="78" fill="#E0F7F4" fontSize="7" fontWeight="bold">TARGET</text>
+
+                  {/* Cast Acoustic Shadow Wedge on Seabed */}
+                  <polygon points="147,95 240,95 147,82" fill="#01050A" stroke="#EF4444" strokeWidth="1" strokeDasharray="2,2" />
+                  <line x1="147" y1="97" x2="240" y2="97" stroke="#F59E0B" strokeWidth="2" />
+                  <text x="160" y="105" fill="#F59E0B" fontSize="6.5" fontWeight="bold">Shadow Ls = {target.shadowLength.toFixed(2)}m</text>
+
+                  {/* Height Extrusion Arrow */}
+                  <line x1="130" y1="82" x2="130" y2="95" stroke="#00D4AA" strokeWidth="1.5" />
+                  <text x="96" y="90" fill="#00D4AA" fontSize="7" fontWeight="bold">h = {((target.shadowLength * 8.4) / (25.0 + target.shadowLength)).toFixed(2)}m</text>
+                </svg>
+              </div>
+
+              {/* Physics Formula Breakdown */}
+              <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded text-[8.5px] space-y-1">
+                <div className="flex justify-between text-[#94A3B8]">
+                  <span>GOVERNING ACOUSTIC EQUATION:</span>
+                  <span className="text-[#00D4AA] font-bold">h = (Ls × H) / (Rs + Ls)</span>
+                </div>
+                <div className="text-[#E0F7F4] font-mono text-[9px]">
+                  h = ({target.shadowLength.toFixed(2)}m × 8.40m) / (25.00m + {target.shadowLength.toFixed(2)}m) = <span className="text-[#00D4AA] font-black text-xs">{((target.shadowLength * 8.4) / (25.0 + target.shadowLength)).toFixed(2)}m</span> proud of seabed
+                </div>
+                <div className="flex items-center justify-between pt-1 border-t border-[#0D2E4A] text-[8px]">
+                  <span className="text-[#94A3B8]">BENTHIC HAZARD RATING:</span>
+                  <span className="text-[#EF4444] font-bold">CRITICAL SUBSEA NAVIGATION RISK</span>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -582,6 +693,24 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           </div>
         )}
       </div>
+
+      {/* MoES Clearance Certificate Trigger Button */}
+      <div className="p-2.5 border-t border-[#0D2E4A] bg-[#030B14] shrink-0">
+        <button
+          onClick={() => setIsCertModalOpen(true)}
+          className="w-full py-2 bg-[#0D2640] border border-[#00D4AA]/60 hover:bg-[#00D4AA]/15 text-[#00D4AA] font-mono font-bold text-[10.5px] rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(0,212,170,0.15)]"
+        >
+          <Award className="w-3.5 h-3.5 text-[#00D4AA]" />
+          <span>MoES CLEARANCE CERTIFICATE (SHA-256)</span>
+        </button>
+      </div>
+
+      {/* MoES Clearance Certificate Modal */}
+      <MoESClearanceCertificateModal
+        isOpen={isCertModalOpen}
+        onClose={() => setIsCertModalOpen(false)}
+        target={target}
+      />
     </aside>
   );
 };

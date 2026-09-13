@@ -31,6 +31,8 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
   const [zoomLevel, setZoomLevel] = useState(1.0);
   const [showTargetsToggle, setShowTargetsToggle] = useState(true);
   const [contrastEnhanced, setContrastEnhanced] = useState(false);
+  const [acousticPalette, setAcousticPalette] = useState<'amber' | 'emerald' | 'cobalt' | 'grayscale'>('amber');
+  const [isSrcActive, setIsSrcActive] = useState(false);
   const [measureActive, setMeasureActive] = useState(false);
   const [measurePoints, setMeasurePoints] = useState<{ x: number; y: number }[]>([]);
   const [cinematicTransform, setCinematicTransform] = useState({ scale: 1, x: 0, y: 0 });
@@ -81,7 +83,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
       const t = (now - startTime) / 1000;
       const data = imgData.data;
 
-      const nadirW = 28;
+      const nadirW = isSrcActive ? 4 : 28;
       const centerX = W / 2;
       const noiseOffset = Math.floor(t * 15); // Slower noise rolling
 
@@ -109,9 +111,25 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
 
           intensity = Math.max(0, Math.min(255, intensity));
 
-          const r = Math.floor(intensity * 0.12);
-          const g = Math.floor(intensity * 0.62);
-          const b = Math.floor(intensity * 0.78);
+          let r = 0, g = 0, b = 0;
+          if (acousticPalette === 'amber') {
+            r = Math.floor(intensity * 0.96);
+            g = Math.floor(intensity * 0.64);
+            b = Math.floor(intensity * 0.18);
+          } else if (acousticPalette === 'emerald') {
+            r = Math.floor(intensity * 0.12);
+            g = Math.floor(intensity * 0.92);
+            b = Math.floor(intensity * 0.38);
+          } else if (acousticPalette === 'cobalt') {
+            r = Math.floor(intensity * 0.12);
+            g = Math.floor(intensity * 0.62);
+            b = Math.floor(intensity * 0.78);
+          } else if (acousticPalette === 'grayscale') {
+            const gray = Math.floor(intensity * 0.88);
+            r = gray;
+            g = gray;
+            b = gray;
+          }
 
           for (let dy = 0; dy < 2 && y + dy < H; dy++) {
             for (let dx = 0; dx < 2 && x + dx < W; dx++) {
@@ -352,11 +370,12 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
       }
 
       animFrameId = requestAnimationFrame(render);
+      return () => cancelAnimationFrame(animFrameId);
     };
 
     animFrameId = requestAnimationFrame(render);
     return () => cancelAnimationFrame(animFrameId);
-  }, [targets, selectedTargetId, hoveredTargetId, showTargetsToggle, contrastEnhanced, measureActive, measurePoints, isDemoRunning, demoPhaseStep, heroConfidence]);
+  }, [targets, selectedTargetId, hoveredTargetId, showTargetsToggle, contrastEnhanced, measureActive, measurePoints, isDemoRunning, demoPhaseStep, heroConfidence, acousticPalette, isSrcActive]);
 
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -481,13 +500,82 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           </button>
 
           <button onClick={() => setContrastEnhanced((v) => !v)} className={`panel-btn ${contrastEnhanced ? 'text-[#00D4AA] border-[#00D4AA]/60 bg-[#082830]' : 'text-[#4A8090]'}`} title="Toggle Raw Sonar vs Bilateral CLAHE Denoised Sonar">
-            <Sliders className="w-3 h-3 mr-1" /><span>{contrastEnhanced ? 'DENOISED (CLAHE)' : 'RAW / DENOISED'}</span>
+            <Sliders className="w-3 h-3 mr-1" /><span>{contrastEnhanced ? 'DENOISED' : 'RAW/DENOISED'}</span>
+          </button>
+
+          {/* Acoustic False-Color Palette Switcher */}
+          <div className="flex items-center gap-0.5 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded text-[8px] font-bold">
+            <span className="text-[7.5px] text-[#94A3B8] px-1 font-mono uppercase">PALETTE:</span>
+            <button
+              onClick={() => setAcousticPalette('amber')}
+              className={`px-1.5 py-0.5 rounded-xs transition-all cursor-pointer ${
+                acousticPalette === 'amber'
+                  ? 'bg-[#F59E0B] text-[#030B14] font-black shadow-[0_0_8px_rgba(245,158,11,0.5)]'
+                  : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+              }`}
+              title="Kongsberg Copper / Amber Palette (Hydrographic Standard)"
+            >
+              AMBER
+            </button>
+            <button
+              onClick={() => setAcousticPalette('emerald')}
+              className={`px-1.5 py-0.5 rounded-xs transition-all cursor-pointer ${
+                acousticPalette === 'emerald'
+                  ? 'bg-[#10B981] text-[#030B14] font-black shadow-[0_0_8px_rgba(16,185,129,0.5)]'
+                  : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+              }`}
+              title="Naval Submarine Phosphor Green"
+            >
+              EMERALD
+            </button>
+            <button
+              onClick={() => setAcousticPalette('cobalt')}
+              className={`px-1.5 py-0.5 rounded-xs transition-all cursor-pointer ${
+                acousticPalette === 'cobalt'
+                  ? 'bg-[#38BDF8] text-[#030B14] font-black shadow-[0_0_8px_rgba(56,189,248,0.5)]'
+                  : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+              }`}
+              title="EdgeTech Deep-Sea Cyan"
+            >
+              COBALT
+            </button>
+            <button
+              onClick={() => setAcousticPalette('grayscale')}
+              className={`px-1.5 py-0.5 rounded-xs transition-all cursor-pointer ${
+                acousticPalette === 'grayscale'
+                  ? 'bg-[#E2E8F0] text-[#030B14] font-black shadow-[0_0_8px_rgba(226,232,240,0.5)]'
+                  : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+              }`}
+              title="Inverted Scientific Paper Grayscale"
+            >
+              B&W
+            </button>
+          </div>
+
+          {/* Slant-Range Correction (SRC) Button */}
+          <button
+            onClick={() => setIsSrcActive((v) => !v)}
+            className={`panel-btn flex items-center gap-1 cursor-pointer transition-all ${
+              isSrcActive
+                ? 'text-[#00D4AA] border-[#00D4AA]/60 bg-[#082830] font-bold shadow-[0_0_8px_rgba(0,212,170,0.3)]'
+                : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+            }`}
+            title="Slant-to-Ground Range Rectification (Compensates Nadir Water Column)"
+          >
+            <span>{isSrcActive ? 'SRC: GROUND' : 'SLANT RANGE'}</span>
           </button>
         </div>
       </div>
 
       {/* ── SONAR VIEWER CANVAS WORKSPACE (VISUAL HERO) ── */}
       <div className="flex-1 relative overflow-hidden bg-[#01050A] flex items-center justify-center perspective-[1000px]">
+        {/* Slant-Range Correction (SRC) Active Indicator */}
+        {isSrcActive && (
+          <div className="absolute top-3 right-3 bg-[#05121F]/90 border border-[#00D4AA]/50 px-2.5 py-1 rounded-md text-[9px] font-mono font-bold text-[#00D4AA] flex items-center gap-1.5 shadow-[0_0_12px_rgba(0,212,170,0.25)] z-20 pointer-events-none">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] animate-ping" />
+            <span>SRC ACTIVE · NADIR RECTIFIED · Rg = √(Rs² - H²)</span>
+          </div>
+        )}
         <div 
           className="w-full h-full flex items-center justify-center"
           style={{

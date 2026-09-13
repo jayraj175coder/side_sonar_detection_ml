@@ -21,6 +21,7 @@ import { exportOfficialIncidentReport } from '../utils/incidentReportGenerator';
 import { SURVEY_SITES } from '../data/consoleData';
 import { LiveDemoSequence } from '../components/console/LiveDemoSequence';
 import { JudgeModeProofView } from '../components/mission/v3/JudgeModeProofView';
+import { MoESClearanceCertificateModal } from '../components/mission/v3/MoESClearanceCertificateModal';
 
 export const MissionPage: React.FC = () => {
   // ── State Management ──
@@ -29,6 +30,7 @@ export const MissionPage: React.FC = () => {
   const [hoveredTargetId, setHoveredTargetId] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
   const [isAlertDrawerOpen, setIsAlertDrawerOpen] = useState<boolean>(false);
+  const [isCertificateModalOpen, setIsCertificateModalOpen] = useState<boolean>(false);
   const [dispatchTarget, setDispatchTarget] = useState<MissionV3Target | null>(null);
 
   // Judge Mode (20-Second Simplified Proof View)
@@ -276,6 +278,7 @@ export const MissionPage: React.FC = () => {
         onOpenUpload={() => setIsUploadModalOpen(true)}
         onExportReport={handleExportReport}
         onExportGeoJson={() => exportGeoJsonDossier(processedTargets)}
+        onOpenCertificate={() => setIsCertificateModalOpen(true)}
         onToggleAlertDrawer={() => setIsAlertDrawerOpen((v) => !v)}
         alertCount={processedTargets.filter((t) => t.priority === 'HIGH' || t.status === 'CONFIRMED').length}
         activePhaseName={PIPELINE_STAGES_V3[currentStageIndex]?.name}
@@ -408,6 +411,13 @@ export const MissionPage: React.FC = () => {
           <LiveDemoSequence onComplete={() => setShowCinematicDemo(false)} />
         </div>
       )}
+
+      {/* ── MoES OFFICIAL CLEARANCE CERTIFICATE MODAL ── */}
+      <MoESClearanceCertificateModal
+        isOpen={isCertificateModalOpen}
+        onClose={() => setIsCertificateModalOpen(false)}
+        target={selectedTarget}
+      />
     </div>
   );
 };

@@ -12,6 +12,7 @@ import {
   Bell,
   Download,
   MoreVertical,
+  Award,
 } from 'lucide-react';
 
 interface MissionTopHeaderProps {
@@ -24,6 +25,7 @@ interface MissionTopHeaderProps {
   onOpenUpload: () => void;
   onExportReport: () => void;
   onExportGeoJson?: () => void;
+  onOpenCertificate?: () => void;
   onToggleAlertDrawer?: () => void;
   alertCount?: number;
   activePhaseName?: string;
@@ -46,6 +48,7 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
   onOpenUpload,
   onExportReport,
   onExportGeoJson,
+  onOpenCertificate,
   onToggleAlertDrawer,
   alertCount = 4,
   activePhaseName,
@@ -222,6 +225,19 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
                     <FileText className="w-3.5 h-3.5 text-[#F59E0B]" />
                     <span>Export MoES Dossier</span>
                   </button>
+
+                  {onOpenCertificate && (
+                    <button
+                      onClick={() => {
+                        onOpenCertificate();
+                        setIsOverflowOpen(false);
+                      }}
+                      className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                    >
+                      <Award className="w-3.5 h-3.5 text-[#00D4AA]" />
+                      <span>MoES Clearance Certificate</span>
+                    </button>
+                  )}
                 </div>
 
                 {onOpenCinematicDemo && (

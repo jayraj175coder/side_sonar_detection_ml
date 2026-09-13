@@ -48,6 +48,14 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   );
   const [hoveredDetId, setHoveredDetId] = useState<string | null>(null);
   const [selectedDetId, setSelectedDetId] = useState<string | null>(null);
+  const [acousticPalette, setAcousticPalette] = useState<'amber' | 'emerald' | 'cobalt' | 'grayscale'>('amber');
+
+  const PALETTE_FILTERS: Record<string, string> = {
+    amber: 'sepia(0.85) hue-rotate(-12deg) saturate(2.1) contrast(1.15)',
+    emerald: 'hue-rotate(85deg) saturate(2.4) contrast(1.2)',
+    cobalt: 'hue-rotate(185deg) saturate(2.2) contrast(1.2)',
+    grayscale: 'grayscale(1) contrast(1.25) brightness(1.05)',
+  };
 
   const visibleDetections = scan.detections.filter(
     (d) => d.confidence >= activeThreshold
@@ -291,6 +299,59 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               <span>Labels</span>
             </button>
 
+            {/* Palette Switcher */}
+            <div className="flex items-center gap-1 bg-[#091522] border border-[#102436] rounded-xl p-1">
+              <span className="text-[9px] font-mono text-slate-500 uppercase px-1 hidden sm:inline">PALETTE:</span>
+              <button
+                type="button"
+                onClick={() => setAcousticPalette('amber')}
+                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
+                  acousticPalette === 'amber'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Kongsberg Copper / Amber Palette"
+              >
+                AMBER
+              </button>
+              <button
+                type="button"
+                onClick={() => setAcousticPalette('emerald')}
+                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
+                  acousticPalette === 'emerald'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Naval Phosphor Green Palette"
+              >
+                EMERALD
+              </button>
+              <button
+                type="button"
+                onClick={() => setAcousticPalette('cobalt')}
+                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
+                  acousticPalette === 'cobalt'
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="EdgeTech Cyan / Cobalt Palette"
+              >
+                COBALT
+              </button>
+              <button
+                type="button"
+                onClick={() => setAcousticPalette('grayscale')}
+                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-all ${
+                  acousticPalette === 'grayscale'
+                    ? 'bg-slate-700 text-slate-200 border border-slate-600 shadow-sm'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Scientific Monochromatic Grayscale"
+              >
+                B&W
+              </button>
+            </div>
+
             <div className="h-4 w-px bg-slate-800 mx-1" />
 
             <button
@@ -326,7 +387,8 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
             <img
               src={previewUrl}
               alt="Analyzed side-scan sonar swath"
-              className="max-h-[520px] w-auto object-contain block pointer-events-none"
+              style={{ filter: PALETTE_FILTERS[acousticPalette] }}
+              className="max-h-[520px] w-auto object-contain block pointer-events-none transition-all duration-300"
             />
 
             {/* SVG Bounding Box Layer with Animated Staggered Draw-In */}

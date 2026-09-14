@@ -233,3 +233,12 @@
   stroke-dasharray: 8, 8 !important;
   animation: surveyTrackPulse 2s linear infinite !important;
 }
+
+/* Leaflet Tactical Hand-Grab and Smooth Drag Cursors */
+.leaflet-container {
+  cursor: grab !important;
+}
+.leaflet-container:active,
+.leaflet-grab:active {
+  cursor: grabbing !important;
+}

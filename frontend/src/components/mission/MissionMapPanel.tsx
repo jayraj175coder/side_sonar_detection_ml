@@ -23,6 +23,9 @@ import {
   Ship,
   Activity,
   Zap,
+  Globe2,
+  Waves,
+  Shield,
 } from 'lucide-react';
 import { useMission } from '../../context/MissionContext';
 import { MISSION_DATA, interpolateVesselPosition } from '../../data/mission';
@@ -141,6 +144,7 @@ export const MissionMapPanel: React.FC = () => {
     activeTargets,
   } = useMission();
 
+  const [mapMode, setMapMode] = useState<'satellite' | 'bathymetry' | 'dark_hud'>('dark_hud');
   const [mapCenter, setMapCenter] = useState<[number, number]>([18.921, 72.821]);
   const vessel = interpolateVesselPosition(playbackTime);
   const track = MISSION_DATA.track.map((p) => [p.lat, p.lon] as [number, number]);
@@ -156,8 +160,8 @@ export const MissionMapPanel: React.FC = () => {
 
   return (
     <div className="relative flex flex-col h-full bg-[#080B11] overflow-hidden select-none font-mono text-[9px]">
-      {/* 1. Header Bar with Indian Maritime Identity */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-[#10151D] border-b border-[#1B2330] shrink-0 z-10 shadow-md">
+      {/* 1. Header Bar with Indian Maritime Identity & 3-Way Mode Switcher */}
+      <div className="flex items-center justify-between px-3 py-1.5 bg-[#10151D] border-b border-[#1B2330] shrink-0 z-10 shadow-md gap-2">
         <div className="flex items-center gap-2">
           <Compass className="w-3.5 h-3.5 text-[#4CD9E8] animate-pulse" />
           <span className="font-black text-[#EAEFF5] uppercase tracking-wider">
@@ -168,7 +172,47 @@ export const MissionMapPanel: React.FC = () => {
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {/* 3-Way Mode Switcher */}
+          <div className="flex items-center bg-[#080B11] p-0.5 rounded-lg border border-[#1B2330]">
+            <button
+              onClick={() => setMapMode('satellite')}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded text-[8px] font-bold transition-all cursor-pointer ${
+                mapMode === 'satellite'
+                  ? 'bg-[#4CD9E8] text-[#080B11]'
+                  : 'text-[#7C8AA0] hover:text-[#EAEFF5]'
+              }`}
+              title="High-Resolution Satellite Imagery"
+            >
+              <Globe2 className="w-2.5 h-2.5" />
+              <span>SAT</span>
+            </button>
+            <button
+              onClick={() => setMapMode('bathymetry')}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded text-[8px] font-bold transition-all cursor-pointer ${
+                mapMode === 'bathymetry'
+                  ? 'bg-[#38BDF8] text-[#080B11]'
+                  : 'text-[#7C8AA0] hover:text-[#EAEFF5]'
+              }`}
+              title="GEBCO Ocean Bathymetry & Seabed Contours"
+            >
+              <Waves className="w-2.5 h-2.5" />
+              <span>BATHY</span>
+            </button>
+            <button
+              onClick={() => setMapMode('dark_hud')}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded text-[8px] font-bold transition-all cursor-pointer ${
+                mapMode === 'dark_hud'
+                  ? 'bg-[#10B981] text-[#080B11]'
+                  : 'text-[#7C8AA0] hover:text-[#EAEFF5]'
+              }`}
+              title="Tactical Dark Subsea HUD"
+            >
+              <Shield className="w-2.5 h-2.5" />
+              <span>DARK</span>
+            </button>
+          </div>
+
           <span className="text-[8px] px-1.5 py-0.5 rounded bg-[#4CD9E8]/10 text-[#4CD9E8] border border-[#4CD9E8]/30 font-bold">
             {visibleTargetIds.length} TARGETS
           </span>
@@ -186,21 +230,63 @@ export const MissionMapPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Map Container with Native Dark Carto Subsea Tiles */}
+      {/* 2. Map Container with Hand-Drag & Smooth Wheel Zoom */}
       <div className="flex-1 relative" style={{ zIndex: 0 }}>
         <MapContainer
           center={mapCenter}
           zoom={13}
+          scrollWheelZoom={true}
+          dragging={true}
+          touchZoom={true}
+          doubleClickZoom={true}
           zoomControl={false}
           attributionControl={false}
-          className="w-full h-full"
+          className="w-full h-full cursor-grab active:cursor-grabbing"
           style={{ background: '#080B11' }}
         >
-          {/* Clean Dark Subsea Marine Tile Layer (Zero Watermarks, No Key Required) */}
-          <TileLayer
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
-            className="sonar-dark-tiles"
-          />
+          {/* Tile Layer by Selected Mode */}
+          {mapMode === 'satellite' && (
+            <>
+              <TileLayer
+                key="mission-sat-base"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              />
+              <TileLayer
+                key="mission-sat-labels"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                opacity={0.8}
+              />
+            </>
+          )}
+
+          {mapMode === 'bathymetry' && (
+            <>
+              <TileLayer
+                key="mission-ocean-base"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}"
+              />
+              <TileLayer
+                key="mission-ocean-reference"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}"
+                opacity={0.7}
+              />
+            </>
+          )}
+
+          {mapMode === 'dark_hud' && (
+            <>
+              <TileLayer
+                key="mission-dark-base"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+                className="sonar-dark-tiles"
+              />
+              <TileLayer
+                key="mission-dark-labels"
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+                opacity={0.7}
+              />
+            </>
+          )}
 
           <MapFlyTo center={mapCenter} />
 

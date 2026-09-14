@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { MarineSurveyHero } from '../components/overview/MarineSurveyHero';
+import { TacticalDebrisRadarShowcase } from '../components/overview/TacticalDebrisRadarShowcase';
 
 const GithubIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -70,6 +71,13 @@ export const OverviewPage: React.FC = () => {
           SURVEY VESSEL + TOW CABLE + TOWFISH + ACOUSTIC BEAM + MARINE WILDLIFE
           ═══════════════════════════════════════════════════════════════════ */}
       <MarineSurveyHero />
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          LIVE AUTONOMOUS MARINE DEBRIS HOLOGRAPHIC RADAR SHOWCASE
+          ═══════════════════════════════════════════════════════════════════ */}
+      <div className="reveal">
+        <TacticalDebrisRadarShowcase />
+      </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
           SECTION 1 — THE PROBLEM: EASY TO COLLECT, HARD TO READ IN TIME

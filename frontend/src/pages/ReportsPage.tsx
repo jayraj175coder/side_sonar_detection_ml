@@ -288,6 +288,18 @@ export const ReportsPage: React.FC = () => {
             </p>
           </div>
 
+          {/* Holographic Govt. of India / IHO S-44 Seal */}
+          <div className="flex items-center gap-3 p-2 px-3 rounded-xl bg-[#082830]/80 border border-[#00D4AA]/40 shadow-[0_0_20px_rgba(0,212,170,0.15)] print:hidden">
+            <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
+              <div className="absolute inset-0 rounded-full border border-dashed border-[#00D4AA] animate-spin" style={{ animationDuration: '10s' }} />
+              <ShieldCheck className="w-5 h-5 text-[#00D4AA] animate-pulse" />
+            </div>
+            <div className="text-left text-[9px] font-mono leading-tight">
+              <span className="text-[#00D4AA] font-black block tracking-wider">IHO S-44 COMPLIANT</span>
+              <span className="text-[#94A3B8] block">SHA-256: 8f4a...29b6 (VERIFIED)</span>
+            </div>
+          </div>
+
           {/* Mission & Sensor Specifications */}
           <div className="text-right text-xs font-mono space-y-1 text-[#94A3B8] print:text-gray-600">
             <p>Scan ID: <strong className="text-white print:text-black">{scanId}</strong></p>

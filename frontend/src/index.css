@@ -242,3 +242,59 @@
 .leaflet-grab:active {
   cursor: grabbing !important;
 }
+
+/* ── Deep-Sea Ambient Bioluminescence & Cyber HUD Animations ── */
+@keyframes ambientDrift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+  50% { transform: translate(40px, -30px) scale(1.12); opacity: 0.25; }
+}
+
+@keyframes ambientDrift2 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.12; }
+  50% { transform: translate(-35px, 25px) scale(1.15); opacity: 0.22; }
+}
+
+@keyframes sonarPingRipple {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  50% { opacity: 0.4; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes laserScanVertical {
+  0% { top: 0%; opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { top: 100%; opacity: 0.8; }
+}
+
+@keyframes tensorFlow {
+  0% { stroke-dashoffset: 24; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes marineSnowFloat {
+  0% { transform: translateY(100%) translateX(0); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(-100%) translateX(20px); opacity: 0; }
+}
+
+.animate-ambient-drift-1 {
+  animation: ambientDrift1 12s ease-in-out infinite;
+}
+
+.animate-ambient-drift-2 {
+  animation: ambientDrift2 16s ease-in-out infinite;
+}
+
+.animate-sonar-ping-ripple {
+  animation: sonarPingRipple 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+}
+
+.animate-laser-scan {
+  animation: laserScanVertical 2.2s ease-in-out infinite alternate;
+}
+
+.animate-tensor-flow {
+  stroke-dasharray: 6, 6;
+  animation: tensorFlow 1s linear infinite;
+}

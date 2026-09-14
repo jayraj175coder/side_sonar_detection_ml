@@ -232,13 +232,16 @@ export const DropZone: React.FC<DropZoneProps> = ({
       >
         {previewUrl ? (
           <div className="relative w-full h-full flex flex-col items-center justify-center space-y-3">
-            <div className="relative group/img">
+            <div className="relative group/img overflow-hidden rounded-2xl">
               <img
                 src={previewUrl}
                 alt="Sonar scan preview"
                 className="max-h-[220px] w-auto object-contain rounded-2xl border border-[#152438] shadow-[0_12px_40px_rgba(0,0,0,0.8)]"
               />
-              <div className="absolute inset-0 bg-[#03070E]/60 opacity-0 group-hover/img:opacity-100 transition-opacity rounded-2xl flex items-center justify-center gap-2 backdrop-blur-[2px]">
+              {/* Tactical Vertical Acoustic Laser Scanline */}
+              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_#00D4AA] animate-laser-scan pointer-events-none z-10" />
+
+              <div className="absolute inset-0 bg-[#03070E]/60 opacity-0 group-hover/img:opacity-100 transition-opacity rounded-2xl flex items-center justify-center gap-2 backdrop-blur-[2px] z-20">
                 <button
                   type="button"
                   onClick={handleOpenFilePicker}
@@ -272,8 +275,12 @@ export const DropZone: React.FC<DropZoneProps> = ({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-md">
-            <div className="w-16 h-16 rounded-2xl bg-[#060D17] border border-[#152438] flex items-center justify-center text-[#4CD9E8] shadow-[0_0_20px_rgba(76,217,232,0.15)] group-hover:scale-110 group-hover:border-[#4CD9E8]/60 transition-all duration-300">
-              <UploadCloud className="w-8 h-8" />
+            {/* Pulsing Sonar Ping Emitter Halo */}
+            <div className="relative flex items-center justify-center">
+              <div className="absolute w-24 h-24 rounded-full border border-cyan-400/40 animate-sonar-ping-ripple pointer-events-none" />
+              <div className="w-16 h-16 rounded-2xl bg-[#060D17] border border-[#152438] flex items-center justify-center text-[#4CD9E8] shadow-[0_0_20px_rgba(76,217,232,0.25)] group-hover:scale-110 group-hover:border-[#4CD9E8]/80 transition-all duration-300 z-10">
+                <UploadCloud className="w-8 h-8 animate-pulse" />
+              </div>
             </div>
 
             <div className="space-y-1">
@@ -295,6 +302,26 @@ export const DropZone: React.FC<DropZoneProps> = ({
               </span>
               <span className="px-2 py-0.5 rounded bg-[#060D17] border border-[#152438]">
                 Clipboard (Ctrl+V)
+              </span>
+            </div>
+
+            {/* Tactical Debris Taxonomy Indicator Pill */}
+            <div className="flex items-center gap-2 text-[8px] font-mono flex-wrap justify-center pt-1">
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/30 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping" />
+                Ghost Nets (ALDFG)
+              </span>
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#06B6D4]/10 text-[#06B6D4] border border-[#06B6D4]/30 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#06B6D4]" />
+                Pipeline Hazards
+              </span>
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+                Anthropogenic Debris
+              </span>
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#A855F7]/10 text-[#A855F7] border border-[#A855F7]/30 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#A855F7]" />
+                Seafloor Anomalies
               </span>
             </div>
 

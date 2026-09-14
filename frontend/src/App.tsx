@@ -14,6 +14,7 @@ import { MissionProvider } from './context/MissionContext';
 import { GeospatialConfigProvider } from './context/GeospatialConfigContext';
 import { GeospatialConfigModal } from './components/common/GeospatialConfigModal';
 import { FloatingDemoController } from './components/common/FloatingDemoController';
+import { AmbientOceanBackdrop } from './components/common/AmbientOceanBackdrop';
 import { useApp } from './context/AppContext';
 import {
   LayoutDashboard, ScanLine, History, MapPin, FileText, Cpu, Crosshair, Eye, BarChart2,
@@ -76,8 +77,9 @@ export const App: React.FC = () => {
               <MissionPage />
             </div>
           ) : (
-            <main className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
-              <div className="w-full px-4 md:px-6 py-4 md:py-6 space-y-4">
+            <main className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 relative">
+              <AmbientOceanBackdrop />
+              <div className="w-full px-4 md:px-6 py-4 md:py-6 space-y-4 relative z-10">
                 {activeTab === 'overview'  && <OverviewPage />}
                 {activeTab === 'scan'      && <NewScanPage />}
                 {activeTab === 'history'   && <ScanHistoryPage />}

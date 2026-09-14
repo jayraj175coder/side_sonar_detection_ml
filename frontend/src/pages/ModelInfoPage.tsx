@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { NeuralTensorFlowDiagram } from '../components/common/NeuralTensorFlowDiagram';
 
 export const ModelInfoPage: React.FC = () => {
   const { modelInfo, isBackendConnected } = useApp();
@@ -106,6 +107,9 @@ export const ModelInfoPage: React.FC = () => {
             <p className="text-[#7C98A6] leading-relaxed">
               The model utilizes a lightweight YOLOv8 Nano architecture fine-tuned specifically for single-channel side-scan sonar acoustic reflectivity arrays. The inference pipeline operates at a native resolution of 640×640 with an anchor-free split decoupled head.
             </p>
+
+            {/* Animated Neural Flow Diagram */}
+            <NeuralTensorFlowDiagram />
 
             {/* Core Specifications Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-[9.5px]">

@@ -3,6 +3,7 @@ import { DropZone } from '../components/scan/DropZone';
 import { ConfigPanel } from '../components/scan/ConfigPanel';
 import { ProcessingState } from '../components/scan/ProcessingState';
 import { DetectionViewer } from '../components/scan/DetectionViewer';
+import { AcousticGisProcessingOverlay } from '../components/scan/AcousticGisProcessingOverlay';
 import { useApp } from '../context/AppContext';
 import { apiClient } from '../services/api';
 import { PredictionResponse } from '../types';
@@ -424,6 +425,16 @@ export const NewScanPage: React.FC = () => {
 
   return (
     <div className="space-y-4 select-none font-sans text-xs">
+      {/* ── REAL-TIME GIS SONAR MAP OVERLAY MODAL (Matching media_1789369770984.png) ── */}
+      {isAnalyzing && (
+        <AcousticGisProcessingOverlay
+          currentStage={currentStage}
+          fileName={selectedFile?.name || 'sonar_swath_transect.png'}
+          latitude={latitude || 17.6868}
+          longitude={longitude || 83.2185}
+        />
+      )}
+
       {/* ── 1. COMPACT TOP ACTION BAR: Title + Auto/Manual Mode + Deliverable Status Pills ── */}
       <div className="p-3.5 bg-[#050B14] border border-[#102436] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-lg">
         <div className="flex items-center gap-3 flex-wrap">

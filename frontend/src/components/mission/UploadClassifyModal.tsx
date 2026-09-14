@@ -21,6 +21,7 @@ import { useMission } from '../../context/MissionContext';
 import { apiClient } from '../../services/api';
 import type { MissionTarget } from '../../types';
 import { sonarAudio } from '../../utils/sonarAudio';
+import { AcousticGisProcessingOverlay } from '../scan/AcousticGisProcessingOverlay';
 
 interface UploadClassifyModalProps {
   isOpen: boolean;
@@ -254,6 +255,16 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
 
   return (
     <div className="fixed inset-0 bg-[#01050A]/90 backdrop-blur-md flex items-center justify-center z-50 p-4 font-sans select-none">
+      {/* ── REAL-TIME GIS SONAR MAP OVERLAY MODAL (Matching media_1789369770984.png) ── */}
+      {isAnalyzing && (
+        <AcousticGisProcessingOverlay
+          currentStage={3}
+          fileName={uploadedFileName || selectedSample?.name || 'uploaded_swath.png'}
+          latitude={18.9214}
+          longitude={72.8217}
+        />
+      )}
+
       <div className="bg-[#05121F] border border-[#0D2E4A] rounded-2xl max-w-4xl w-full h-[660px] flex flex-col shadow-2xl overflow-hidden text-xs">
         {/* Modal Header */}
         <div className="px-5 py-3.5 bg-[#030B14] border-b border-[#0D2E4A] flex items-center justify-between shrink-0">

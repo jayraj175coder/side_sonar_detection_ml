@@ -696,6 +696,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           filteredNoiseDescription="Denoised (Lee 7x7 Filter + CLAHE Contrast Enhancement)"
           contrastImprovementDb={4.8}
           isDenoisedActive={scan.noise_filtering_applied ?? true}
+          imageUrl={previewUrl}
         />
       </div>
 

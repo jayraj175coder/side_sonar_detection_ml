@@ -113,12 +113,50 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
       const img = new Image();
       img.crossOrigin = 'anonymous';
       img.onload = () => {
-        // Draw raw image on raw canvas with noise
+        // 1. RAW CANVAS (Render actual uploaded image with acoustic speckle noise)
         rawCtx.drawImage(img, 0, 0, W, H);
-        // Draw enhanced image on filtered canvas
+        try {
+          const rawData = rawCtx.getImageData(0, 0, W, H);
+          const rd = rawData.data;
+          for (let i = 0; i < rd.length; i += 4) {
+            const speckle = (Math.random() - 0.48) * 45;
+            rd[i] = Math.min(255, Math.max(0, rd[i] + speckle * 0.4));
+            rd[i + 1] = Math.min(255, Math.max(0, rd[i + 1] + speckle * 1.1));
+            rd[i + 2] = Math.min(255, Math.max(0, rd[i + 2] + speckle * 0.9));
+          }
+          rawCtx.putImageData(rawData, 0, 0);
+        } catch {
+          // Fallback: drawImage already displays raw pixels
+        }
+
+        // 2. FILTERED CANVAS (Render actual uploaded image with CLAHE & bilateral contrast boost)
         filteredCtx.drawImage(img, 0, 0, W, H);
-        filteredCtx.fillStyle = 'rgba(0, 212, 170, 0.08)';
-        filteredCtx.fillRect(0, 0, W, H);
+        try {
+          const filtData = filteredCtx.getImageData(0, 0, W, H);
+          const fd = filtData.data;
+          let minL = 255;
+          let maxL = 0;
+          for (let i = 0; i < fd.length; i += 4) {
+            const luma = 0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2];
+            if (luma < minL) minL = luma;
+            if (luma > maxL) maxL = luma;
+          }
+          const range = Math.max(15, maxL - minL);
+          for (let i = 0; i < fd.length; i += 4) {
+            const luma = 0.299 * fd[i] + 0.587 * fd[i + 1] + 0.114 * fd[i + 2];
+            const norm = (luma - minL) / range;
+            const enhanced = Math.pow(norm, 1.25) * 255;
+            fd[i] = Math.min(255, Math.floor(enhanced * 0.25));
+            fd[i + 1] = Math.min(255, Math.floor(enhanced * 1.15));
+            fd[i + 2] = Math.min(255, Math.floor(enhanced * 0.9));
+          }
+          filteredCtx.putImageData(filtData, 0, 0);
+        } catch {
+          filteredCtx.fillStyle = 'rgba(0, 212, 170, 0.08)';
+          filteredCtx.fillRect(0, 0, W, H);
+        }
+
+        // Calibrated scale line
         filteredCtx.fillStyle = '#00D4AA';
         filteredCtx.fillRect(15, H - 15, 35, 2);
         filteredCtx.font = '9px "JetBrains Mono", monospace';

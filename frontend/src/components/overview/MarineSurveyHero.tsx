@@ -154,8 +154,8 @@ export const MarineSurveyHero: React.FC = () => {
   const cableMidX = (shipBaseX + towfishX) / 2 + 18;
   const cableMidY = (shipY + towfishY) / 2 + 24 + Math.sin(time * 2.0) * 3;
 
-  // 1. Mother Sea Turtle & Calf (Guaranteed positive modulo so never disappears!)
-  const turtleX = (((1000 - time * 24) % 1200) + 1200) % 1200 - 60;
+  // 1. Mother Sea Turtle & Calf swimming forward naturally (left-to-right) alongside research vessel
+  const turtleX = (((time * 24) % 1300) + 1300) % 1300 - 80;
   const turtleY = 155 + Math.sin(time * 1.2) * 16;
   const turtleFlipperAngle = Math.sin(time * 3.8) * 24;
   const turtlePitch = Math.sin(time * 1.2) * 7;

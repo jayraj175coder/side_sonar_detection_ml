@@ -128,7 +128,7 @@ export const AnalyticsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto font-sans select-none px-2 sm:px-4">
+    <div className="space-y-6 w-full font-sans select-none">
       {/* Page header banner */}
       <div className="p-4 sm:p-5 rounded-2xl bg-[#060D17] border border-[#152438] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl">
         <div>

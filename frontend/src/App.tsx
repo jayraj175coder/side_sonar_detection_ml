@@ -77,11 +77,7 @@ export const App: React.FC = () => {
             </div>
           ) : (
             <main className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
-              <div className={`w-full ${
-                activeTab === 'sonar' || activeTab === 'analytics'
-                  ? 'p-4 md:p-6'
-                  : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6'
-              }`}>
+              <div className="w-full px-4 md:px-6 py-4 md:py-6 space-y-4">
                 {activeTab === 'overview'  && <OverviewPage />}
                 {activeTab === 'scan'      && <NewScanPage />}
                 {activeTab === 'history'   && <ScanHistoryPage />}

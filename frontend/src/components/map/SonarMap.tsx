@@ -217,34 +217,13 @@ const MapEventsTracker: React.FC<{
   return null;
 };
 
-// Vertical Navigation & Zoom Controls (Floating Bottom Right)
-const MapNavigationControls: React.FC<{ onRecenter: () => void }> = ({ onRecenter }) => {
+// Capture Map Instance safely for external controls
+const MapInstanceCapturer: React.FC<{ onMap: (map: L.Map) => void }> = ({ onMap }) => {
   const map = useMap();
-  return (
-    <div className="flex flex-col gap-1 bg-[#080B11]/95 p-1 rounded-xl border border-[#1B2330] shadow-2xl backdrop-blur-md">
-      <button
-        onClick={() => map.zoomIn()}
-        className="w-8 h-8 rounded-lg bg-[#10151D] hover:bg-[#1B2330] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] flex items-center justify-center transition-all cursor-pointer"
-        title="Zoom In (or use mouse wheel / pinch)"
-      >
-        <Plus className="w-4 h-4" />
-      </button>
-      <button
-        onClick={() => map.zoomOut()}
-        className="w-8 h-8 rounded-lg bg-[#10151D] hover:bg-[#1B2330] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] flex items-center justify-center transition-all cursor-pointer"
-        title="Zoom Out (or use mouse wheel / pinch)"
-      >
-        <Minus className="w-4 h-4" />
-      </button>
-      <button
-        onClick={onRecenter}
-        className="w-8 h-8 rounded-lg bg-[#10151D] hover:bg-[#1B2330] border border-[#1B2330] hover:border-[#4CD9E8] text-[#4CD9E8] flex items-center justify-center transition-all cursor-pointer"
-        title="Re-Center to Active Scenario AOI"
-      >
-        <Crosshair className="w-4 h-4" />
-      </button>
-    </div>
-  );
+  useEffect(() => {
+    onMap(map);
+  }, [map, onMap]);
+  return null;
 };
 
 export const SonarMap: React.FC = () => {
@@ -282,9 +261,10 @@ export const SonarMap: React.FC = () => {
   const [selectedSector, setSelectedSector] = useState<IndiaMaritimeSector | null>(INDIA_MARITIME_SECTORS[0]);
   const [selectedVessel, setSelectedVessel] = useState<HydrographicVessel | null>(null);
 
-  // Map View Coordinates
+  // Map View Coordinates & Instance
   const [mapCenter, setMapCenter] = useState<[number, number]>([18.921, 72.821]);
   const [mapZoom, setMapZoom] = useState<number>(7);
+  const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
 
   const scenarioDropdownRef = useRef<HTMLDivElement>(null);
   const layersDropdownRef = useRef<HTMLDivElement>(null);
@@ -626,6 +606,7 @@ export const SonarMap: React.FC = () => {
           >
             <MapFlyTo coords={mapCenter} zoom={mapZoom} />
             <MapEventsTracker onMouseMove={(lat, lon) => setMouseCoords({ lat, lon })} />
+            <MapInstanceCapturer onMap={setMapInstance} />
 
             {/* BASE LAYER 1: SATELLITE (Esri World Imagery) */}
             {mapMode === 'satellite' && (
@@ -774,7 +755,29 @@ export const SonarMap: React.FC = () => {
             </div>
 
             {/* Vertical Zoom Navigation Controls */}
-            <MapNavigationControls onRecenter={handleRecenter} />
+            <div className="flex flex-col gap-1 bg-[#080B11]/95 p-1 rounded-xl border border-[#222E40] shadow-2xl backdrop-blur-md">
+              <button
+                onClick={() => mapInstance?.zoomIn()}
+                className="w-8 h-8 rounded-lg bg-[#10151D] hover:bg-[#1B2330] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] flex items-center justify-center transition-all cursor-pointer"
+                title="Zoom In (or use mouse wheel / pinch)"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => mapInstance?.zoomOut()}
+                className="w-8 h-8 rounded-lg bg-[#10151D] hover:bg-[#1B2330] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] flex items-center justify-center transition-all cursor-pointer"
+                title="Zoom Out (or use mouse wheel / pinch)"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleRecenter}
+                className="w-8 h-8 rounded-lg bg-[#10151D] hover:bg-[#1B2330] border border-[#1B2330] hover:border-[#4CD9E8] text-[#4CD9E8] flex items-center justify-center transition-all cursor-pointer"
+                title="Re-Center to Active Scenario AOI"
+              >
+                <Crosshair className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           {/* ─────────────────────────────────────────────────────────────

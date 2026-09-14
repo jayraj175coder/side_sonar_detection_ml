@@ -27,7 +27,6 @@ import { PredictionResponse, Detection } from '../../types';
 import { Badge } from '../common/Badge';
 import { useApp } from '../../context/AppContext';
 import { BeforeAfterNoisePanel } from '../mission/BeforeAfterNoisePanel';
-import { traceAcousticContourFromImage } from '../../utils/acousticSegmentation';
 
 interface DetectionViewerProps {
   scan: PredictionResponse;
@@ -45,8 +44,6 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [showBoxes, setShowBoxes] = useState<boolean>(true);
   const [showLabels, setShowLabels] = useState<boolean>(true);
-  const [overlayMode, setOverlayMode] = useState<'box' | 'seg'>('box'); // Default to Ground-Truth Trained Bounding Boxes
-  const [segMaskMode, setSegMaskMode] = useState<'dual' | 'echo' | 'shadow'>('dual'); // Optional acoustic contour sub-mode
   const [activeThreshold, setActiveThreshold] = useState<number>(
     scan.confidence_threshold || 0.25
   );
@@ -278,75 +275,6 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
 
           {/* View Toggles & Zoom */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            {/* BOUNDING BOX (PRIMARY/DEFAULT) VS OPTIONAL CONTOUR TOGGLE */}
-            <div className="flex items-center bg-[#091522] border border-[#102436] rounded-xl p-0.5">
-              <button
-                type="button"
-                onClick={() => setOverlayMode('box')}
-                className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer ${
-                  overlayMode === 'box'
-                    ? 'bg-[#38BDF8] text-[#030B14] shadow-[0_0_10px_rgba(56,189,248,0.4)]'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-                title="Ground-Truth YOLO Bounding Boxes (Trained Model Format)"
-              >
-                BOXES (PRIMARY)
-              </button>
-              <button
-                type="button"
-                onClick={() => setOverlayMode('seg')}
-                className={`px-2 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer ${
-                  overlayMode === 'seg'
-                    ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_10px_rgba(0,212,170,0.4)]'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-                title="Optional Acoustic Contour & Shadow Void Hull"
-              >
-                CONTOUR (OPTIONAL)
-              </button>
-            </div>
-
-            {/* Segmentation Sub-Mode: DUAL vs ECHO vs SHADOW */}
-            {overlayMode === 'seg' && (
-              <div className="flex items-center bg-[#07131D] border border-[#0F283C] rounded-xl p-0.5 text-[9px] font-mono">
-                <button
-                  type="button"
-                  onClick={() => setSegMaskMode('dual')}
-                  className={`px-2 py-0.5 rounded cursor-pointer transition-all ${
-                    segMaskMode === 'dual'
-                      ? 'bg-[#00D4AA] text-[#030B14] font-bold shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Dual Mode: Show both Target Echo contour and Acoustic Shadow Void"
-                >
-                  DUAL
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSegMaskMode('echo')}
-                  className={`px-2 py-0.5 rounded cursor-pointer transition-all ${
-                    segMaskMode === 'echo'
-                      ? 'bg-[#00D4AA] text-[#030B14] font-bold shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Echo Mode: Target Highlight contour only"
-                >
-                  ECHO
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSegMaskMode('shadow')}
-                  className={`px-2 py-0.5 rounded cursor-pointer transition-all ${
-                    segMaskMode === 'shadow'
-                      ? 'bg-[#6366F1] text-white font-bold shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                  title="Shadow Mode: Acoustic Shadow Void only"
-                >
-                  SHADOW
-                </button>
-              </div>
-            )}
 
             <button
               onClick={() => setShowBoxes(!showBoxes)}
@@ -520,14 +448,6 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                   const b = det.bbox;
                   const isSelected = selectedDetId === det.id || hoveredDetId === det.id;
                   const strokeColor = getColorForClass(det.type);
-                  const contour = traceAcousticContourFromImage(
-                    imgRef.current,
-                    b,
-                    det.type,
-                    scan.image_width,
-                    scan.image_height
-                  );
-
                   return (
                     <g
                       key={det.id}
@@ -536,114 +456,19 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                       onMouseLeave={() => setHoveredDetId(null)}
                       className="cursor-pointer group"
                     >
-                      {/* Bounding Box (Ground-Truth Trained YOLO Format) */}
-                      {overlayMode === 'box' ? (
-                        <g>
-                          <rect
-                            x={b.x1}
-                            y={b.y1}
-                            width={Math.max(1, b.x2 - b.x1)}
-                            height={Math.max(1, b.y2 - b.y1)}
-                            fill={strokeColor}
-                            fillOpacity={isSelected ? 0.35 : 0.12}
-                            stroke={strokeColor}
-                            strokeWidth={isSelected ? 3 : 2}
-                            strokeDasharray={isSelected ? '4 2' : 'none'}
-                            className="transition-all animate-box-draw"
-                            style={{ filter: `drop-shadow(0 0 6px ${strokeColor}60)` }}
-                          />
-                          {/* Corner Precision Reticles */}
-                          <path
-                            d={`M ${b.x1} ${b.y1 + 10} L ${b.x1} ${b.y1} L ${b.x1 + 10} ${b.y1} M ${b.x2 - 10} ${b.y1} L ${b.x2} ${b.y1} L ${b.x2} ${b.y1 + 10} M ${b.x1} ${b.y2 - 10} L ${b.x1} ${b.y2} L ${b.x1 + 10} ${b.y2} M ${b.x2 - 10} ${b.y2} L ${b.x2} ${b.y2} L ${b.x2} ${b.y2 - 10}`}
-                            stroke={strokeColor}
-                            strokeWidth={2}
-                            fill="none"
-                            opacity={0.85}
-                          />
-                        </g>
-                      ) : (
-                        <g>
-                          {/* 1. Acoustic Shadow Void (Cast along seafloor away from Nadir) */}
-                          {(segMaskMode === 'dual' || segMaskMode === 'shadow') && (
-                            <g className="transition-all">
-                              {/* Shadow void translucent mask */}
-                              <path
-                                d={contour.shadowPathD}
-                                fill="#1E1B4B"
-                                fillOpacity={isSelected ? 0.6 : 0.4}
-                                stroke="#818CF8"
-                                strokeWidth={isSelected ? 2 : 1.5}
-                                strokeDasharray="4 3"
-                                strokeLinejoin="round"
-                                style={{ filter: 'drop-shadow(0 0 8px rgba(129,140,248,0.5))' }}
-                              />
-                              {/* Shadow annotation indicator */}
-                              <text
-                                x={contour.shadowPoints[0]?.[0] || b.x1 - 30}
-                                y={b.y2 + 13}
-                                fill="#A5B4FC"
-                                fontSize="8.5"
-                                fontFamily="monospace"
-                                fontWeight="bold"
-                                letterSpacing="0.4px"
-                              >
-                                SHADOW VOID
-                              </text>
-                            </g>
-                          )}
-
-                          {/* 2. Target Echo / Acoustic Highlight Contour */}
-                          {(segMaskMode === 'dual' || segMaskMode === 'echo') && (
-                            <g>
-                              {/* High-fidelity smooth Catmull-Rom Bezier contour path */}
-                              <path
-                                d={contour.highlightPathD}
-                                fill={strokeColor}
-                                fillOpacity={isSelected ? 0.45 : 0.25}
-                                stroke={strokeColor}
-                                strokeWidth={isSelected ? 3 : 2.2}
-                                strokeLinejoin="round"
-                                className="transition-all"
-                                style={{ filter: `drop-shadow(0 0 10px ${strokeColor}99)` }}
-                              />
-                              {/* Subtle acoustic scanning outline */}
-                              <path
-                                d={contour.highlightPathD}
-                                fill="none"
-                                stroke={strokeColor}
-                                strokeWidth={0.8}
-                                strokeDasharray="4 3"
-                                opacity={0.65}
-                              />
-                              {/* Cardinal tracking anchor dots (4 cardinal boundaries) */}
-                              {[0, 8, 16, 24].map((idx) => {
-                                const pt = contour.points[idx];
-                                if (!pt) return null;
-                                return (
-                                  <circle
-                                    key={idx}
-                                    cx={pt[0]}
-                                    cy={pt[1]}
-                                    r={isSelected ? 3.5 : 2}
-                                    fill="#030B14"
-                                    stroke={strokeColor}
-                                    strokeWidth={1.5}
-                                  />
-                                );
-                              })}
-                            </g>
-                          )}
-
-                          {/* Precision Reticle Brackets at Corner Bounds */}
-                          <path
-                            d={`M ${b.x1} ${b.y1 + 8} L ${b.x1} ${b.y1} L ${b.x1 + 8} ${b.y1} M ${b.x2 - 8} ${b.y1} L ${b.x2} ${b.y1} L ${b.x2} ${b.y1 + 8} M ${b.x1} ${b.y2 - 8} L ${b.x1} ${b.y2} L ${b.x1 + 8} ${b.y2} M ${b.x2 - 8} ${b.y2} L ${b.x2} ${b.y2} L ${b.x2} ${b.y2 - 8}`}
-                            stroke={strokeColor}
-                            strokeWidth={1.5}
-                            fill="none"
-                            opacity={0.5}
-                          />
-                        </g>
-                      )}
+                      {/* Clean Standard YOLO Bounding Box */}
+                      <rect
+                        x={b.x1}
+                        y={b.y1}
+                        width={Math.max(1, b.x2 - b.x1)}
+                        height={Math.max(1, b.y2 - b.y1)}
+                        fill={strokeColor}
+                        fillOpacity={isSelected ? 0.35 : 0.15}
+                        stroke={strokeColor}
+                        strokeWidth={isSelected ? 3 : 2}
+                        className="transition-all"
+                        style={{ filter: `drop-shadow(0 0 6px ${strokeColor}60)` }}
+                      />
 
                       {/* Pill Label */}
                       {showLabels && (

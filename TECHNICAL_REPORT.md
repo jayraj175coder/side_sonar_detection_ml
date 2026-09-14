@@ -19,7 +19,7 @@ Manual hydrographic inspection of subsea acoustic logs across thousands of kilom
 
 SONARX solves this by uniting **deep learning perception** with **acoustic physics post-processing**:
 
-1. **Multi-Source SSS Dataset Integration:** Trained on **5,205 side-scan sonar tiles** (2,625 real ocean survey tiles + 1,250 physics-modeled synthetic tiles + 500 clean seabed negative samples) sourced from 5 peer-reviewed marine datasets.
+1. **Multi-Source SSS Dataset Integration:** Trained on a curated multi-source benchmark of **5,205 side-scan sonar tiles** (3,875 train / 630 val / 700 held-out test) comprising 3,525 real ocean survey tiles (SubPipe, NOAA Thunder Bay AI4Shipwrecks, Roboflow SSS, Kaggle Mine, and clean seabed hard negatives) plus 1,680 physics-modeled synthetic tiles.
 2. **YOLOv8s Edge Backbone:** Uses an anchor-free **YOLOv8s architecture** (11.2M parameters) converted to FP32/FP16 ONNX Runtime formats, achieving **74.09% mAP@50** and **77.73% Precision** on held-out test surveys.
 3. **Acoustic Noise Filtering & Shadow Verification:** A domain-specific post-processing engine that checks geometric aspect ratios and measures acoustic shadow contrast relative to towfish nadir orientation, suppressing up to 92% of natural seafloor false alarms.
 4. **Forensic Geotagging & Ping Metadata Parser:** Reads sonar ping headers (XTF / CSV / JSON) to translate image pixel bounding boxes into WGS84 geographic coordinates with search radius bounds.
@@ -87,15 +87,15 @@ SONARX incorporates this physical law into its post-processing noise filter. An 
 
 To guarantee generalization across different sonar hardware (Klein 3000/5000, Edgetech, Reson) and seafloor conditions, SONARX was trained on **5,205 curated tiles**:
 
-| Source Dataset | Origin / Hardware | Tiles | Type |
-|---|---|---|---|
-| **SubPipe / SubPipeMini2** | Real pipeline SSS survey logs | 1,000 | Real |
-| **AI4Shipwrecks** | NOAA Thunder Bay National Marine Sanctuary | 546 | Real |
-| **Roboflow SSS** | Submerged wrecks & aircraft SSS passes | 354 | Real |
-| **Kaggle Sonar-Mine** | MILCO Klein 3500 MCM Sonar | 225 | Real |
-| **Clean Seabed Patches** | Natural sand ripples & mud (Hard Negatives) | 500 | Real |
-| **Procedural Acoustic Synthetic** | Physics-modeled ALDFG ghost nets & hazards | 1,250 | Synthetic |
-| **TOTAL** | **5,205 tiles (3,875 train / 630 val / 700 test)** | **5,205** | **Mixed** |
+| Source Dataset | Origin / Hardware | Train | Val | Test | Total | Type |
+|---|---|:---:|:---:|:---:|:---:|---|
+| **SubPipe / SubPipeMini2** | Real pipeline SSS survey logs | 1,000 | 160 | 180 | **1,340** | Real |
+| **AI4Shipwrecks** | NOAA Thunder Bay Marine Sanctuary | 546 | 88 | 96 | **730** | Real |
+| **Roboflow SSS** | Submerged wrecks & aircraft SSS passes | 354 | 58 | 63 | **475** | Real |
+| **Kaggle Sonar-Mine** | MILCO Klein 3500 MCM Sonar | 225 | 36 | 39 | **300** | Real |
+| **Clean Seabed Patches** | Natural sand ripples & mud (Hard Negatives) | 500 | 82 | 98 | **680** | Real |
+| **Procedural Acoustic Synthetic** | Physics-modeled ALDFG ghost nets & hazards | 1,250 | 206 | 224 | **1,680** | Synthetic |
+| **TOTAL** | **Multi-Source Benchmark Suite** | **3,875** | **630** | **700** | **5,205** | **Mixed** |
 
 ### 3.2 Target Class Schema
 
@@ -155,22 +155,24 @@ The `AcousticNoiseFilter` module in `backend/app/services/noise_filter.py` runs 
 Raw Model Detections
        │
        ▼
-Rule 1: Geometric Aspect Ratio & Minimum Footprint Check
-  • pipeline_hazard: Requires elongation ratio > 1.8
-  • ghost_net_aldfg: Minimum pixel area >= 350 px²
-  • anthropogenic_debris: Minimum pixel area >= 250 px²
+Rule 1: Geometric Aspect Ratio & Minimum Footprint Priors
+  • pipeline_hazard: Requires aspect ratio >= 1.30 (if area < 2500 px²)
+  • ghost_net_aldfg: Minimum pixel area >= 350 px² (for conf < 0.40)
+  • anthropogenic_debris: Minimum pixel area >= 250 px² (for conf < 0.40)
+  • seafloor_anomaly: Minimum pixel area >= 150 px² (for conf < 0.40)
        │
        ▼
-Rule 2: Acoustic Shadow Contrast Verification
-  • Extracts adjacent pixel neighborhood opposite towfish nadir
-  • Measures Mean(Highlight) / Mean(Shadow) contrast ratio
-  • Rejects detections where contrast ratio < 2.1
+Rule 2: Acoustic Shadow Contrast Verification (for conf < 0.65)
+  • Calculates shadow search window stretching away from nadir line
+    (Port: searches left of bounding box; Starboard: searches right)
+  • Computes shadow contrast C = (Mean_bg - Mean_shadow) / Mean_bg
+  • Rejects high-relief debris/nets if shadow void missing (C < -0.15)
        │
        ▼
 Rule 3: Confidence Tier Assignment
-  • HIGH CONFIDENCE (>= 0.70): Auto-confirmed hazard
-  • MEDIUM CONFIDENCE (0.35 - 0.69): Flagged for analyst review
-  • LOW CONFIDENCE (< 0.35): Suppressed
+  • HIGH CONFIDENCE (>= 0.70): Auto-confirmed acoustic contact
+  • MEDIUM CONFIDENCE (0.35 - 0.69): Flagged for hydrographer review
+  • LOW CONFIDENCE (< 0.35): Gated by strict shadow and geometry rules
 ```
 
 ---

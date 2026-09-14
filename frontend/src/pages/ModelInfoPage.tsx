@@ -253,7 +253,7 @@ export const ModelInfoPage: React.FC = () => {
                     <td className="py-2 px-2 text-[#E0F7F4]">Combined Debris Target Metric</td>
                     <td className="py-2 px-2 text-right font-mono text-[#E0F7F4]">77.7%</td>
                     <td className="py-2 px-2 text-right font-mono text-[#E0F7F4]">74.6%</td>
-                    <td className="py-2 px-2 text-right font-mono text-[#00D4AA] text-xs font-black">95.91% mAP50</td>
+                    <td className="py-2 px-2 text-right font-mono text-[#00D4AA] text-xs font-black">74.09% mAP50</td>
                     <td className="py-2 px-2 text-right font-mono text-[#00D4AA]">700 Test Set</td>
                   </tr>
                 </tbody>

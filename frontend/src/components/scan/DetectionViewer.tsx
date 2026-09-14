@@ -45,8 +45,8 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [showBoxes, setShowBoxes] = useState<boolean>(true);
   const [showLabels, setShowLabels] = useState<boolean>(true);
-  const [overlayMode, setOverlayMode] = useState<'box' | 'seg'>('seg'); // Default to high-fidelity acoustic polygon segmentation
-  const [segMaskMode, setSegMaskMode] = useState<'dual' | 'echo' | 'shadow'>('dual'); // Dual (Echo + Shadow) vs Echo only vs Shadow only
+  const [overlayMode, setOverlayMode] = useState<'box' | 'seg'>('box'); // Default to Ground-Truth Trained Bounding Boxes
+  const [segMaskMode, setSegMaskMode] = useState<'dual' | 'echo' | 'shadow'>('dual'); // Optional acoustic contour sub-mode
   const [activeThreshold, setActiveThreshold] = useState<number>(
     scan.confidence_threshold || 0.25
   );
@@ -278,8 +278,20 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
 
           {/* View Toggles & Zoom */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            {/* SEGMENTATION VS BOUNDING BOX DUAL TOGGLE */}
+            {/* BOUNDING BOX (PRIMARY/DEFAULT) VS OPTIONAL CONTOUR TOGGLE */}
             <div className="flex items-center bg-[#091522] border border-[#102436] rounded-xl p-0.5">
+              <button
+                type="button"
+                onClick={() => setOverlayMode('box')}
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                  overlayMode === 'box'
+                    ? 'bg-[#38BDF8] text-[#030B14] shadow-[0_0_10px_rgba(56,189,248,0.4)]'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Ground-Truth YOLO Bounding Boxes (Trained Model Format)"
+              >
+                BOXES (PRIMARY)
+              </button>
               <button
                 type="button"
                 onClick={() => setOverlayMode('seg')}
@@ -288,21 +300,9 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                     ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_10px_rgba(0,212,170,0.4)]'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-                title="Acoustic Instance Segmentation Hull & Contour"
+                title="Optional Acoustic Contour & Shadow Void Hull"
               >
-                SEGMENT
-              </button>
-              <button
-                type="button"
-                onClick={() => setOverlayMode('box')}
-                className={`px-2 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer ${
-                  overlayMode === 'box'
-                    ? 'bg-[#38BDF8] text-[#030B14] shadow-[0_0_10px_rgba(56,189,248,0.4)]'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-                title="Standard Bounding Box Format"
-              >
-                BOXES
+                CONTOUR (OPTIONAL)
               </button>
             </div>
 
@@ -536,20 +536,31 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                       onMouseLeave={() => setHoveredDetId(null)}
                       className="cursor-pointer group"
                     >
-                      {/* Bounding Box or High-Fidelity Instance Segmentation */}
+                      {/* Bounding Box (Ground-Truth Trained YOLO Format) */}
                       {overlayMode === 'box' ? (
-                        <rect
-                          x={b.x1}
-                          y={b.y1}
-                          width={Math.max(1, b.x2 - b.x1)}
-                          height={Math.max(1, b.y2 - b.y1)}
-                          fill={strokeColor}
-                          fillOpacity={isSelected ? 0.35 : 0.15}
-                          stroke={strokeColor}
-                          strokeWidth={isSelected ? 3.5 : 2}
-                          strokeDasharray={isSelected ? '4 2' : 'none'}
-                          className="transition-all animate-box-draw"
-                        />
+                        <g>
+                          <rect
+                            x={b.x1}
+                            y={b.y1}
+                            width={Math.max(1, b.x2 - b.x1)}
+                            height={Math.max(1, b.y2 - b.y1)}
+                            fill={strokeColor}
+                            fillOpacity={isSelected ? 0.35 : 0.12}
+                            stroke={strokeColor}
+                            strokeWidth={isSelected ? 3 : 2}
+                            strokeDasharray={isSelected ? '4 2' : 'none'}
+                            className="transition-all animate-box-draw"
+                            style={{ filter: `drop-shadow(0 0 6px ${strokeColor}60)` }}
+                          />
+                          {/* Corner Precision Reticles */}
+                          <path
+                            d={`M ${b.x1} ${b.y1 + 10} L ${b.x1} ${b.y1} L ${b.x1 + 10} ${b.y1} M ${b.x2 - 10} ${b.y1} L ${b.x2} ${b.y1} L ${b.x2} ${b.y1 + 10} M ${b.x1} ${b.y2 - 10} L ${b.x1} ${b.y2} L ${b.x1 + 10} ${b.y2} M ${b.x2 - 10} ${b.y2} L ${b.x2} ${b.y2} L ${b.x2} ${b.y2 - 10}`}
+                            stroke={strokeColor}
+                            strokeWidth={2}
+                            fill="none"
+                            opacity={0.85}
+                          />
+                        </g>
                       ) : (
                         <g>
                           {/* 1. Acoustic Shadow Void (Cast along seafloor away from Nadir) */}

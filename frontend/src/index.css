@@ -152,10 +152,17 @@
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: #030B14; }
-::-webkit-scrollbar-thumb { background: #0D2E4A; border-radius: 0; }
-::-webkit-scrollbar-thumb:hover { background: #00D4AA; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(3, 11, 20, 0.6); }
+::-webkit-scrollbar-thumb { 
+  background: #0E3555; 
+  border-radius: 9999px; 
+  border: 1px solid rgba(0, 212, 170, 0.15);
+}
+::-webkit-scrollbar-thumb:hover { 
+  background: #00D4AA; 
+  box-shadow: 0 0 10px rgba(0, 212, 170, 0.6);
+}
 
 /* Instrument button — ocean theme */
 .panel-btn {

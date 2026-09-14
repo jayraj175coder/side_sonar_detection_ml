@@ -76,19 +76,21 @@ export const App: React.FC = () => {
               <MissionPage />
             </div>
           ) : (
-            <main className={`flex-1 overflow-y-auto ${
-              activeTab === 'sonar' || activeTab === 'analytics'
-                ? 'p-4 md:p-6'
-                : 'p-4 md:p-8 max-w-7xl w-full mx-auto space-y-6'
-            }`}>
-              {activeTab === 'overview'  && <OverviewPage />}
-              {activeTab === 'scan'      && <NewScanPage />}
-              {activeTab === 'history'   && <ScanHistoryPage />}
-              {activeTab === 'map'       && <DetectionMapPage />}
-              {activeTab === 'reports'   && <ReportsPage />}
-              {activeTab === 'model'     && <ModelInfoPage />}
-              {activeTab === 'sonar'     && <SonarViewerPage />}
-              {activeTab === 'analytics' && <AnalyticsPage />}
+            <main className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+              <div className={`w-full ${
+                activeTab === 'sonar' || activeTab === 'analytics'
+                  ? 'p-4 md:p-6'
+                  : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 space-y-6'
+              }`}>
+                {activeTab === 'overview'  && <OverviewPage />}
+                {activeTab === 'scan'      && <NewScanPage />}
+                {activeTab === 'history'   && <ScanHistoryPage />}
+                {activeTab === 'map'       && <DetectionMapPage />}
+                {activeTab === 'reports'   && <ReportsPage />}
+                {activeTab === 'model'     && <ModelInfoPage />}
+                {activeTab === 'sonar'     && <SonarViewerPage />}
+                {activeTab === 'analytics' && <AnalyticsPage />}
+              </div>
             </main>
           )}
         </div>

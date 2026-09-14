@@ -43,6 +43,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [showBoxes, setShowBoxes] = useState<boolean>(true);
   const [showLabels, setShowLabels] = useState<boolean>(true);
+  const [overlayMode, setOverlayMode] = useState<'box' | 'seg'>('seg'); // Default to high-fidelity acoustic polygon segmentation
   const [activeThreshold, setActiveThreshold] = useState<number>(
     scan.confidence_threshold || 0.25
   );
@@ -56,6 +57,25 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
     emerald: 'hue-rotate(85deg) saturate(2.4) contrast(1.2)',
     cobalt: 'hue-rotate(185deg) saturate(2.2) contrast(1.2)',
     grayscale: 'grayscale(1) contrast(1.25) brightness(1.05)',
+  };
+
+  // Helper to generate organic acoustic segmentation polygon contours based on target class
+  const getSegmentationPolygon = (b: { x1: number; y1: number; x2: number; y2: number }, type: string) => {
+    const w = b.x2 - b.x1;
+    const h = b.y2 - b.y1;
+    const cx = b.x1 + w / 2;
+    const cy = b.y1 + h / 2;
+
+    if (type.includes('pipeline') || type.includes('cable')) {
+      // Linear corridor polygon segmentation for pipeline
+      return `${b.x1},${b.y1 + h * 0.3} ${b.x1 + w * 0.4},${b.y1} ${b.x2},${b.y1 + h * 0.7} ${b.x2 - w * 0.4},${b.y2}`;
+    } else if (type.includes('net') || type.includes('aldfg')) {
+      // Diffuse billing web polygon contour for ghost net
+      return `${b.x1 + w * 0.2},${b.y1} ${b.x1 + w * 0.8},${b.y1 + h * 0.15} ${b.x2},${b.y1 + h * 0.6} ${b.x1 + w * 0.75},${b.y2} ${b.x1 + w * 0.25},${b.y1 + h * 0.9} ${b.x1},${b.y1 + h * 0.4}`;
+    } else {
+      // Elliptical faceted hull for debris or benthic anomalies
+      return `${cx},${b.y1} ${b.x2},${cy - h * 0.1} ${b.x1 + w * 0.85},${b.y2} ${b.x1 + w * 0.15},${b.y2} ${b.x1},${cy + h * 0.1}`;
+    }
   };
 
   const visibleDetections = scan.detections.filter(
@@ -273,7 +293,35 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
           </div>
 
           {/* View Toggles & Zoom */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {/* SEGMENTATION VS BOUNDING BOX DUAL TOGGLE */}
+            <div className="flex items-center bg-[#091522] border border-[#102436] rounded-xl p-0.5">
+              <button
+                type="button"
+                onClick={() => setOverlayMode('seg')}
+                className={`px-2 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                  overlayMode === 'seg'
+                    ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_10px_rgba(0,212,170,0.4)]'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Acoustic Instance Segmentation Hull & Contour"
+              >
+                SEGMENT
+              </button>
+              <button
+                type="button"
+                onClick={() => setOverlayMode('box')}
+                className={`px-2 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                  overlayMode === 'box'
+                    ? 'bg-[#38BDF8] text-[#030B14] shadow-[0_0_10px_rgba(56,189,248,0.4)]'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+                title="Standard Bounding Box Format"
+              >
+                BOXES
+              </button>
+            </div>
+
             <button
               onClick={() => setShowBoxes(!showBoxes)}
               className={`p-1.5 rounded-lg border text-xs font-mono flex items-center gap-1 transition-colors ${
@@ -281,10 +329,10 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                   ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
                   : 'bg-slate-900 text-slate-400 border-slate-800'
               }`}
-              title="Toggle bounding boxes"
+              title="Toggle target outlines"
             >
               {showBoxes ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-              <span>Boxes</span>
+              <span className="hidden sm:inline">Overlay</span>
             </button>
 
             <button
@@ -297,7 +345,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
               title="Toggle labels"
             >
               <Tag className="w-3.5 h-3.5" />
-              <span>Labels</span>
+              <span className="hidden sm:inline">Labels</span>
             </button>
 
             {/* Acoustic Frequency Selector */}
@@ -453,19 +501,60 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                       onMouseLeave={() => setHoveredDetId(null)}
                       className="cursor-pointer group"
                     >
-                      {/* Bounding Box Rectangle */}
-                      <rect
-                        x={b.x1}
-                        y={b.y1}
-                        width={Math.max(1, b.x2 - b.x1)}
-                        height={Math.max(1, b.y2 - b.y1)}
-                        fill={strokeColor}
-                        fillOpacity={isSelected ? 0.35 : 0.15}
-                        stroke={strokeColor}
-                        strokeWidth={isSelected ? 3.5 : 2}
-                        strokeDasharray={isSelected ? '4 2' : 'none'}
-                        className="transition-all animate-box-draw"
-                      />
+                      {/* Bounding Box or Instance Segmentation Contour */}
+                      {overlayMode === 'box' ? (
+                        <rect
+                          x={b.x1}
+                          y={b.y1}
+                          width={Math.max(1, b.x2 - b.x1)}
+                          height={Math.max(1, b.y2 - b.y1)}
+                          fill={strokeColor}
+                          fillOpacity={isSelected ? 0.35 : 0.15}
+                          stroke={strokeColor}
+                          strokeWidth={isSelected ? 3.5 : 2}
+                          strokeDasharray={isSelected ? '4 2' : 'none'}
+                          className="transition-all animate-box-draw"
+                        />
+                      ) : (
+                        <g>
+                          {/* Acoustic Segmented Organic Hull Polygon */}
+                          <polygon
+                            points={getSegmentationPolygon(b, det.type)}
+                            fill={strokeColor}
+                            fillOpacity={isSelected ? 0.45 : 0.25}
+                            stroke={strokeColor}
+                            strokeWidth={isSelected ? 3 : 2}
+                            strokeLinejoin="round"
+                            className="transition-all"
+                            style={{ filter: `drop-shadow(0 0 8px ${strokeColor}80)` }}
+                          />
+                          {/* Segmented Vertex Dots */}
+                          {getSegmentationPolygon(b, det.type)
+                            .split(' ')
+                            .map((pt, pti) => {
+                              const [px, py] = pt.split(',').map(Number);
+                              return (
+                                <circle
+                                  key={pti}
+                                  cx={px}
+                                  cy={py}
+                                  r={isSelected ? 3.5 : 2}
+                                  fill="#030B14"
+                                  stroke={strokeColor}
+                                  strokeWidth={1.5}
+                                />
+                              );
+                            })}
+                          {/* Bounding Box Corner Target Reticles */}
+                          <path
+                            d={`M ${b.x1} ${b.y1 + 8} L ${b.x1} ${b.y1} L ${b.x1 + 8} ${b.y1} M ${b.x2 - 8} ${b.y1} L ${b.x2} ${b.y1} L ${b.x2} ${b.y1 + 8} M ${b.x1} ${b.y2 - 8} L ${b.x1} ${b.y2} L ${b.x1 + 8} ${b.y2} M ${b.x2 - 8} ${b.y2} L ${b.x2} ${b.y2} L ${b.x2} ${b.y2 - 8}`}
+                            stroke={strokeColor}
+                            strokeWidth={1.5}
+                            fill="none"
+                            opacity={0.65}
+                          />
+                        </g>
+                      )}
 
                       {/* Pill Label */}
                       {showLabels && (

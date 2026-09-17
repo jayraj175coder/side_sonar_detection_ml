@@ -71,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           title={isSidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
         >
           {isSidebarCollapsed ? (
-            <PanelLeftOpen className="w-4 h-4 text-[#00F5D4]" />
+            <PanelLeftOpen className="w-4 h-4 text-[#FFB703]" />
           ) : (
             <PanelLeftClose className="w-4 h-4" />
           )}
@@ -88,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         )}
 
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-[#00F5D4]/30 flex items-center justify-center text-[#00F5D4] shadow-[0_0_12px_rgba(0,245,212,0.2)]">
+          <div className="w-7 h-7 rounded-lg bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shadow-[0_0_12px_rgba(255,183,3,0.2)]">
             <Radio className="w-3.5 h-3.5 animate-pulse" />
           </div>
 
@@ -102,8 +102,8 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           </div>
 
           {/* Mission Telemetry Pill */}
-          <div className="hidden lg:flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/[0.08] border border-emerald-500/20 text-[10px] font-mono font-semibold text-[#00F5D4]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-ping" />
+          <div className="hidden lg:flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/25 text-[10px] font-mono font-semibold text-[#FFB703]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
             <span>SIH26057</span>
           </div>
         </div>
@@ -112,9 +112,9 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
       {/* 2. Center: Linear-style Live Telemetry Ticker (Quiet Chrome) */}
       <div className="hidden xl:flex items-center gap-4 text-[11px] font-mono text-slate-400 bg-white/[0.02] border border-white/[0.06] px-3 py-1 rounded-full shadow-inner">
         <div className="flex items-center gap-1.5">
-          <Activity className="w-3 h-3 text-[#00F5D4] animate-pulse" />
+          <Activity className="w-3 h-3 text-[#FFB703] animate-pulse" />
           <span className="text-slate-300 font-semibold">ACOUSTIC CHIRP:</span>
-          <span className="text-[#00F5D4]">900 kHz</span>
+          <span className="text-[#FFB703]">900 kHz</span>
         </div>
 
         <span className="w-1 h-1 rounded-full bg-slate-700" />
@@ -128,9 +128,9 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         <span className="w-1 h-1 rounded-full bg-slate-700" />
 
         <div className="flex items-center gap-1.5">
-          <ShieldCheck className="w-3 h-3 text-[#38BDF8]" />
+          <ShieldCheck className="w-3 h-3 text-slate-400" />
           <span className="text-slate-300">STANDARDS:</span>
-          <span className="text-[#38BDF8]">IHO S-44 ORDER 1A</span>
+          <span className="text-slate-200">IHO S-44 ORDER 1A</span>
         </div>
       </div>
 
@@ -152,13 +152,13 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           onClick={handleToggleAudio}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-all cursor-pointer ${
             !isAudioMuted
-              ? 'bg-emerald-500/10 border-[#00F5D4]/40 text-[#00F5D4] shadow-[0_0_10px_rgba(0,245,212,0.15)]'
+              ? 'bg-[#FFB703]/10 border-[#FFB703]/40 text-[#FFB703] shadow-[0_0_10px_rgba(255,183,3,0.15)]'
               : 'bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]'
           }`}
           title={!isAudioMuted ? 'Mute Sonar Audio' : 'Unmute Sonar Audio'}
         >
           {!isAudioMuted ? (
-            <Volume2 className="w-3.5 h-3.5 text-[#00F5D4]" />
+            <Volume2 className="w-3.5 h-3.5 text-[#FFB703]" />
           ) : (
             <VolumeX className="w-3.5 h-3.5 text-slate-400" />
           )}

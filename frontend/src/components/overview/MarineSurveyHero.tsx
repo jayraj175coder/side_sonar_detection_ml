@@ -47,7 +47,7 @@ export const MarineSurveyHero: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [sonarActive, setSonarActive] = useState(true);
   const [vesselSpeed, setVesselSpeed] = useState<number>(3.5); // knots: 1.5, 3.5, 5.5
-  const [palette, setPalette] = useState<PaletteMode>('cobalt');
+  const [palette, setPalette] = useState<PaletteMode>('amber');
   const [viewMode, setViewMode] = useState<ViewMode>('ecosystem');
   const [activeModeHover, setActiveModeHover] = useState<'none' | 'manual' | 'live'>('none');
   const [animationTick, setAnimationTick] = useState(0);
@@ -90,20 +90,6 @@ export const MarineSurveyHero: React.FC = () => {
           sky2: '#03140F',
           highlight: '#6EE7B7',
         };
-      case 'amber':
-        return {
-          primary: '#F59E0B',
-          accent: '#FBBF24',
-          glow: 'rgba(245, 158, 11, 0.4)',
-          beam1: 'rgba(245, 158, 11, 0.45)',
-          beam2: 'rgba(251, 191, 36, 0.12)',
-          water1: '#211504',
-          water2: '#130C02',
-          water3: '#090501',
-          sky1: '#261805',
-          sky2: '#120B02',
-          highlight: '#FDE68A',
-        };
       case 'grayscale':
         return {
           primary: '#E2E8F0',
@@ -119,7 +105,6 @@ export const MarineSurveyHero: React.FC = () => {
           highlight: '#FFFFFF',
         };
       case 'cobalt':
-      default:
         return {
           primary: '#00F0FF',
           accent: '#38BDF8',
@@ -132,6 +117,21 @@ export const MarineSurveyHero: React.FC = () => {
           sky1: '#0C2A48',
           sky2: '#041525',
           highlight: '#7DD3FC',
+        };
+      case 'amber':
+      default:
+        return {
+          primary: '#FFB703',
+          accent: '#FCD34D',
+          glow: 'rgba(255, 183, 3, 0.45)',
+          beam1: 'rgba(255, 183, 3, 0.45)',
+          beam2: 'rgba(252, 211, 77, 0.12)',
+          water1: '#151108',
+          water2: '#0D0A05',
+          water3: '#060502',
+          sky1: '#1A1408',
+          sky2: '#0B0803',
+          highlight: '#FDE68A',
         };
     }
   }, [palette]);
@@ -214,8 +214,8 @@ export const MarineSurveyHero: React.FC = () => {
           SECTION 1 — HIGH-IMPACT HEADER
           ═══════════════════════════════════════════════════════════════════ */}
       <div className="text-center max-w-4xl mx-auto space-y-4 pt-4">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#00F0FF]/10 border border-[#00F0FF]/30 text-[#00F0FF] text-xs font-mono font-medium rounded-full shadow-[0_0_20px_rgba(0,240,255,0.2)]">
-          <Radio className="w-3.5 h-3.5 animate-pulse text-[#00F0FF]" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#FFB703]/10 border border-[#FFB703]/30 text-[#FFB703] text-xs font-mono font-semibold rounded-full shadow-[0_0_20px_rgba(255,183,3,0.15)]">
+          <Radio className="w-3.5 h-3.5 animate-pulse text-[#FFB703]" />
           <span>AUTONOMOUS ACOUSTIC RECONNAISSANCE // DUAL-ENGINE INGESTION</span>
         </div>
 
@@ -224,17 +224,17 @@ export const MarineSurveyHero: React.FC = () => {
         </h1>
 
         <p className="text-base sm:text-lg md:text-xl text-[#94A3B8] leading-relaxed max-w-2xl mx-auto">
-          AI-powered Side-Scan Sonar analysis for detecting <span className="text-[#00F0FF] font-semibold">ghost nets (ALDFG)</span>,{' '}
-          <span className="text-[#38BDF8] font-semibold">underwater marine debris</span>,{' '}
+          AI-powered Side-Scan Sonar analysis for detecting <span className="text-[#FFB703] font-semibold">ghost nets (ALDFG)</span>,{' '}
+          <span className="text-white font-semibold">underwater marine debris</span>,{' '}
           <span className="text-[#F59E0B] font-semibold">subsea pipelines</span>, and seabed anomalies.
         </p>
 
         <div className="pt-2 flex items-center justify-center gap-3">
-          <div className="h-px w-14 bg-gradient-to-r from-transparent to-[#00F0FF]/50" />
-          <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#38BDF8] font-bold">
+          <div className="h-px w-14 bg-gradient-to-r from-transparent to-[#FFB703]/40" />
+          <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#FFB703] font-bold">
             Choose Your Analysis Mode
           </span>
-          <div className="h-px w-14 bg-gradient-to-l from-transparent to-[#00F0FF]/50" />
+          <div className="h-px w-14 bg-gradient-to-l from-transparent to-[#FFB703]/40" />
         </div>
       </div>
 
@@ -249,20 +249,20 @@ export const MarineSurveyHero: React.FC = () => {
           onMouseLeave={() => setActiveModeHover('none')}
           className={`caliper-box relative rounded-2xl bg-gradient-to-b from-[#0A0F18]/95 to-[#06090F]/95 backdrop-blur-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
             activeModeHover === 'manual'
-              ? 'border-white/[0.22] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_50px_-12px_rgba(0,245,212,0.12)] translate-y-[-2px]'
+              ? 'border-white/[0.22] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_50px_-12px_rgba(255,183,3,0.12)] translate-y-[-2px]'
               : 'border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_15px_35px_-10px_rgba(0,0,0,0.6)] hover:border-white/[0.16]'
           }`}
         >
           {/* Subtle Ambient Radial Spotlight */}
-          <div className="absolute top-0 left-1/4 right-1/4 h-32 bg-[radial-gradient(ellipse_at_top,rgba(0,245,212,0.12),transparent_70%)] pointer-events-none" />
+          <div className="absolute top-0 left-1/4 right-1/4 h-32 bg-[radial-gradient(ellipse_at_top,rgba(255,183,3,0.10),transparent_70%)] pointer-events-none" />
 
           <div className="p-7 sm:p-8 space-y-6 relative z-10">
             <div className="flex items-start justify-between">
-              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.1] flex items-center justify-center shadow-inner group-hover:border-[#00F5D4]/40">
-                <UploadCloud className="w-6 h-6 text-[#00F5D4]" />
+              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.1] flex items-center justify-center shadow-inner group-hover:border-[#FFB703]/40">
+                <UploadCloud className="w-6 h-6 text-[#FFB703]" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#00F5D4]/10 border border-[#00F5D4]/25 text-[#00F5D4]">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#FFB703]/10 border border-[#FFB703]/30 text-[#FFB703]">
                   MOD-01
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-white/[0.03] text-slate-400 border border-white/[0.08]">
@@ -282,8 +282,8 @@ export const MarineSurveyHero: React.FC = () => {
 
             <div className="space-y-3 pt-4 border-t border-white/[0.06]">
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
+                <div className="w-5 h-5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#FFB703]" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200 flex items-center gap-2">
@@ -297,8 +297,8 @@ export const MarineSurveyHero: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
+                <div className="w-5 h-5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#FFB703]" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200">YOLOv8s Deep Marine Perception</div>
@@ -307,8 +307,8 @@ export const MarineSurveyHero: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
+                <div className="w-5 h-5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#FFB703]" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200">Platt-Calibrated Confidence Scoring</div>
@@ -317,8 +317,8 @@ export const MarineSurveyHero: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
+                <div className="w-5 h-5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#FFB703]" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200">Automated WGS84 Geotagged Coordinates</div>
@@ -327,8 +327,8 @@ export const MarineSurveyHero: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
+                <div className="w-5 h-5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#FFB703]" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200">Enterprise Standardized Export</div>
@@ -341,7 +341,7 @@ export const MarineSurveyHero: React.FC = () => {
           <div className="p-7 sm:p-8 pt-0 relative z-10">
             <button
               onClick={() => setActiveTab('scan')}
-              className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-[#00F5D4] hover:from-emerald-400 hover:to-[#5EFFD8] text-[#05070B] font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,245,212,0.25)] hover:shadow-[0_0_25px_rgba(0,245,212,0.4)] transition-all cursor-pointer group"
+              className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-[#FFB703] to-[#F59E0B] hover:brightness-110 text-[#05070B] font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,183,3,0.25)] hover:shadow-[0_0_25px_rgba(255,183,3,0.4)] transition-all cursor-pointer group"
             >
               <span>LAUNCH MANUAL UPLOAD & ANALYZE</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -355,24 +355,24 @@ export const MarineSurveyHero: React.FC = () => {
           onMouseLeave={() => setActiveModeHover('none')}
           className={`caliper-box relative rounded-2xl bg-gradient-to-b from-[#0A0F18]/95 to-[#06090F]/95 backdrop-blur-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
             activeModeHover === 'live'
-              ? 'border-white/[0.22] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_50px_-12px_rgba(56,189,248,0.12)] translate-y-[-2px]'
+              ? 'border-white/[0.25] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25),0_25px_50px_-12px_rgba(255,255,255,0.12)] translate-y-[-2px]'
               : 'border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_15px_35px_-10px_rgba(0,0,0,0.6)] hover:border-white/[0.16]'
           }`}
         >
           {/* Subtle Ambient Radial Spotlight */}
-          <div className="absolute top-0 left-1/4 right-1/4 h-32 bg-[radial-gradient(ellipse_at_top,rgba(56,189,248,0.12),transparent_70%)] pointer-events-none" />
+          <div className="absolute top-0 left-1/4 right-1/4 h-32 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none" />
 
           <div className="p-7 sm:p-8 space-y-6 relative z-10">
             <div className="flex items-start justify-between">
-              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.1] flex items-center justify-center shadow-inner group-hover:border-[#38BDF8]/40">
-                <Radio className="w-6 h-6 text-[#38BDF8] animate-pulse" />
+              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.1] flex items-center justify-center shadow-inner group-hover:border-white/40">
+                <Radio className="w-6 h-6 text-white animate-pulse" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#38BDF8]/10 border border-[#38BDF8]/25 text-[#38BDF8]">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/[0.08] border border-white/[0.18] text-white">
                   MOD-02
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/10 text-[#00F5D4] border border-emerald-500/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-ping" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
                   LIVE STREAM
                 </span>
               </div>
@@ -389,8 +389,8 @@ export const MarineSurveyHero: React.FC = () => {
 
             <div className="space-y-3 pt-4 border-t border-white/[0.06]">
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
+                <div className="w-5 h-5 rounded-full bg-white/[0.06] border border-white/[0.15] flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200 flex items-center gap-2">
@@ -404,8 +404,8 @@ export const MarineSurveyHero: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
+                <div className="w-5 h-5 rounded-full bg-white/[0.06] border border-white/[0.15] flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200">Real-Time Acoustic Waterfall Detection</div>
@@ -414,8 +414,8 @@ export const MarineSurveyHero: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
+                <div className="w-5 h-5 rounded-full bg-white/[0.06] border border-white/[0.15] flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200">Active Mission Monitoring & Telemetry Lock</div>
@@ -424,8 +424,8 @@ export const MarineSurveyHero: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
+                <div className="w-5 h-5 rounded-full bg-white/[0.06] border border-white/[0.15] flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200">Tactical Stream Pause & Ring Buffer</div>
@@ -434,8 +434,8 @@ export const MarineSurveyHero: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
+                <div className="w-5 h-5 rounded-full bg-white/[0.06] border border-white/[0.15] flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
                 </div>
                 <div>
                   <div className="text-[13.5px] font-semibold text-slate-200">Real-Time Acoustic Operator Alerts</div>
@@ -448,7 +448,7 @@ export const MarineSurveyHero: React.FC = () => {
           <div className="p-7 sm:p-8 pt-0 relative z-10">
             <button
               onClick={() => setActiveTab('mission')}
-              className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-[#38BDF8] hover:from-sky-400 hover:to-sky-300 text-[#05070B] font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(56,189,248,0.25)] hover:shadow-[0_0_25px_rgba(56,189,248,0.4)] transition-all cursor-pointer group"
+              className="w-full py-3 px-6 rounded-xl bg-white hover:bg-slate-200 text-[#05070B] font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.35)] transition-all cursor-pointer group"
             >
               <span>ENTER MISSION CONTROL STREAM</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -461,38 +461,38 @@ export const MarineSurveyHero: React.FC = () => {
           SECTION 3 — ULTRA-ANIMATED INTERACTIVE MARINE ECOSYSTEM HERO
           SURVEY VESSEL CRUISING + TOW CABLE + TOWFISH + ACOUSTIC BEAM + MARINE WILDLIFE
           ═══════════════════════════════════════════════════════════════════ */}
-      <div className="relative rounded-2xl border border-[#1E3A5F] bg-[#020914] overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.9)] max-w-6xl mx-auto">
+      <div className="relative rounded-2xl border border-white/[0.1] bg-[#07090E] overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.9)] max-w-6xl mx-auto">
         {/* Top Control Bar — Cleanly Organized with ZERO text obscuring the ship */}
-        <div className="px-5 py-3 bg-[#041220]/95 backdrop-blur-xl border-b border-[#1E3A5F]/80 flex items-center justify-between flex-wrap gap-3 font-mono text-[11px] text-[#94A3B8]">
+        <div className="px-5 py-3 bg-[#0B0E17]/95 backdrop-blur-xl border-b border-white/[0.08] flex items-center justify-between flex-wrap gap-3 font-mono text-[11px] text-[#94A3B8]">
           {/* Left: Vessel telemetry badges */}
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-1.5 text-white bg-[#0A2238] px-2.5 py-1 rounded-md border border-[#1E3A5F]">
-              <Anchor className="w-3.5 h-3.5 text-[#00F0FF]" />
+            <div className="flex items-center gap-1.5 text-white bg-white/[0.04] px-2.5 py-1 rounded-md border border-white/[0.1]">
+              <Anchor className="w-3.5 h-3.5 text-[#FFB703]" />
               <span className="font-bold tracking-wider">R/V SAGARIKA</span>
-              <span className="text-[9px] text-[#38BDF8] px-1 py-0.2 bg-[#0284C7]/30 border border-[#00F0FF]/40 rounded">
+              <span className="text-[9px] text-[#FFB703] px-1 py-0.2 bg-[#FFB703]/15 border border-[#FFB703]/30 rounded">
                 SURVEY SHIP
               </span>
             </div>
 
-            <span className="text-[#334155]">|</span>
+            <span className="text-white/20">|</span>
             <span>SPEED: <strong className="text-white">{vesselSpeed.toFixed(1)} KTS</strong></span>
-            <span className="text-[#334155]">|</span>
+            <span className="text-white/20">|</span>
             <span>TOW CABLE: <strong className="text-white">48.2 M</strong></span>
-            <span className="text-[#334155]">|</span>
-            <span>TOWFISH: <strong className="text-[#00F0FF]">24.0M DEPTH</strong> (8.4M ALT)</span>
-            <span className="text-[#334155]">|</span>
-            <span>FREQ: <strong className="text-[#10B981]">900 kHz CHIRP</strong></span>
+            <span className="text-white/20">|</span>
+            <span>TOWFISH: <strong className="text-[#FFB703]">24.0M DEPTH</strong> (8.4M ALT)</span>
+            <span className="text-white/20">|</span>
+            <span>FREQ: <strong className="text-emerald-400">900 kHz CHIRP</strong></span>
           </div>
 
           {/* Right: Simulation Controls & Interactive Ping */}
           <div className="flex items-center gap-2.5 flex-wrap">
             {/* View Mode Toggle: Ecosystem vs Waterfall */}
-            <div className="flex items-center bg-[#07192C] border border-[#1E3A5F] rounded-lg p-0.5">
+            <div className="flex items-center bg-white/[0.03] border border-white/[0.08] rounded-lg p-0.5">
               <button
                 onClick={() => setViewMode('ecosystem')}
                 className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer ${
                   viewMode === 'ecosystem'
-                    ? 'bg-[#00F0FF] text-[#030914] shadow-[0_0_10px_rgba(0,240,255,0.4)]'
+                    ? 'bg-[#FFB703] text-[#030914] shadow-[0_0_10px_rgba(255,183,3,0.4)]'
                     : 'text-[#94A3B8] hover:text-white'
                 }`}
               >
@@ -503,7 +503,7 @@ export const MarineSurveyHero: React.FC = () => {
                 onClick={() => setViewMode('waterfall')}
                 className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 transition-all cursor-pointer ${
                   viewMode === 'waterfall'
-                    ? 'bg-[#F59E0B] text-[#030914] shadow-[0_0_10px_rgba(245,158,11,0.4)]'
+                    ? 'bg-white text-black shadow-[0_0_10px_rgba(255,255,255,0.4)]'
                     : 'text-[#94A3B8] hover:text-white'
                 }`}
               >
@@ -515,7 +515,7 @@ export const MarineSurveyHero: React.FC = () => {
             {/* Emit Sonar Ping Button */}
             <button
               onClick={triggerAcousticPing}
-              className="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-[#0284C7]/20 border border-[#00F0FF]/50 text-[#00F0FF] hover:bg-[#00F0FF]/30 transition-all cursor-pointer flex items-center gap-1 shadow-[0_0_15px_rgba(0,240,255,0.2)] animate-pulse"
+              className="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-[#FFB703]/15 border border-[#FFB703]/50 text-[#FFB703] hover:bg-[#FFB703]/30 transition-all cursor-pointer flex items-center gap-1 shadow-[0_0_15px_rgba(255,183,3,0.2)] animate-pulse"
               title="Transmit acoustic chirp shockwave across survey transect"
             >
               <Zap className="w-3 h-3" />
@@ -523,14 +523,14 @@ export const MarineSurveyHero: React.FC = () => {
             </button>
 
             {/* Speed Selector */}
-            <div className="flex items-center bg-[#07192C] border border-[#1E3A5F] rounded-lg p-0.5">
+            <div className="flex items-center bg-white/[0.03] border border-white/[0.08] rounded-lg p-0.5">
               {[1.5, 3.5, 5.5].map((spd) => (
                 <button
                   key={spd}
                   onClick={() => setVesselSpeed(spd)}
                   className={`px-2 py-0.5 rounded text-[9.5px] font-mono font-bold transition-all cursor-pointer ${
                     vesselSpeed === spd
-                      ? 'bg-[#00F0FF] text-[#030914]'
+                      ? 'bg-[#FFB703] text-[#030914]'
                       : 'text-[#94A3B8] hover:text-white'
                   }`}
                 >
@@ -540,14 +540,14 @@ export const MarineSurveyHero: React.FC = () => {
             </div>
 
             {/* Palette Switcher */}
-            <div className="flex items-center bg-[#07192C] border border-[#1E3A5F] rounded-lg p-0.5">
-              {(['cobalt', 'emerald', 'amber', 'grayscale'] as PaletteMode[]).map((p) => (
+            <div className="flex items-center bg-white/[0.03] border border-white/[0.08] rounded-lg p-0.5">
+              {(['amber', 'emerald', 'cobalt', 'grayscale'] as PaletteMode[]).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPalette(p)}
                   className={`px-2 py-0.5 rounded text-[9.5px] font-mono font-bold uppercase transition-all cursor-pointer ${
                     palette === p
-                      ? 'bg-[#38BDF8] text-[#030914]'
+                      ? 'bg-[#FFB703] text-[#030914]'
                       : 'text-[#94A3B8] hover:text-white'
                   }`}
                 >
@@ -559,7 +559,7 @@ export const MarineSurveyHero: React.FC = () => {
             {/* Pause/Play */}
             <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className="p-1.5 rounded-md bg-[#0B2138] hover:bg-[#123150] border border-[#1E3A5F] text-[#94A3B8] hover:text-white transition-colors cursor-pointer"
+              className="p-1.5 rounded-md bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-[#94A3B8] hover:text-white transition-colors cursor-pointer"
             >
               {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
             </button>
@@ -567,10 +567,10 @@ export const MarineSurveyHero: React.FC = () => {
         </div>
 
         {/* ── QUICK JUMP ENTITY SELECTOR CHIPS ── */}
-        <div className="px-5 py-2 bg-[#020B16] border-b border-[#1E3A5F]/50 flex items-center justify-between flex-wrap gap-2 text-[11px] font-mono">
+        <div className="px-5 py-2 bg-[#07090E] border-b border-white/[0.08] flex items-center justify-between flex-wrap gap-2 text-[11px] font-mono">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[#64748B] text-[10px] uppercase font-bold flex items-center gap-1">
-              <Info className="w-3 h-3 text-[#38BDF8]" />
+            <span className="text-slate-400 text-[10px] uppercase font-bold flex items-center gap-1">
+              <Info className="w-3 h-3 text-[#FFB703]" />
               Quick Inspect:
             </span>
             <button
@@ -589,7 +589,7 @@ export const MarineSurveyHero: React.FC = () => {
                     'Equipped with heavy hydraulic A-frame stern winch and tow cable deploying high-frequency side-scan sonar across the Mumbai Shelf and coastal shipping corridors.',
                 })
               }
-              className="px-2 py-0.5 rounded bg-[#0A2238] hover:bg-[#00F0FF]/20 border border-[#1E3A5F] hover:border-[#00F0FF]/50 text-[#E0F7F4] text-[10px] transition-all cursor-pointer"
+              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-[#FFB703]/50 text-slate-300 hover:text-white text-[10px] transition-all cursor-pointer"
             >
               🚢 R/V Sagarika
             </button>
@@ -610,7 +610,7 @@ export const MarineSurveyHero: React.FC = () => {
                     'Hydrodynamic towfish maintaining stable trim to deliver clean acoustic waterfalls. Emits high-frequency sound pulses to generate high-contrast seabed highlight and shadow relief.',
                 })
               }
-              className="px-2 py-0.5 rounded bg-[#0A2238] hover:bg-[#00F0FF]/20 border border-[#1E3A5F] hover:border-[#00F0FF]/50 text-[#E0F7F4] text-[10px] transition-all cursor-pointer"
+              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-[#FFB703]/50 text-slate-300 hover:text-white text-[10px] transition-all cursor-pointer"
             >
               🟡 SSS Towfish
             </button>
@@ -631,7 +631,7 @@ export const MarineSurveyHero: React.FC = () => {
                   ecoNote: 'Passive and high-frequency ultrasonic side-scan sonar does not interfere with marine reptile orientation or auditory systems.',
                 })
               }
-              className="px-2 py-0.5 rounded bg-[#0A2238] hover:bg-[#10B981]/20 border border-[#1E3A5F] hover:border-[#10B981]/50 text-[#34D399] text-[10px] transition-all cursor-pointer"
+              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-emerald-500/50 text-emerald-300 text-[10px] transition-all cursor-pointer"
             >
               🐢 Sea Turtle & Calf
             </button>
@@ -651,7 +651,7 @@ export const MarineSurveyHero: React.FC = () => {
                     'Dolphins frequently ride the surface bow waves of survey vessels. High-frequency side-scan sonar operates above 900 kHz, safely avoiding dolphin communications.',
                 })
               }
-              className="px-2 py-0.5 rounded bg-[#0A2238] hover:bg-[#38BDF8]/20 border border-[#1E3A5F] hover:border-[#38BDF8]/50 text-[#38BDF8] text-[10px] transition-all cursor-pointer"
+              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/40 text-slate-300 hover:text-white text-[10px] transition-all cursor-pointer"
             >
               🐬 Bow Dolphins
             </button>
@@ -673,7 +673,7 @@ export const MarineSurveyHero: React.FC = () => {
                   ecoNote: 'Severe entanglement hazard to marine megafauna (turtles & cetaceans). Marked for priority ROV retrieval.',
                 })
               }
-              className="px-2 py-0.5 rounded bg-[#0A2238] hover:bg-[#F59E0B]/20 border border-[#1E3A5F] hover:border-[#F59E0B]/50 text-[#F59E0B] text-[10px] transition-all cursor-pointer"
+              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-[#FFB703]/50 text-[#FFB703] text-[10px] transition-all cursor-pointer"
             >
               🕸️ Ghost Net Target
             </button>
@@ -694,14 +694,14 @@ export const MarineSurveyHero: React.FC = () => {
                     'Exposed subsea pipeline spanning over a bathymetric scour depression. High linear backscatter verified with aspect ratio prior (AR >= 1.30).',
                 })
               }
-              className="px-2 py-0.5 rounded bg-[#0A2238] hover:bg-[#38BDF8]/20 border border-[#1E3A5F] hover:border-[#38BDF8]/50 text-[#38BDF8] text-[10px] transition-all cursor-pointer"
+              className="px-2 py-0.5 rounded bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-amber-400/50 text-amber-200 text-[10px] transition-all cursor-pointer"
             >
               ⚡ Subsea Pipeline
             </button>
           </div>
 
-          <div className="flex items-center gap-1.5 text-[#10B981] font-bold text-[10.5px]">
-            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+          <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[10.5px]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             <span>USBL TRANSDUCER LOCK: STABLE (99.8%)</span>
           </div>
         </div>
@@ -740,10 +740,10 @@ export const MarineSurveyHero: React.FC = () => {
                   <stop offset="100%" stopColor={colors.accent} stopOpacity="0.02" />
                 </linearGradient>
 
-                {/* Sunlight Caustic Pattern under surface */}
+                {/* Dynamic Caustic Pattern under surface */}
                 <radialGradient id="sun-caustic" cx="50%" cy="0%" r="70%">
-                  <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.3" />
-                  <stop offset="40%" stopColor="#0284C7" stopOpacity="0.08" />
+                  <stop offset="0%" stopColor={colors.accent} stopOpacity="0.22" />
+                  <stop offset="40%" stopColor={colors.primary} stopOpacity="0.06" />
                   <stop offset="100%" stopColor="transparent" stopOpacity="0" />
                 </radialGradient>
               </defs>
@@ -772,14 +772,14 @@ export const MarineSurveyHero: React.FC = () => {
 
               {/* Shimmering Underwater Caustic Rays */}
               <rect x="0" y="68" width="1000" height="180" fill="url(#sun-caustic)" />
-              <g opacity="0.12">
+              <g opacity="0.10">
                 {Array.from({ length: 9 }).map((_, idx) => {
                   const rayX = 80 + idx * 110 + Math.sin(time * 0.8 + idx) * 35;
                   return (
                     <polygon
                       key={idx}
                       points={`${rayX},68 ${rayX + 30},68 ${rayX + 95},380 ${rayX - 35},380`}
-                      fill="#38BDF8"
+                      fill={colors.accent}
                     />
                   );
                 })}
@@ -1157,10 +1157,10 @@ export const MarineSurveyHero: React.FC = () => {
                VIEW MODE 2: RAW SSS ACOUSTIC WATERFALL DISPLAY
                Demonstrates deep side-scan sonar domain understanding!
                ══════════════════════════════════════════════════════════════ */
-            <div className="w-full h-full bg-[#02070D] p-4 flex flex-col justify-between font-mono text-[11px] select-none">
-              <div className="flex items-center justify-between border-b border-[#1E3A5F] pb-2 text-[#94A3B8]">
+            <div className="w-full h-full bg-[#07090E] p-4 flex flex-col justify-between font-mono text-[11px] select-none">
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-2 text-[#94A3B8]">
                 <div className="flex items-center gap-2">
-                  <span className="text-[#00F0FF] font-bold">RAW SSS WATERFALL STREAM</span>
+                  <span className="text-[#FFB703] font-bold">RAW SSS WATERFALL STREAM</span>
                   <span>·</span>
                   <span>PORT: 75M</span>
                   <span>·</span>
@@ -1168,30 +1168,30 @@ export const MarineSurveyHero: React.FC = () => {
                   <span>·</span>
                   <span>RESOLUTION: 0.05 M/PX</span>
                 </div>
-                <div className="text-[#10B981] font-bold">LIVE SLIDING SEGMENTATION</div>
+                <div className="text-emerald-400 font-bold">LIVE SLIDING SEGMENTATION</div>
               </div>
 
               {/* Waterfall simulation canvas */}
-              <div className="relative flex-1 my-2 border border-[#1E3A5F]/80 rounded bg-[#010408] overflow-hidden flex items-center justify-center">
+              <div className="relative flex-1 my-2 border border-white/[0.08] rounded bg-[#030508] overflow-hidden flex items-center justify-center">
                 {/* Central Nadir Blind Zone */}
-                <div className="absolute inset-y-0 w-16 bg-[#000000] border-x border-[#00F0FF]/30 flex items-center justify-center">
-                  <span className="text-[9px] text-[#00F0FF]/60 rotate-90 whitespace-nowrap">
+                <div className="absolute inset-y-0 w-16 bg-[#000000] border-x border-[#FFB703]/30 flex items-center justify-center">
+                  <span className="text-[9px] text-[#FFB703]/70 rotate-90 whitespace-nowrap font-bold">
                     NADIR BLIND ZONE
                   </span>
                 </div>
 
                 {/* Acoustic scanlines animation */}
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00F0FF]/5 to-transparent animate-pulse" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#FFB703]/5 to-transparent animate-pulse" />
 
                 {/* Target Highlight Contacts in Waterfall */}
-                <div className="absolute left-1/4 top-1/3 p-2 bg-[#0284C7]/20 border border-[#00F0FF] rounded">
-                  <span className="text-[10px] text-[#00F0FF] font-bold block">SX-T01: GHOST NET</span>
+                <div className="absolute left-1/4 top-1/3 p-2 bg-[#FFB703]/15 border border-[#FFB703] rounded">
+                  <span className="text-[10px] text-[#FFB703] font-bold block">SX-T01: GHOST NET</span>
                   <span className="text-[9px] text-white block">SPECULAR HIGHLIGHT + SHADOW</span>
                 </div>
 
-                <div className="absolute right-1/4 bottom-1/4 p-2 bg-[#38BDF8]/20 border border-[#38BDF8] rounded">
-                  <span className="text-[10px] text-[#38BDF8] font-bold block">SX-T03: PIPELINE TRENCH</span>
-                  <span className="text-[9px] text-white block">LINEAR REFLECTIVITY (AR=2.8)</span>
+                <div className="absolute right-1/4 bottom-1/4 p-2 bg-white/[0.08] border border-white/40 rounded">
+                  <span className="text-[10px] text-white font-bold block">SX-T03: PIPELINE TRENCH</span>
+                  <span className="text-[9px] text-slate-300 block">LINEAR REFLECTIVITY (AR=2.8)</span>
                 </div>
               </div>
 
@@ -1204,19 +1204,19 @@ export const MarineSurveyHero: React.FC = () => {
           )}
 
           {/* Bottom Ambient Legend with Clean Math Formula */}
-          <div className="absolute bottom-2.5 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-[#94A3B8] bg-[#020B16]/85 backdrop-blur-md px-3 py-1.5 rounded-lg border border-[#1E3A5F]">
+          <div className="absolute bottom-2.5 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-[#94A3B8] bg-[#07090E]/95 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/[0.08]">
             <div className="flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-[#34D399]">
-                <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+              <span className="flex items-center gap-1.5 text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
                 Eco-Safe Acoustics (Passive 900kHz CHIRP Safe for Turtles & Dolphins)
               </span>
-              <span className="hidden sm:inline text-[#334155]">|</span>
-              <span className="hidden sm:inline text-[#38BDF8]">
+              <span className="hidden sm:inline text-white/20">|</span>
+              <span className="hidden sm:inline text-slate-300">
                 Benthic Conservation Mode
               </span>
             </div>
-            <div className="flex items-center gap-1.5 text-[#00F0FF]">
-              <Zap className="w-3.5 h-3.5 text-[#00F0FF]" />
+            <div className="flex items-center gap-1.5 text-[#FFB703]">
+              <Zap className="w-3.5 h-3.5 text-[#FFB703]" />
               <span>
                 Ray-Traced Shadow Math: <strong className="text-white">L = (h · G) / (H − h)</strong>
               </span>
@@ -1226,11 +1226,11 @@ export const MarineSurveyHero: React.FC = () => {
 
         {/* ── MODAL / POPOVER FOR CLICKED ENTITY ── */}
         {selectedEntity && (
-          <div className="absolute inset-0 bg-[#020712]/80 backdrop-blur-md flex items-center justify-center p-4 z-40 animate-in fade-in duration-200">
-            <div className="max-w-md w-full bg-[#051424] border border-[#00F0FF]/50 rounded-xl p-6 space-y-4 shadow-[0_0_50px_rgba(0,240,255,0.3)]">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-40 animate-in fade-in duration-200">
+            <div className="max-w-md w-full bg-[#0B0F17] border border-white/[0.15] rounded-2xl p-6 space-y-4 shadow-[0_0_50px_rgba(0,0,0,0.9)]">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#0284C7]/20 border border-[#00F0FF]/40 text-[#00F0FF]">
+                  <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#FFB703]/15 border border-[#FFB703]/30 text-[#FFB703]">
                     {selectedEntity.badge}
                   </span>
                   <h3 className="font-display font-bold text-lg text-white mt-1.5">
@@ -1239,35 +1239,35 @@ export const MarineSurveyHero: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setSelectedEntity(null)}
-                  className="p-1 rounded-lg bg-[#0E2840] hover:bg-[#1A3D60] text-[#94A3B8] hover:text-white transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-400 hover:text-white transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 bg-[#030B14] p-3 rounded-lg border border-[#1E3A5F] text-[11px] font-mono">
+              <div className="grid grid-cols-2 gap-2 bg-white/[0.02] p-3 rounded-xl border border-white/[0.06] text-[11px] font-mono">
                 {selectedEntity.specs.map((s, idx) => (
                   <div key={idx} className="space-y-0.5">
-                    <span className="text-[#64748B] block text-[9.5px] uppercase">{s.label}</span>
-                    <span className="text-[#E0F7F4] font-semibold">{s.value}</span>
+                    <span className="text-slate-500 block text-[9.5px] uppercase">{s.label}</span>
+                    <span className="text-slate-200 font-semibold">{s.value}</span>
                   </div>
                 ))}
               </div>
 
-              <p className="text-[13px] text-[#94A3B8] leading-relaxed">
+              <p className="text-[13px] text-slate-300 leading-relaxed">
                 {selectedEntity.description}
               </p>
 
               {selectedEntity.ecoNote && (
-                <div className="p-2.5 rounded-lg bg-[#062419] border border-[#10B981]/40 text-[11.5px] text-[#34D399] flex items-start gap-2">
-                  <ShieldCheck className="w-4 h-4 shrink-0 text-[#10B981] mt-0.5" />
+                <div className="p-2.5 rounded-lg bg-emerald-500/[0.08] border border-emerald-500/20 text-[11.5px] text-emerald-300 flex items-start gap-2">
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
                   <span>{selectedEntity.ecoNote}</span>
                 </div>
               )}
 
               <button
                 onClick={() => setSelectedEntity(null)}
-                className="w-full py-2 bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                className="w-full py-2.5 bg-[#FFB703] hover:bg-[#F59E0B] text-[#05070B] font-bold text-xs rounded-xl transition-all cursor-pointer shadow-[0_0_15px_rgba(255,183,3,0.25)]"
               >
                 RETURN TO SIMULATION
               </button>

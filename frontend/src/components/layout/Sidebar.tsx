@@ -71,13 +71,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="h-13 border-b border-white/[0.08] px-4 flex items-center justify-between shrink-0 bg-[#070B12]/80">
           {!isSidebarCollapsed ? (
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-[#00F5D4]/30 flex items-center justify-center text-[#00F5D4] shadow-[0_0_12px_rgba(0,245,212,0.2)]">
+              <div className="w-7 h-7 rounded-lg bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shadow-[0_0_12px_rgba(255,183,3,0.2)]">
                 <Radio className="w-3.5 h-3.5 animate-pulse" />
               </div>
               <div>
                 <div className="text-[13px] font-extrabold text-white tracking-wider flex items-center gap-1.5">
                   <span>SONARX</span>
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-500/10 text-[#00F5D4] border border-emerald-500/20">
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/20">
                     SIH 26057
                   </span>
                 </div>
@@ -85,7 +85,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </div>
           ) : (
-            <div className="mx-auto w-8 h-8 rounded-lg bg-emerald-500/10 border border-[#00F5D4]/30 flex items-center justify-center text-[#00F5D4] shadow-[0_0_12px_rgba(0,245,212,0.2)]">
+            <div className="mx-auto w-8 h-8 rounded-lg bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shadow-[0_0_12px_rgba(255,183,3,0.2)]">
               <Radio className="w-4 h-4 animate-pulse" />
             </div>
           )}
@@ -116,12 +116,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   >
                     {/* Active Left Indicator Bar */}
                     {isActive && (
-                      <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-[#00F5D4] rounded-r shadow-[0_0_8px_#00F5D4]" />
+                      <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-[#FFB703] rounded-r shadow-[0_0_8px_#FFB703]" />
                     )}
 
                     <Icon
                       className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-105 ${
-                        isActive ? 'text-[#00F5D4] drop-shadow-[0_0_6px_rgba(0,245,212,0.5)]' : 'text-slate-400 group-hover:text-slate-200'
+                        isActive ? 'text-[#FFB703] drop-shadow-[0_0_6px_rgba(255,183,3,0.5)]' : 'text-slate-400 group-hover:text-slate-200'
                       }`}
                     />
                     {!isSidebarCollapsed && (
@@ -133,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         title={item.tooltip}
                         className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-bold uppercase tracking-wider ${
                           isActive
-                            ? 'bg-[#00F5D4] text-[#05070B] shadow-xs'
+                            ? 'bg-[#FFB703] text-[#05070B] shadow-xs'
                             : 'bg-white/[0.04] border border-white/[0.08] text-slate-400 group-hover:text-slate-200'
                         }`}
                       >
@@ -162,18 +162,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
                   <span className="text-slate-300 text-xs font-medium">Perception Engine</span>
                 </div>
-                <span className="text-[9px] font-mono font-bold text-[#00F5D4] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-[9px] font-mono font-bold text-[#FFB703] bg-[#FFB703]/10 px-1.5 py-0.5 rounded border border-[#FFB703]/20">
                   ONNX 14.2ms
                 </span>
               </div>
 
               <div className="p-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs space-y-0.5">
                 <div className="flex items-center justify-between text-slate-300 font-semibold">
-                  <span className="flex items-center gap-1 text-[#38BDF8]">
-                    <ShieldAlert className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  <span className="flex items-center gap-1 text-slate-300">
+                    <ShieldAlert className="w-3.5 h-3.5 text-[#FFB703]" />
                     MoES // INDIA EEZ
                   </span>
-                  <span className="text-[#00F5D4] font-mono text-[9px]">ORDER 1A</span>
+                  <span className="text-[#FFB703] font-mono text-[9px]">ORDER 1A</span>
                 </div>
                 <div className="text-[9.5px] text-slate-400 leading-tight font-mono">
                   WGS84 Subsea Debris Protocol

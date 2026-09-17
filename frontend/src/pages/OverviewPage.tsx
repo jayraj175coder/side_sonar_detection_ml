@@ -94,7 +94,7 @@ export const OverviewPage: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="subpixel-card p-6 rounded-2xl space-y-3 reveal">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#00F5D4]">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#FFB703]">
               <Clock className="w-5 h-5" />
             </div>
             <h3 className="font-display font-semibold text-base text-white">Manual inspection</h3>
@@ -104,7 +104,7 @@ export const OverviewPage: React.FC = () => {
           </div>
 
           <div className="subpixel-card p-6 rounded-2xl space-y-3 reveal">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#00F5D4]">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#FFB703]">
               <Waves className="w-5 h-5" />
             </div>
             <h3 className="font-display font-semibold text-base text-white">Acoustic noise</h3>
@@ -114,7 +114,7 @@ export const OverviewPage: React.FC = () => {
           </div>
 
           <div className="subpixel-card p-6 rounded-2xl space-y-3 reveal">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#00F5D4]">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#FFB703]">
               <Filter className="w-5 h-5" />
             </div>
             <h3 className="font-display font-semibold text-base text-white">Natural vs. artificial</h3>
@@ -124,7 +124,7 @@ export const OverviewPage: React.FC = () => {
           </div>
 
           <div className="subpixel-card p-6 rounded-2xl space-y-3 reveal">
-            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#00F5D4]">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#FFB703]">
               <MapPin className="w-5 h-5" />
             </div>
             <h3 className="font-display font-semibold text-base text-white">No location intelligence</h3>
@@ -154,34 +154,34 @@ export const OverviewPage: React.FC = () => {
               <tr className="bg-white/[0.02] border-b border-white/[0.08] text-slate-300 font-display font-semibold text-[13px]">
                 <th className="p-4">Existing approach</th>
                 <th className="p-4">Where it breaks down</th>
-                <th className="p-4 text-[#00F5D4]">What SONARX does instead</th>
+                <th className="p-4 text-[#FFB703]">What SONARX does instead</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.06] text-slate-400">
               <tr className="hover:bg-white/[0.02] transition-colors">
                 <td className="p-4 font-medium text-slate-200">Manual sonar review</td>
                 <td className="p-4">Slow, subjective, depends on analyst experience</td>
-                <td className="p-4 font-medium text-[#00F5D4]">Automated, consistent detection in 14.2 ms</td>
+                <td className="p-4 font-medium text-[#FFB703]">Automated, consistent detection in 14.2 ms</td>
               </tr>
               <tr className="hover:bg-white/[0.02] transition-colors">
                 <td className="p-4 font-medium text-slate-200">Ghost-net-specific tools</td>
                 <td className="p-4">Built for one target type only</td>
-                <td className="p-4 font-medium text-[#00F5D4]">Multi-class marine debris & pipeline hazard perception</td>
+                <td className="p-4 font-medium text-[#FFB703]">Multi-class marine debris & pipeline hazard perception</td>
               </tr>
               <tr className="hover:bg-white/[0.02] transition-colors">
                 <td className="p-4 font-medium text-slate-200">Generic object detectors</td>
                 <td className="p-4">High false-positive rate on seabed clutter</td>
-                <td className="p-4 font-medium text-[#00F5D4]">Acoustic shadow geometry filtering & rock rejection</td>
+                <td className="p-4 font-medium text-[#FFB703]">Acoustic shadow geometry filtering & rock rejection</td>
               </tr>
               <tr className="hover:bg-white/[0.02] transition-colors">
                 <td className="p-4 font-medium text-slate-200">Detection-only systems</td>
                 <td className="p-4">No geotagging or operational context</td>
-                <td className="p-4 font-medium text-[#00F5D4]">End-to-end workflow with WGS-84 coordinates & dossiers</td>
+                <td className="p-4 font-medium text-[#FFB703]">End-to-end workflow with WGS-84 coordinates & dossiers</td>
               </tr>
               <tr className="hover:bg-white/[0.02] transition-colors">
                 <td className="p-4 font-medium text-slate-200">Cloud-dependent pipelines</td>
                 <td className="p-4">High latency, needs a live satellite connection</td>
-                <td className="p-4 font-medium text-[#00F5D4]">Lightweight ONNX model built for offline edge inference</td>
+                <td className="p-4 font-medium text-[#FFB703]">Lightweight ONNX model built for offline edge inference</td>
               </tr>
             </tbody>
           </table>
@@ -206,50 +206,50 @@ export const OverviewPage: React.FC = () => {
           <div className="lg:col-span-6 space-y-6 reveal">
             <ul className="space-y-4 list-none p-0 m-0">
               <li className="flex items-start gap-3.5">
-                <span className="w-2 h-2 rounded-full bg-[#00D4AA] mt-2 shrink-0 shadow-[0_0_8px_#00D4AA]" />
+                <span className="w-2 h-2 rounded-full bg-[#FFB703] mt-2 shrink-0 shadow-[0_0_8px_#FFB703]" />
                 <div>
-                  <strong className="block font-display font-semibold text-[15.5px] text-[#FFFFFF]">Multi-class detection</strong>
-                  <span className="text-[14px] text-[#8CA6B8]">Locates ghost nets, lost fishing gear, and pipelines directly in raw side-scan sonar imagery.</span>
+                  <strong className="block font-display font-semibold text-[15.5px] text-white">Multi-class detection</strong>
+                  <span className="text-[14px] text-slate-400">Locates ghost nets, lost fishing gear, and pipelines directly in raw side-scan sonar imagery.</span>
                 </div>
               </li>
 
               <li className="flex items-start gap-3.5">
-                <span className="w-2 h-2 rounded-full bg-[#00D4AA] mt-2 shrink-0 shadow-[0_0_8px_#00D4AA]" />
+                <span className="w-2 h-2 rounded-full bg-[#FFB703] mt-2 shrink-0 shadow-[0_0_8px_#FFB703]" />
                 <div>
-                  <strong className="block font-display font-semibold text-[15.5px] text-[#FFFFFF]">Acoustic clutter filtering</strong>
-                  <span className="text-[14px] text-[#8CA6B8]">Shadow trigonometry and confidence scoring cut down the false positives that noise and seabed texture create.</span>
+                  <strong className="block font-display font-semibold text-[15.5px] text-white">Acoustic clutter filtering</strong>
+                  <span className="text-[14px] text-slate-400">Shadow trigonometry and confidence scoring cut down the false positives that noise and seabed texture create.</span>
                 </div>
               </li>
 
               <li className="flex items-start gap-3.5">
-                <span className="w-2 h-2 rounded-full bg-[#00D4AA] mt-2 shrink-0 shadow-[0_0_8px_#00D4AA]" />
+                <span className="w-2 h-2 rounded-full bg-[#FFB703] mt-2 shrink-0 shadow-[0_0_8px_#FFB703]" />
                 <div>
-                  <strong className="block font-display font-semibold text-[15.5px] text-[#FFFFFF]">Automatic geotagging</strong>
-                  <span className="text-[14px] text-[#8CA6B8]">Every contact is tagged to WGS-84 coordinates and logged against the USBL ping that produced it.</span>
+                  <strong className="block font-display font-semibold text-[15.5px] text-white">Automatic geotagging</strong>
+                  <span className="text-[14px] text-slate-400">Every contact is tagged to WGS-84 coordinates and logged against the USBL ping that produced it.</span>
                 </div>
               </li>
 
               <li className="flex items-start gap-3.5">
-                <span className="w-2 h-2 rounded-full bg-[#00D4AA] mt-2 shrink-0 shadow-[0_0_8px_#00D4AA]" />
+                <span className="w-2 h-2 rounded-full bg-[#FFB703] mt-2 shrink-0 shadow-[0_0_8px_#FFB703]" />
                 <div>
-                  <strong className="block font-display font-semibold text-[15.5px] text-[#FFFFFF]">Prioritized anomaly reports</strong>
-                  <span className="text-[14px] text-[#8CA6B8]">Findings are ranked and written up automatically, ready to hand to an operational MoES retrieval team.</span>
+                  <strong className="block font-display font-semibold text-[15.5px] text-white">Prioritized anomaly reports</strong>
+                  <span className="text-[14px] text-slate-400">Findings are ranked and written up automatically, ready to hand to an operational MoES retrieval team.</span>
                 </div>
               </li>
 
               <li className="flex items-start gap-3.5">
-                <span className="w-2 h-2 rounded-full bg-[#00D4AA] mt-2 shrink-0 shadow-[0_0_8px_#00D4AA]" />
+                <span className="w-2 h-2 rounded-full bg-[#FFB703] mt-2 shrink-0 shadow-[0_0_8px_#FFB703]" />
                 <div>
-                  <strong className="block font-display font-semibold text-[15.5px] text-[#FFFFFF]">Interactive intelligence map</strong>
-                  <span className="text-[14px] text-[#8CA6B8]">A live map and 3D bathymetry viewer for hydrographic and conservation teams to inspect contacts.</span>
+                  <strong className="block font-display font-semibold text-[15.5px] text-white">Interactive intelligence map</strong>
+                  <span className="text-[14px] text-slate-400">A live map and 3D bathymetry viewer for hydrographic and conservation teams to inspect contacts.</span>
                 </div>
               </li>
 
               <li className="flex items-start gap-3.5">
-                <span className="w-2 h-2 rounded-full bg-[#00D4AA] mt-2 shrink-0 shadow-[0_0_8px_#00D4AA]" />
+                <span className="w-2 h-2 rounded-full bg-[#FFB703] mt-2 shrink-0 shadow-[0_0_8px_#FFB703]" />
                 <div>
-                  <strong className="block font-display font-semibold text-[15.5px] text-[#FFFFFF]">Edge-ready inference</strong>
-                  <span className="text-[14px] text-[#8CA6B8]">A lightweight 12.3 MB ONNX model that runs locally on towfish edge hardware without internet.</span>
+                  <strong className="block font-display font-semibold text-[15.5px] text-white">Edge-ready inference</strong>
+                  <span className="text-[14px] text-slate-400">A lightweight 12.3 MB ONNX model that runs locally on towfish edge hardware without internet.</span>
                 </div>
               </li>
             </ul>
@@ -257,17 +257,17 @@ export const OverviewPage: React.FC = () => {
             {/* Empirical Validation Metrics Strip (Linear Key Metric Grid) */}
             <div className="grid grid-cols-3 gap-px bg-white/[0.08] border border-white/[0.08] rounded-2xl overflow-hidden shadow-xl">
               <div className="bg-[#090E17]/95 p-4 text-center">
-                <div className="font-mono text-2xl font-bold text-[#00F5D4]">77.7%</div>
+                <div className="font-mono text-2xl font-bold text-[#FFB703]">77.7%</div>
                 <div className="text-[11px] text-slate-400 mt-1 uppercase font-mono font-medium">Precision (Val)</div>
               </div>
 
               <div className="bg-[#090E17]/95 p-4 text-center">
-                <div className="font-mono text-2xl font-bold text-[#00F5D4]">74.6%</div>
+                <div className="font-mono text-2xl font-bold text-[#FFB703]">74.6%</div>
                 <div className="text-[11px] text-slate-400 mt-1 uppercase font-mono font-medium">Recall (Val)</div>
               </div>
 
               <div className="bg-[#090E17]/95 p-4 text-center">
-                <div className="font-mono text-2xl font-bold text-[#00F5D4]">74.1%</div>
+                <div className="font-mono text-2xl font-bold text-[#FFB703]">74.1%</div>
                 <div className="text-[11px] text-slate-400 mt-1 uppercase font-mono font-medium">mAP@0.50</div>
               </div>
             </div>
@@ -275,13 +275,13 @@ export const OverviewPage: React.FC = () => {
             {/* Class Tags */}
             <div className="flex flex-wrap gap-2 pt-1">
               <span className="font-mono text-xs px-2.5 py-1 bg-white/[0.03] border border-white/[0.08] text-slate-300 rounded-lg">
-                <b className="text-[#00F5D4]">0: ghost_net_aldfg</b> — 99.5% accuracy
+                <b className="text-[#FFB703]">0: ghost_net_aldfg</b> — 99.5% accuracy
               </span>
               <span className="font-mono text-xs px-2.5 py-1 bg-white/[0.03] border border-white/[0.08] text-slate-300 rounded-lg">
                 <b className="text-[#FFB703]">1: anthropogenic_debris</b> — metallic clutter
               </span>
               <span className="font-mono text-xs px-2.5 py-1 bg-white/[0.03] border border-white/[0.08] text-slate-300 rounded-lg">
-                <b className="text-[#38BDF8]">2: pipeline_hazard</b> — 99.5% accuracy
+                <b className="text-white">2: pipeline_hazard</b> — 99.5% accuracy
               </span>
               <span className="font-mono text-xs px-2.5 py-1 bg-white/[0.03] border border-white/[0.08] text-slate-300 rounded-lg">
                 <b className="text-rose-400">3: seafloor_anomaly</b> — seabed contact
@@ -293,12 +293,12 @@ export const OverviewPage: React.FC = () => {
           <div className="lg:col-span-6 caliper-box subpixel-card rounded-2xl overflow-hidden shadow-2xl reveal border border-white/[0.08]">
             <div className="p-3.5 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between font-mono text-xs">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#00F5D4] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[#FFB703] animate-pulse" />
                 <span className="text-slate-200 font-medium">Mission Control — Live Workstation</span>
               </div>
               <button
                 onClick={() => setActiveTab('mission')}
-                className="text-[#00F5D4] hover:underline flex items-center gap-1 cursor-pointer font-bold"
+                className="text-[#FFB703] hover:underline flex items-center gap-1 cursor-pointer font-bold"
               >
                 <span>Open full ↗</span>
               </button>
@@ -306,15 +306,15 @@ export const OverviewPage: React.FC = () => {
 
             {/* Interactive Spotlight Target Card */}
             <div className="p-6 space-y-4">
-              <div className="p-4 bg-white/[0.02] border border-[#00F5D4]/30 rounded-xl space-y-3">
+              <div className="p-4 bg-white/[0.02] border border-[#FFB703]/30 rounded-xl space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-[#00F5D4] text-[#05070B] font-mono font-bold text-xs rounded">
+                    <span className="px-2 py-0.5 bg-[#FFB703] text-[#05070B] font-mono font-bold text-xs rounded">
                       FLAGSHIP HAZARD: SX-T07
                     </span>
                     <span className="font-display font-semibold text-sm text-white">Ghost Net (ALDFG)</span>
                   </div>
-                  <span className="font-mono font-bold text-[#00F5D4] text-sm">94.7% CONFIDENCE</span>
+                  <span className="font-mono font-bold text-[#FFB703] text-sm">94.7% CONFIDENCE</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono">
@@ -324,7 +324,7 @@ export const OverviewPage: React.FC = () => {
                   </div>
                   <div className="p-2.5 bg-white/[0.02] border border-white/[0.06] rounded-lg">
                     <span className="text-slate-400 text-[10px] block">BATHYMETRIC DEPTH</span>
-                    <strong className="text-[#00F5D4]">43.1 m (USBL Fix)</strong>
+                    <strong className="text-[#FFB703]">43.1 m (USBL Fix)</strong>
                   </div>
                   <div className="p-2.5 bg-white/[0.02] border border-white/[0.06] rounded-lg">
                     <span className="text-slate-400 text-[10px] block">SHADOW RELIEF</span>
@@ -332,12 +332,12 @@ export const OverviewPage: React.FC = () => {
                   </div>
                   <div className="p-2.5 bg-white/[0.02] border border-white/[0.06] rounded-lg">
                     <span className="text-slate-400 text-[10px] block">EVIDENCE MATCH</span>
-                    <strong className="text-[#00F5D4]">96% Shadow · 92% Shape</strong>
+                    <strong className="text-[#FFB703]">96% Shadow · 92% Shape</strong>
                   </div>
                 </div>
 
-                <div className="p-2.5 bg-emerald-500/[0.06] border border-emerald-500/20 text-xs text-slate-200 leading-relaxed rounded-lg">
-                  <strong className="text-[#00F5D4]">Acoustic Noise Filter Verdict: </strong>
+                <div className="p-2.5 bg-[#FFB703]/[0.06] border border-[#FFB703]/20 text-xs text-slate-200 leading-relaxed rounded-lg">
+                  <strong className="text-[#FFB703]">Acoustic Noise Filter Verdict: </strong>
                   Passed. Object exhibits specular highlight relief followed by acoustic shadow void, distinct from flat seabed sediment.
                 </div>
               </div>
@@ -345,7 +345,7 @@ export const OverviewPage: React.FC = () => {
               <div className="flex gap-2.5">
                 <button
                   onClick={() => setActiveTab('mission')}
-                  className="flex-1 py-2.5 bg-[#00F5D4] hover:bg-[#5EFFD8] text-[#05070B] font-display font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,245,212,0.3)] transition-all cursor-pointer"
+                  className="flex-1 py-2.5 bg-[#FFB703] hover:bg-[#F59E0B] text-[#05070B] font-display font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,183,3,0.3)] transition-all cursor-pointer"
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />
                   <span>LAUNCH TACTICAL RADAR HUD</span>
@@ -355,7 +355,7 @@ export const OverviewPage: React.FC = () => {
                   onClick={() => setActiveTab('reports')}
                   className="px-4 py-2.5 bg-white/[0.04] border border-white/[0.1] hover:border-white/[0.2] text-slate-200 font-display font-medium text-xs rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#38BDF8]" />
+                  <FileText className="w-3.5 h-3.5 text-white" />
                   <span>View Dossier</span>
                 </button>
               </div>
@@ -369,59 +369,59 @@ export const OverviewPage: React.FC = () => {
           ═══════════════════════════════════════════════════════════════════ */}
       <section id="pipeline" className="space-y-8">
         <div className="max-w-2xl space-y-2 reveal">
-          <h2 className="font-display font-semibold text-2xl md:text-3xl text-[#FFFFFF] tracking-tight">
+          <h2 className="font-display font-semibold text-2xl md:text-3xl text-white tracking-tight">
             How it works
           </h2>
-          <p className="text-[16px] text-[#8CA6B8] leading-relaxed">
+          <p className="text-[16px] text-slate-400 leading-relaxed">
             The same six-stage pipeline that runs inside Mission Control, from raw sonar to a finished report.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 reveal">
-          <div className="p-5 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 rounded-xs space-y-2 transition-all group">
-            <span className="font-mono text-xs text-[#00D4AA] font-bold block">01</span>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF] group-hover:text-[#00D4AA] transition-colors">Ingest</h3>
-            <p className="text-[13.5px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-5 rounded-2xl space-y-2 group transition-all">
+            <span className="font-mono text-xs text-[#FFB703] font-bold block">01</span>
+            <h3 className="font-display font-semibold text-base text-white group-hover:text-[#FFB703] transition-colors">Ingest</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               Raw side-scan sonar survey data enters the pipeline.
             </p>
           </div>
 
-          <div className="p-5 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 rounded-xs space-y-2 transition-all group">
-            <span className="font-mono text-xs text-[#00D4AA] font-bold block">02</span>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF] group-hover:text-[#00D4AA] transition-colors">Denoise</h3>
-            <p className="text-[13.5px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-5 rounded-2xl space-y-2 group transition-all">
+            <span className="font-mono text-xs text-[#FFB703] font-bold block">02</span>
+            <h3 className="font-display font-semibold text-base text-white group-hover:text-[#FFB703] transition-colors">Denoise</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               Speckle and seabed texture are suppressed before detection.
             </p>
           </div>
 
-          <div className="p-5 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 rounded-xs space-y-2 transition-all group">
-            <span className="font-mono text-xs text-[#00D4AA] font-bold block">03</span>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF] group-hover:text-[#00D4AA] transition-colors">Detect</h3>
-            <p className="text-[13.5px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-5 rounded-2xl space-y-2 group transition-all">
+            <span className="font-mono text-xs text-[#FFB703] font-bold block">03</span>
+            <h3 className="font-display font-semibold text-base text-white group-hover:text-[#FFB703] transition-colors">Detect</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               YOLOv8n locates candidate contacts in the imagery.
             </p>
           </div>
 
-          <div className="p-5 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 rounded-xs space-y-2 transition-all group">
-            <span className="font-mono text-xs text-[#00D4AA] font-bold block">04</span>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF] group-hover:text-[#00D4AA] transition-colors">Filter</h3>
-            <p className="text-[13.5px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-5 rounded-2xl space-y-2 group transition-all">
+            <span className="font-mono text-xs text-[#FFB703] font-bold block">04</span>
+            <h3 className="font-display font-semibold text-base text-white group-hover:text-[#FFB703] transition-colors">Filter</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               Confidence scoring removes low-quality candidates.
             </p>
           </div>
 
-          <div className="p-5 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 rounded-xs space-y-2 transition-all group">
-            <span className="font-mono text-xs text-[#00D4AA] font-bold block">05</span>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF] group-hover:text-[#00D4AA] transition-colors">Classify</h3>
-            <p className="text-[13.5px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-5 rounded-2xl space-y-2 group transition-all">
+            <span className="font-mono text-xs text-[#FFB703] font-bold block">05</span>
+            <h3 className="font-display font-semibold text-base text-white group-hover:text-[#FFB703] transition-colors">Classify</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               Remaining contacts are tagged to MoES debris taxonomy.
             </p>
           </div>
 
-          <div className="p-5 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 rounded-xs space-y-2 transition-all group">
-            <span className="font-mono text-xs text-[#00D4AA] font-bold block">06</span>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF] group-hover:text-[#00D4AA] transition-colors">Report</h3>
-            <p className="text-[13.5px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-5 rounded-2xl space-y-2 group transition-all">
+            <span className="font-mono text-xs text-[#FFB703] font-bold block">06</span>
+            <h3 className="font-display font-semibold text-base text-white group-hover:text-[#FFB703] transition-colors">Report</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               Geotagged, prioritized findings are written up automatically.
             </p>
           </div>
@@ -433,36 +433,36 @@ export const OverviewPage: React.FC = () => {
           ═══════════════════════════════════════════════════════════════════ */}
       <section id="impact" className="space-y-6">
         <div className="max-w-2xl space-y-2 reveal">
-          <h2 className="font-display font-semibold text-2xl md:text-3xl text-[#FFFFFF] tracking-tight">
+          <h2 className="font-display font-semibold text-2xl md:text-3xl text-white tracking-tight">
             What that changes for a survey team
           </h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-6 bg-[#05121F] border border-[#0D2E4A] rounded-xs space-y-2 reveal">
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF]">Faster detection</h3>
-            <p className="text-[14px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-6 rounded-2xl space-y-2 reveal">
+            <h3 className="font-display font-semibold text-base text-white">Faster detection</h3>
+            <p className="text-[14px] text-slate-400 leading-relaxed">
               Contacts surface as the survey is processed, not after a manual review queue.
             </p>
           </div>
 
-          <div className="p-6 bg-[#05121F] border border-[#0D2E4A] rounded-xs space-y-2 reveal">
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF]">Automated reporting</h3>
-            <p className="text-[14px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-6 rounded-2xl space-y-2 reveal">
+            <h3 className="font-display font-semibold text-base text-white">Automated reporting</h3>
+            <p className="text-[14px] text-slate-400 leading-relaxed">
               Findings are written up and geotagged without a separate write-up step.
             </p>
           </div>
 
-          <div className="p-6 bg-[#05121F] border border-[#0D2E4A] rounded-xs space-y-2 reveal">
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF]">Less inspection effort</h3>
-            <p className="text-[14px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-6 rounded-2xl space-y-2 reveal">
+            <h3 className="font-display font-semibold text-base text-white">Less inspection effort</h3>
+            <p className="text-[14px] text-slate-400 leading-relaxed">
               Analysts review flagged, filtered contacts instead of raw, noisy imagery.
             </p>
           </div>
 
-          <div className="p-6 bg-[#05121F] border border-[#0D2E4A] rounded-xs space-y-2 reveal">
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF]">Cleaner, safer oceans</h3>
-            <p className="text-[14px] text-[#8CA6B8] leading-relaxed">
+          <div className="subpixel-card p-6 rounded-2xl space-y-2 reveal">
+            <h3 className="font-display font-semibold text-base text-white">Cleaner, safer oceans</h3>
+            <p className="text-[14px] text-slate-400 leading-relaxed">
               Debris and hazards get found and acted on before they're forgotten at depth.
             </p>
           </div>
@@ -470,22 +470,22 @@ export const OverviewPage: React.FC = () => {
       </section>
 
       {/* ── TECHNICAL STACK LINE ── */}
-      <div className="text-center font-mono text-xs text-[#7C98A6] pt-4 pb-2 border-t border-[#0D2E4A]/80 reveal">
+      <div className="text-center font-mono text-xs text-slate-500 pt-4 pb-2 border-t border-white/[0.08] reveal">
         Python · YOLOv8n · ONNX Runtime · FastAPI · React · Vite · Leaflet · MoES SIH 2026
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
           CLOSING CTA & TEAM CREDITS
           ═══════════════════════════════════════════════════════════════════ */}
-      <div className="bg-[#05121F] border border-[#0D2E4A] text-center p-10 md:p-14 space-y-5 rounded-xs shadow-2xl reveal">
-        <h2 className="font-display font-semibold text-2xl sm:text-3xl text-[#FFFFFF] max-w-xl mx-auto tracking-tight">
+      <div className="subpixel-card text-center p-10 md:p-14 space-y-5 rounded-3xl shadow-2xl reveal">
+        <h2 className="font-display font-semibold text-2xl sm:text-3xl text-white max-w-xl mx-auto tracking-tight">
           See the sonar-to-report pipeline running on real data.
         </h2>
-        <p className="text-[#8CA6B8] text-[15px]">Live dashboard, no login required.</p>
+        <p className="text-slate-400 text-[15px]">Live dashboard, no login required.</p>
         <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
           <button
             onClick={() => setActiveTab('mission')}
-            className="btn-primary cursor-pointer"
+            className="px-6 py-3 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm shadow-[0_0_25px_rgba(255,255,255,0.25)] transition-all cursor-pointer flex items-center gap-2"
           >
             <span>View live dashboard</span>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -496,9 +496,9 @@ export const OverviewPage: React.FC = () => {
             href="https://github.com/jayraj175coder/side_sonar_detection_ml"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-secondary"
+            className="px-5 py-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.12] text-slate-300 hover:text-white font-medium text-sm transition-all flex items-center gap-2"
           >
-            <GithubIcon className="w-4 h-4 text-[#A6C0CE]" />
+            <GithubIcon className="w-4 h-4 text-slate-400" />
             <span>View the repo</span>
           </a>
         </div>

@@ -14,14 +14,14 @@
 
     --border-subtle:      rgba(255, 255, 255, 0.08); /* 1px sub-pixel border */
     --border-sheen:       rgba(255, 255, 255, 0.16); /* highlighted top border sheen */
-    --border-glow:        rgba(0, 245, 212, 0.35);    /* luminous acoustic emerald glow */
+    --border-glow:        rgba(255, 183, 3, 0.35);    /* luminous acoustic amber phosphor glow */
 
     --text-primary:       #F8FAFC;   /* high contrast pure crisp white */
     --text-secondary:     #94A3B8;   /* balanced slate */
     --text-muted:         #64748B;   /* legible muted slate */
 
-    --accent-emerald:     #00F5D4;   /* active acoustic telemetry */
     --accent-amber:       #FFB703;   /* naval sonar phosphor gold */
+    --accent-emerald:     #10B981;   /* marine conservation safe */
     --accent-cyan:        #38BDF8;   /* GEBCO bathymetric contours */
     --accent-rose:        #F43F5E;   /* critical hazard reject */
 
@@ -31,27 +31,27 @@
     --bg-secondary:       #101726;
     --bg-elevated:        #162136;
     --border-main:        rgba(255, 255, 255, 0.09);
-    --border-bright:      rgba(0, 245, 212, 0.4);
-    --teal-primary:       #00F5D4;
-    --teal-dim:           #059669;
-    --teal-bright:        #5EFFD8;
-    --teal-glow-bg:       rgba(0, 245, 212, 0.08);
-    --teal-subtle:        rgba(0, 245, 212, 0.04);
-    --phosphor-green:     #00F5D4;
-    --phosphor-dim:       #059669;
-    --phosphor-bright:    #5EFFD8;
+    --border-bright:      rgba(255, 183, 3, 0.4);
+    --teal-primary:       #FFB703;
+    --teal-dim:           #D97706;
+    --teal-bright:        #FCD34D;
+    --teal-glow-bg:       rgba(255, 183, 3, 0.08);
+    --teal-subtle:        rgba(255, 183, 3, 0.04);
+    --phosphor-green:     #FFB703;
+    --phosphor-dim:       #D97706;
+    --phosphor-bright:    #FCD34D;
     --surface-console:    #05070B;
     --surface-panel:      #0A0F18;
     --surface-panel-raised: #101726;
     --surface-border:     rgba(255, 255, 255, 0.09);
-    --sonar-cyan:         #00F5D4;
-    --signal-live:        #00F5D4;
+    --sonar-cyan:         #FFB703;
+    --signal-live:        #FFB703;
     --amber-warning:      #FFB703;
     --amber-bright:       #FCD34D;
     --red-reject:         #F43F5E;
     --warning:            #FFB703;
     --critical:           #F43F5E;
-    --success:            #00F5D4;
+    --success:            #10B981;
   }
 
   body {
@@ -98,22 +98,22 @@
 
 /* ── Refined Buttons ── */
 .btn-primary {
-  background-color: #00D4AA;
-  color: #030B14;
+  background-color: #FFB703;
+  color: #05070B;
   padding: 11px 20px;
-  border-radius: 2px;
+  border-radius: 8px;
   font-family: 'Space Grotesk', sans-serif;
-  font-weight: 600;
-  font-size: 14.5px;
+  font-weight: 700;
+  font-size: 14px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   transition: all 0.15s ease;
-  box-shadow: 0 0 15px rgba(0, 212, 170, 0.25);
+  box-shadow: 0 0 15px rgba(255, 183, 3, 0.25);
 }
 .btn-primary:hover {
-  background-color: #5EFFD8;
-  box-shadow: 0 0 20px rgba(0, 212, 170, 0.4);
+  background-color: #FCD34D;
+  box-shadow: 0 0 20px rgba(255, 183, 3, 0.4);
   transform: translateY(-1px);
 }
 .btn-primary:active {
@@ -135,7 +135,7 @@
 }
 .subpixel-card:hover {
   border-color: rgba(255, 255, 255, 0.16);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.18), 0 15px 35px -10px rgba(0, 245, 212, 0.08);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.18), 0 15px 35px -10px rgba(255, 183, 3, 0.08);
   transform: translateY(-1px);
 }
 
@@ -165,8 +165,8 @@
   left: -1px;
   width: 8px;
   height: 8px;
-  border-top: 2px solid #00F5D4;
-  border-left: 2px solid #00F5D4;
+  border-top: 2px solid #FFB703;
+  border-left: 2px solid #FFB703;
   pointer-events: none;
 }
 .caliper-box::after {
@@ -176,8 +176,8 @@
   right: -1px;
   width: 8px;
   height: 8px;
-  border-bottom: 2px solid #00F5D4;
-  border-right: 2px solid #00F5D4;
+  border-bottom: 2px solid #FFB703;
+  border-right: 2px solid #FFB703;
   pointer-events: none;
 }
 

@@ -102,33 +102,33 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
   }, []);
 
   return (
-    <section className="relative p-5 md:p-8 rounded-3xl bg-[#050D18]/90 border border-[#122A42] shadow-[0_0_60px_rgba(0,212,170,0.08)] backdrop-blur-xl overflow-hidden font-mono text-xs select-none space-y-6">
+    <section className="relative p-5 md:p-8 rounded-3xl bg-[#0A0F18]/95 border border-white/[0.08] shadow-[0_0_60px_rgba(0,0,0,0.8)] backdrop-blur-xl overflow-hidden font-mono text-xs select-none space-y-6">
       {/* Background Ambience */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#00D4AA]/8 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#06B6D4]/8 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-[#FFB703]/[0.03] rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/[0.02] rounded-full blur-[120px] pointer-events-none" />
 
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#122A42] pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#00D4AA]/15 border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_12px_rgba(0,212,170,0.3)]">
+            <div className="w-7 h-7 rounded-lg bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shadow-[0_0_12px_rgba(255,183,3,0.2)]">
               <Radio className="w-4 h-4 animate-pulse" />
             </div>
-            <h2 className="text-base sm:text-lg font-black text-[#EAEFF5] uppercase tracking-wider">
+            <h2 className="text-base sm:text-lg font-black text-white uppercase tracking-wider">
               Autonomous Marine Debris Holographic Radar
             </h2>
-            <span className="text-[9px] font-black px-2 py-0.5 rounded bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/40">
+            <span className="text-[9px] font-black px-2 py-0.5 rounded bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/30">
               YOLOv8s LIVE INFERENCE
             </span>
           </div>
-          <p className="text-[11px] text-[#8CA6B8] font-sans">
+          <p className="text-[11px] text-slate-400 font-sans">
             Real-time classification of subsea threats, lost fishing gear (ALDFG), pipelines, and seafloor anomalies from high-frequency side-scan sonar.
           </p>
         </div>
 
         <button
           onClick={() => setActiveTab('scan')}
-          className="self-start md:self-auto flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00D4AA] hover:bg-[#00baa0] text-[#030B14] font-black text-xs transition-all shadow-lg shadow-[rgba(0,212,170,0.25)] cursor-pointer"
+          className="self-start md:self-auto flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFB703] hover:bg-[#F59E0B] text-[#05070B] font-black text-xs transition-all shadow-lg shadow-[rgba(255,183,3,0.25)] cursor-pointer"
         >
           <span>TEST LIVE INGESTION</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -139,28 +139,28 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
         {/* Left Column: Rotating Sonar Radar (5 Cols) */}
         <div className="lg:col-span-5 flex flex-col items-center justify-center p-4">
-          <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-full border border-cyan-500/30 flex items-center justify-center bg-[#030914]/80 shadow-[0_0_40px_rgba(6,182,212,0.15)]">
+          <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-full border border-amber-500/30 flex items-center justify-center bg-[#05080E] shadow-[0_0_40px_rgba(255,183,3,0.08)]">
             {/* Concentric Range Rings */}
-            <div className="absolute w-3/4 h-3/4 rounded-full border border-cyan-500/20 flex items-start justify-center pt-1">
-              <span className="text-[7px] text-cyan-500/60 font-bold bg-[#030914] px-1 rounded">200m</span>
+            <div className="absolute w-3/4 h-3/4 rounded-full border border-amber-500/20 flex items-start justify-center pt-1">
+              <span className="text-[7px] text-amber-500/70 font-bold bg-[#05080E] px-1 rounded">200m</span>
             </div>
-            <div className="absolute w-1/2 h-1/2 rounded-full border border-cyan-500/20 flex items-start justify-center pt-1">
-              <span className="text-[7px] text-cyan-500/60 font-bold bg-[#030914] px-1 rounded">100m</span>
+            <div className="absolute w-1/2 h-1/2 rounded-full border border-amber-500/20 flex items-start justify-center pt-1">
+              <span className="text-[7px] text-amber-500/70 font-bold bg-[#05080E] px-1 rounded">100m</span>
             </div>
-            <div className="absolute w-1/4 h-1/4 rounded-full border border-cyan-500/25" />
+            <div className="absolute w-1/4 h-1/4 rounded-full border border-amber-500/25" />
 
             {/* Crosshairs */}
-            <div className="absolute top-0 bottom-0 left-1/2 w-px bg-cyan-500/20 -translate-x-1/2" />
-            <div className="absolute left-0 right-0 top-1/2 h-px bg-cyan-500/20 -translate-y-1/2" />
+            <div className="absolute top-0 bottom-0 left-1/2 w-px bg-amber-500/20 -translate-x-1/2" />
+            <div className="absolute left-0 right-0 top-1/2 h-px bg-amber-500/20 -translate-y-1/2" />
 
-            {/* Rotating 360° Radar Conic Beam */}
+            {/* Rotating 360° Radar Conic Beam (Acoustic Amber Phosphor) */}
             <div
               className="absolute inset-0 rounded-full origin-center animate-spin pointer-events-none"
               style={{
                 animationDuration: '4s',
                 animationTimingFunction: 'linear',
                 background:
-                  'conic-gradient(from 0deg, rgba(0,212,170,0.3) 0deg, rgba(0,212,170,0.06) 50deg, transparent 90deg, transparent 360deg)',
+                  'conic-gradient(from 0deg, rgba(255,183,3,0.32) 0deg, rgba(255,183,3,0.06) 50deg, transparent 90deg, transparent 360deg)',
               }}
             />
 
@@ -191,7 +191,7 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
                         isSelected ? 'scale-125' : ''
                       }`}
                       style={{
-                        backgroundColor: '#030914',
+                        backgroundColor: '#05080E',
                         borderColor: target.color,
                         boxShadow: `0 0 12px ${target.color}`,
                       }}
@@ -203,8 +203,8 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
                     <span
                       className={`absolute top-5 px-1.5 py-0.5 rounded text-[7px] font-black whitespace-nowrap shadow-md transition-all ${
                         isSelected
-                          ? 'opacity-100 bg-[#030914] border'
-                          : 'opacity-0 group-hover:opacity-100 bg-[#030914]/90 border border-[#122A42]'
+                          ? 'opacity-100 bg-[#05080E] border'
+                          : 'opacity-0 group-hover:opacity-100 bg-[#05080E]/90 border border-white/[0.1]'
                       }`}
                       style={{
                         borderColor: target.color,
@@ -219,13 +219,13 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
             })}
 
             {/* Center Core Transducer */}
-            <div className="relative z-10 w-8 h-8 rounded-full bg-[#05121F] border-2 border-[#00D4AA] flex items-center justify-center text-[#00D4AA] shadow-[0_0_15px_rgba(0,212,170,0.8)]">
+            <div className="relative z-10 w-8 h-8 rounded-full bg-[#0E1522] border-2 border-[#FFB703] flex items-center justify-center text-[#FFB703] shadow-[0_0_15px_rgba(255,183,3,0.8)]">
               <Crosshair className="w-4 h-4 animate-spin" style={{ animationDuration: '12s' }} />
             </div>
           </div>
 
-          <div className="flex items-center gap-2 mt-3 text-[9px] text-[#8CA6B8]">
-            <span className="w-2 h-2 rounded-full bg-[#00D4AA] animate-ping" />
+          <div className="flex items-center gap-2 mt-3 text-[9px] text-slate-400">
+            <span className="w-2 h-2 rounded-full bg-[#FFB703] animate-ping" />
             <span>Interactive: Click blips to inspect acoustic dossier</span>
           </div>
         </div>
@@ -233,7 +233,7 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
         {/* Right Column: Selected Target Tactical Dossier & Acoustic Spectrogram (7 Cols) */}
         <div className="lg:col-span-7 space-y-4">
           {/* Target Title & Confidence Pill */}
-          <div className="p-4 rounded-2xl bg-[#071322] border border-[#152E48] space-y-2 relative overflow-hidden">
+          <div className="p-4 rounded-2xl bg-[#0E1522] border border-white/[0.08] space-y-2 relative overflow-hidden">
             <div
               className="absolute top-0 right-0 w-48 h-48 rounded-full blur-[60px] pointer-events-none"
               style={{ backgroundColor: selectedTarget.accentBg }}
@@ -256,42 +256,42 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
                 style={{
                   color: selectedTarget.color,
                   borderColor: selectedTarget.color,
-                  backgroundColor: '#030914',
+                  backgroundColor: '#05080E',
                 }}
               >
                 YOLOv8 CONFIDENCE: {(selectedTarget.confidence * 100).toFixed(1)}%
               </span>
             </div>
 
-            <h3 className="text-base font-black text-[#FFFFFF] tracking-wide">
+            <h3 className="text-base font-black text-white tracking-wide">
               {selectedTarget.name}
             </h3>
 
-            <p className="text-[11px] text-[#8CA6B8] font-sans leading-relaxed">
+            <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
               {selectedTarget.description}
             </p>
 
             {/* Metric Strip */}
-            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#152E48] text-[9px]">
-              <div className="p-2 rounded bg-[#030914] border border-[#152E48]">
-                <span className="text-[8px] text-[#64748B] block">SOUNDING DEPTH</span>
-                <strong className="text-cyan-300 font-bold">{selectedTarget.depthM} Meters</strong>
+            <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/[0.08] text-[9px]">
+              <div className="p-2 rounded-lg bg-[#05080E] border border-white/[0.06]">
+                <span className="text-[8px] text-slate-500 block">SOUNDING DEPTH</span>
+                <strong className="text-amber-300 font-bold">{selectedTarget.depthM} Meters</strong>
               </div>
-              <div className="p-2 rounded bg-[#030914] border border-[#152E48]">
-                <span className="text-[8px] text-[#64748B] block">FOOTPRINT (L × W)</span>
-                <strong className="text-emerald-300 font-bold">{selectedTarget.dimensions}</strong>
+              <div className="p-2 rounded-lg bg-[#05080E] border border-white/[0.06]">
+                <span className="text-[8px] text-slate-500 block">FOOTPRINT (L × W)</span>
+                <strong className="text-white font-bold">{selectedTarget.dimensions}</strong>
               </div>
-              <div className="p-2 rounded bg-[#030914] border border-[#152E48]">
-                <span className="text-[8px] text-[#64748B] block">ACOUSTIC SHADOW</span>
-                <strong className="text-amber-300 font-bold">{selectedTarget.shadowLength}</strong>
+              <div className="p-2 rounded-lg bg-[#05080E] border border-white/[0.06]">
+                <span className="text-[8px] text-slate-500 block">ACOUSTIC SHADOW</span>
+                <strong className="text-[#FFB703] font-bold">{selectedTarget.shadowLength}</strong>
               </div>
             </div>
           </div>
 
           {/* Real-time Acoustic Pulse Spectrogram Visualizer */}
-          <div className="p-3.5 rounded-2xl bg-[#071322] border border-[#152E48] space-y-2">
-            <div className="flex items-center justify-between text-[9px] text-[#8CA6B8]">
-              <div className="flex items-center gap-1.5 text-cyan-400 font-bold">
+          <div className="p-3.5 rounded-2xl bg-[#0E1522] border border-white/[0.08] space-y-2">
+            <div className="flex items-center justify-between text-[9px] text-slate-400">
+              <div className="flex items-center gap-1.5 text-[#FFB703] font-bold">
                 <Waves className="w-3.5 h-3.5 animate-pulse" />
                 <span>ACOUSTIC BACKSCATTER FREQUENCY RESPONSE (900 kHz CHIRP)</span>
               </div>
@@ -299,7 +299,7 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
             </div>
 
             {/* Animated Audio Equalizer Bars */}
-            <div className="flex items-end justify-between h-12 gap-1 px-2 pt-2 bg-[#030914] rounded-xl border border-[#152E48] overflow-hidden">
+            <div className="flex items-end justify-between h-12 gap-1 px-2 pt-2 bg-[#05080E] rounded-xl border border-white/[0.06] overflow-hidden">
               {waveHeights.map((h, i) => (
                 <div
                   key={i}
@@ -307,7 +307,7 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
                   style={{
                     height: `${h}%`,
                     backgroundColor:
-                      h > 70 ? selectedTarget.color : h > 40 ? '#00D4AA' : '#06B6D4',
+                      h > 70 ? selectedTarget.color : h > 40 ? '#FFB703' : '#F59E0B',
                     opacity: 0.85,
                   }}
                 />
@@ -324,7 +324,7 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
                 className={`px-2.5 py-2 rounded-xl border text-left transition-all cursor-pointer ${
                   selectedTarget.id === t.id
                     ? 'border-2 shadow-lg'
-                    : 'bg-[#050D18] border-[#152E48] hover:border-cyan-500/40 text-[#8CA6B8]'
+                    : 'bg-[#0E1522] border-white/[0.08] hover:border-amber-400/40 text-slate-400'
                 }`}
                 style={{
                   borderColor: selectedTarget.id === t.id ? t.color : undefined,
@@ -333,9 +333,9 @@ export const TacticalDebrisRadarShowcase: React.FC = () => {
               >
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full" style={{ backgroundColor: t.color }} />
-                  <span className="text-[9px] font-bold text-[#FFFFFF] truncate">{t.id}</span>
+                  <span className="text-[9px] font-bold text-white truncate">{t.id}</span>
                 </div>
-                <div className="text-[8px] text-[#8CA6B8] truncate mt-0.5">{t.name.split(' ')[0]}</div>
+                <div className="text-[8px] text-slate-400 truncate mt-0.5">{t.name.split(' ')[0]}</div>
               </button>
             ))}
           </div>

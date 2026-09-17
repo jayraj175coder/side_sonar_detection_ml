@@ -222,12 +222,12 @@ export const DropZone: React.FC<DropZoneProps> = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={handleOpenFilePicker}
-        className={`relative min-h-[340px] rounded-3xl glass-panel border-2 border-dashed transition-all duration-300 cursor-pointer flex flex-col items-center justify-center p-6 overflow-hidden group ${
+        className={`relative min-h-[340px] rounded-3xl subpixel-card border-2 border-dashed transition-all duration-300 cursor-pointer flex flex-col items-center justify-center p-6 overflow-hidden group ${
           isDragging
-            ? 'border-[#4CD9E8] bg-[#4CD9E8]/10 scale-[1.01] shadow-[0_0_30px_rgba(76,217,232,0.3)]'
+            ? 'border-[#FFB703] bg-[#FFB703]/10 scale-[1.01] shadow-[0_0_30px_rgba(255,183,3,0.3)]'
             : previewUrl
-            ? 'border-[#4CD9E8]/40 bg-[#060D17]'
-            : 'border-[#152438] hover:border-[#4CD9E8]/50 bg-[#0A1322]/80 hover:shadow-2xl'
+            ? 'border-white/[0.15] bg-[#070B12]'
+            : 'border-white/[0.08] hover:border-[#FFB703]/50 bg-[#070B12]/80 hover:shadow-2xl'
         }`}
       >
         {previewUrl ? (
@@ -236,16 +236,16 @@ export const DropZone: React.FC<DropZoneProps> = ({
               <img
                 src={previewUrl}
                 alt="Sonar scan preview"
-                className="max-h-[220px] w-auto object-contain rounded-2xl border border-[#152438] shadow-[0_12px_40px_rgba(0,0,0,0.8)]"
+                className="max-h-[220px] w-auto object-contain rounded-2xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.8)]"
               />
               {/* Tactical Vertical Acoustic Laser Scanline */}
-              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_#FFB703] animate-laser-scan pointer-events-none z-10" />
+              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#FFB703] to-transparent shadow-[0_0_10px_#FFB703] animate-laser-scan pointer-events-none z-10" />
 
               <div className="absolute inset-0 bg-[#03070E]/60 opacity-0 group-hover/img:opacity-100 transition-opacity rounded-2xl flex items-center justify-center gap-2 backdrop-blur-[2px] z-20">
                 <button
                   type="button"
                   onClick={handleOpenFilePicker}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#4CD9E8] text-[#03070E] font-mono text-xs font-bold shadow-lg hover:scale-105 transition-transform cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#FFB703] text-[#05070B] font-mono text-xs font-bold shadow-lg hover:scale-105 transition-transform cursor-pointer"
                 >
                   Change Image
                 </button>
@@ -253,12 +253,12 @@ export const DropZone: React.FC<DropZoneProps> = ({
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
-              <span className="font-mono font-bold text-[#4CD9E8] bg-[#0A1A2E] px-3 py-1 rounded-lg border border-[#4CD9E8]/40 shadow-md">
+              <span className="font-mono font-bold text-[#FFB703] bg-[#FFB703]/10 px-3 py-1 rounded-lg border border-[#FFB703]/30 shadow-md">
                 {selectedFile ? selectedFile.name : 'Selected Sonar Image'}
               </span>
 
               {imageMeta && (
-                <span className="font-mono text-[#7C8AA0] bg-[#060D17] px-3 py-1 rounded-lg border border-[#152438]">
+                <span className="font-mono text-slate-400 bg-white/[0.02] px-3 py-1 rounded-lg border border-white/[0.08]">
                   {imageMeta.width} × {imageMeta.height} px • {imageMeta.size}
                 </span>
               )}
@@ -266,7 +266,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
               <button
                 type="button"
                 onClick={handleClear}
-                className="p-1.5 rounded-lg bg-[#0A1322] border border-[#152438] text-[#7C8AA0] hover:text-[#F04438] transition-colors cursor-pointer"
+                className="p-1.5 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
                 title="Clear selected image"
               >
                 <Trash2 className="w-4 h-4" />
@@ -277,60 +277,60 @@ export const DropZone: React.FC<DropZoneProps> = ({
           <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-md">
             {/* Pulsing Sonar Ping Emitter Halo */}
             <div className="relative flex items-center justify-center">
-              <div className="absolute w-24 h-24 rounded-full border border-cyan-400/40 animate-sonar-ping-ripple pointer-events-none" />
-              <div className="w-16 h-16 rounded-2xl bg-[#060D17] border border-[#152438] flex items-center justify-center text-[#4CD9E8] shadow-[0_0_20px_rgba(76,217,232,0.25)] group-hover:scale-110 group-hover:border-[#4CD9E8]/80 transition-all duration-300 z-10">
+              <div className="absolute w-24 h-24 rounded-full border border-[#FFB703]/30 animate-sonar-ping-ripple pointer-events-none" />
+              <div className="w-16 h-16 rounded-2xl bg-[#0A101D] border border-white/[0.1] flex items-center justify-center text-[#FFB703] shadow-[0_0_20px_rgba(255,183,3,0.18)] group-hover:scale-110 group-hover:border-[#FFB703]/80 transition-all duration-300 z-10">
                 <UploadCloud className="w-8 h-8 animate-pulse" />
               </div>
             </div>
 
             <div className="space-y-1">
-              <h3 className="text-sm font-black text-[#EAEFF5] uppercase tracking-wider">
+              <h3 className="text-sm font-black text-white uppercase tracking-wider">
                 DRAG & DROP RAW SONAR SWATH
               </h3>
-              <p className="text-xs text-[#7C8AA0]">
+              <p className="text-xs text-slate-400">
                 Drop single image swath, multi-frame log, or click to browse.
               </p>
             </div>
 
             {/* Ingestion Mode Badges */}
-            <div className="flex items-center gap-2 text-[9px] font-mono text-[#7C8AA0] flex-wrap justify-center">
-              <span className="px-2 py-0.5 rounded bg-[#060D17] border border-[#152438]">
+            <div className="flex items-center gap-2 text-[9px] font-mono text-slate-400 flex-wrap justify-center">
+              <span className="px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.08]">
                 PNG / JPG / TIFF
               </span>
-              <span className="px-2 py-0.5 rounded bg-[#060D17] border border-[#152438]">
+              <span className="px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.08]">
                 900 kHz / 450 kHz
               </span>
-              <span className="px-2 py-0.5 rounded bg-[#060D17] border border-[#152438]">
+              <span className="px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.08]">
                 Clipboard (Ctrl+V)
               </span>
             </div>
 
             {/* Tactical Debris Taxonomy Indicator Pill */}
             <div className="flex items-center gap-2 text-[8px] font-mono flex-wrap justify-center pt-1">
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/30 font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-ping" />
+              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/30 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
                 Ghost Nets (ALDFG)
               </span>
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#06B6D4]/10 text-[#06B6D4] border border-[#06B6D4]/30 font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#06B6D4]" />
+              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#38BDF8]/10 text-[#38BDF8] border border-[#38BDF8]/30 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
                 Pipeline Hazards
               </span>
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 font-bold">
+              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
                 Anthropogenic Debris
               </span>
-              <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#A855F7]/10 text-[#A855F7] border border-[#A855F7]/30 font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#A855F7]" />
+              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/[0.04] text-slate-300 border border-white/[0.1] font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                 Seafloor Anomalies
               </span>
             </div>
 
-            {/* SIH GAP 4 — Batch / Log Ingestion Button */}
+            {/* Batch / Log Ingestion Button */}
             <div className="flex items-center gap-2 pt-2">
               <button
                 type="button"
                 onClick={handleOpenBatchPicker}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0A1A2E] border border-[#4CD9E8]/40 hover:border-[#4CD9E8] text-[#4CD9E8] text-[9px] font-bold transition-all shadow-md cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.1] hover:border-[#FFB703]/60 text-slate-300 hover:text-[#FFB703] text-[9px] font-bold transition-all shadow-md cursor-pointer"
               >
                 <ListOrdered className="w-3.5 h-3.5" />
                 <span>Upload Sonar Image Log (Batch)</span>
@@ -339,7 +339,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
               <button
                 type="button"
                 onClick={handleOpenPingLogPicker}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#060D17] border border-[#152438] hover:border-[#3FD98A]/40 text-[#3FD98A] text-[9px] font-bold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.1] hover:border-[#FFB703]/60 text-slate-300 hover:text-[#FFB703] text-[9px] font-bold transition-all cursor-pointer"
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
                 <span>Attach Ping Log CSV</span>

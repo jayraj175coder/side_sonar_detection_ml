@@ -58,57 +58,57 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({
   ];
 
   return (
-    <div className="rounded-3xl glass-panel p-8 md:p-10 flex flex-col items-center justify-center space-y-8 relative overflow-hidden shadow-2xl bg-acoustic-grid">
+    <div className="rounded-3xl subpixel-card border border-white/[0.08] p-8 md:p-10 flex flex-col items-center justify-center space-y-8 relative overflow-hidden shadow-2xl">
       {/* Background Ambient Glow */}
-      <div className="absolute -top-24 -left-24 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-24 -left-24 w-72 h-72 bg-[#FFB703]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Cinematic Sonar Aperture & Scan Sweep */}
-      <div className="relative w-full max-w-sm h-40 rounded-2xl bg-[#030816] border border-cyan-500/30 overflow-hidden shadow-[0_0_40px_rgba(6,182,212,0.15)] flex items-center justify-center">
+      <div className="relative w-full max-w-sm h-40 rounded-2xl bg-[#05070B] border border-[#FFB703]/30 overflow-hidden shadow-[0_0_40px_rgba(255,183,3,0.15)] flex items-center justify-center">
         {/* Waterfall Grid Lines */}
-        <div className="absolute inset-0 bg-acoustic-dots opacity-40" />
+        <div className="absolute inset-0 bg-acoustic-dots opacity-30" />
 
         {/* Central Nadir Blind-Zone Line */}
-        <div className="absolute top-0 bottom-0 left-1/2 w-8 -translate-x-1/2 bg-slate-950/90 border-x border-cyan-500/20 flex flex-col justify-between items-center py-2 text-[8px] font-mono text-cyan-500/50">
+        <div className="absolute top-0 bottom-0 left-1/2 w-8 -translate-x-1/2 bg-black/90 border-x border-[#FFB703]/20 flex flex-col justify-between items-center py-2 text-[8px] font-mono text-[#FFB703]/50">
           <span>0m</span>
           <span className="rotate-90 text-[7px] tracking-widest uppercase">Nadir</span>
           <span>50m</span>
         </div>
 
         {/* Animated Sonar Sweep Laser Line */}
-        <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#06B6D4] animate-sonar-sweep" />
+        <div className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#FFB703] to-transparent shadow-[0_0_15px_#FFB703] animate-sonar-sweep" />
 
         {/* Sonar Transducer Radar Rings */}
         <div className="relative z-10 flex items-center justify-center">
-          <div className="w-16 h-16 rounded-full border border-cyan-500/30 flex items-center justify-center animate-ping opacity-30" />
-          <div className="absolute w-12 h-12 rounded-2xl bg-cyan-950/80 border border-cyan-400 flex items-center justify-center text-cyan-300 shadow-xl shadow-cyan-950">
+          <div className="w-16 h-16 rounded-full border border-[#FFB703]/30 flex items-center justify-center animate-ping opacity-30" />
+          <div className="absolute w-12 h-12 rounded-2xl bg-[#FFB703]/20 border border-[#FFB703] flex items-center justify-center text-[#FFB703] shadow-[0_0_20px_rgba(255,183,3,0.3)]">
             <Radio className="w-6 h-6 animate-pulse" />
           </div>
         </div>
 
         {/* Live Acoustic Equalizer Waves */}
         <div className="absolute bottom-2 left-3 flex items-end gap-1 h-5">
-          <div className="w-1 bg-cyan-400 rounded-full animate-eq-1" />
-          <div className="w-1 bg-teal-400 rounded-full animate-eq-2" />
-          <div className="w-1 bg-cyan-400 rounded-full animate-eq-3" />
-          <div className="w-1 bg-teal-400 rounded-full animate-eq-4" />
-          <div className="w-1 bg-cyan-400 rounded-full animate-eq-5" />
+          <div className="w-1 bg-[#FFB703] rounded-full animate-eq-1" />
+          <div className="w-1 bg-[#F59E0B] rounded-full animate-eq-2" />
+          <div className="w-1 bg-[#FFB703] rounded-full animate-eq-3" />
+          <div className="w-1 bg-[#F59E0B] rounded-full animate-eq-4" />
+          <div className="w-1 bg-[#FFB703] rounded-full animate-eq-5" />
         </div>
 
         {/* Live Frequency Readout */}
-        <div className="absolute top-2 right-3 text-[10px] font-mono text-cyan-400/80 flex items-center gap-1">
-          <Activity className="w-3 h-3 text-cyan-400 animate-pulse" />
+        <div className="absolute top-2 right-3 text-[10px] font-mono text-[#FFB703]/80 flex items-center gap-1">
+          <Activity className="w-3 h-3 text-[#FFB703] animate-pulse" />
           <span>CHIRP: 450 kHz</span>
         </div>
       </div>
 
       {/* Header Info */}
       <div className="text-center space-y-1.5 max-w-md">
-        <div className="inline-flex items-center gap-1.5 text-[10px] font-mono font-extrabold text-cyan-300 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 shadow-md">
-          <Sparkles className="w-3 h-3 text-cyan-400" />
+        <div className="inline-flex items-center gap-1.5 text-[10px] font-mono font-extrabold text-[#FFB703] px-3 py-1 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/30 shadow-md">
+          <Sparkles className="w-3 h-3 text-[#FFB703]" />
           <span>REAL-TIME SSS ACOUSTIC INFERENCE</span>
         </div>
-        <h3 className="text-xl font-extrabold text-slate-100 font-mono tracking-wider">
+        <h3 className="text-xl font-extrabold text-white font-mono tracking-wider">
           SCANNING ACOUSTIC WATERFALL
         </h3>
         <p className="text-xs text-slate-400 font-mono">
@@ -130,8 +130,8 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({
                 isDone
                   ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-300 shadow-sm'
                   : isCurrent
-                  ? 'bg-cyan-950/50 border-cyan-400 text-cyan-200 shadow-xl shadow-cyan-950/60 scale-[1.01] ring-1 ring-cyan-500/30'
-                  : 'bg-slate-950/30 border-slate-800/80 text-slate-500 opacity-60'
+                  ? 'bg-[#FFB703]/10 border-[#FFB703] text-amber-200 shadow-xl shadow-[#FFB703]/10 scale-[1.01] ring-1 ring-[#FFB703]/30'
+                  : 'bg-white/[0.02] border-white/[0.08] text-slate-500 opacity-60'
               }`}
             >
               <div
@@ -139,8 +139,8 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({
                   isDone
                     ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                     : isCurrent
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 animate-pulse'
-                    : 'bg-slate-900 text-slate-500 border border-slate-800'
+                    ? 'bg-[#FFB703]/20 text-[#FFB703] border border-[#FFB703]/40 animate-pulse'
+                    : 'bg-white/[0.04] text-slate-500 border border-white/[0.08]'
                 }`}
               >
                 {isDone ? (
@@ -155,7 +155,7 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({
                     {stage.title}
                   </p>
                   {isCurrent && (
-                    <span className="text-[10px] font-mono font-extrabold text-cyan-400 animate-pulse">
+                    <span className="text-[10px] font-mono font-extrabold text-[#FFB703] animate-pulse">
                       PROCESSING...
                     </span>
                   )}

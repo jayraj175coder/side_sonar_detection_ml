@@ -28,6 +28,7 @@ import {
   Fish,
   Layers,
 } from 'lucide-react';
+import { SonarxLogoIcon } from '../common/SonarxLogo';
 import { useApp } from '../../context/AppContext';
 
 type PaletteMode = 'cobalt' | 'emerald' | 'amber' | 'grayscale';
@@ -215,7 +216,7 @@ export const MarineSurveyHero: React.FC = () => {
           ═══════════════════════════════════════════════════════════════════ */}
       <div className="text-center max-w-4xl mx-auto space-y-4 pt-4">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#FFB703]/10 border border-[#FFB703]/30 text-[#FFB703] text-xs font-mono font-semibold rounded-full shadow-[0_0_20px_rgba(255,183,3,0.15)]">
-          <Radio className="w-3.5 h-3.5 animate-pulse text-[#FFB703]" />
+          <SonarxLogoIcon size={18} animated={true} />
           <span>AUTONOMOUS ACOUSTIC RECONNAISSANCE // DUAL-ENGINE INGESTION</span>
         </div>
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Play, Pause, Download, RotateCcw, Zap, FileText } from 'lucide-react';
+import { SonarxLogoIcon } from '../common/SonarxLogo';
 import { SURVEY_SITES, SurveySite } from '../../data/consoleData';
 
 type DemoPhase = 'idle' | 'running' | 'done';
@@ -30,12 +31,13 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
   return (
     <header className="h-11 bg-[#05121F] border-b border-[#0D2E4A] px-3 flex items-center justify-between font-mono text-[11px] select-none shrink-0 z-30">
       {/* Left: Product + node + link */}
-      <div className="flex items-center gap-3">
-        <span className="font-bold tracking-wider text-green-400">
-          SONARX
+      <div className="flex items-center gap-2.5">
+        <SonarxLogoIcon size={22} animated={demoPhase === 'running'} />
+        <span className="font-extrabold tracking-wider text-white">
+          SONAR<span className="text-[#FFB703]">X</span>
         </span>
-        <span className="text-[#2A5060]">|</span>
-        <span className="text-[10px] text-[#4A8090] uppercase tracking-wider">ANALYSIS NODE 04</span>
+        <span className="text-white/20">|</span>
+        <span className="text-[10px] text-slate-400 uppercase tracking-wider">ANALYSIS NODE 04</span>
 
         {/* Live demo status pill */}
         {demoPhase === 'running' && (

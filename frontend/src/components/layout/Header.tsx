@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { sonarAudio } from '../../utils/sonarAudio';
+import { SonarxLogo } from '../common/SonarxLogo';
 
 interface HeaderProps {
   title?: string;
@@ -87,24 +88,19 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           </button>
         )}
 
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shadow-[0_0_12px_rgba(255,183,3,0.2)]">
-            <Radio className="w-3.5 h-3.5 animate-pulse" />
-          </div>
-
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-[13px] font-extrabold text-white tracking-[0.16em] uppercase">
-              SONARX
-            </span>
-            <span className="hidden sm:inline-block text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-slate-400">
-              v2.6
-            </span>
-          </div>
+        <div className="flex items-center gap-3">
+          <SonarxLogo
+            size="sm"
+            subtitle=""
+            badge="v2.6"
+            animated={true}
+            onClick={() => setActiveTab('overview')}
+          />
 
           {/* Mission Telemetry Pill */}
-          <div className="hidden lg:flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/25 text-[10px] font-mono font-semibold text-[#FFB703]">
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/25 text-[10px] font-mono font-semibold text-[#FFB703]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
-            <span>SIH26057</span>
+            <span>SIH26057 // MoES</span>
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import {
   Radio,
   ShieldAlert,
 } from 'lucide-react';
+import { SonarxLogo, SonarxLogoIcon } from '../common/SonarxLogo';
 import { useApp } from '../../context/AppContext';
 import { TabType } from '../../types';
 
@@ -68,25 +69,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }`}
       >
         {/* Top Sidebar Header Logo */}
-        <div className="h-13 border-b border-white/[0.08] px-4 flex items-center justify-between shrink-0 bg-[#070B12]/80">
+        <div className="h-13 border-b border-white/[0.08] px-3.5 flex items-center shrink-0 bg-[#070B12]/90">
           {!isSidebarCollapsed ? (
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shadow-[0_0_12px_rgba(255,183,3,0.2)]">
-                <Radio className="w-3.5 h-3.5 animate-pulse" />
-              </div>
-              <div>
-                <div className="text-[13px] font-extrabold text-white tracking-wider flex items-center gap-1.5">
-                  <span>SONARX</span>
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/20">
-                    SIH 26057
-                  </span>
-                </div>
-                <div className="text-[10px] text-slate-400 font-medium">MoES Subsea Intelligence</div>
-              </div>
-            </div>
+            <SonarxLogo
+              size="sm"
+              subtitle="MoES Subsea Intelligence"
+              badge="SIH 26057"
+              animated={true}
+              onClick={() => setActiveTab('overview')}
+            />
           ) : (
-            <div className="mx-auto w-8 h-8 rounded-lg bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shadow-[0_0_12px_rgba(255,183,3,0.2)]">
-              <Radio className="w-4 h-4 animate-pulse" />
+            <div
+              className="mx-auto cursor-pointer group"
+              onClick={() => setActiveTab('overview')}
+              title="SONARX // Overview"
+            >
+              <SonarxLogoIcon size={30} animated={true} />
             </div>
           )}
         </div>

@@ -54,8 +54,8 @@ export const App: React.FC = () => {
   return (
     <GeospatialConfigProvider>
       <MissionProvider>
-        <div className="flex h-screen bg-[#001017] text-slate-100 overflow-hidden font-sans select-none relative">
-          {/* Global Ambient Ocean Cloud & Current Backdrop */}
+        <div className="flex h-screen bg-[#05070B] text-slate-100 overflow-hidden font-sans select-none relative">
+          {/* Global Ambient Hydrographic Backdrop */}
           <AmbientOceanBackdrop />
 
           {/* Fixed Left Sidebar */}

@@ -63,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   }, []);
 
   return (
-    <header className="h-13 bg-[#001017]/85 backdrop-blur-2xl border-b border-white/[0.08] px-4 flex items-center justify-between sticky top-0 z-30 font-sans select-none transition-all shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
+    <header className="h-13 bg-[#05070B]/85 backdrop-blur-xl border-b border-white/[0.08] px-4 flex items-center justify-between sticky top-0 z-30 font-sans select-none transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
       {/* 1. Left: Sidebar Toggle + Logo + Survey ID Badge */}
       <div className="flex items-center gap-3">
         <button

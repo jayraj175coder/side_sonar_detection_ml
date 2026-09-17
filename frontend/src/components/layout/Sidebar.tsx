@@ -62,14 +62,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Main Sidebar */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col bg-[#001017]/85 backdrop-blur-2xl border-r border-white/[0.08] transition-all duration-300 ease-in-out font-sans select-none shadow-2xl ${
+        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col bg-[#05070B] border-r border-white/[0.08] transition-all duration-300 ease-in-out font-sans select-none shadow-2xl ${
           isSidebarCollapsed ? 'w-20' : 'w-64'
         } ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         {/* Top Sidebar Header Logo */}
-        <div className="h-13 border-b border-white/[0.08] px-3.5 flex items-center shrink-0 bg-[#00141d]/90">
+        <div className="h-13 border-b border-white/[0.08] px-3.5 flex items-center shrink-0 bg-[#070B12]/90">
           {!isSidebarCollapsed ? (
             <SonarxLogo
               size="sm"

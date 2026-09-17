@@ -54,33 +54,35 @@ export const App: React.FC = () => {
   return (
     <GeospatialConfigProvider>
       <MissionProvider>
-        <div className="flex h-screen bg-[#05070B] text-slate-100 overflow-hidden font-sans select-none">
-        {/* Fixed Left Sidebar */}
-        <Sidebar
-          isMobileOpen={isMobileMenuOpen}
-          onCloseMobile={() => setIsMobileMenuOpen(false)}
-        />
+        <div className="flex h-screen bg-[#001017] text-slate-100 overflow-hidden font-sans select-none relative">
+          {/* Global Ambient Ocean Cloud & Current Backdrop */}
+          <AmbientOceanBackdrop />
 
-        {/* Main Content Viewport */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          {/* Header (Hidden on dedicated Mission Control workstation) */}
-          {activeTab !== 'mission' && (
-            <Header
-              title={headerInfo.title}
-              subtitle={headerInfo.subtitle}
-              onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            />
-          )}
+          {/* Fixed Left Sidebar */}
+          <Sidebar
+            isMobileOpen={isMobileMenuOpen}
+            onCloseMobile={() => setIsMobileMenuOpen(false)}
+          />
 
-          {/* Page content */}
-          {activeTab === 'mission' ? (
-            <div className="flex-1 overflow-hidden">
-              <MissionPage />
-            </div>
-          ) : (
-            <main className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 relative">
-              <AmbientOceanBackdrop />
-              <div className="w-full px-4 md:px-6 py-4 md:py-6 space-y-4 relative z-10">
+          {/* Main Content Viewport */}
+          <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
+            {/* Header (Hidden on dedicated Mission Control workstation) */}
+            {activeTab !== 'mission' && (
+              <Header
+                title={headerInfo.title}
+                subtitle={headerInfo.subtitle}
+                onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              />
+            )}
+
+            {/* Page content */}
+            {activeTab === 'mission' ? (
+              <div className="flex-1 overflow-hidden">
+                <MissionPage />
+              </div>
+            ) : (
+              <main className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 relative">
+                <div className="w-full px-4 md:px-6 py-4 md:py-6 space-y-4 relative z-10">
                 {activeTab === 'overview'  && <OverviewPage />}
                 {activeTab === 'scan'      && <NewScanPage />}
                 {activeTab === 'history'   && <ScanHistoryPage />}

@@ -379,46 +379,45 @@ export const SonarMap: React.FC = () => {
   ].filter(Boolean).length;
 
   return (
-    <div className="flex flex-col h-[760px] bg-[#080B11] border border-[#1B2330] rounded-2xl overflow-hidden select-none font-mono text-xs shadow-2xl relative">
+    <div className="flex flex-col h-full w-full bg-[#001017] rounded-2xl overflow-hidden select-none font-mono text-xs shadow-2xl relative">
       {/* ─────────────────────────────────────────────────────────────────
           TOP BAR: SCENARIO SELECTOR, SEARCH, OFFLINE STATUS, 3-WAY MAP SWITCHER, LAYERS DROPDOWN
-          Matches user reference screenshot UI verbatim
       ───────────────────────────────────────────────────────────────── */}
-      <div className="px-3.5 py-2.5 bg-[#0C1118] border-b border-[#1B2330] flex flex-wrap items-center justify-between gap-3 shrink-0 z-20">
+      <div className="px-3.5 py-2 bg-[#00141d]/90 backdrop-blur-xl border-b border-white/[0.08] flex flex-wrap items-center justify-between gap-3 shrink-0 z-20">
         <div className="flex items-center gap-2.5 flex-1 min-w-[320px]">
           {/* Active Scenario Selector Dropdown */}
           <div className="relative" ref={scenarioDropdownRef}>
             <button
               onClick={() => setIsScenarioDropdownOpen(!isScenarioDropdownOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#121924] border border-[#222E40] hover:border-[#4CD9E8]/60 text-[#EAEFF5] text-[10px] font-bold transition-all cursor-pointer shadow-md"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-[#FFB703]/50 text-white text-[10px] font-bold transition-all cursor-pointer shadow-sm"
             >
-              <span className="text-[#64748B] uppercase tracking-wider font-semibold">
+              <span className="text-slate-400 uppercase tracking-wider font-semibold">
                 ACTIVE SCENARIO:
               </span>
-              <span className="text-[#4CD9E8] font-black">{currentScenario.name}</span>
-              <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+              <span className="text-[#FFB703] font-black">{currentScenario.name}</span>
+              <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
 
             {isScenarioDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1.5 w-80 bg-[#0C1118] border border-[#222E40] rounded-xl shadow-2xl z-50 p-1.5 space-y-1 backdrop-blur-xl">
-                <div className="px-2 py-1 text-[8px] uppercase tracking-wider text-[#64748B] font-bold">
+              <div className="absolute top-full left-0 mt-1.5 w-80 bg-[#00141d]/95 border border-white/[0.08] rounded-xl shadow-2xl z-50 p-1.5 space-y-1 backdrop-blur-2xl">
+                <div className="px-2 py-1 text-[8px] uppercase tracking-wider text-slate-400 font-bold border-b border-white/[0.06]">
                   INDIAN MARITIME THEATRE SCENARIOS
                 </div>
                 {SCENARIOS.map((sc) => (
                   <button
                     key={sc.id}
                     onClick={() => handleSelectScenario(sc)}
-                    className={`w-full flex flex-col items-start px-2.5 py-2 rounded-lg text-left transition-all ${
+                    className={`w-full flex flex-col items-start px-2.5 py-2 rounded-lg text-left transition-all cursor-pointer ${
                       sc.id === activeScenarioId
-                        ? 'bg-[#4CD9E8]/15 border border-[#4CD9E8]/40 text-[#4CD9E8]'
-                        : 'hover:bg-[#16202E] text-[#94A3B8] hover:text-[#EAEFF5]'
+                        ? 'bg-[#FFB703]/15 border border-[#FFB703]/40 text-[#FFB703]'
+                        : 'hover:bg-white/[0.04] text-slate-300 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
-                      <span className="text-[10px] font-bold text-[#EAEFF5]">{sc.name}</span>
-                      {sc.id === activeScenarioId && <Check className="w-3 h-3 text-[#4CD9E8]" />}
+                      <span className="text-[10px] font-bold text-white">{sc.name}</span>
+                      {sc.id === activeScenarioId && <Check className="w-3 h-3 text-[#FFB703]" />}
                     </div>
-                    <span className="text-[8px] text-[#64748B] mt-0.5">{sc.subLabel}</span>
+                    <span className="text-[8px] text-slate-400 mt-0.5">{sc.subLabel}</span>
                   </button>
                 ))}
               </div>
@@ -427,13 +426,13 @@ export const SonarMap: React.FC = () => {
 
           {/* Search MMSI, Vessel name, or coords */}
           <form onSubmit={handleSearchSubmit} className="relative flex items-center flex-1 max-w-sm">
-            <Search className="w-3.5 h-3.5 text-[#64748B] absolute left-3 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 pointer-events-none" />
             <input
               type="text"
               placeholder="Search MMSI, vessel name, or coords (lon, lat)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#121924] border border-[#222E40] rounded-xl pl-8 pr-3 py-1.5 text-[9px] text-[#EAEFF5] placeholder-[#64748B] focus:outline-none focus:border-[#4CD9E8] transition-all"
+              className="w-full bg-white/[0.03] border border-white/[0.08] rounded-xl pl-8 pr-3 py-1.5 text-[10px] text-white placeholder-slate-500 focus:outline-none focus:border-[#FFB703] transition-all"
             />
           </form>
         </div>
@@ -445,25 +444,25 @@ export const SonarMap: React.FC = () => {
             onClick={() => setIsOffline(!isOffline)}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[9px] font-black transition-all cursor-pointer ${
               isOffline
-                ? 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]'
-                : 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]'
+                ? 'bg-red-500/10 border-red-500/30 text-red-400'
+                : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
             }`}
             title="Click to toggle Live AIS / Autonomous Offline telemetry"
           >
             <span
-              className={`w-2 h-2 rounded-full ${isOffline ? 'bg-[#EF4444]' : 'bg-[#10B981] animate-ping'}`}
+              className={`w-2 h-2 rounded-full ${isOffline ? 'bg-red-400' : 'bg-emerald-400 animate-ping'}`}
             />
             <span>{isOffline ? '🔴 OFFLINE' : '🟢 LIVE SYNC'}</span>
           </button>
 
           {/* 3-WAY MAP STYLE SWITCHER: SATELLITE | BATHYMETRY | DARK HUD */}
-          <div className="flex items-center bg-[#121924] p-1 rounded-xl border border-[#222E40]">
+          <div className="flex items-center bg-white/[0.03] p-1 rounded-xl border border-white/[0.08]">
             <button
               onClick={() => setMapMode('satellite')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold transition-all cursor-pointer ${
                 mapMode === 'satellite'
-                  ? 'bg-[#4CD9E8] text-[#080B11] shadow-[0_0_12px_rgba(76,217,232,0.4)]'
-                  : 'text-[#94A3B8] hover:text-[#EAEFF5]'
+                  ? 'bg-[#FFB703] text-[#05070B] font-black shadow-[0_0_12px_rgba(255,183,3,0.35)]'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               <Globe2 className="w-3.5 h-3.5" />
@@ -474,8 +473,8 @@ export const SonarMap: React.FC = () => {
               onClick={() => setMapMode('bathymetry')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold transition-all cursor-pointer ${
                 mapMode === 'bathymetry'
-                  ? 'bg-[#38BDF8] text-[#080B11] shadow-[0_0_12px_rgba(56,189,248,0.4)]'
-                  : 'text-[#94A3B8] hover:text-[#EAEFF5]'
+                  ? 'bg-[#38BDF8] text-[#05070B] font-black shadow-[0_0_12px_rgba(56,189,248,0.35)]'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               <Waves className="w-3.5 h-3.5" />
@@ -486,8 +485,8 @@ export const SonarMap: React.FC = () => {
               onClick={() => setMapMode('dark_hud')}
               className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold transition-all cursor-pointer ${
                 mapMode === 'dark_hud'
-                  ? 'bg-[#10B981] text-[#080B11] shadow-[0_0_12px_rgba(16,185,129,0.4)]'
-                  : 'text-[#94A3B8] hover:text-[#EAEFF5]'
+                  ? 'bg-emerald-400 text-[#05070B] font-black shadow-[0_0_12px_rgba(52,211,153,0.35)]'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               <Shield className="w-3.5 h-3.5" />
@@ -499,86 +498,86 @@ export const SonarMap: React.FC = () => {
           <div className="relative" ref={layersDropdownRef}>
             <button
               onClick={() => setIsLayersOpen(!isLayersOpen)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#121924] border border-[#222E40] hover:border-[#4CD9E8]/60 text-[#EAEFF5] text-[9px] font-black transition-all cursor-pointer shadow-md"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-[#FFB703]/50 text-white text-[9px] font-black transition-all cursor-pointer shadow-sm"
             >
-              <Layers className="w-3.5 h-3.5 text-[#4CD9E8]" />
+              <Layers className="w-3.5 h-3.5 text-[#FFB703]" />
               <span>LAYERS {activeLayerCount}/7</span>
-              <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+              <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
 
             {isLayersOpen && (
-              <div className="absolute top-full right-0 mt-1.5 w-64 bg-[#0C1118] border border-[#222E40] rounded-xl shadow-2xl z-50 p-2 space-y-1.5 backdrop-blur-xl">
-                <div className="px-2 py-1 text-[8px] uppercase tracking-wider text-[#64748B] font-bold border-b border-[#1B2330]">
+              <div className="absolute top-full right-0 mt-1.5 w-64 bg-[#00141d]/95 border border-white/[0.08] rounded-xl shadow-2xl z-50 p-2 space-y-1.5 backdrop-blur-2xl">
+                <div className="px-2 py-1 text-[8px] uppercase tracking-wider text-slate-400 font-bold border-b border-white/[0.06]">
                   TACTICAL GIS LAYERS
                 </div>
 
-                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-[#16202E] cursor-pointer text-[9px] text-[#EAEFF5]">
+                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-white/[0.04] cursor-pointer text-[9px] text-white">
                   <span>1. EEZ Boundary (UNCLOS)</span>
                   <input
                     type="checkbox"
                     checked={showEEZ}
                     onChange={(e) => setShowEEZ(e.target.checked)}
-                    className="accent-[#4CD9E8] rounded cursor-pointer"
+                    className="accent-[#FFB703] rounded cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-[#16202E] cursor-pointer text-[9px] text-[#EAEFF5]">
+                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-white/[0.04] cursor-pointer text-[9px] text-white">
                   <span>2. Hydrographic Sectors (8)</span>
                   <input
                     type="checkbox"
                     checked={showSectors}
                     onChange={(e) => setShowSectors(e.target.checked)}
-                    className="accent-[#4CD9E8] rounded cursor-pointer"
+                    className="accent-[#FFB703] rounded cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-[#16202E] cursor-pointer text-[9px] text-[#EAEFF5]">
+                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-white/[0.04] cursor-pointer text-[9px] text-white">
                   <span>3. Research Vessels (4)</span>
                   <input
                     type="checkbox"
                     checked={showVessels}
                     onChange={(e) => setShowVessels(e.target.checked)}
-                    className="accent-[#4CD9E8] rounded cursor-pointer"
+                    className="accent-[#FFB703] rounded cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-[#16202E] cursor-pointer text-[9px] text-[#EAEFF5]">
+                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-white/[0.04] cursor-pointer text-[9px] text-white">
                   <span>4. Bathymetric Contours</span>
                   <input
                     type="checkbox"
                     checked={showBathymetry}
                     onChange={(e) => setShowBathymetry(e.target.checked)}
-                    className="accent-[#4CD9E8] rounded cursor-pointer"
+                    className="accent-[#FFB703] rounded cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-[#16202E] cursor-pointer text-[9px] text-[#EAEFF5]">
+                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-white/[0.04] cursor-pointer text-[9px] text-white">
                   <span>5. Real-Time Tracklines</span>
                   <input
                     type="checkbox"
                     checked={showTracklines}
                     onChange={(e) => setShowTracklines(e.target.checked)}
-                    className="accent-[#4CD9E8] rounded cursor-pointer"
+                    className="accent-[#FFB703] rounded cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-[#16202E] cursor-pointer text-[9px] text-[#EAEFF5]">
+                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-white/[0.04] cursor-pointer text-[9px] text-white">
                   <span>6. Subsea Geographic Labels</span>
                   <input
                     type="checkbox"
                     checked={showLabels}
                     onChange={(e) => setShowLabels(e.target.checked)}
-                    className="accent-[#4CD9E8] rounded cursor-pointer"
+                    className="accent-[#FFB703] rounded cursor-pointer"
                   />
                 </label>
 
-                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-[#16202E] cursor-pointer text-[9px] text-[#EAEFF5]">
+                <label className="flex items-center justify-between px-2 py-1 rounded-lg hover:bg-white/[0.04] cursor-pointer text-[9px] text-white">
                   <span>7. Contact Ping Reticles</span>
                   <input
                     type="checkbox"
                     checked={showContactMarkers}
                     onChange={(e) => setShowContactMarkers(e.target.checked)}
-                    className="accent-[#4CD9E8] rounded cursor-pointer"
+                    className="accent-[#FFB703] rounded cursor-pointer"
                   />
                 </label>
               </div>
@@ -682,10 +681,10 @@ export const SonarMap: React.FC = () => {
               <Polygon
                 positions={INDIA_EEZ_POLYGON}
                 pathOptions={{
-                  color: '#4CD9E8',
+                  color: '#FFB703',
                   weight: 1.5,
                   dashArray: '6, 6',
-                  fillColor: '#4CD9E8',
+                  fillColor: '#FFB703',
                   fillOpacity: 0.05,
                 }}
               />
@@ -706,20 +705,23 @@ export const SonarMap: React.FC = () => {
                 />
               ))}
 
-            {/* Layer 2 & 7: Hydrographic Survey Sectors & Contacts */}
+            {/* Layer 2: Maritime Sector Contact Pins */}
             {showSectors &&
-              INDIA_MARITIME_SECTORS.map((sector) => (
-                <Marker
-                  key={sector.id}
-                  position={[sector.lat, sector.lon]}
-                  icon={createSectorPin(sector, selectedSector?.id === sector.id)}
-                  eventHandlers={{
-                    click: () => handleJumpToSector(sector),
-                  }}
-                />
-              ))}
+              INDIA_MARITIME_SECTORS.map((sector) => {
+                const isSelected = selectedSector?.id === sector.id;
+                return (
+                  <Marker
+                    key={sector.id}
+                    position={[sector.lat, sector.lon]}
+                    icon={createSectorPin(sector, isSelected)}
+                    eventHandlers={{
+                      click: () => handleJumpToSector(sector),
+                    }}
+                  />
+                );
+              })}
 
-            {/* Layer 3: Active Research Vessels */}
+            {/* Layer 3: Dynamic Survey Vessels */}
             {showVessels &&
               HYDROGRAPHIC_VESSELS.map((vessel) => (
                 <Marker
@@ -740,39 +742,39 @@ export const SonarMap: React.FC = () => {
           ───────────────────────────────────────────────────────────── */}
           <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2 pointer-events-auto">
             {/* Coordinate Pill */}
-            <div className="px-3 py-1.5 rounded-xl bg-[#0C1118]/95 border border-[#222E40] text-[9px] text-[#94A3B8] flex items-center gap-2 shadow-2xl backdrop-blur-md">
-              <span className="text-[#64748B] font-bold">LON:</span>
-              <strong className="text-[#4CD9E8] font-mono">
+            <div className="px-3 py-1.5 rounded-xl bg-[#00141d]/90 border border-white/[0.08] text-[9px] text-slate-300 flex items-center gap-2 shadow-2xl backdrop-blur-xl">
+              <span className="text-slate-400 font-bold">LON:</span>
+              <strong className="text-[#FFB703] font-mono">
                 {Math.abs(mouseCoords.lon).toFixed(4)}° {mouseCoords.lon >= 0 ? 'E' : 'W'}
               </strong>
-              <span className="text-[#222E40]">|</span>
-              <span className="text-[#64748B] font-bold">LAT:</span>
-              <strong className="text-[#4CD9E8] font-mono">
+              <span className="text-white/[0.1]">|</span>
+              <span className="text-slate-400 font-bold">LAT:</span>
+              <strong className="text-[#FFB703] font-mono">
                 {Math.abs(mouseCoords.lat).toFixed(4)}° {mouseCoords.lat >= 0 ? 'N' : 'S'}
               </strong>
-              <span className="text-[#222E40]">|</span>
-              <span className="text-[#10B981] font-black tracking-wider">MARITIME AOI</span>
+              <span className="text-white/[0.1]">|</span>
+              <span className="text-emerald-400 font-black tracking-wider">MARITIME AOI</span>
             </div>
 
             {/* Vertical Zoom Navigation Controls */}
-            <div className="flex flex-col gap-1 bg-[#080B11]/95 p-1 rounded-xl border border-[#222E40] shadow-2xl backdrop-blur-md">
+            <div className="flex flex-col gap-1 bg-[#00141d]/90 p-1 rounded-xl border border-white/[0.08] shadow-2xl backdrop-blur-xl">
               <button
                 onClick={() => mapInstance?.zoomIn()}
-                className="w-8 h-8 rounded-lg bg-[#10151D] hover:bg-[#1B2330] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] flex items-center justify-center transition-all cursor-pointer"
+                className="w-8 h-8 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-[#FFB703] text-slate-300 hover:text-[#FFB703] flex items-center justify-center transition-all cursor-pointer"
                 title="Zoom In (or use mouse wheel / pinch)"
               >
                 <Plus className="w-4 h-4" />
               </button>
               <button
                 onClick={() => mapInstance?.zoomOut()}
-                className="w-8 h-8 rounded-lg bg-[#10151D] hover:bg-[#1B2330] border border-[#1B2330] hover:border-[#4CD9E8] text-[#EAEFF5] hover:text-[#4CD9E8] flex items-center justify-center transition-all cursor-pointer"
+                className="w-8 h-8 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-[#FFB703] text-slate-300 hover:text-[#FFB703] flex items-center justify-center transition-all cursor-pointer"
                 title="Zoom Out (or use mouse wheel / pinch)"
               >
                 <Minus className="w-4 h-4" />
               </button>
               <button
                 onClick={handleRecenter}
-                className="w-8 h-8 rounded-lg bg-[#10151D] hover:bg-[#1B2330] border border-[#1B2330] hover:border-[#4CD9E8] text-[#4CD9E8] flex items-center justify-center transition-all cursor-pointer"
+                className="w-8 h-8 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-[#FFB703] text-[#FFB703] flex items-center justify-center transition-all cursor-pointer"
                 title="Re-Center to Active Scenario AOI"
               >
                 <Crosshair className="w-4 h-4" />
@@ -786,34 +788,34 @@ export const SonarMap: React.FC = () => {
           <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 pointer-events-auto">
             <button
               onClick={() => setShowInfoModal(!showInfoModal)}
-              className="w-8 h-8 rounded-xl bg-[#0C1118]/95 hover:bg-[#16202E] border border-[#222E40] hover:border-[#4CD9E8] text-[#4CD9E8] flex items-center justify-center transition-all shadow-2xl backdrop-blur-md cursor-pointer"
+              className="w-8 h-8 rounded-xl bg-[#00141d]/90 hover:bg-white/[0.08] border border-white/[0.08] hover:border-[#FFB703] text-[#FFB703] flex items-center justify-center transition-all shadow-2xl backdrop-blur-xl cursor-pointer"
               title="AOI Intelligence & Map Interaction Guide"
             >
               <Info className="w-4 h-4" />
             </button>
 
             {showInfoModal && (
-              <div className="w-80 bg-[#0C1118]/95 border border-[#222E40] rounded-xl p-3 shadow-2xl backdrop-blur-xl space-y-2 text-[9px]">
-                <div className="flex items-center justify-between border-b border-[#1B2330] pb-1.5">
-                  <div className="flex items-center gap-1.5 text-[#4CD9E8] font-bold">
+              <div className="w-80 bg-[#00141d]/95 border border-white/[0.08] rounded-xl p-3 shadow-2xl backdrop-blur-2xl space-y-2 text-[9px]">
+                <div className="flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+                  <div className="flex items-center gap-1.5 text-[#FFB703] font-bold">
                     <Compass className="w-3.5 h-3.5" />
                     <span>MARITIME GIS CONTROLS</span>
                   </div>
                   <button
                     onClick={() => setShowInfoModal(false)}
-                    className="text-[#64748B] hover:text-[#EAEFF5]"
+                    className="text-slate-400 hover:text-white cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
-                <p className="text-[#94A3B8]">
-                  • <strong className="text-[#EAEFF5]">Hand Drag:</strong> Click & hold anywhere with the hand cursor to pan smoothly across maritime sectors.
+                <p className="text-slate-300">
+                  • <strong className="text-white">Hand Drag:</strong> Click & hold anywhere with the hand cursor to pan smoothly across maritime sectors.
                 </p>
-                <p className="text-[#94A3B8]">
-                  • <strong className="text-[#EAEFF5]">Scroll-Wheel / Pinch:</strong> Zoom in and out smoothly down to 10m seabed resolution.
+                <p className="text-slate-300">
+                  • <strong className="text-white">Scroll-Wheel / Pinch:</strong> Zoom in and out smoothly down to 10m seabed resolution.
                 </p>
-                <p className="text-[#94A3B8]">
-                  • <strong className="text-[#EAEFF5]">Modes:</strong> Switch between High-Res Satellite Imagery, GEBCO Ocean Bathymetry, or Cyber Dark HUD.
+                <p className="text-slate-300">
+                  • <strong className="text-white">Modes:</strong> Switch between High-Res Satellite Imagery, GEBCO Ocean Bathymetry, or Cyber Dark HUD.
                 </p>
               </div>
             )}
@@ -823,66 +825,66 @@ export const SonarMap: React.FC = () => {
         {/* ─────────────────────────────────────────────────────────────
             RIGHT SIDE: TACTICAL SECTOR & VESSEL INTELLIGENCE DRAWER
         ───────────────────────────────────────────────────────────── */}
-        <div className="w-80 md:w-96 bg-[#0C1118] border-l border-[#1B2330] flex flex-col overflow-y-auto z-10 shadow-2xl p-3.5 space-y-3 shrink-0">
+        <div className="w-80 md:w-96 bg-[#00141d]/95 backdrop-blur-2xl border-l border-white/[0.08] flex flex-col overflow-y-auto z-10 shadow-2xl p-3.5 space-y-3 shrink-0">
           {selectedSector && (
             <>
               {/* Sector Header */}
-              <div className="p-3.5 rounded-xl bg-[#080B11] border border-[#1B2330] space-y-2">
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-[#4CD9E8]/15 text-[#4CD9E8] border border-[#4CD9E8]/30">
+                  <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-[#FFB703]/15 text-[#FFB703] border border-[#FFB703]/30">
                     {selectedSector.id}
                   </span>
                   <span
                     className={`text-[8px] font-black px-2 py-0.5 rounded border ${
                       selectedSector.status === 'HIGH ALERT'
-                        ? 'bg-[#F04438]/15 text-[#F04438] border-[#F04438]/40'
+                        ? 'bg-red-500/15 text-red-400 border-red-500/40'
                         : selectedSector.status === 'ACTIVE SURVEY'
-                        ? 'bg-[#4CD9E8]/15 text-[#4CD9E8] border-[#4CD9E8]/40'
-                        : 'bg-[#3FD98A]/15 text-[#3FD98A] border-[#3FD98A]/40'
+                        ? 'bg-[#FFB703]/15 text-[#FFB703] border-[#FFB703]/40'
+                        : 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40'
                     }`}
                   >
                     {selectedSector.status}
                   </span>
                 </div>
 
-                <h3 className="text-sm font-black text-[#EAEFF5] leading-snug">
+                <h3 className="text-sm font-black text-white leading-snug">
                   {selectedSector.name}
                 </h3>
-                <p className="text-[9px] text-[#94A3B8]">
+                <p className="text-[9px] text-slate-400">
                   {selectedSector.subName} · {selectedSector.fleetCommand}
                 </p>
 
                 {/* Telemetry Metrics Grid */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#1B2330] text-[9px]">
-                  <div className="p-2 rounded bg-[#121924] border border-[#1B2330]">
-                    <span className="text-[7px] text-[#94A3B8] uppercase block">BATHYMETRY DEPTH</span>
-                    <strong className="text-[#29B6F6] font-bold">{selectedSector.depthRangeM}</strong>
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.08] text-[9px]">
+                  <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
+                    <span className="text-[7px] text-slate-400 uppercase block">BATHYMETRY DEPTH</span>
+                    <strong className="text-[#38BDF8] font-bold">{selectedSector.depthRangeM}</strong>
                   </div>
-                  <div className="p-2 rounded bg-[#121924] border border-[#1B2330]">
-                    <span className="text-[7px] text-[#94A3B8] uppercase block">TOTAL CONTACTS</span>
-                    <strong className="text-[#4CD9E8] font-bold">{selectedSector.contactsLogged} Cataloged</strong>
+                  <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
+                    <span className="text-[7px] text-slate-400 uppercase block">TOTAL CONTACTS</span>
+                    <strong className="text-[#FFB703] font-bold">{selectedSector.contactsLogged} Cataloged</strong>
                   </div>
-                  <div className="p-2 rounded bg-[#121924] border border-[#1B2330]">
-                    <span className="text-[7px] text-[#94A3B8] uppercase block">HIGH-RISK THREATS</span>
-                    <strong className="text-[#F04438] font-bold">{selectedSector.criticalThreats} Critical</strong>
+                  <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
+                    <span className="text-[7px] text-slate-400 uppercase block">HIGH-RISK THREATS</span>
+                    <strong className="text-red-400 font-bold">{selectedSector.criticalThreats} Critical</strong>
                   </div>
-                  <div className="p-2 rounded bg-[#121924] border border-[#1B2330]">
-                    <span className="text-[7px] text-[#94A3B8] uppercase block">ASSIGNED VESSEL</span>
-                    <strong className="text-[#EAEFF5] font-bold">{selectedSector.assignedVessel}</strong>
+                  <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
+                    <span className="text-[7px] text-slate-400 uppercase block">ASSIGNED VESSEL</span>
+                    <strong className="text-white font-bold">{selectedSector.assignedVessel}</strong>
                   </div>
                 </div>
               </div>
 
               {/* Sector Environmental & Hydrographic Findings */}
-              <div className="p-3.5 rounded-xl bg-[#080B11] border border-[#1B2330] space-y-1.5 text-[9px]">
-                <span className="text-[8px] font-bold text-[#94A3B8] uppercase tracking-wider block">
+              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-1.5 text-[9px]">
+                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
                   SURVEY INTELLIGENCE & THREAT SUMMARY
                 </span>
-                <p className="text-[#EAEFF5] leading-relaxed">
+                <p className="text-slate-200 leading-relaxed">
                   {selectedSector.description}
                 </p>
-                <div className="pt-2 text-[8px] text-[#4CD9E8]">
-                  PRIMARY TARGET CLASS: <strong className="text-[#EAEFF5]">{selectedSector.primaryClass}</strong>
+                <div className="pt-2 text-[8px] text-[#FFB703]">
+                  PRIMARY TARGET CLASS: <strong className="text-white">{selectedSector.primaryClass}</strong>
                 </div>
               </div>
 
@@ -890,7 +892,7 @@ export const SonarMap: React.FC = () => {
               <div className="space-y-2 pt-1">
                 <button
                   onClick={() => setActiveTab('mission')}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#4CD9E8] hover:bg-[#38b2c0] text-[#080B11] font-black text-xs transition-all cursor-pointer shadow-lg shadow-[rgba(76,217,232,0.25)]"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-[#FFB703] hover:bg-[#FCD34D] text-[#05070B] font-black text-xs transition-all cursor-pointer shadow-lg shadow-[#FFB703]/25 active:scale-95"
                 >
                   <Crosshair className="w-4 h-4" />
                   <span>OPEN MISSION CONTROL CONSOLE</span>
@@ -900,43 +902,43 @@ export const SonarMap: React.FC = () => {
           )}
 
           {selectedVessel && (
-            <div className="p-3.5 rounded-xl bg-[#080B11] border border-[#1B2330] space-y-3">
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-[#29B6F6]/15 text-[#29B6F6] border border-[#29B6F6]/30">
+                <span className="text-[8px] font-black px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">
                   {selectedVessel.pennant}
                 </span>
-                <span className="text-[8px] font-bold text-[#3FD98A]">● UNDERWAY SURVEY</span>
+                <span className="text-[8px] font-bold text-emerald-400">● UNDERWAY SURVEY</span>
               </div>
 
               <div>
-                <h3 className="text-sm font-black text-[#EAEFF5]">{selectedVessel.name}</h3>
-                <p className="text-[9px] text-[#94A3B8]">{selectedVessel.type} · {selectedVessel.operator}</p>
+                <h3 className="text-sm font-black text-white">{selectedVessel.name}</h3>
+                <p className="text-[9px] text-slate-400">{selectedVessel.type} · {selectedVessel.operator}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[9px]">
-                <div className="p-2 rounded bg-[#121924] border border-[#1B2330]">
-                  <span className="text-[7px] text-[#94A3B8] block uppercase">HEADING</span>
-                  <strong className="text-[#4CD9E8] font-bold">{selectedVessel.headingDeg}° TRUE</strong>
+                <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-[7px] text-slate-400 block uppercase">HEADING</span>
+                  <strong className="text-[#FFB703] font-bold">{selectedVessel.headingDeg}° TRUE</strong>
                 </div>
-                <div className="p-2 rounded bg-[#121924] border border-[#1B2330]">
-                  <span className="text-[7px] text-[#94A3B8] block uppercase">SPEED</span>
-                  <strong className="text-[#EAEFF5] font-bold">{selectedVessel.speedKts} KTS</strong>
+                <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-[7px] text-slate-400 block uppercase">SPEED</span>
+                  <strong className="text-white font-bold">{selectedVessel.speedKts} KTS</strong>
                 </div>
-                <div className="p-2 rounded bg-[#121924] border border-[#1B2330]">
-                  <span className="text-[7px] text-[#94A3B8] block uppercase">SWATH WIDTH</span>
-                  <strong className="text-[#29B6F6] font-bold">{selectedVessel.swathWidthM} Meters</strong>
+                <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-[7px] text-slate-400 block uppercase">SWATH WIDTH</span>
+                  <strong className="text-[#38BDF8] font-bold">{selectedVessel.swathWidthM} Meters</strong>
                 </div>
-                <div className="p-2 rounded bg-[#121924] border border-[#1B2330]">
-                  <span className="text-[7px] text-[#94A3B8] block uppercase">SECTOR</span>
-                  <strong className="text-[#EAEFF5] font-bold">{selectedVessel.currentSector}</strong>
+                <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-[7px] text-slate-400 block uppercase">SECTOR</span>
+                  <strong className="text-white font-bold">{selectedVessel.currentSector}</strong>
                 </div>
               </div>
             </div>
           )}
 
           {/* Quick List of All 8 Indian Sectors */}
-          <div className="pt-2 border-t border-[#1B2330] space-y-2">
-            <span className="text-[8px] font-bold text-[#94A3B8] uppercase tracking-wider block">
+          <div className="pt-2 border-t border-white/[0.08] space-y-2">
+            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-wider block">
               ALL INDIAN SECTORS REGISTER
             </span>
             <div className="space-y-1 max-h-48 overflow-y-auto">
@@ -944,10 +946,10 @@ export const SonarMap: React.FC = () => {
                 <button
                   key={s.id}
                   onClick={() => handleJumpToSector(s)}
-                  className={`w-full flex items-center justify-between p-2 rounded-lg border text-left transition-all ${
+                  className={`w-full flex items-center justify-between p-2 rounded-lg border text-left transition-all cursor-pointer ${
                     selectedSector?.id === s.id
-                      ? 'bg-[#4CD9E8]/15 border-[#4CD9E8]/50 text-[#4CD9E8]'
-                      : 'bg-[#080B11] border-[#1B2330] text-[#94A3B8] hover:border-[#4CD9E8]/30 hover:text-[#EAEFF5]'
+                      ? 'bg-[#FFB703]/15 border-[#FFB703]/50 text-[#FFB703] font-bold'
+                      : 'bg-white/[0.02] border-white/[0.06] text-slate-400 hover:border-[#FFB703]/30 hover:text-white'
                   }`}
                 >
                   <span className="text-[9px] font-bold truncate max-w-[170px]">{s.name}</span>

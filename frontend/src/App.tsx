@@ -15,6 +15,7 @@ import { GeospatialConfigProvider } from './context/GeospatialConfigContext';
 import { GeospatialConfigModal } from './components/common/GeospatialConfigModal';
 import { FloatingDemoController } from './components/common/FloatingDemoController';
 import { AmbientOceanBackdrop } from './components/common/AmbientOceanBackdrop';
+import { TacticalSonarCursor } from './components/common/TacticalSonarCursor';
 import { useApp } from './context/AppContext';
 import {
   LayoutDashboard, ScanLine, History, MapPin, FileText, Cpu, Crosshair, Eye, BarChart2,
@@ -53,7 +54,7 @@ export const App: React.FC = () => {
   return (
     <GeospatialConfigProvider>
       <MissionProvider>
-        <div className="flex h-screen bg-[#030B14] text-[#E0F7F4] overflow-hidden font-sans select-none">
+        <div className="flex h-screen bg-[#05070B] text-slate-100 overflow-hidden font-sans select-none">
         {/* Fixed Left Sidebar */}
         <Sidebar
           isMobileOpen={isMobileMenuOpen}
@@ -94,7 +95,7 @@ export const App: React.FC = () => {
         </div>
 
         {/* Mobile Bottom Navigation Bar */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#070D1B]/90 backdrop-blur-xl border-t border-slate-800 flex items-center justify-around z-40 px-2">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#070B12]/95 backdrop-blur-xl border-t border-white/[0.08] flex items-center justify-around z-40 px-2">
           {mobileNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -103,7 +104,7 @@ export const App: React.FC = () => {
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
                 className={`flex flex-col items-center justify-center p-1 rounded-xl transition-all ${
-                  isActive ? 'text-cyan-400 font-bold' : 'text-slate-500 hover:text-slate-300'
+                  isActive ? 'text-[#FFB703] font-bold' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''}`} />
@@ -113,6 +114,7 @@ export const App: React.FC = () => {
           })}
         </div>
         <FloatingDemoController />
+        <TacticalSonarCursor />
       </div>
       <GeospatialConfigModal />
     </MissionProvider>

@@ -344,3 +344,22 @@
   stroke-dasharray: 6, 6;
   animation: tensorFlow 1s linear infinite;
 }
+
+@keyframes pingWave {
+  0% {
+    width: 0px;
+    height: 0px;
+    opacity: 0.95;
+    border-width: 2px;
+  }
+  100% {
+    width: 90px;
+    height: 90px;
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+.animate-ping-wave {
+  animation: pingWave 0.65s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}

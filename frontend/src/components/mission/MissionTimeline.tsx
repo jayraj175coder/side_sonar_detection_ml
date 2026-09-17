@@ -78,7 +78,7 @@ export const MissionTimeline: React.FC = () => {
       {/* 1. Horizontal SONARX AI PIPELINE Workflow Stages */}
       <div className="px-4 py-2.5 bg-[#0C171E] border-b border-[#16303B] flex items-center justify-between gap-2 overflow-x-auto">
         <div className="flex items-center gap-2 shrink-0 pr-2 border-r border-[#16303B]">
-          <span className="text-[10px] font-black text-[#32E6D1] uppercase tracking-wider font-sans">
+          <span className="text-[10px] font-black text-[#FFB703] uppercase tracking-wider font-sans">
             AI PIPELINE
           </span>
         </div>
@@ -95,7 +95,7 @@ export const MissionTimeline: React.FC = () => {
                   onClick={() => setStageDirectly(idx)}
                   className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-bold transition-all cursor-pointer ${
                     isCurrent
-                      ? 'bg-[#32E6D1] text-[#03070B] shadow-[0_0_12px_rgba(50,230,209,0.35)] scale-105'
+                      ? 'bg-[#FFB703] text-[#03070B] shadow-[0_0_12px_rgba(50,230,209,0.35)] scale-105'
                       : isCompleted
                       ? 'bg-[#081118] text-[#65D391] border border-[#65D391]/40'
                       : 'bg-[#081118] text-[#6F8992] border border-[#16303B] hover:text-[#E4F2F5]'
@@ -137,8 +137,8 @@ export const MissionTimeline: React.FC = () => {
             }}
             className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[10px] font-bold transition-all cursor-pointer ${
               isDemoRunning
-                ? 'bg-[#32E6D1]/20 border-[#32E6D1] text-[#32E6D1]'
-                : 'bg-[#0C171E] border-[#16303B] text-[#E4F2F5] hover:text-[#32E6D1]'
+                ? 'bg-[#FFB703]/20 border-[#FFB703] text-[#FFB703]'
+                : 'bg-[#0C171E] border-[#16303B] text-[#E4F2F5] hover:text-[#FFB703]'
             }`}
           >
             {isDemoRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 fill-current" />}
@@ -166,7 +166,7 @@ export const MissionTimeline: React.FC = () => {
             step={10}
             value={Math.floor(playbackTime)}
             onChange={(e) => setPlaybackTime(Number(e.target.value))}
-            className="flex-1 h-1 bg-[#16303B] rounded-full appearance-none cursor-pointer accent-[#32E6D1]"
+            className="flex-1 h-1 bg-[#16303B] rounded-full appearance-none cursor-pointer accent-[#FFB703]"
           />
           <span className="text-[10px] text-[#6F8992] shrink-0">
             SWATH: 75m
@@ -175,7 +175,7 @@ export const MissionTimeline: React.FC = () => {
 
         {/* Current Mission Stage Info */}
         <div className="hidden lg:flex items-center gap-2 text-[10px] text-[#6F8992] shrink-0">
-          <span>TARGETS: <strong className="text-[#32E6D1]">17 (4 HIGH)</strong></span>
+          <span>TARGETS: <strong className="text-[#FFB703]">17 (4 HIGH)</strong></span>
           <span>·</span>
           <span>FILTERED: <strong className="text-[#65D391]">20 NATURAL</strong></span>
         </div>

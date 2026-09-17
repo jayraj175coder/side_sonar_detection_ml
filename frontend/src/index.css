@@ -198,43 +198,44 @@
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: rgba(3, 11, 20, 0.6); }
+::-webkit-scrollbar-track { background: rgba(5, 7, 11, 0.8); }
 ::-webkit-scrollbar-thumb { 
-  background: #0E3555; 
+  background: #1E293B; 
   border-radius: 9999px; 
-  border: 1px solid rgba(0, 212, 170, 0.15);
+  border: 1px solid rgba(255, 183, 3, 0.2);
 }
 ::-webkit-scrollbar-thumb:hover { 
-  background: #00D4AA; 
-  box-shadow: 0 0 10px rgba(0, 212, 170, 0.6);
+  background: #FFB703; 
+  box-shadow: 0 0 10px rgba(255, 183, 3, 0.6);
 }
 
-/* Instrument button — ocean theme */
+/* Instrument button — tactical obsidian theme */
 .panel-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.25rem 0.5rem;
-  background-color: #0A1E30;
-  border: 1px solid #0D2E4A;
-  color: #4A8090;
+  padding: 0.35rem 0.65rem;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94A3B8;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  transition: all 0.1s ease;
+  transition: all 0.15s ease;
   cursor: pointer;
-  border-radius: 0px;
+  border-radius: 6px;
 }
 .panel-btn:hover {
-  color: #00D4AA;
-  border-color: #00D4AA;
-  background-color: rgba(0, 212, 170, 0.08);
+  color: #FFFFFF;
+  border-color: #FFB703;
+  background-color: rgba(255, 183, 3, 0.08);
 }
 .panel-btn-active {
-  color: #030B14;
-  background-color: #00D4AA;
-  border-color: #00D4AA;
+  color: #05070B !important;
+  background-color: #FFB703 !important;
+  border-color: #FFB703 !important;
+  font-weight: 800;
 }
 
 /* Live demo scene fade-in */
@@ -254,14 +255,14 @@
 .cursor-blink::after {
   content: '▊';
   animation: cursor-blink 0.8s step-end infinite;
-  color: #00D4AA;
+  color: #FFB703;
   margin-left: 1px;
 }
 
 /* Progress rail glow pulse */
 @keyframes dot-pulse {
-  0%, 100% { box-shadow: 0 0 4px #00D4AA; }
-  50%       { box-shadow: 0 0 12px #00D4AA, 0 0 20px rgba(0,212,170,0.4); }
+  0%, 100% { box-shadow: 0 0 4px #FFB703; }
+  50%       { box-shadow: 0 0 12px #FFB703, 0 0 20px rgba(255,183,3,0.4); }
 }
 .dot-active {
   animation: dot-pulse 1.2s ease-in-out infinite;

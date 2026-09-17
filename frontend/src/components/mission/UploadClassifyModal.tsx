@@ -38,7 +38,7 @@ const BUNDLED_SONAR_SAMPLES = [
     uncertaintyRating: 'LOW AMBIGUITY' as const,
     dimensions: { length: 12.4, width: 3.2, height: 0.82, shadow: 2.31 },
     operatorCaveat: 'Irregular acoustic mesh boundary with prominent acoustic shadow void (2.31m). Classified as abandoned monofilament fishing gear (ALDFG).',
-    color: '#00D4AA',
+    color: '#FFB703',
     targetStrengthDb: -14.2,
   },
   {
@@ -109,7 +109,7 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
       if (res && res.detections && res.detections.length > 0) {
         const top = res.detections[0];
         const categoryMap: Record<string, { label: string; color: string }> = {
-          ghost_net_aldfg: { label: 'Ghost Net (ALDFG)', color: '#00D4AA' },
+          ghost_net_aldfg: { label: 'Ghost Net (ALDFG)', color: '#FFB703' },
           anthropogenic_debris: { label: 'Anthropogenic Debris', color: '#F59E0B' },
           pipeline_hazard: { label: 'Pipeline Hazard', color: '#38BDF8' },
           seafloor_anomaly: { label: 'Seafloor Anomaly', color: '#EC4899' },
@@ -119,7 +119,7 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
 
         const mapped = categoryMap[top.type] || {
           label: top.type.replace(/_/g, ' ').toUpperCase(),
-          color: '#00D4AA',
+          color: '#FFB703',
         };
 
         const len = Math.max(1.8, Number(((top.bbox.x2 - top.bbox.x1) * 0.05).toFixed(1)));
@@ -265,23 +265,23 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
         />
       )}
 
-      <div className="bg-[#05121F] border border-[#0D2E4A] rounded-2xl max-w-4xl w-full h-[660px] flex flex-col shadow-2xl overflow-hidden text-xs">
+      <div className="bg-[#080D17] border border-[#162136] rounded-2xl max-w-4xl w-full h-[660px] flex flex-col shadow-2xl overflow-hidden text-xs">
         {/* Modal Header */}
-        <div className="px-5 py-3.5 bg-[#030B14] border-b border-[#0D2E4A] flex items-center justify-between shrink-0">
+        <div className="px-5 py-3.5 bg-[#05070B] border-b border-[#162136] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_15px_rgba(0,212,170,0.3)]">
+            <div className="w-8 h-8 rounded-xl bg-[#131B2A] border border-[#FFB703]/40 flex items-center justify-center text-[#FFB703] shadow-[0_0_15px_rgba(255, 183, 3, )]">
               <UploadCloud className="w-4 h-4 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-black text-[#E0F7F4] tracking-widest uppercase">
+                <h2 className="text-sm font-black text-[#F8FAFC] tracking-widest uppercase">
                   UPLOAD & CLASSIFY SONAR SWATH
                 </h2>
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40">
+                <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40">
                   YOLOv8s ONNX RUNTIME
                 </span>
               </div>
-              <p className="text-[10px] text-[#4A8090]">
+              <p className="text-[10px] text-[#94A3B8]">
                 Executes trained ONNX model inference with bilateral CLAHE & acoustic shadow noise filtering
               </p>
             </div>
@@ -289,25 +289,25 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
 
           <button
             onClick={onClose}
-            className="p-1 rounded-lg bg-[#05121F] border border-[#0D2E4A] text-[#7C98A6] hover:text-[#E0F7F4] transition-colors cursor-pointer"
+            className="p-1 rounded-lg bg-[#080D17] border border-[#162136] text-[#94A3B8] hover:text-[#F8FAFC] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Body: Left Upload/Selector + Right Exact Contact Inspector Presentation */}
-        <div className="flex-1 flex min-h-0 divide-x divide-[#0D2E4A]">
+        <div className="flex-1 flex min-h-0 divide-x divide-[#162136]">
           {/* Left Column: Image Ingestion & Bundled Samples */}
-          <div className="w-80 bg-[#030B14] p-4 flex flex-col justify-between overflow-y-auto shrink-0 space-y-4">
+          <div className="w-80 bg-[#05070B] p-4 flex flex-col justify-between overflow-y-auto shrink-0 space-y-4">
             {/* Drag & Drop Upload Zone */}
             <div className="space-y-2">
-              <span className="text-[9px] font-bold text-[#7C98A6] uppercase tracking-wider block">
+              <span className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider block">
                 1. UPLOAD ANY SONAR IMAGE FILE
               </span>
 
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="p-4 rounded-xl border border-dashed border-[#0D2E4A] hover:border-[#00D4AA]/60 bg-[#05121F] flex flex-col items-center justify-center text-center gap-2 cursor-pointer transition-all hover:bg-[#082830] group"
+                className="p-4 rounded-xl border border-dashed border-[#162136] hover:border-[#FFB703]/60 bg-[#080D17] flex flex-col items-center justify-center text-center gap-2 cursor-pointer transition-all hover:bg-[#131B2A] group"
               >
                 <input
                   type="file"
@@ -316,21 +316,21 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
                   accept=".png,.jpg,.jpeg,.tif,.tiff"
                   className="hidden"
                 />
-                <div className="w-8 h-8 rounded-lg bg-[#030B14] border border-[#0D2E4A] flex items-center justify-center text-[#7C98A6] group-hover:text-[#00D4AA]">
+                <div className="w-8 h-8 rounded-lg bg-[#05070B] border border-[#162136] flex items-center justify-center text-[#94A3B8] group-hover:text-[#FFB703]">
                   <FileImage className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-bold text-[#E0F7F4]">
+                  <p className="text-[11px] font-bold text-[#F8FAFC]">
                     {uploadedFileName ? uploadedFileName : 'Click to Upload Sonar Swath'}
                   </p>
-                  <p className="text-[9.5px] text-[#4A8090]">Runs live on YOLOv8s ONNX model</p>
+                  <p className="text-[9.5px] text-[#94A3B8]">Runs live on YOLOv8s ONNX model</p>
                 </div>
               </div>
             </div>
 
             {/* Bundled Evaluation Samples */}
             <div className="space-y-2 flex-1">
-              <span className="text-[9px] font-bold text-[#7C98A6] uppercase tracking-wider block">
+              <span className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider block">
                 OR TEST REAL TRAINED DATASET SAMPLES
               </span>
 
@@ -343,8 +343,8 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
                       onClick={() => handleSelectSample(sample)}
                       className={`w-full p-2.5 rounded-xl border text-left transition-all flex flex-col gap-1 cursor-pointer ${
                         isSelected
-                          ? 'bg-[#082830] border-[#00D4AA] text-[#E0F7F4] shadow-[0_0_12px_rgba(0,212,170,0.15)]'
-                          : 'bg-[#05121F] border-[#0D2E4A] text-[#7C98A6] hover:border-[#00D4AA]/40 hover:text-[#E0F7F4]'
+                          ? 'bg-[#131B2A] border-[#FFB703] text-[#F8FAFC] shadow-[0_0_12px_rgba(255, 183, 3, )]'
+                          : 'bg-[#080D17] border-[#162136] text-[#94A3B8] hover:border-[#FFB703]/40 hover:text-[#F8FAFC]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -358,11 +358,11 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
                         >
                           {sample.category}
                         </span>
-                        <span className="text-[9px] font-mono text-[#7C98A6]">
+                        <span className="text-[9px] font-mono text-[#94A3B8]">
                           {(sample.confidence * 100).toFixed(0)}%
                         </span>
                       </div>
-                      <span className="text-[10.5px] font-bold text-[#E0F7F4] truncate">
+                      <span className="text-[10.5px] font-bold text-[#F8FAFC] truncate">
                         {sample.name}
                       </span>
                     </button>
@@ -373,24 +373,24 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
           </div>
 
           {/* Right Column: Exact Contact Inspector Presentation */}
-          <div className="flex-1 bg-[#05121F] p-5 flex flex-col justify-between overflow-y-auto space-y-4">
+          <div className="flex-1 bg-[#080D17] p-5 flex flex-col justify-between overflow-y-auto space-y-4">
             {isAnalyzing ? (
               <div className="flex-1 flex flex-col items-center justify-center space-y-3">
-                <Loader2 className="w-10 h-10 text-[#00D4AA] animate-spin" />
-                <h3 className="text-sm font-bold text-[#E0F7F4]">RUNNING REAL YOLOv8s ONNX INFERENCE...</h3>
-                <p className="text-xs text-[#7C98A6]">Extracting acoustic bounding boxes & running shadow noise gate</p>
+                <Loader2 className="w-10 h-10 text-[#FFB703] animate-spin" />
+                <h3 className="text-sm font-bold text-[#F8FAFC]">RUNNING REAL YOLOv8s ONNX INFERENCE...</h3>
+                <p className="text-xs text-[#94A3B8]">Extracting acoustic bounding boxes & running shadow noise gate</p>
               </div>
             ) : selectedSample && isClassified ? (
               <>
                 {/* 1. Category Callout Banner */}
-                <div className="p-3.5 rounded-xl bg-[#030B14] border border-[#0D2E4A] flex items-center justify-between">
+                <div className="p-3.5 rounded-xl bg-[#05070B] border border-[#162136] flex items-center justify-between">
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-[9px] font-bold text-[#7C98A6] uppercase tracking-wider block">
+                      <span className="text-[9px] font-bold text-[#94A3B8] uppercase tracking-wider block">
                         MODEL INFERENCE CLASSIFICATION
                       </span>
                       {inferenceMeta && (
-                        <span className="text-[8.5px] font-mono text-[#00D4AA] px-1.5 py-0.2 bg-[#082830] border border-[#00D4AA]/40 rounded">
+                        <span className="text-[8.5px] font-mono text-[#FFB703] px-1.5 py-0.2 bg-[#131B2A] border border-[#FFB703]/40 rounded">
                           {inferenceMeta.inferenceMs} ms · {inferenceMeta.modelName}
                         </span>
                       )}
@@ -406,7 +406,7 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
                   <span
                     className={`text-[9px] font-bold px-2.5 py-1 rounded border ${
                       selectedSample.uncertaintyRating === 'LOW AMBIGUITY'
-                        ? 'bg-[#00D4AA]/15 text-[#00D4AA] border-[#00D4AA]/40'
+                        ? 'bg-[#FFB703]/15 text-[#FFB703] border-[#FFB703]/40'
                         : selectedSample.uncertaintyRating === 'MODERATE UNCERTAINTY'
                         ? 'bg-[#F59E0B]/15 text-[#F59E0B] border-[#F59E0B]/40'
                         : 'bg-[#64748B]/15 text-[#64748B] border-[#64748B]/40'
@@ -418,49 +418,49 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
 
                 {/* 2. Physical & Shadow Measurements Grid */}
                 <div className="grid grid-cols-4 gap-2 text-[10px]">
-                  <div className="p-2.5 rounded-xl bg-[#030B14] border border-[#0D2E4A]">
-                    <span className="text-[8px] text-[#7C98A6] uppercase block">LENGTH</span>
-                    <strong className="text-[#E0F7F4] font-bold">{selectedSample.dimensions.length} m</strong>
+                  <div className="p-2.5 rounded-xl bg-[#05070B] border border-[#162136]">
+                    <span className="text-[8px] text-[#94A3B8] uppercase block">LENGTH</span>
+                    <strong className="text-[#F8FAFC] font-bold">{selectedSample.dimensions.length} m</strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-[#030B14] border border-[#0D2E4A]">
-                    <span className="text-[8px] text-[#7C98A6] uppercase block">WIDTH</span>
-                    <strong className="text-[#E0F7F4] font-bold">{selectedSample.dimensions.width} m</strong>
+                  <div className="p-2.5 rounded-xl bg-[#05070B] border border-[#162136]">
+                    <span className="text-[8px] text-[#94A3B8] uppercase block">WIDTH</span>
+                    <strong className="text-[#F8FAFC] font-bold">{selectedSample.dimensions.width} m</strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-[#030B14] border border-[#0D2E4A]">
-                    <span className="text-[8px] text-[#7C98A6] uppercase block">SHADOW RELIEF</span>
-                    <strong className="text-[#00D4AA] font-bold">{selectedSample.dimensions.shadow} m</strong>
+                  <div className="p-2.5 rounded-xl bg-[#05070B] border border-[#162136]">
+                    <span className="text-[8px] text-[#94A3B8] uppercase block">SHADOW RELIEF</span>
+                    <strong className="text-[#FFB703] font-bold">{selectedSample.dimensions.shadow} m</strong>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-[#030B14] border border-[#0D2E4A]">
-                    <span className="text-[8px] text-[#7C98A6] uppercase block">ESTIMATED HEIGHT</span>
+                  <div className="p-2.5 rounded-xl bg-[#05070B] border border-[#162136]">
+                    <span className="text-[8px] text-[#94A3B8] uppercase block">ESTIMATED HEIGHT</span>
                     <strong className="text-[#38BDF8] font-bold">{selectedSample.dimensions.height} m</strong>
                   </div>
                 </div>
 
                 {/* 3. Operator Assessment & Reasoning Copy */}
-                <div className="p-3.5 rounded-xl bg-[#030B14] border border-[#0D2E4A] space-y-2 text-[10.5px]">
+                <div className="p-3.5 rounded-xl bg-[#05070B] border border-[#162136] space-y-2 text-[10.5px]">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Shield className="w-3.5 h-3.5 text-[#00D4AA]" />
-                      <span className="font-bold text-[#E0F7F4] uppercase tracking-wider text-[9.5px]">
+                      <Shield className="w-3.5 h-3.5 text-[#FFB703]" />
+                      <span className="font-bold text-[#F8FAFC] uppercase tracking-wider text-[9.5px]">
                         ACOUSTIC NOISE FILTER & MODEL VERIFICATION
                       </span>
                     </div>
                     {inferenceMeta && (
                       <span className={`text-[8.5px] font-bold px-1.5 py-0.2 rounded border ${
                         inferenceMeta.noiseFilterPassed
-                          ? 'bg-[#00D4AA]/15 text-[#00D4AA] border-[#00D4AA]/40'
+                          ? 'bg-[#FFB703]/15 text-[#FFB703] border-[#FFB703]/40'
                           : 'bg-[#EF4444]/15 text-[#EF4444] border-[#EF4444]/40'
                       }`}>
                         {inferenceMeta.noiseFilterPassed ? '✓ SHADOW VERIFIED' : '✕ NOISE REJECTED'}
                       </span>
                     )}
                   </div>
-                  <p className="text-[#E0F7F4] leading-relaxed">
+                  <p className="text-[#F8FAFC] leading-relaxed">
                     {inferenceMeta?.noiseFilterReason || selectedSample.operatorCaveat}
                   </p>
-                  <div className="pt-2 border-t border-[#0D2E4A] flex items-center justify-between text-[9px] text-[#7C98A6]">
-                    <span>TARGET STRENGTH: <strong className="text-[#00D4AA]">{selectedSample.targetStrengthDb} dB</strong></span>
-                    <span>CONFIDENCE: <strong className="text-[#E0F7F4]">{(selectedSample.confidence * 100).toFixed(1)}%</strong></span>
+                  <div className="pt-2 border-t border-[#162136] flex items-center justify-between text-[9px] text-[#94A3B8]">
+                    <span>TARGET STRENGTH: <strong className="text-[#FFB703]">{selectedSample.targetStrengthDb} dB</strong></span>
+                    <span>CONFIDENCE: <strong className="text-[#F8FAFC]">{(selectedSample.confidence * 100).toFixed(1)}%</strong></span>
                     {inferenceMeta?.bbox && (
                       <span className="font-mono">
                         BBOX: [{inferenceMeta.bbox.x1.toFixed(0)}, {inferenceMeta.bbox.y1.toFixed(0)}, {inferenceMeta.bbox.x2.toFixed(0)}, {inferenceMeta.bbox.y2.toFixed(0)}]
@@ -470,8 +470,8 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
                 </div>
 
                 {/* 4. Action: Pin Directly to Live Mission Control Tree */}
-                <div className="pt-2 flex items-center justify-between border-t border-[#0D2E4A]">
-                  <span className="text-[9px] text-[#7C98A6]">
+                <div className="pt-2 flex items-center justify-between border-t border-[#162136]">
+                  <span className="text-[9px] text-[#94A3B8]">
                     Injects this classified contact into the active waterfall mosaic & hierarchy
                   </span>
 
@@ -479,8 +479,8 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
                     onClick={handlePinToMission}
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-lg cursor-pointer active:scale-95 ${
                       isPinned
-                        ? 'bg-[#00D4AA] text-[#030B14]'
-                        : 'bg-[#00D4AA] text-[#030B14] hover:brightness-110'
+                        ? 'bg-[#FFB703] text-[#05070B]'
+                        : 'bg-[#FFB703] text-[#05070B] hover:brightness-110'
                     }`}
                   >
                     {isPinned ? <CheckCircle2 className="w-4 h-4" /> : <Pin className="w-4 h-4" />}

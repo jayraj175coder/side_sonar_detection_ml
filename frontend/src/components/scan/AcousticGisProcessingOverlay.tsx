@@ -79,7 +79,7 @@ export const AcousticGisProcessingOverlay: React.FC<AcousticGisProcessingOverlay
       <div className="relative w-full max-w-md bg-[#040E1B]/95 border border-cyan-500/40 rounded-2xl p-5 shadow-[0_0_50px_rgba(6,182,212,0.25)] backdrop-blur-xl flex flex-col items-center text-center space-y-3.5">
         
         {/* Card Header: Mini Title & Status Badge */}
-        <div className="w-full flex items-center justify-between border-b border-[#0D2E4A] pb-2 text-[10px]">
+        <div className="w-full flex items-center justify-between border-b border-[#162136] pb-2 text-[10px]">
           <div className="flex items-center gap-1.5">
             <Waves className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
             <span className="font-extrabold text-cyan-300 uppercase tracking-wider text-[11px]">

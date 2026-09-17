@@ -84,8 +84,8 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
 
       // High-contrast clean netting target (CLAHE enhanced)
       filteredCtx.save();
-      filteredCtx.fillStyle = '#00D4AA';
-      filteredCtx.shadowColor = '#00D4AA';
+      filteredCtx.fillStyle = '#FFB703';
+      filteredCtx.shadowColor = '#FFB703';
       filteredCtx.shadowBlur = 16;
       filteredCtx.beginPath();
       filteredCtx.ellipse(W * 0.38, H * 0.45, 32, 16, 0.4, 0, Math.PI * 2);
@@ -103,7 +103,7 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
       filteredCtx.fill();
 
       // Calibrated scale line
-      filteredCtx.fillStyle = '#00D4AA';
+      filteredCtx.fillStyle = '#FFB703';
       filteredCtx.fillRect(15, H - 15, 35, 2);
       filteredCtx.font = '9px "JetBrains Mono", monospace';
       filteredCtx.fillText('1.0m SCALE', 55, H - 11);
@@ -152,12 +152,12 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
           }
           filteredCtx.putImageData(filtData, 0, 0);
         } catch {
-          filteredCtx.fillStyle = 'rgba(0, 212, 170, 0.08)';
+          filteredCtx.fillStyle = 'rgba(255, 183, 3, )';
           filteredCtx.fillRect(0, 0, W, H);
         }
 
         // Calibrated scale line
-        filteredCtx.fillStyle = '#00D4AA';
+        filteredCtx.fillStyle = '#FFB703';
         filteredCtx.fillRect(15, H - 15, 35, 2);
         filteredCtx.font = '9px "JetBrains Mono", monospace';
         filteredCtx.fillText('1.0m SCALE', 55, H - 11);
@@ -176,7 +176,7 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
       {/* Header with KPI and View Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Sliders className="w-4 h-4 text-[#32E6D1]" />
+          <Sliders className="w-4 h-4 text-[#FFB703]" />
           <h3 className="text-xs font-black text-[#E4F2F5] tracking-wider uppercase font-sans">
             BEFORE / AFTER NOISE SUPPRESSION
           </h3>
@@ -191,7 +191,7 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
             onClick={() => setViewMode('side-by-side')}
             className={`px-2 py-0.5 rounded-lg border font-bold transition-all cursor-pointer ${
               viewMode === 'side-by-side'
-                ? 'bg-[#32E6D1] text-[#03070B] border-[#32E6D1]'
+                ? 'bg-[#FFB703] text-[#03070B] border-[#FFB703]'
                 : 'bg-[#0C171E] text-[#6F8992] border-[#16303B]'
             }`}
           >
@@ -201,7 +201,7 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
             onClick={() => setViewMode('split')}
             className={`px-2 py-0.5 rounded-lg border font-bold transition-all cursor-pointer ${
               viewMode === 'split'
-                ? 'bg-[#32E6D1] text-[#03070B] border-[#32E6D1]'
+                ? 'bg-[#FFB703] text-[#03070B] border-[#FFB703]'
                 : 'bg-[#0C171E] text-[#6F8992] border-[#16303B]'
             }`}
           >
@@ -231,10 +231,10 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
           </div>
 
           {/* Denoised Sonar Box */}
-          <div className="rounded-xl bg-[#03070B] border border-[#32E6D1]/50 p-2 space-y-1.5 overflow-hidden shadow-[0_0_12px_rgba(50,230,209,0.15)]">
+          <div className="rounded-xl bg-[#03070B] border border-[#FFB703]/50 p-2 space-y-1.5 overflow-hidden shadow-[0_0_12px_rgba(50,230,209,0.15)]">
             <div className="flex items-center justify-between text-[9px]">
-              <span className="font-bold text-[#32E6D1] flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#32E6D1] animate-pulse" />
+              <span className="font-bold text-[#FFB703] flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-pulse" />
                 PREPROCESSED & CLAHE ENHANCED
               </span>
               <span className="text-[#65D391] font-bold">Filtered</span>
@@ -242,7 +242,7 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
             <div className="rounded-lg overflow-hidden border border-[#16303B]">
               <canvas ref={filteredCanvasRef} width={280} height={140} className="w-full h-auto block" />
             </div>
-            <p className="text-[8px] text-[#32E6D1]/90 leading-tight truncate">
+            <p className="text-[8px] text-[#FFB703]/90 leading-tight truncate">
               {filteredNoiseDescription}
             </p>
           </div>
@@ -265,17 +265,17 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
               style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
             >
               <canvas ref={filteredCanvasRef} width={500} height={176} className="w-full h-full object-cover" />
-              <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-[#32E6D1] text-[9px] font-bold border border-[#32E6D1]/40">
+              <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-[#FFB703] text-[9px] font-bold border border-[#FFB703]/40">
                 DENOISED (CLAHE)
               </div>
             </div>
 
             {/* Split Divider line */}
             <div
-              className="absolute top-0 bottom-0 w-0.5 bg-[#32E6D1] shadow-[0_0_10px_#32E6D1] pointer-events-none"
+              className="absolute top-0 bottom-0 w-0.5 bg-[#FFB703] shadow-[0_0_10px_#FFB703] pointer-events-none"
               style={{ left: `${sliderPos}%` }}
             >
-              <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-[#32E6D1] text-[#03070B] flex items-center justify-center text-[8px] font-bold shadow-lg">
+              <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-[#FFB703] text-[#03070B] flex items-center justify-center text-[8px] font-bold shadow-lg">
                 ⬌
               </div>
             </div>
@@ -289,9 +289,9 @@ export const BeforeAfterNoisePanel: React.FC<BeforeAfterNoisePanelProps> = ({
               max={100}
               value={sliderPos}
               onChange={(e) => setSliderPos(Number(e.target.value))}
-              className="flex-1 h-1 bg-[#16303B] rounded-full appearance-none cursor-pointer accent-[#32E6D1]"
+              className="flex-1 h-1 bg-[#16303B] rounded-full appearance-none cursor-pointer accent-[#FFB703]"
             />
-            <span className="text-[#32E6D1] font-bold">{sliderPos}%</span>
+            <span className="text-[#FFB703] font-bold">{sliderPos}%</span>
           </div>
         </div>
       )}

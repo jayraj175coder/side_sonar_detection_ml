@@ -239,7 +239,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
                 className="max-h-[220px] w-auto object-contain rounded-2xl border border-[#152438] shadow-[0_12px_40px_rgba(0,0,0,0.8)]"
               />
               {/* Tactical Vertical Acoustic Laser Scanline */}
-              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_#00D4AA] animate-laser-scan pointer-events-none z-10" />
+              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_10px_#FFB703] animate-laser-scan pointer-events-none z-10" />
 
               <div className="absolute inset-0 bg-[#03070E]/60 opacity-0 group-hover/img:opacity-100 transition-opacity rounded-2xl flex items-center justify-center gap-2 backdrop-blur-[2px] z-20">
                 <button

@@ -64,16 +64,16 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
   }, [targets, selectedCategory, searchTerm]);
 
   return (
-    <aside className="w-64 xl:w-72 bg-[#05121F] border-r border-[#0D2E4A] flex flex-col font-sans select-none overflow-hidden shrink-0 z-20">
+    <aside className="w-64 xl:w-72 bg-[#080D17] border-r border-[#162136] flex flex-col font-sans select-none overflow-hidden shrink-0 z-20">
       {/* ── 1. PIPELINE STAGES PROGRESSION (COLLAPSIBLE) ── */}
-      <div className="border-b border-[#0D2E4A] bg-[#030B14]">
+      <div className="border-b border-[#162136] bg-[#05070B]">
         <button
           onClick={() => setIsPipelineExpanded(!isPipelineExpanded)}
-          className="w-full p-2.5 flex items-center justify-between text-[9px] font-bold text-[#94A3B8] hover:text-[#E0F7F4] uppercase tracking-wider cursor-pointer"
+          className="w-full p-2.5 flex items-center justify-between text-[9px] font-bold text-[#94A3B8] hover:text-[#F8FAFC] uppercase tracking-wider cursor-pointer"
         >
           <div className="flex items-center gap-1.5">
             <span>PIPELINE:</span>
-            <span className="text-[#00D4AA]">
+            <span className="text-[#FFB703]">
               STAGE 0{currentStageIndex + 1} ({PIPELINE_STAGES_V3[currentStageIndex]?.name || 'COMPLETE'})
             </span>
           </div>
@@ -93,13 +93,13 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
                     key={stg.number}
                     className={`px-1.5 py-0.5 rounded flex items-center gap-1 border transition-all ${
                       isCurrent
-                        ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA] font-bold shadow-[0_0_8px_rgba(0,212,170,0.2)]'
+                        ? 'bg-[#131B2A] border-[#FFB703] text-[#FFB703] font-bold shadow-[0_0_8px_rgba(255, 183, 3, )]'
                         : isDone
-                        ? 'bg-[#05121F] border-[#0D2E4A] text-[#E0F7F4]'
+                        ? 'bg-[#080D17] border-[#162136] text-[#F8FAFC]'
                         : 'bg-[#02070D] border-transparent text-[#94A3B8]'
                     }`}
                   >
-                    <span className={isCurrent ? 'text-[#00D4AA] animate-pulse' : isDone ? 'text-[#00D4AA]' : 'text-[#4A8090]'}>
+                    <span className={isCurrent ? 'text-[#FFB703] animate-pulse' : isDone ? 'text-[#FFB703]' : 'text-[#94A3B8]'}>
                       {isDone ? '✓' : isCurrent ? '●' : '○'}
                     </span>
                     <span className="truncate">{stg.number} {stg.name}</span>
@@ -112,51 +112,51 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
       </div>
 
       {/* ── 2. DEDICATED ACOUSTIC NOISE FILTER PANEL (SECTION 6 REQUIREMENT) ── */}
-      <div className="p-3 border-b border-[#0D2E4A] bg-[#05121F] space-y-2">
+      <div className="p-3 border-b border-[#162136] bg-[#080D17] space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-[9.5px] font-black text-[#E0F7F4] uppercase tracking-wider flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#00D4AA]" />
+          <span className="text-[9.5px] font-black text-[#F8FAFC] uppercase tracking-wider flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#FFB703]" />
             <span>ACOUSTIC NOISE FILTER</span>
           </span>
-          <span className="text-[8px] px-1 py-0.2 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded-xs font-bold">
+          <span className="text-[8px] px-1 py-0.2 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded-xs font-bold">
             SHADOW GATE ACTIVE
           </span>
         </div>
 
         {/* Triage Counts */}
         <div className="grid grid-cols-3 gap-1 text-center">
-          <div className="p-1.5 bg-[#030B14] border border-[#0D2E4A] rounded-xs">
-            <div className="text-[7.5px] text-[#7C98A6] uppercase">CANDIDATES</div>
-            <div className="text-sm font-black text-[#E0F7F4]">8</div>
+          <div className="p-1.5 bg-[#05070B] border border-[#162136] rounded-xs">
+            <div className="text-[7.5px] text-[#94A3B8] uppercase">CANDIDATES</div>
+            <div className="text-sm font-black text-[#F8FAFC]">8</div>
           </div>
-          <div className="p-1.5 bg-[#030B14] border border-[#EF4444]/40 rounded-xs">
+          <div className="p-1.5 bg-[#05070B] border border-[#EF4444]/40 rounded-xs">
             <div className="text-[7.5px] text-[#EF4444] uppercase">REJECTED</div>
             <div className="text-sm font-black text-[#EF4444]">4</div>
           </div>
-          <div className="p-1.5 bg-[#030B14] border border-[#00D4AA]/40 rounded-xs">
-            <div className="text-[7.5px] text-[#00D4AA] uppercase">CONFIRMED</div>
-            <div className="text-sm font-black text-[#00D4AA]">4</div>
+          <div className="p-1.5 bg-[#05070B] border border-[#FFB703]/40 rounded-xs">
+            <div className="text-[7.5px] text-[#FFB703] uppercase">CONFIRMED</div>
+            <div className="text-sm font-black text-[#FFB703]">4</div>
           </div>
         </div>
 
         {/* Filter Reasons & Confirmed Breakdown */}
-        <div className="space-y-1 text-[8px] text-[#7C98A6] pt-0.5">
+        <div className="space-y-1 text-[8px] text-[#94A3B8] pt-0.5">
           <div className="flex items-center justify-between">
             <span className="text-[#EF4444]">✕ Filter Reasons:</span>
             <span>2× low conf · 1× rock · 1× sediment</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[#00D4AA]">✓ Confirmed Debris:</span>
+            <span className="text-[#FFB703]">✓ Confirmed Debris:</span>
             <span>2× Ghost Net · 1× Gear · 1× Debris</span>
           </div>
         </div>
 
         {/* Interactive Confidence Cutoff Slider */}
         {onChangeConfidenceThreshold && (
-          <div className="pt-1 border-t border-[#0D2E4A]/80">
+          <div className="pt-1 border-t border-[#162136]/80">
             <div className="flex items-center justify-between text-[8px] mb-1">
-              <span className="text-[#7C98A6] font-bold">Confidence Threshold:</span>
-              <span className="text-[#00D4AA] font-bold">{confidenceThreshold}%</span>
+              <span className="text-[#94A3B8] font-bold">Confidence Threshold:</span>
+              <span className="text-[#FFB703] font-bold">{confidenceThreshold}%</span>
             </div>
             <input
               type="range"
@@ -164,22 +164,22 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
               max="85"
               value={confidenceThreshold}
               onChange={(e) => onChangeConfidenceThreshold(Number(e.target.value))}
-              className="w-full h-1 bg-[#0A1E30] accent-[#00D4AA] cursor-pointer"
+              className="w-full h-1 bg-[#0A1E30] accent-[#FFB703] cursor-pointer"
             />
           </div>
         )}
       </div>
 
       {/* ── 3. SEARCH & CATEGORY FILTER ── */}
-      <div className="p-2.5 border-b border-[#0D2E4A] bg-[#030B14] space-y-1.5">
+      <div className="p-2.5 border-b border-[#162136] bg-[#05070B] space-y-1.5">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-[#4A8090]" />
+          <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 text-[#94A3B8]" />
           <input
             type="text"
             placeholder="Search targets..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-7 pr-2 py-1 bg-[#0A1E30] border border-[#0D2E4A] text-[9.5px] text-[#E0F7F4] placeholder-[#4A8090] focus:outline-none focus:border-[#00D4AA]/70 rounded-xs"
+            className="w-full pl-7 pr-2 py-1 bg-[#0A1E30] border border-[#162136] text-[9.5px] text-[#F8FAFC] placeholder-[#94A3B8] focus:outline-none focus:border-[#FFB703]/70 rounded-xs"
           />
         </div>
 
@@ -193,8 +193,8 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-1.5 py-0.5 text-[8px] font-bold border transition-all cursor-pointer rounded-xs ${
                   isActive
-                    ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] shadow-[0_0_8px_rgba(0,212,170,0.3)]'
-                    : 'bg-[#0A1E30] text-[#7C98A6] border-[#0D2E4A] hover:text-[#E0F7F4]'
+                    ? 'bg-[#FFB703] text-[#05070B] border-[#FFB703] shadow-[0_0_8px_rgba(255, 183, 3, )]'
+                    : 'bg-[#0A1E30] text-[#94A3B8] border-[#162136] hover:text-[#F8FAFC]'
                 }`}
               >
                 {cat}
@@ -205,9 +205,9 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
       </div>
 
       {/* ── 4. TARGET REGISTER CARDS ── */}
-      <div className="flex-1 overflow-y-auto divide-y divide-[#0D2E4A]/60 p-2 space-y-1">
+      <div className="flex-1 overflow-y-auto divide-y divide-[#162136]/60 p-2 space-y-1">
         {filteredTargets.length === 0 ? (
-          <div className="p-6 text-center text-[#7C98A6] text-xs">
+          <div className="p-6 text-center text-[#94A3B8] text-xs">
             No targets match filter.
           </div>
         ) : (
@@ -225,24 +225,24 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
                 onMouseLeave={() => onHoverTarget?.(null)}
                 className={`p-2.5 rounded-xs transition-all duration-150 cursor-pointer border ${
                   isSelected
-                    ? 'bg-[#082830] border-[#00D4AA] shadow-[0_0_12px_rgba(0,212,170,0.2)]'
+                    ? 'bg-[#131B2A] border-[#FFB703] shadow-[0_0_12px_rgba(255, 183, 3, )]'
                     : isHovered
-                    ? 'bg-[#0A1E30] border-[#00D4AA]/40'
-                    : 'bg-[#05121F] border-[#0D2E4A] hover:border-[#0D2E4A]/80'
+                    ? 'bg-[#0A1E30] border-[#FFB703]/40'
+                    : 'bg-[#080D17] border-[#162136] hover:border-[#162136]/80'
                 } ${isFiltered ? 'opacity-55' : ''}`}
               >
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className={`text-[10.5px] font-bold ${isGhostNet ? 'text-[#00D4AA]' : 'text-[#E0F7F4]'}`}>
+                      <span className={`text-[10.5px] font-bold ${isGhostNet ? 'text-[#FFB703]' : 'text-[#F8FAFC]'}`}>
                         {target.id}
                       </span>
-                      <span className="text-[8px] text-[#4A8090]">·</span>
-                      <span className="text-[9.5px] text-[#7C98A6] font-semibold">
+                      <span className="text-[8px] text-[#94A3B8]">·</span>
+                      <span className="text-[9.5px] text-[#94A3B8] font-semibold">
                         {target.label}
                       </span>
                     </div>
-                    <div className="text-[8.5px] text-[#4A8090] mt-0.5">
+                    <div className="text-[8.5px] text-[#94A3B8] mt-0.5">
                       DEPTH: -{target.depth.toFixed(1)}m · SHADOW: {target.shadowLength.toFixed(2)}m
                     </div>
                   </div>
@@ -256,7 +256,7 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
                           ? 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/50'
                           : target.priority === 'MEDIUM'
                           ? 'bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/50'
-                          : 'bg-[#4A8090]/20 text-[#7C98A6] border-[#4A8090]/50'
+                          : 'bg-[#94A3B8]/20 text-[#94A3B8] border-[#94A3B8]/50'
                       }`}
                     >
                       {isFiltered ? 'FILTERED' : `${(target.confidence * 100).toFixed(0)}%`}
@@ -265,8 +265,8 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
                 </div>
 
                 {isGhostNet && (
-                  <div className="mt-2 pt-2 border-t border-[#00D4AA]/30 flex items-center justify-between">
-                    <span className="text-[8px] font-bold text-[#00D4AA] flex items-center gap-1">
+                  <div className="mt-2 pt-2 border-t border-[#FFB703]/30 flex items-center justify-between">
+                    <span className="text-[8px] font-bold text-[#FFB703] flex items-center gap-1">
                       <Sparkles className="w-2.5 h-2.5" />
                       FLAGSHIP HAZARD
                     </span>
@@ -276,7 +276,7 @@ export const SurveyTargetQueue: React.FC<SurveyTargetQueueProps> = ({
                           e.stopPropagation();
                           onFocusHeroTarget('SX-T07');
                         }}
-                        className="px-2 py-0.5 bg-[#00D4AA] text-[#030B14] font-black text-[8px] rounded-xs hover:brightness-110 cursor-pointer"
+                        className="px-2 py-0.5 bg-[#FFB703] text-[#05070B] font-black text-[8px] rounded-xs hover:brightness-110 cursor-pointer"
                       >
                         FOCUS HERO
                       </button>

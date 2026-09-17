@@ -4,7 +4,7 @@ import { useMission } from '../../context/MissionContext';
 import { MISSION_TARGETS, getTargetById } from '../../data/targets';
 
 const EvidenceBar: React.FC<{ label: string; value: number; color?: string }> = ({
-  label, value, color = '#32E6D1',
+  label, value, color = '#FFB703',
 }) => (
   <div className="space-y-1">
     <div className="flex items-center justify-between">
@@ -51,7 +51,7 @@ export const TargetIntelPanel: React.FC<{ onCollapse?: () => void }> = ({ onColl
             <button
               onClick={onCollapse}
               title="Collapse panel"
-              className="p-1 rounded bg-[#0C171E] border border-[#16303B] hover:border-[#32E6D1]/40 text-[#66848D] hover:text-[#32E6D1] transition-colors"
+              className="p-1 rounded bg-[#0C171E] border border-[#16303B] hover:border-[#FFB703]/40 text-[#66848D] hover:text-[#FFB703] transition-colors"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
@@ -74,7 +74,7 @@ export const TargetIntelPanel: React.FC<{ onCollapse?: () => void }> = ({ onColl
               <button
                 key={t.id}
                 onClick={() => setSelectedTargetId(t.id)}
-                className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#0C171E] border border-[#16303B] hover:border-[#32E6D1]/30 transition-all"
+                className="w-full flex items-center justify-between px-3 py-1.5 rounded-lg bg-[#0C171E] border border-[#16303B] hover:border-[#FFB703]/30 transition-all"
               >
                 <span className="text-[10px] font-mono text-[#E4F2F5]">{t.id} — {t.class}</span>
                 <span className="text-[10px] font-mono font-bold" style={{ color: t.color }}>
@@ -104,8 +104,8 @@ export const TargetIntelPanel: React.FC<{ onCollapse?: () => void }> = ({ onColl
       <div className="px-4 py-3 border-b border-[#16303B] bg-[#03070B]/60">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Crosshair className="w-3.5 h-3.5 text-[#32E6D1]" />
-            <span className="text-[11px] font-mono font-black text-[#32E6D1] tracking-widest">TARGET {target.id}</span>
+            <Crosshair className="w-3.5 h-3.5 text-[#FFB703]" />
+            <span className="text-[11px] font-mono font-black text-[#FFB703] tracking-widest">TARGET {target.id}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <RiskBadge risk={target.risk} />
@@ -113,7 +113,7 @@ export const TargetIntelPanel: React.FC<{ onCollapse?: () => void }> = ({ onColl
               <button
                 onClick={onCollapse}
                 title="Collapse panel"
-                className="p-1 rounded bg-[#0C171E] border border-[#16303B] hover:border-[#32E6D1]/40 text-[#66848D] hover:text-[#32E6D1] transition-colors"
+                className="p-1 rounded bg-[#0C171E] border border-[#16303B] hover:border-[#FFB703]/40 text-[#66848D] hover:text-[#FFB703] transition-colors"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -171,16 +171,16 @@ export const TargetIntelPanel: React.FC<{ onCollapse?: () => void }> = ({ onColl
           </div>
 
           {/* Coordinates */}
-          <div className="mt-2 p-2 rounded-lg bg-[#0C171E] border border-[#32E6D1]/20 text-[9px] font-mono">
+          <div className="mt-2 p-2 rounded-lg bg-[#0C171E] border border-[#FFB703]/20 text-[9px] font-mono">
             <span className="text-[#66848D]">WGS-84: </span>
-            <span className="text-[#32E6D1]">{target.lat.toFixed(4)}°N  {target.lon.toFixed(4)}°E</span>
+            <span className="text-[#FFB703]">{target.lat.toFixed(4)}°N  {target.lon.toFixed(4)}°E</span>
           </div>
         </div>
 
         {/* WHY SONARX FLAGGED THIS */}
         <div className="p-3 rounded-xl bg-[#03070B]/70 border border-[#16303B]">
           <div className="flex items-center gap-1.5 mb-3">
-            <TrendingUp className="w-3 h-3 text-[#32E6D1]" />
+            <TrendingUp className="w-3 h-3 text-[#FFB703]" />
             <span className="text-[9px] font-mono font-black text-[#66848D] uppercase tracking-widest">Why SonarX Flagged This</span>
           </div>
           <div className="space-y-2.5">
@@ -203,7 +203,7 @@ export const TargetIntelPanel: React.FC<{ onCollapse?: () => void }> = ({ onColl
           <ul className="space-y-1.5">
             {target.detectionEvidence.map((e, i) => (
               <li key={i} className="flex items-start gap-2 text-[10px] font-mono text-[#E4F2F5]">
-                <ChevronRight className="w-3 h-3 text-[#32E6D1] shrink-0 mt-0.5" />
+                <ChevronRight className="w-3 h-3 text-[#FFB703] shrink-0 mt-0.5" />
                 <span className="leading-snug">{e}</span>
               </li>
             ))}

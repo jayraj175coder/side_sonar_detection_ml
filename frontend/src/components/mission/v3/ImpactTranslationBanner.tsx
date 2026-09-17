@@ -25,19 +25,19 @@ export const ImpactTranslationBanner: React.FC<ImpactTranslationBannerProps> = (
   }, [isDemoRunning]);
 
   return (
-    <div className="bg-[#030B14] border-b border-[#0D2E4A] px-3 sm:px-4 py-1 select-none font-sans">
+    <div className="bg-[#05070B] border-b border-[#162136] px-3 sm:px-4 py-1 select-none font-sans">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
         {/* Card 1: Debris Sites & Tonnage */}
-        <div className="px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] rounded flex items-center justify-between">
+        <div className="px-2.5 py-1 bg-[#080D17] border border-[#162136] rounded flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded bg-[#EF4444]/15 border border-[#EF4444]/30 flex items-center justify-center text-[#EF4444] shrink-0">
               <Target className="w-3 h-3" />
             </div>
             <div>
-              <div className="text-[11px] font-black text-[#E0F7F4] leading-none">
+              <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
                 <span className="text-[#EF4444]">{debrisCount}</span> SITES FLAGGED
               </div>
-              <div className="text-[8px] text-[#4A8090] mt-0.5">est. 2.3 tons ghost gear</div>
+              <div className="text-[8px] text-[#94A3B8] mt-0.5">est. 2.3 tons ghost gear</div>
             </div>
           </div>
           <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-[#EF4444]/20 text-[#EF4444] rounded">
@@ -46,34 +46,34 @@ export const ImpactTranslationBanner: React.FC<ImpactTranslationBannerProps> = (
         </div>
 
         {/* Card 2: Human Time Saved (Speed Triage) */}
-        <div className="px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] rounded flex items-center justify-between">
+        <div className="px-2.5 py-1 bg-[#080D17] border border-[#162136] rounded flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-[#00D4AA]/15 border border-[#00D4AA]/30 flex items-center justify-center text-[#00D4AA] shrink-0">
+            <div className="w-5 h-5 rounded bg-[#FFB703]/15 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shrink-0">
               <Clock className="w-3 h-3" />
             </div>
             <div>
-              <div className="text-[11px] font-black text-[#E0F7F4] leading-none">
-                <span className="text-[#00D4AA]">4 MIN</span> <span className="text-[#4A8090] text-[9px] font-normal">vs ~6 hrs dive</span>
+              <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
+                <span className="text-[#FFB703]">4 MIN</span> <span className="text-[#94A3B8] text-[9px] font-normal">vs ~6 hrs dive</span>
               </div>
-              <div className="text-[8px] text-[#4A8090] mt-0.5">Automated side-scan triage</div>
+              <div className="text-[8px] text-[#94A3B8] mt-0.5">Automated side-scan triage</div>
             </div>
           </div>
-          <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded">
+          <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded">
             90× FASTER
           </span>
         </div>
 
         {/* Card 3: Seafloor Coverage */}
-        <div className="px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] rounded flex items-center justify-between">
+        <div className="px-2.5 py-1 bg-[#080D17] border border-[#162136] rounded flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded bg-[#38BDF8]/15 border border-[#38BDF8]/30 flex items-center justify-center text-[#38BDF8] shrink-0">
               <ShieldCheck className="w-3 h-3" />
             </div>
             <div>
-              <div className="text-[11px] font-black text-[#E0F7F4] leading-none">
+              <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
                 <span className="text-[#38BDF8]">{coveragePct}%</span> COVERAGE
               </div>
-              <div className="text-[8px] text-[#4A8090] mt-0.5">12.84 km² shelf swath surveyed</div>
+              <div className="text-[8px] text-[#94A3B8] mt-0.5">12.84 km² shelf swath surveyed</div>
             </div>
           </div>
           <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-[#38BDF8]/20 text-[#38BDF8] rounded">

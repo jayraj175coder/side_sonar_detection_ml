@@ -29,7 +29,7 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
   onExportIncidentReport,
 }) => {
   return (
-    <header className="h-11 bg-[#05121F] border-b border-[#0D2E4A] px-3 flex items-center justify-between font-mono text-[11px] select-none shrink-0 z-30">
+    <header className="h-11 bg-[#080D17] border-b border-[#162136] px-3 flex items-center justify-between font-mono text-[11px] select-none shrink-0 z-30">
       {/* Left: Product + node + link */}
       <div className="flex items-center gap-2.5">
         <SonarxLogoIcon size={22} animated={demoPhase === 'running'} />
@@ -41,20 +41,20 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
 
         {/* Live demo status pill */}
         {demoPhase === 'running' && (
-          <span className="flex items-center gap-1 text-[9px] text-[#00D4AA] font-bold border border-[#00D4AA]/50 bg-[#122415] px-1.5 py-0.2 animate-pulse">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA]" />
+          <span className="flex items-center gap-1 text-[9px] text-[#FFB703] font-bold border border-[#FFB703]/50 bg-[#122415] px-1.5 py-0.2 animate-pulse">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703]" />
             LIVE DEMO RUNNING
           </span>
         )}
         {demoPhase === 'idle' && (
-          <span className="flex items-center gap-1 text-[9px] text-[#2A5060]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#2A5060]" />
+          <span className="flex items-center gap-1 text-[9px] text-[#64748B]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#64748B]" />
             AWAITING TRIGGER
           </span>
         )}
         {demoPhase === 'done' && (
-          <span className="flex items-center gap-1 text-[9px] text-[#00D4AA] font-bold">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA]" />
+          <span className="flex items-center gap-1 text-[9px] text-[#FFB703] font-bold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703]" />
             PIPELINE COMPLETE
           </span>
         )}
@@ -63,14 +63,14 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
       {/* Center: Survey selector + timestamp */}
       <div className="flex items-center gap-3 text-[10px]">
         <div className="flex items-center gap-1.5">
-          <span className="text-[#4A8090] uppercase">SURVEY:</span>
+          <span className="text-[#94A3B8] uppercase">SURVEY:</span>
           <select
             value={activeSite.id}
             onChange={(e) => {
               const found = SURVEY_SITES.find((s) => s.id === e.target.value);
               if (found) onSelectSite(found);
             }}
-            className="bg-[#0A1E30] border border-[#0D2E4A] text-[#E0F7F4] px-2 py-0.5 text-[10px] font-mono focus:outline-none focus:border-[#00D4AA] cursor-pointer"
+            className="bg-[#0A1E30] border border-[#162136] text-[#F8FAFC] px-2 py-0.5 text-[10px] font-mono focus:outline-none focus:border-[#FFB703] cursor-pointer"
           >
             {SURVEY_SITES.map((site) => (
               <option key={site.id} value={site.id}>
@@ -79,11 +79,11 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
             ))}
           </select>
         </div>
-        <span className="text-[#2A5060]">·</span>
-        <span className="text-[#4A8090] hidden md:inline font-mono">{activeSite.timestamp}</span>
-        <span className="text-[#2A5060] hidden md:inline">·</span>
-        <span className="text-[#E0F7F4] hidden lg:inline font-mono">
-          SRC: <strong className="text-[#00D4AA]">{activeSite.sourceFile}</strong>
+        <span className="text-[#64748B]">·</span>
+        <span className="text-[#94A3B8] hidden md:inline font-mono">{activeSite.timestamp}</span>
+        <span className="text-[#64748B] hidden md:inline">·</span>
+        <span className="text-[#F8FAFC] hidden lg:inline font-mono">
+          SRC: <strong className="text-[#FFB703]">{activeSite.sourceFile}</strong>
         </span>
       </div>
 
@@ -99,11 +99,11 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
           className={`flex items-center gap-1.5 px-3 py-1 border font-black text-[10px] transition-all cursor-pointer ${
             demoPhase === 'running'
               ? isPlaying
-                ? 'bg-amber-500 text-[#030B14] border-amber-500'
+                ? 'bg-amber-500 text-[#05070B] border-amber-500'
                 : 'bg-[#0A1E30] text-amber-400 border-amber-500'
               : demoPhase === 'done'
-              ? 'bg-[#0A1E30] border-[#00D4AA]/60 text-[#00D4AA] hover:bg-[#122415]'
-              : 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] hover:brightness-110 shadow-[0_0_16px_rgba(74,222,128,0.35)]'
+              ? 'bg-[#0A1E30] border-[#FFB703]/60 text-[#FFB703] hover:bg-[#122415]'
+              : 'bg-[#FFB703] text-[#05070B] border-[#FFB703] hover:brightness-110 shadow-[0_0_16px_rgba(74,222,128,0.35)]'
           }`}
           title={demoPhase === 'idle' ? 'Run automated live demo' : demoPhase === 'running' ? 'Pause / Resume' : 'Replay from beginning'}
         >
@@ -116,7 +116,7 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
 
         <button
           onClick={onExportDossier}
-          className="panel-btn flex items-center gap-1 hover:text-[#00D4AA]"
+          className="panel-btn flex items-center gap-1 hover:text-[#FFB703]"
           title="Export structured JSON / CSV inspection dossier"
         >
           <Download className="w-3 h-3" />
@@ -126,7 +126,7 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
         {onExportIncidentReport && (
           <button
             onClick={onExportIncidentReport}
-            className="panel-btn flex items-center gap-1 border-[#38bdf8]/50 text-[#38bdf8] hover:bg-[#38bdf8] hover:text-[#030B14] transition-all"
+            className="panel-btn flex items-center gap-1 border-[#38bdf8]/50 text-[#38bdf8] hover:bg-[#38bdf8] hover:text-[#05070B] transition-all"
             title="Generate official Ministry of Earth Sciences marine pollution incident advisory"
           >
             <FileText className="w-3 h-3" />
@@ -136,7 +136,7 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
 
         <button
           onClick={onReset}
-          className="panel-btn text-[#4A8090] hover:text-[#ef4444]"
+          className="panel-btn text-[#94A3B8] hover:text-[#ef4444]"
           title="Reset to idle"
         >
           <RotateCcw className="w-3 h-3" />

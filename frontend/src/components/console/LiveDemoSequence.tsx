@@ -7,7 +7,7 @@ const TOTAL_SCENES = 8;
 const AUTO_MS = 3800;
 
 const CLASS_COLORS: Record<string, string> = {
-  'Ghost Net (ALDFG)':             '#00D4AA',
+  'Ghost Net (ALDFG)':             '#FFB703',
   'Lost Fishing Trawl Gear':       '#38BDF8',
   'Anthropogenic Debris Bundle':   '#F59E0B',
   'Subsea Pipeline Free-Span':     '#FB923C',
@@ -229,7 +229,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
     const drawNadir = () => {
       ctx.fillStyle = '#01050A';
       ctx.fillRect(W / 2 - 18, 0, 36, H);
-      ctx.strokeStyle = '#00D4AA';
+      ctx.strokeStyle = '#FFB703';
       ctx.globalAlpha = 0.45;
       ctx.setLineDash([4, 4]);
       ctx.lineWidth = 1;
@@ -264,7 +264,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         ctx.fillText('✕ NOISE', cx, cy + 3);
         ctx.textAlign = 'left';
       } else if (style === 'confirmed' || style === 'classified') {
-        const col = style === 'classified' ? (CLASS_COLORS[cand.class] || '#00D4AA') : '#00D4AA';
+        const col = style === 'classified' ? (CLASS_COLORS[cand.class] || '#FFB703') : '#FFB703';
 
         // Acoustic Void Shadow
         ctx.fillStyle = '#01050A';
@@ -308,7 +308,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         }
       } else {
         // Raw proposals
-        let col = '#00D4AA';
+        let col = '#FFB703';
         if (cand.confidence < 0.4) col = REJECT_COLOR;
         else if (cand.confidence < 0.7) col = '#F59E0B';
 
@@ -344,9 +344,9 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
 
         // Laser Wipe Bar with Neon Glow
         ctx.save();
-        ctx.strokeStyle = '#00D4AA';
+        ctx.strokeStyle = '#FFB703';
         ctx.lineWidth = 3;
-        ctx.shadowColor = '#00D4AA';
+        ctx.shadowColor = '#FFB703';
         ctx.shadowBlur = 20;
         ctx.beginPath();
         ctx.moveTo(wX, 0);
@@ -355,7 +355,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
 
         // Sparkle points on laser edge
         for (let s = 20; s < H; s += 45) {
-          ctx.fillStyle = '#E0F7F4';
+          ctx.fillStyle = '#F8FAFC';
           ctx.beginPath();
           ctx.arc(wX, s + Math.sin(wX * 0.1 + s) * 8, 2.5, 0, Math.PI * 2);
           ctx.fill();
@@ -365,9 +365,9 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         // Telemetry tags
         ctx.fillStyle = 'rgba(1,5,10,0.85)';
         ctx.fillRect(10, 10, 110, 24);
-        ctx.strokeStyle = '#0D2E4A';
+        ctx.strokeStyle = '#162136';
         ctx.strokeRect(10, 10, 110, 24);
-        ctx.fillStyle = '#4A8090';
+        ctx.fillStyle = '#94A3B8';
         ctx.font = 'bold 8px monospace';
         ctx.fillText('RAW SPECKLE (−0 dB)', 16, 25);
 
@@ -375,9 +375,9 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
           const lx = Math.max(wX + 10, W - 140);
           ctx.fillStyle = 'rgba(1,5,10,0.85)';
           ctx.fillRect(lx, 10, 130, 24);
-          ctx.strokeStyle = '#00D4AA';
+          ctx.strokeStyle = '#FFB703';
           ctx.strokeRect(lx, 10, 130, 24);
-          ctx.fillStyle = '#00D4AA';
+          ctx.fillStyle = '#FFB703';
           ctx.font = 'bold 8.5px monospace';
           ctx.fillText('CLAHE DENOISED (−18.4 dB)', lx + 6, 25);
         }
@@ -392,10 +392,10 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         // High-tech counter HUD
         ctx.fillStyle = 'rgba(1,5,10,0.92)';
         ctx.fillRect(W - 145, 10, 135, 30);
-        ctx.strokeStyle = '#00D4AA';
+        ctx.strokeStyle = '#FFB703';
         ctx.lineWidth = 1;
         ctx.strokeRect(W - 145, 10, 135, 30);
-        ctx.fillStyle = '#00D4AA';
+        ctx.fillStyle = '#FFB703';
         ctx.font = 'bold 11px monospace';
         ctx.fillText(`⚡ ${boxCount} PROPOSALS`, W - 138, 28);
       }
@@ -413,12 +413,12 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         if (filterDone) {
           ctx.fillStyle = 'rgba(1,5,10,0.92)';
           ctx.fillRect(W - 195, 10, 185, 46);
-          ctx.strokeStyle = '#0D2E4A';
+          ctx.strokeStyle = '#162136';
           ctx.strokeRect(W - 195, 10, 185, 46);
-          ctx.fillStyle = '#00D4AA';
+          ctx.fillStyle = '#FFB703';
           ctx.font = 'bold 10px monospace';
           ctx.fillText(`FILTER GATE ACTIVE`, W - 185, 26);
-          ctx.fillStyle = '#E0F7F4';
+          ctx.fillStyle = '#F8FAFC';
           ctx.font = '8.5px monospace';
           ctx.fillText(`37 Raw  →  17 Confirmed Debris`, W - 185, 42);
         }
@@ -443,7 +443,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       // Sensor telemetry ribbon
       ctx.fillStyle = 'rgba(1,5,10,0.7)';
       ctx.fillRect(0, H - 20, W, 20);
-      ctx.fillStyle = '#4A8090';
+      ctx.fillStyle = '#94A3B8';
       ctx.font = '8px monospace';
       ctx.fillText(`${site.frequency} · SWATH: ${site.swathWidthM}m · SPEED: 4.2 KTS · ${site.timestamp}`, 8, H - 7);
     }
@@ -481,7 +481,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       }
 
       // Seafloor contour curves
-      ctx.strokeStyle = '#0D2E4A';
+      ctx.strokeStyle = '#162136';
       ctx.lineWidth = 1;
       ctx.beginPath();
       for (let x = 0; x < W; x += 20) {
@@ -493,7 +493,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
 
       // Survey track line
       const trackY = H * 0.48;
-      ctx.strokeStyle = '#00D4AA';
+      ctx.strokeStyle = '#FFB703';
       ctx.globalAlpha = 0.5;
       ctx.setLineDash([8, 6]);
       ctx.lineWidth = 1.5;
@@ -510,7 +510,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       const vy = trackY;
 
       // Hydrodynamic wake particles behind vessel
-      ctx.strokeStyle = 'rgba(0,212,170,0.3)';
+      ctx.strokeStyle = 'rgba(255, 183, 3, )';
       ctx.lineWidth = 1.2;
       for (let i = 1; i <= 3; i++) {
         ctx.beginPath();
@@ -521,7 +521,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       // Tow cable to towfish
       const fx = vx - 65;
       const fy = vy + 18;
-      ctx.strokeStyle = '#4A8090';
+      ctx.strokeStyle = '#94A3B8';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(vx - 14, vy);
@@ -534,9 +534,9 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
 
       [-1, 1].forEach((dir) => {
         const grad = ctx.createRadialGradient(fx, fy, 10, fx, fy, coneLen);
-        grad.addColorStop(0, 'rgba(0,212,170,0.5)');
-        grad.addColorStop(0.7, 'rgba(0,212,170,0.15)');
-        grad.addColorStop(1, 'rgba(0,212,170,0)');
+        grad.addColorStop(0, 'rgba(255, 183, 3, )');
+        grad.addColorStop(0.7, 'rgba(255, 183, 3, )');
+        grad.addColorStop(1, 'rgba(255, 183, 3, )');
 
         ctx.save();
         ctx.fillStyle = grad;
@@ -549,7 +549,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         ctx.fill();
 
         // Sonar wavefront pulses
-        ctx.strokeStyle = 'rgba(0,212,170,0.6)';
+        ctx.strokeStyle = 'rgba(255, 183, 3, )';
         ctx.lineWidth = 1.5;
         const pulseR = ((t * 40) % coneLen);
         ctx.beginPath();
@@ -559,24 +559,24 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       });
 
       // Towfish body with glow
-      ctx.fillStyle = '#00D4AA';
-      ctx.shadowColor = '#00D4AA';
+      ctx.fillStyle = '#FFB703';
+      ctx.shadowColor = '#FFB703';
       ctx.shadowBlur = 16;
       ctx.beginPath();
       ctx.ellipse(fx, fy, 10, 5, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      ctx.fillStyle = '#E0F7F4';
+      ctx.fillStyle = '#F8FAFC';
       ctx.font = 'bold 8px monospace';
       ctx.fillText('SSS TOWFISH', fx - 22, fy + 16);
 
       // Autonomous Vessel Body
       ctx.save();
-      ctx.shadowColor = '#00D4AA';
+      ctx.shadowColor = '#FFB703';
       ctx.shadowBlur = 18;
-      ctx.fillStyle = '#E0F7F4';
-      ctx.strokeStyle = '#00D4AA';
+      ctx.fillStyle = '#F8FAFC';
+      ctx.strokeStyle = '#FFB703';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(vx + 18, vy);
@@ -588,22 +588,22 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       ctx.stroke();
       ctx.restore();
 
-      ctx.fillStyle = '#00D4AA';
+      ctx.fillStyle = '#FFB703';
       ctx.font = 'bold 9px monospace';
       ctx.fillText('SURVEY AUV', vx - 18, vy - 14);
 
       // Live Telemetry Glass Panel
       ctx.fillStyle = 'rgba(5,18,31,0.92)';
       ctx.fillRect(14, 14, 210, 72);
-      ctx.strokeStyle = '#00D4AA';
+      ctx.strokeStyle = '#FFB703';
       ctx.lineWidth = 1;
       ctx.strokeRect(14, 14, 210, 72);
 
-      ctx.fillStyle = '#00D4AA';
+      ctx.fillStyle = '#FFB703';
       ctx.font = 'bold 9.5px monospace';
       ctx.fillText('● REAL-TIME MISSION TELEMETRY', 22, 32);
 
-      ctx.fillStyle = '#E0F7F4';
+      ctx.fillStyle = '#F8FAFC';
       ctx.font = '8.5px monospace';
       ctx.fillText(`SWATH WIDTH : ${site.swathWidthM}m DUAL-SIDE`, 22, 48);
       ctx.fillText(`FREQUENCY   : ${site.frequency}`, 22, 60);
@@ -637,21 +637,21 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
               <div
                 className={`w-6 h-6 rounded-full border flex items-center justify-center text-[8.5px] font-black transition-all duration-300 ${
                   active
-                    ? 'border-[#00D4AA] bg-[#00D4AA] text-[#030B14] dot-active shadow-[0_0_15px_#00D4AA]'
+                    ? 'border-[#FFB703] bg-[#FFB703] text-[#05070B] dot-active shadow-[0_0_15px_#FFB703]'
                     : done
-                    ? 'border-[#00D4AA] bg-[#082830] text-[#00D4AA]'
-                    : 'border-[#0D2E4A] bg-[#030B14] text-[#2A5060]'
+                    ? 'border-[#FFB703] bg-[#131B2A] text-[#FFB703]'
+                    : 'border-[#162136] bg-[#05070B] text-[#64748B]'
                 }`}
               >
                 {done ? '✓' : i}
               </div>
             </div>
             {i < TOTAL_SCENES - 1 && (
-              <div className="h-0.5 flex-1 mx-1.5 relative overflow-hidden bg-[#0D2E4A]" style={{ minWidth: 24, maxWidth: 50 }}>
-                {done && <div className="absolute inset-0 bg-[#00D4AA]" />}
+              <div className="h-0.5 flex-1 mx-1.5 relative overflow-hidden bg-[#162136]" style={{ minWidth: 24, maxWidth: 50 }}>
+                {done && <div className="absolute inset-0 bg-[#FFB703]" />}
                 {active && (
                   <div
-                    className="absolute inset-y-0 left-0 bg-[#00D4AA] shadow-[0_0_10px_#00D4AA]"
+                    className="absolute inset-y-0 left-0 bg-[#FFB703] shadow-[0_0_10px_#FFB703]"
                     style={{ width: `${progress * 100}%`, transition: 'width 30ms linear' }}
                   />
                 )}
@@ -671,7 +671,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="absolute rounded-full border border-[#00D4AA]/15"
+            className="absolute rounded-full border border-[#FFB703]/15"
             style={{
               width: `${i * 22}%`,
               height: `${i * 22}%`,
@@ -683,14 +683,14 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       </div>
 
       <div className="relative z-10 max-w-2xl space-y-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#082830] border border-[#00D4AA]/50 text-[10px] font-bold tracking-[0.25em] text-[#00D4AA] uppercase shadow-[0_0_15px_rgba(0,212,170,0.25)]">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#131B2A] border border-[#FFB703]/50 text-[10px] font-bold tracking-[0.25em] text-[#FFB703] uppercase shadow-[0_0_15px_rgba(255, 183, 3, )]">
           <Waves className="w-3.5 h-3.5" />
           <span>MoES SIH 2026 // PROBLEM STATEMENT</span>
         </div>
 
-        <h1 className="text-2xl md:text-4xl font-black text-[#E0F7F4] leading-tight tracking-tight drop-shadow-lg">
+        <h1 className="text-2xl md:text-4xl font-black text-[#F8FAFC] leading-tight tracking-tight drop-shadow-lg">
           GHOST NETS: ABANDONED FISHING GEAR<br />
-          <span className="text-[#00D4AA] drop-shadow-[0_0_25px_rgba(0,212,170,0.8)] animate-pulse inline-block">
+          <span className="text-[#FFB703] drop-shadow-[0_0_25px_rgba(255, 183, 3, )] animate-pulse inline-block">
             KILLING MARINE LIFE,
           </span><br />
           INVISIBLE TO EVERY SENSOR EXCEPT SONAR.
@@ -705,21 +705,21 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
             <div
               key={stat}
               className={`p-3.5 border ${
-                alert ? 'border-[#0D2E4A] bg-[#05121F]/90' : 'border-[#00D4AA]/60 bg-[#082830]'
+                alert ? 'border-[#162136] bg-[#080D17]/90' : 'border-[#FFB703]/60 bg-[#131B2A]'
               } shadow-lg text-center flex flex-col justify-between`}
             >
               <div>
-                <div className="text-xl font-black text-[#00D4AA]">{stat}</div>
-                <div className="text-[8.5px] text-[#4A8090] mt-1 leading-snug">{label}</div>
+                <div className="text-xl font-black text-[#FFB703]">{stat}</div>
+                <div className="text-[8.5px] text-[#94A3B8] mt-1 leading-snug">{label}</div>
               </div>
-              <div className="text-[7px] text-[#2A5060] font-mono mt-2 pt-1 border-t border-[#0D2E4A]/60">
+              <div className="text-[7px] text-[#64748B] font-mono mt-2 pt-1 border-t border-[#162136]/60">
                 Source: {source}
               </div>
             </div>
           ))}
         </div>
 
-        <p className="text-[11px] text-[#4A8090] max-w-xl mx-auto leading-relaxed">
+        <p className="text-[11px] text-[#94A3B8] max-w-xl mx-auto leading-relaxed">
           Side-scan sonar acoustic pulses penetrate dark, deep, and turbid coastal waters where cameras fail.
           Our automated perception system extracts, filters, and geotags submerged debris in real time.
         </p>
@@ -730,25 +730,25 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
   // ── Render Scene 2 Overlay: Typewritten Coordinates ──────────────────────────
   const renderScene2Overlay = () => (
     <>
-      <div className="absolute top-3 left-3 bg-[#01050A]/95 border border-[#00D4AA]/40 px-2.5 py-1 text-[8.5px] text-[#00D4AA] font-mono shadow-md">
+      <div className="absolute top-3 left-3 bg-[#01050A]/95 border border-[#FFB703]/40 px-2.5 py-1 text-[8.5px] text-[#FFB703] font-mono shadow-md">
         NW PIN: {site.latRange[1].toFixed(4)}°N, {site.lonRange[0].toFixed(4)}°E
       </div>
-      <div className="absolute top-3 right-3 bg-[#01050A]/95 border border-[#00D4AA]/40 px-2.5 py-1 text-[8.5px] text-[#00D4AA] font-mono shadow-md">
+      <div className="absolute top-3 right-3 bg-[#01050A]/95 border border-[#FFB703]/40 px-2.5 py-1 text-[8.5px] text-[#FFB703] font-mono shadow-md">
         NE PIN: {site.latRange[1].toFixed(4)}°N, {site.lonRange[1].toFixed(4)}°E
       </div>
-      <div className="absolute bottom-12 left-3 bg-[#01050A]/95 border border-[#00D4AA]/40 px-2.5 py-1 text-[8.5px] text-[#00D4AA] font-mono shadow-md">
+      <div className="absolute bottom-12 left-3 bg-[#01050A]/95 border border-[#FFB703]/40 px-2.5 py-1 text-[8.5px] text-[#FFB703] font-mono shadow-md">
         SW PIN: {site.latRange[0].toFixed(4)}°N, {site.lonRange[0].toFixed(4)}°E
       </div>
-      <div className="absolute bottom-12 right-3 bg-[#01050A]/95 border border-[#00D4AA]/40 px-2.5 py-1 text-[8.5px] text-[#00D4AA] font-mono shadow-md">
+      <div className="absolute bottom-12 right-3 bg-[#01050A]/95 border border-[#FFB703]/40 px-2.5 py-1 text-[8.5px] text-[#FFB703] font-mono shadow-md">
         SE PIN: {site.latRange[0].toFixed(4)}°N, {site.lonRange[1].toFixed(4)}°E
       </div>
 
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#05121F]/95 border border-[#00D4AA] p-4 max-w-lg w-full shadow-[0_0_30px_rgba(0,212,170,0.35)]">
-        <div className="flex items-center gap-2 text-[9px] text-[#00D4AA] font-bold uppercase tracking-wider mb-1.5">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#080D17]/95 border border-[#FFB703] p-4 max-w-lg w-full shadow-[0_0_30px_rgba(255, 183, 3, )]">
+        <div className="flex items-center gap-2 text-[9px] text-[#FFB703] font-bold uppercase tracking-wider mb-1.5">
           <Crosshair className="w-3.5 h-3.5 animate-spin" />
           <span>REAL-TIME SENSOR GEOTAG TELEMETRY</span>
         </div>
-        <div className="text-[11px] text-[#E0F7F4] font-mono cursor-blink leading-relaxed">
+        <div className="text-[11px] text-[#F8FAFC] font-mono cursor-blink leading-relaxed">
           {coordStr}
         </div>
       </div>
@@ -759,25 +759,25 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
   const renderScene7 = () => (
     <div className="flex-1 flex flex-col md:flex-row gap-4 p-5 scene-enter overflow-hidden bg-[#01050A]">
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="text-[10px] font-bold text-[#00D4AA] uppercase tracking-widest mb-2 flex items-center gap-2">
+        <div className="text-[10px] font-bold text-[#FFB703] uppercase tracking-widest mb-2 flex items-center gap-2">
           <Sparkles className="w-3.5 h-3.5" />
           <span>GEOTAGGED TARGET MAP REGISTER — {geotags}/{confirmed.length} TARGETS</span>
         </div>
-        <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 border border-[#0D2E4A] p-2 bg-[#030B14]">
+        <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 border border-[#162136] p-2 bg-[#05070B]">
           {confirmed.slice(0, geotags).map((c) => {
-            const col = CLASS_COLORS[c.class] || '#00D4AA';
+            const col = CLASS_COLORS[c.class] || '#FFB703';
             return (
               <div
                 key={c.id}
-                className="flex items-center justify-between p-2 border bg-[#05121F] text-[9px] font-mono shadow-sm"
+                className="flex items-center justify-between p-2 border bg-[#080D17] text-[9px] font-mono shadow-sm"
                 style={{ borderColor: `${col}60` }}
               >
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: col }} />
                   <span style={{ color: col }} className="font-bold">{c.id}</span>
-                  <span className="text-[#E0F7F4] truncate">{c.class}</span>
+                  <span className="text-[#F8FAFC] truncate">{c.class}</span>
                 </div>
-                <div className="text-[#4A8090] text-right">
+                <div className="text-[#94A3B8] text-right">
                   {c.lat.toFixed(4)}°N, {c.lon.toFixed(4)}°E (Depth {c.depthM}m)
                 </div>
               </div>
@@ -787,20 +787,20 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       </div>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="text-[10px] font-bold text-[#00D4AA] uppercase tracking-widest mb-2">
+        <div className="text-[10px] font-bold text-[#FFB703] uppercase tracking-widest mb-2">
           STREAMING STRUCTURED INSPECTION DOSSIER
         </div>
-        <div className="flex-1 overflow-y-auto space-y-1.5 border border-[#0D2E4A] p-2 bg-[#030B14]">
+        <div className="flex-1 overflow-y-auto space-y-1.5 border border-[#162136] p-2 bg-[#05070B]">
           {confirmed.slice(0, reportRows).map((c) => {
-            const col = CLASS_COLORS[c.class] || '#00D4AA';
+            const col = CLASS_COLORS[c.class] || '#FFB703';
             return (
-              <div key={c.id} className="p-2 border border-[#0D2E4A] bg-[#05121F] text-[8.5px] font-mono">
+              <div key={c.id} className="p-2 border border-[#162136] bg-[#080D17] text-[8.5px] font-mono">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                  <span className="text-[#4A8090]">TARGET_ID:</span><span className="text-[#E0F7F4] font-bold">{c.id}</span>
-                  <span className="text-[#4A8090]">CLASS:</span><span style={{ color: col }} className="font-bold">{c.class}</span>
-                  <span className="text-[#4A8090]">CONFIDENCE:</span><span className="text-[#00D4AA]">{(c.confidence * 100).toFixed(1)}%</span>
-                  <span className="text-[#4A8090]">SHADOW LENGTH:</span><span className="text-[#E0F7F4]">{c.shadowLengthM}m relief</span>
-                  <span className="text-[#4A8090]">COORDINATES:</span><span className="text-[#00D4AA]">{c.lat.toFixed(4)}°N, {c.lon.toFixed(4)}°E</span>
+                  <span className="text-[#94A3B8]">TARGET_ID:</span><span className="text-[#F8FAFC] font-bold">{c.id}</span>
+                  <span className="text-[#94A3B8]">CLASS:</span><span style={{ color: col }} className="font-bold">{c.class}</span>
+                  <span className="text-[#94A3B8]">CONFIDENCE:</span><span className="text-[#FFB703]">{(c.confidence * 100).toFixed(1)}%</span>
+                  <span className="text-[#94A3B8]">SHADOW LENGTH:</span><span className="text-[#F8FAFC]">{c.shadowLengthM}m relief</span>
+                  <span className="text-[#94A3B8]">COORDINATES:</span><span className="text-[#FFB703]">{c.lat.toFixed(4)}°N, {c.lon.toFixed(4)}°E</span>
                 </div>
               </div>
             );
@@ -810,12 +810,12 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
         <div className="mt-3 space-y-2">
           <button
             onClick={onComplete}
-            className="w-full flex items-center justify-center gap-2.5 px-4 py-3 bg-[#00D4AA] text-[#030B14] font-black text-sm border border-[#00D4AA] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_25px_rgba(0,212,170,0.55)] animate-pulse"
+            className="w-full flex items-center justify-center gap-2.5 px-4 py-3 bg-[#FFB703] text-[#05070B] font-black text-sm border border-[#FFB703] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_25px_rgba(255, 183, 3, )] animate-pulse"
           >
             <span>⚡ ENTER MISSION CONTROL</span>
             <ArrowRight className="w-4 h-4" />
           </button>
-          <div className="text-center text-[8.5px] text-[#4A8090]">
+          <div className="text-center text-[8.5px] text-[#94A3B8]">
             Full pipeline verified · Click to enter Mission Control or auto-advancing in 5s
           </div>
         </div>
@@ -826,17 +826,17 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
   const needsCanvas = scene >= 1 && scene <= 6;
 
   return (
-    <div className="fixed inset-0 bg-[#01050A] z-50 flex flex-col font-mono text-[#E0F7F4] select-none">
+    <div className="fixed inset-0 bg-[#01050A] z-50 flex flex-col font-mono text-[#F8FAFC] select-none">
       {/* Top Progress Rail */}
-      <div className="shrink-0 px-6 py-2.5 border-b border-[#0D2E4A] bg-[#05121F] flex items-center gap-4">
-        <div className="text-[9px] font-bold text-[#00D4AA] uppercase tracking-widest shrink-0">
+      <div className="shrink-0 px-6 py-2.5 border-b border-[#162136] bg-[#080D17] flex items-center gap-4">
+        <div className="text-[9px] font-bold text-[#FFB703] uppercase tracking-widest shrink-0">
           CINEMATIC DEMO
         </div>
         <div className="flex-1">{renderProgressRail()}</div>
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onComplete}
-            className="flex items-center gap-1.5 px-3 py-1 bg-[#00D4AA] text-[#030B14] font-bold text-[9px] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,212,170,0.3)]"
+            className="flex items-center gap-1.5 px-3 py-1 bg-[#FFB703] text-[#05070B] font-bold text-[9px] cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_15px_rgba(255, 183, 3, )]"
             title="Jump directly to interactive Mission Control"
           >
             <span>⚡ MISSION CONTROL</span>
@@ -849,7 +849,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
                 if (autoTimer.current) clearTimeout(autoTimer.current);
                 advance();
               }}
-              className="flex items-center gap-1 px-2.5 py-1 border border-[#0D2E4A] text-[#4A8090] hover:text-[#00D4AA] hover:border-[#00D4AA]/50 text-[8.5px] font-bold cursor-pointer transition-all"
+              className="flex items-center gap-1 px-2.5 py-1 border border-[#162136] text-[#94A3B8] hover:text-[#FFB703] hover:border-[#FFB703]/50 text-[8.5px] font-bold cursor-pointer transition-all"
               title="Skip scene (Space or →)"
             >
               <SkipForward className="w-3 h-3" />
@@ -858,7 +858,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
           )}
           <button
             onClick={onComplete}
-            className="p-1 text-[#4A8090] hover:text-[#EF4444] cursor-pointer transition-colors"
+            className="p-1 text-[#94A3B8] hover:text-[#EF4444] cursor-pointer transition-colors"
             title="Exit to Mission Control"
           >
             <X className="w-4 h-4" />
@@ -891,7 +891,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
             {/* Cinematic Scan Line (Scene 4 & 5) */}
             {(scene === 4 || scene === 5) && (
               <div 
-                className="absolute left-0 right-0 h-1 bg-[#00D4AA] shadow-[0_0_20px_4px_#00D4AA] opacity-80"
+                className="absolute left-0 right-0 h-1 bg-[#FFB703] shadow-[0_0_20px_4px_#FFB703] opacity-80"
                 style={{
                   top: '-10%',
                   animation: 'sweepDown 3.8s linear forwards'
@@ -916,25 +916,25 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       </div>
 
       {/* Bottom Caption Bar */}
-      <div className="shrink-0 px-6 py-3 border-t border-[#0D2E4A] bg-[#05121F] flex items-center justify-between gap-4">
+      <div className="shrink-0 px-6 py-3 border-t border-[#162136] bg-[#080D17] flex items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
           {scene > 0 && scene < 7 && (
-            <p className="text-[11px] text-[#E0F7F4] font-mono leading-snug scene-enter">
+            <p className="text-[11px] text-[#F8FAFC] font-mono leading-snug scene-enter">
               {SCENE_CAPTIONS[scene]}
             </p>
           )}
           {scene === 0 && (
-            <p className="text-[10px] text-[#00D4AA] font-mono">
+            <p className="text-[10px] text-[#FFB703] font-mono">
               The automated pipeline you are about to see is built specifically for this mission.
             </p>
           )}
           {scene === 7 && (
-            <p className="text-[11px] text-[#E0F7F4] font-mono">
+            <p className="text-[11px] text-[#F8FAFC] font-mono">
               {SCENE_CAPTIONS[7]}
             </p>
           )}
         </div>
-        <div className="text-[8.5px] text-[#4A8090] shrink-0">
+        <div className="text-[8.5px] text-[#94A3B8] shrink-0">
           {scene < TOTAL_SCENES - 1 ? 'Auto-advancing  ·  Space / → to skip' : 'Click ENTER MISSION CONTROL'}
         </div>
       </div>

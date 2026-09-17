@@ -203,14 +203,14 @@ export const SonarWaterfallPanel: React.FC = () => {
       {/* Toolbar */}
       <div className="flex items-center justify-between px-3 py-2 bg-[#081118] border-b border-[#16303B] shrink-0">
         <div className="flex items-center gap-1.5">
-          <Eye className="w-3 h-3 text-[#32E6D1]" />
+          <Eye className="w-3 h-3 text-[#FFB703]" />
           <span className="text-[9px] font-mono font-black text-[#66848D] uppercase tracking-widest">Sonar Waterfall</span>
-          <span className="ml-2 text-[9px] font-mono text-[#32E6D1]">900 kHz · Range 75m</span>
+          <span className="ml-2 text-[9px] font-mono text-[#FFB703]">900 kHz · Range 75m</span>
         </div>
         <div className="flex items-center gap-1 text-[9px] font-mono">
           {['PORT', 'STBD', 'GAIN', 'CONTRAST', 'TARGETS'].map(label => (
             <button key={label}
-              className="px-2 py-0.5 rounded bg-[#0C171E] border border-[#16303B] text-[#66848D] hover:text-[#32E6D1] hover:border-[#32E6D1]/40 transition-colors">
+              className="px-2 py-0.5 rounded bg-[#0C171E] border border-[#16303B] text-[#66848D] hover:text-[#FFB703] hover:border-[#FFB703]/40 transition-colors">
               {label}
             </button>
           ))}
@@ -226,7 +226,7 @@ export const SonarWaterfallPanel: React.FC = () => {
           style={{ display: 'block' }}
         />
         {/* Ping counter overlay */}
-        <div className="absolute top-2 right-2 px-2 py-1 rounded bg-[#03070B]/80 border border-[#16303B] text-[9px] font-mono text-[#32E6D1]">
+        <div className="absolute top-2 right-2 px-2 py-1 rounded bg-[#03070B]/80 border border-[#16303B] text-[9px] font-mono text-[#FFB703]">
           PING {Math.floor(playbackTime * 10).toLocaleString().padStart(7, '0')}
         </div>
         {visibleTargetIds.length === 0 && (

@@ -93,18 +93,18 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200 font-sans">
-      <div className="relative w-full max-w-3xl bg-[#05121F] border-2 border-[#00D4AA]/60 rounded-2xl shadow-[0_20px_70px_rgba(0,0,0,0.9),0_0_35px_rgba(0,212,170,0.25)] text-[#E0F7F4] overflow-hidden my-auto">
+      <div className="relative w-full max-w-3xl bg-[#080D17] border-2 border-[#FFB703]/60 rounded-2xl shadow-[0_20px_70px_rgba(0,0,0,0.9),0_0_35px_rgba(255, 183, 3, )] text-[#F8FAFC] overflow-hidden my-auto">
         {/* Top Control Bar */}
-        <div className="bg-[#030B14] px-5 py-3 border-b border-[#0D2E4A] flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs font-mono text-[#00D4AA] font-bold">
-            <ShieldCheck className="w-4 h-4 text-[#00D4AA]" />
+        <div className="bg-[#05070B] px-5 py-3 border-b border-[#162136] flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-mono text-[#FFB703] font-bold">
+            <ShieldCheck className="w-4 h-4 text-[#FFB703]" />
             <span>OFFICIAL CLEARANCE CERTIFICATE · MOES / NIOT PROTOCOL</span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0D2640] border border-[#1A4E6A] hover:border-[#00D4AA] text-[#E0F7F4] hover:text-[#00D4AA] text-xs font-mono font-bold rounded cursor-pointer transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0D2640] border border-[#1A4E6A] hover:border-[#FFB703] text-[#F8FAFC] hover:text-[#FFB703] text-xs font-mono font-bold rounded cursor-pointer transition-all"
               title="Print official document"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -113,7 +113,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
 
             <button
               onClick={handleDownloadJSON}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00D4AA] text-[#030B14] hover:bg-[#5EFFD8] text-xs font-mono font-black rounded cursor-pointer transition-all shadow-[0_0_10px_rgba(0,212,170,0.3)]"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#FFB703] text-[#05070B] hover:bg-[#5EFFD8] text-xs font-mono font-black rounded cursor-pointer transition-all shadow-[0_0_10px_rgba(255, 183, 3, )]"
               title="Download signed JSON metadata"
             >
               <Download className="w-3.5 h-3.5" />
@@ -130,22 +130,22 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
         </div>
 
         {/* Printable Official Certificate Body */}
-        <div id="moes-printable-certificate" className="p-6 md:p-8 space-y-6 text-xs bg-gradient-to-b from-[#05121F] to-[#030B14]">
+        <div id="moes-printable-certificate" className="p-6 md:p-8 space-y-6 text-xs bg-gradient-to-b from-[#080D17] to-[#05070B]">
           {/* Government Official Letterhead */}
-          <div className="text-center border-b border-[#0D2E4A] pb-5 space-y-1">
-            <div className="inline-block px-3 py-1 bg-[#082830] border border-[#00D4AA]/40 rounded-full text-[10px] font-mono font-bold text-[#00D4AA] tracking-widest uppercase mb-1">
+          <div className="text-center border-b border-[#162136] pb-5 space-y-1">
+            <div className="inline-block px-3 py-1 bg-[#131B2A] border border-[#FFB703]/40 rounded-full text-[10px] font-mono font-bold text-[#FFB703] tracking-widest uppercase mb-1">
               GOVERNMENT OF INDIA // MINISTRY OF EARTH SCIENCES
             </div>
-            <h1 className="text-lg md:text-xl font-black tracking-tight text-[#E0F7F4] uppercase font-sans">
+            <h1 className="text-lg md:text-xl font-black tracking-tight text-[#F8FAFC] uppercase font-sans">
               NATIONAL INSTITUTE OF OCEAN TECHNOLOGY (NIOT)
             </h1>
             <h2 className="text-xs font-mono font-bold text-[#38BDF8] tracking-widest uppercase">
               DEEP OCEAN MISSION · SUBSEA MARINE DEBRIS HAZARD CLEARANCE CERTIFICATE
             </h2>
             <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-[#94A3B8] pt-1">
-              <span>CERTIFICATE REF: <strong className="text-[#E0F7F4]">{certRef}</strong></span>
+              <span>CERTIFICATE REF: <strong className="text-[#F8FAFC]">{certRef}</strong></span>
               <span>•</span>
-              <span>SURVEY ID: <strong className="text-[#E0F7F4]">MX-026</strong></span>
+              <span>SURVEY ID: <strong className="text-[#F8FAFC]">MX-026</strong></span>
               <span>•</span>
               <span>WGS-84 UTM ZONE 43N</span>
             </div>
@@ -154,8 +154,8 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
           {/* Target Metadata & Verification Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
             {/* Box 1: Acoustic Target Parameters */}
-            <div className="p-4 bg-[#081525] border border-[#0D2E4A] rounded-xl space-y-2.5">
-              <div className="text-[10px] font-bold text-[#00D4AA] uppercase tracking-wider flex items-center gap-1.5 border-b border-[#0D2E4A] pb-1.5">
+            <div className="p-4 bg-[#081525] border border-[#162136] rounded-xl space-y-2.5">
+              <div className="text-[10px] font-bold text-[#FFB703] uppercase tracking-wider flex items-center gap-1.5 border-b border-[#162136] pb-1.5">
                 <Anchor className="w-3.5 h-3.5" />
                 <span>ACOUSTIC TARGET CLASSIFICATION</span>
               </div>
@@ -163,15 +163,15 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
               <div className="grid grid-cols-2 gap-2 text-[11px]">
                 <div>
                   <span className="text-[#94A3B8] text-[9px] uppercase block">TARGET DESIGNATION</span>
-                  <strong className="text-[#E0F7F4] text-sm">{targetId}</strong>
+                  <strong className="text-[#F8FAFC] text-sm">{targetId}</strong>
                 </div>
                 <div>
                   <span className="text-[#94A3B8] text-[9px] uppercase block">MODEL CONFIDENCE</span>
-                  <strong className="text-[#00D4AA] text-sm">{confidence}% VERIFIED</strong>
+                  <strong className="text-[#FFB703] text-sm">{confidence}% VERIFIED</strong>
                 </div>
                 <div>
                   <span className="text-[#94A3B8] text-[9px] uppercase block">CLASSIFICATION</span>
-                  <strong className="text-[#E0F7F4]">{targetClass}</strong>
+                  <strong className="text-[#F8FAFC]">{targetClass}</strong>
                 </div>
                 <div>
                   <span className="text-[#94A3B8] text-[9px] uppercase block">TAXONOMY CODE</span>
@@ -181,8 +181,8 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
             </div>
 
             {/* Box 2: Geospatial & Depth Sounding */}
-            <div className="p-4 bg-[#081525] border border-[#0D2E4A] rounded-xl space-y-2.5">
-              <div className="text-[10px] font-bold text-[#38BDF8] uppercase tracking-wider flex items-center gap-1.5 border-b border-[#0D2E4A] pb-1.5">
+            <div className="p-4 bg-[#081525] border border-[#162136] rounded-xl space-y-2.5">
+              <div className="text-[10px] font-bold text-[#38BDF8] uppercase tracking-wider flex items-center gap-1.5 border-b border-[#162136] pb-1.5">
                 <Compass className="w-3.5 h-3.5" />
                 <span>GEOSPATIAL & PHYSICAL RELIEF</span>
               </div>
@@ -190,34 +190,34 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
               <div className="grid grid-cols-2 gap-2 text-[11px]">
                 <div>
                   <span className="text-[#94A3B8] text-[9px] uppercase block">WGS-84 LATITUDE</span>
-                  <strong className="text-[#E0F7F4]">{lat.toFixed(4)}° N</strong>
+                  <strong className="text-[#F8FAFC]">{lat.toFixed(4)}° N</strong>
                 </div>
                 <div>
                   <span className="text-[#94A3B8] text-[9px] uppercase block">WGS-84 LONGITUDE</span>
-                  <strong className="text-[#E0F7F4]">{lon.toFixed(4)}° E</strong>
+                  <strong className="text-[#F8FAFC]">{lon.toFixed(4)}° E</strong>
                 </div>
                 <div>
                   <span className="text-[#94A3B8] text-[9px] uppercase block">BATHYMETRY DEPTH</span>
-                  <strong className="text-[#E0F7F4]">{depth.toFixed(1)} Meters</strong>
+                  <strong className="text-[#F8FAFC]">{depth.toFixed(1)} Meters</strong>
                 </div>
                 <div>
                   <span className="text-[#94A3B8] text-[9px] uppercase block">HEIGHT PROUD OF SEABED</span>
-                  <strong className="text-[#00D4AA]">{calculatedHeight} m (Ray-Traced)</strong>
+                  <strong className="text-[#FFB703]">{calculatedHeight} m (Ray-Traced)</strong>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Cryptographic Proof & SHA-256 Signature */}
-          <div className="p-3.5 bg-[#030B14] border border-[#0D2E4A] rounded-xl space-y-1 font-mono text-[10px]">
+          <div className="p-3.5 bg-[#05070B] border border-[#162136] rounded-xl space-y-1 font-mono text-[10px]">
             <div className="flex items-center justify-between text-[#94A3B8]">
-              <span className="uppercase font-bold text-[#00D4AA] flex items-center gap-1.5">
+              <span className="uppercase font-bold text-[#FFB703] flex items-center gap-1.5">
                 <FileCheck className="w-3.5 h-3.5" />
                 <span>TAMPER-EVIDENT CRYPTOGRAPHIC TELEMETRY HASH (SHA-256)</span>
               </span>
               <span className="text-[9px] text-[#94A3B8]">RAW SSS ACOUSTIC STREAM</span>
             </div>
-            <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded text-[9.5px] text-[#E0F7F4] break-all font-mono">
+            <div className="p-2 bg-[#080D17] border border-[#162136] rounded text-[9.5px] text-[#F8FAFC] break-all font-mono">
               {sha256Hash}
             </div>
             <p className="text-[#94A3B8] text-[8.5px] leading-tight">
@@ -238,29 +238,29 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[10px] font-mono pt-1">
-              <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded">
+              <div className="p-2 bg-[#080D17] border border-[#162136] rounded">
                 <span className="text-[#94A3B8] block text-[8px] uppercase">RECOMMENDED ASSET</span>
-                <strong className="text-[#E0F7F4] text-[10.5px]">Class-III Heavy ROV</strong>
+                <strong className="text-[#F8FAFC] text-[10.5px]">Class-III Heavy ROV</strong>
                 <p className="text-[#94A3B8] text-[8.5px] mt-0.5">Samudrayaan / NIOT Support Ship</p>
               </div>
-              <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded">
+              <div className="p-2 bg-[#080D17] border border-[#162136] rounded">
                 <span className="text-[#94A3B8] block text-[8px] uppercase">SALVAGE TOOLING</span>
                 <strong className="text-[#38BDF8] text-[10.5px]">Hydraulic Guillotine Cutter</strong>
                 <p className="text-[#94A3B8] text-[8.5px] mt-0.5">Heavy Drag Net Wire Grapple</p>
               </div>
-              <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded">
+              <div className="p-2 bg-[#080D17] border border-[#162136] rounded">
                 <span className="text-[#94A3B8] block text-[8px] uppercase">HAZARD MITIGATION</span>
-                <strong className="text-[#00D4AA] text-[10.5px]">Ghost Fishing Prevention</strong>
+                <strong className="text-[#FFB703] text-[10.5px]">Ghost Fishing Prevention</strong>
                 <p className="text-[#94A3B8] text-[8.5px] mt-0.5">Eliminates ALDFG marine mortality</p>
               </div>
             </div>
           </div>
 
           {/* Official Sign-Off Seals */}
-          <div className="pt-4 border-t border-[#0D2E4A] flex flex-wrap items-center justify-between gap-4 font-mono text-[10px]">
+          <div className="pt-4 border-t border-[#162136] flex flex-wrap items-center justify-between gap-4 font-mono text-[10px]">
             <div className="space-y-1">
               <div className="text-[9px] text-[#94A3B8] uppercase">DIGITAL VERIFICATION AUTHORITY</div>
-              <div className="flex items-center gap-1.5 text-[#00D4AA] font-bold">
+              <div className="flex items-center gap-1.5 text-[#FFB703] font-bold">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>SONARX AUTONOMOUS ACOUSTIC PIPELINE · CERTIFIED COMPLIANT</span>
               </div>
@@ -269,7 +269,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
 
             <div className="text-right space-y-1">
               <div className="text-[9px] text-[#94A3B8] uppercase">ISSUED AT MUMBAI MARITIME THEATRE</div>
-              <div className="text-[#E0F7F4] font-bold">CHIEF HYDROGRAPHER VERIFIED</div>
+              <div className="text-[#F8FAFC] font-bold">CHIEF HYDROGRAPHER VERIFIED</div>
               <div className="text-[8.5px] text-[#38BDF8]">NATIONAL HYDROGRAPHIC OFFICE (NHO)</div>
             </div>
           </div>

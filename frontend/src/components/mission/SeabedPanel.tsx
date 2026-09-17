@@ -208,8 +208,8 @@ export const SeabedPanel: React.FC = () => {
         const p = project(cgi, cgj, h + 0.1, W, H, ry, rx);
         ctx.beginPath();
         ctx.arc(p.sx, p.sy, 4 * pulse, 0, Math.PI * 2);
-        ctx.fillStyle = '#32E6D1';
-        ctx.shadowColor = '#32E6D1';
+        ctx.fillStyle = '#FFB703';
+        ctx.shadowColor = '#FFB703';
         ctx.shadowBlur = 10;
         ctx.fill();
         ctx.shadowBlur = 0;

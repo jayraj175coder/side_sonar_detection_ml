@@ -38,7 +38,7 @@ export const PipelineStatusRail: React.FC<PipelineStatusRailProps> = ({
     <div className="w-full bg-[#081118] border border-[#16303B] rounded-2xl p-3.5 shadow-xl font-mono select-none">
       <div className="flex items-center justify-between mb-2 px-1">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-[#32E6D1] animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-[#FFB703] animate-pulse" />
           <span className="text-[11px] font-black tracking-widest text-[#E4F2F5] uppercase font-sans">
             AUTOMATED AI PERCEPTION PIPELINE
           </span>
@@ -48,7 +48,7 @@ export const PipelineStatusRail: React.FC<PipelineStatusRailProps> = ({
           <span
             className={`font-bold px-2 py-0.5 rounded-full ${
               isProcessing
-                ? 'bg-[#32E6D1]/20 text-[#32E6D1] border border-[#32E6D1]/40 animate-pulse'
+                ? 'bg-[#FFB703]/20 text-[#FFB703] border border-[#FFB703]/40 animate-pulse'
                 : 'bg-[#65D391]/20 text-[#65D391] border border-[#65D391]/40'
             }`}
           >
@@ -71,7 +71,7 @@ export const PipelineStatusRail: React.FC<PipelineStatusRailProps> = ({
               <div
                 className={`p-2.5 rounded-xl border transition-all duration-300 flex flex-col justify-between min-h-[74px] ${
                   isCurrent
-                    ? 'bg-gradient-to-b from-[#32E6D1]/20 to-[#0C171E] border-[#32E6D1] shadow-[0_0_15px_rgba(50,230,209,0.3)] scale-[1.02]'
+                    ? 'bg-gradient-to-b from-[#FFB703]/20 to-[#0C171E] border-[#FFB703] shadow-[0_0_15px_rgba(50,230,209,0.3)] scale-[1.02]'
                     : isDone
                     ? 'bg-[#0C171E] border-[#65D391]/50 text-[#E4F2F5]'
                     : 'bg-[#081118]/60 border-[#16303B]/60 text-[#6F8992] opacity-70'
@@ -83,7 +83,7 @@ export const PipelineStatusRail: React.FC<PipelineStatusRailProps> = ({
                     <div
                       className={`w-5 h-5 rounded-lg flex items-center justify-center text-[10px] font-bold ${
                         isCurrent
-                          ? 'bg-[#32E6D1] text-[#03070B]'
+                          ? 'bg-[#FFB703] text-[#03070B]'
                           : isDone
                           ? 'bg-[#65D391]/20 text-[#65D391]'
                           : 'bg-[#16303B] text-[#6F8992]'
@@ -106,7 +106,7 @@ export const PipelineStatusRail: React.FC<PipelineStatusRailProps> = ({
                   <span
                     className={`text-[8px] font-mono px-1.5 py-0.2 rounded font-bold ${
                       isCurrent
-                        ? 'bg-[#32E6D1] text-[#03070B]'
+                        ? 'bg-[#FFB703] text-[#03070B]'
                         : isDone
                         ? 'bg-[#65D391]/20 text-[#65D391]'
                         : 'bg-[#16303B] text-[#6F8992]'
@@ -124,7 +124,7 @@ export const PipelineStatusRail: React.FC<PipelineStatusRailProps> = ({
                 {/* Timestamp & Duration Metrics */}
                 <div className="flex items-center justify-between text-[8px] text-[#6F8992] pt-1 border-t border-[#16303B]/40 mt-1">
                   <span className="font-mono">{stage.timestamp || '--:--:--'}</span>
-                  <span className={`font-mono font-bold ${isDone ? 'text-[#32E6D1]' : ''}`}>
+                  <span className={`font-mono font-bold ${isDone ? 'text-[#FFB703]' : ''}`}>
                     {isDone ? `${stage.durationMs}ms` : isCurrent ? 'running...' : 'pending'}
                   </span>
                 </div>

@@ -80,8 +80,8 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
 
     // 1. Acoustic Return Specular Highlight
     ctx.save();
-    ctx.fillStyle = '#32E6D1';
-    ctx.shadowColor = '#32E6D1';
+    ctx.fillStyle = '#FFB703';
+    ctx.shadowColor = '#FFB703';
     ctx.shadowBlur = 12;
     ctx.beginPath();
     ctx.ellipse(
@@ -116,18 +116,18 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
     const boxW = targetW + 8;
     const boxH = targetH + 8;
 
-    ctx.strokeStyle = '#32E6D1';
+    ctx.strokeStyle = '#FFB703';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(boxX, boxY, boxW, boxH);
 
     // Detection Label Pill
     ctx.fillStyle = '#081118';
     ctx.fillRect(boxX, boxY - 14, 110, 12);
-    ctx.strokeStyle = '#32E6D1';
+    ctx.strokeStyle = '#FFB703';
     ctx.lineWidth = 0.8;
     ctx.strokeRect(boxX, boxY - 14, 110, 12);
 
-    ctx.fillStyle = '#32E6D1';
+    ctx.fillStyle = '#FFB703';
     ctx.font = 'bold 7.5px "JetBrains Mono", monospace';
     ctx.fillText(
       `AI: ${(target.confidence * 100).toFixed(1)}% · ${target.length}m×${target.width}m`,
@@ -137,7 +137,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
     ctx.restore();
 
     // 1m Scale bar
-    ctx.fillStyle = '#32E6D1';
+    ctx.fillStyle = '#FFB703';
     ctx.fillRect(14, H - 14, 25, 2);
     ctx.font = '8px "JetBrains Mono", monospace';
     ctx.fillText('1.0m SCALE', 44, H - 10);
@@ -212,7 +212,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
       <div className="p-3.5 border-b border-[#16303B] bg-[#0C171E] shrink-0 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-[#32E6D1] text-[#03070B] font-mono">
+            <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-[#FFB703] text-[#03070B] font-mono">
               {target.id}
             </span>
             <h3 className="text-sm font-black text-[#E4F2F5] tracking-wide font-sans truncate">
@@ -224,7 +224,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
             className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${
               target.risk === 'CRITICAL' || target.risk === 'HIGH'
                 ? 'bg-[#FF5D5D]/20 text-[#FF5D5D] border-[#FF5D5D]/40'
-                : 'bg-[#32E6D1]/20 text-[#32E6D1] border-[#32E6D1]/40'
+                : 'bg-[#FFB703]/20 text-[#FFB703] border-[#FFB703]/40'
             }`}
           >
             {target.risk === 'CRITICAL' ? 'HIGH PRIORITY' : target.risk}
@@ -236,7 +236,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
           <span className="text-[10px] text-[#6F8992] uppercase tracking-wider font-bold">
             AI CONFIDENCE
           </span>
-          <span className="text-xl font-extrabold text-[#32E6D1] font-mono">
+          <span className="text-xl font-extrabold text-[#FFB703] font-mono">
             {(target.confidence * 100).toFixed(1)}%
           </span>
         </div>
@@ -257,7 +257,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
 
           <div className="p-2.5 rounded-xl bg-[#0C171E] border border-[#16303B] space-y-0.5">
             <span className="text-[9px] text-[#6F8992] uppercase block">Acoustic Shadow</span>
-            <strong className="text-sm font-bold text-[#32E6D1] font-mono">{target.shadowLength} m</strong>
+            <strong className="text-sm font-bold text-[#FFB703] font-mono">{target.shadowLength} m</strong>
           </div>
 
           <div className="p-2.5 rounded-xl bg-[#0C171E] border border-[#16303B] space-y-0.5">
@@ -280,7 +280,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
 
         {/* 4. WHY SONARX FLAGGED THIS (Visual Confidence Bars) */}
         <div className="p-3 rounded-2xl bg-[#0C171E] border border-[#16303B] space-y-2.5">
-          <span className="text-[10px] font-black text-[#32E6D1] uppercase tracking-wider block font-sans">
+          <span className="text-[10px] font-black text-[#FFB703] uppercase tracking-wider block font-sans">
             WHY SONARX FLAGGED THIS
           </span>
 
@@ -299,7 +299,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
                 </div>
                 <div className="h-1.5 bg-[#081118] rounded-full overflow-hidden border border-[#16303B]/60">
                   <div
-                    className="h-full bg-gradient-to-r from-[#32E6D1] to-[#29B6F6] rounded-full transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-[#FFB703] to-[#29B6F6] rounded-full transition-all duration-500"
                     style={{ width: `${val}%` }}
                   />
                 </div>
@@ -328,7 +328,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
         <div className="p-3 rounded-2xl bg-[#0C171E] border border-[#16303B] space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black text-[#E4F2F5] uppercase tracking-wider flex items-center gap-1.5 font-sans">
-              <UserCheck className="w-3.5 h-3.5 text-[#32E6D1]" />
+              <UserCheck className="w-3.5 h-3.5 text-[#FFB703]" />
               <span>HUMAN ANALYST AUDIT QUEUE</span>
             </span>
 
@@ -382,7 +382,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
             onClick={() => setFocusedPanel(focusedPanel === 'seabed' ? null : 'seabed')}
             className="px-3 py-2 rounded-xl bg-[#0C171E] hover:bg-[#16303B] border border-[#16303B] text-[10px] font-bold text-[#E4F2F5] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md"
           >
-            <Box className="w-3.5 h-3.5 text-[#32E6D1]" />
+            <Box className="w-3.5 h-3.5 text-[#FFB703]" />
             <span>View in 3D</span>
           </button>
 
@@ -390,7 +390,7 @@ export const ContactInspector: React.FC<{ onCollapse?: () => void }> = ({ onColl
             onClick={() => handleExportAnomaly('json')}
             className="px-3 py-2 rounded-xl bg-[#0C171E] hover:bg-[#16303B] border border-[#16303B] text-[10px] font-bold text-[#E4F2F5] flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md"
           >
-            {downloadSuccess ? <Check className="w-3.5 h-3.5 text-[#65D391]" /> : <Download className="w-3.5 h-3.5 text-[#32E6D1]" />}
+            {downloadSuccess ? <Check className="w-3.5 h-3.5 text-[#65D391]" /> : <Download className="w-3.5 h-3.5 text-[#FFB703]" />}
             <span>{downloadSuccess ? 'Saved' : 'Export Dossier'}</span>
           </button>
         </div>

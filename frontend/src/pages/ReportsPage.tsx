@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { MISSION_TARGETS } from '../data/targets';
+import { SonarxLogo } from '../components/common/SonarxLogo';
 
 type SortField = 'id' | 'class' | 'confidence' | 'depth' | 'risk';
 type SortOrder = 'asc' | 'desc';
@@ -220,46 +221,46 @@ export const ReportsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 font-sans select-none text-xs text-[#E0F7F4]">
+    <div className="space-y-6 font-sans select-none text-xs text-slate-200">
       {/* 1. Header Toolbar */}
-      <div className="p-4 bg-[#05121F] border border-[#0D2E4A] rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden shadow-lg">
+      <div className="p-4 subpixel-card rounded-2xl border border-white/[0.08] flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_15px_rgba(0,212,170,0.25)]">
+          <div className="w-10 h-10 rounded-xl bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shadow-[0_0_15px_rgba(255,183,3,0.2)]">
             <FileText className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-base font-black text-[#E0F7F4] uppercase tracking-wider">
+            <h1 className="text-base font-black text-white uppercase tracking-wider">
               REPORTS & ANOMALY DOSSIER
             </h1>
-            <p className="text-[10px] text-[#94A3B8]">
+            <p className="text-[10px] text-slate-400 font-mono">
               Ministry of Earth Sciences (MoES) Formal Survey Compliance Report · Scan {scanId}
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 flex-wrap text-xs">
+        <div className="flex items-center gap-2 flex-wrap text-xs font-mono">
           <button
             onClick={handleDownloadJson}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A1E30] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#E0F7F4] hover:text-[#00D4AA] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.1] hover:border-[#FFB703]/60 text-slate-300 hover:text-[#FFB703] transition-colors cursor-pointer"
             title="Download target register as structured JSON"
           >
-            {downloadJsonSuccess ? <Check className="w-3.5 h-3.5 text-[#00D4AA]" /> : <Download className="w-3.5 h-3.5" />}
+            {downloadJsonSuccess ? <Check className="w-3.5 h-3.5 text-[#FFB703]" /> : <Download className="w-3.5 h-3.5" />}
             <span>JSON</span>
           </button>
 
           <button
             onClick={handleDownloadCsv}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A1E30] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#E0F7F4] hover:text-[#00D4AA] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.1] hover:border-[#FFB703]/60 text-slate-300 hover:text-[#FFB703] transition-colors cursor-pointer"
             title="Download target register as CSV spreadsheet"
           >
-            {downloadCsvSuccess ? <Check className="w-3.5 h-3.5 text-[#00D4AA]" /> : <FileSpreadsheet className="w-3.5 h-3.5" />}
+            {downloadCsvSuccess ? <Check className="w-3.5 h-3.5 text-[#FFB703]" /> : <FileSpreadsheet className="w-3.5 h-3.5" />}
             <span>CSV</span>
           </button>
 
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#00D4AA] text-[#030B14] font-black hover:bg-[#00c098] transition-all cursor-pointer shadow-[0_0_12px_rgba(0,212,170,0.3)] active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#FFB703] text-[#05070B] font-black hover:bg-[#FCD34D] transition-all cursor-pointer shadow-[0_0_15px_rgba(255,183,3,0.3)] active:scale-95"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>PRINT / PDF DOSSIER</span>
@@ -268,111 +269,104 @@ export const ReportsPage: React.FC = () => {
       </div>
 
       {/* 2. Dynamic Report Document Container */}
-      <div className="bg-[#050B14] border border-[#102436] rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl print:border-none print:shadow-none print:p-0 print:bg-white print:text-black">
+      <div className="subpixel-card border border-white/[0.08] rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl print:border-none print:shadow-none print:p-0 print:bg-white print:text-black">
         {/* Document Header */}
-        <div className="border-b border-[#102436] pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-black text-white tracking-wider uppercase print:text-black">
-                SONAR<span className="text-[#00D4AA]">X</span>
-              </span>
-              <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[#082830] text-[#00D4AA] font-bold border border-[#00D4AA]/40 print:border-black print:text-black">
-                MoES SIH 26057 SPEC
-              </span>
-            </div>
-            <h2 className="text-base font-black text-[#00D4AA] uppercase print:text-black">
+        <div className="border-b border-white/[0.08] pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1.5">
+            <SonarxLogo size="sm" badge="MoES SIH 26057 SPEC" subtitle="" />
+            <h2 className="text-base font-black text-white uppercase print:text-black tracking-wide">
               SUBSEA MARINE DEBRIS ANOMALY DOSSIER
             </h2>
-            <p className="text-xs text-[#94A3B8] print:text-gray-600">
+            <p className="text-xs text-slate-400 print:text-gray-600">
               Ministry of Earth Sciences · WGS84 Automated Perception Report
             </p>
           </div>
 
           {/* Holographic Govt. of India / IHO S-44 Seal */}
-          <div className="flex items-center gap-3 p-2 px-3 rounded-xl bg-[#082830]/80 border border-[#00D4AA]/40 shadow-[0_0_20px_rgba(0,212,170,0.15)] print:hidden">
+          <div className="flex items-center gap-3 p-2.5 px-3.5 rounded-xl bg-[#FFB703]/5 border border-[#FFB703]/25 shadow-[0_0_20px_rgba(255,183,3,0.1)] print:hidden">
             <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
-              <div className="absolute inset-0 rounded-full border border-dashed border-[#00D4AA] animate-spin" style={{ animationDuration: '10s' }} />
-              <ShieldCheck className="w-5 h-5 text-[#00D4AA] animate-pulse" />
+              <div className="absolute inset-0 rounded-full border border-dashed border-[#FFB703] animate-spin" style={{ animationDuration: '10s' }} />
+              <ShieldCheck className="w-5 h-5 text-[#FFB703] animate-pulse" />
             </div>
             <div className="text-left text-[9px] font-mono leading-tight">
-              <span className="text-[#00D4AA] font-black block tracking-wider">IHO S-44 COMPLIANT</span>
-              <span className="text-[#94A3B8] block">SHA-256: 8f4a...29b6 (VERIFIED)</span>
+              <span className="text-[#FFB703] font-black block tracking-wider">IHO S-44 COMPLIANT</span>
+              <span className="text-slate-400 block">SHA-256: 8f4a...29b6 (VERIFIED)</span>
             </div>
           </div>
 
           {/* Mission & Sensor Specifications */}
-          <div className="text-right text-xs font-mono space-y-1 text-[#94A3B8] print:text-gray-600">
+          <div className="text-right text-xs font-mono space-y-1 text-slate-400 print:text-gray-600">
             <p>Scan ID: <strong className="text-white print:text-black">{scanId}</strong></p>
-            <p>File Swath: <span className="text-[#00D4AA] print:text-black">{filename}</span></p>
+            <p>File Swath: <span className="text-[#FFB703] print:text-black">{filename}</span></p>
             <p>Date: <span className="text-white print:text-black">{createdAt}</span></p>
-            <p>Model: <strong className="text-[#00D4AA] print:text-black">{modelName}</strong></p>
-            <p>Latency: <span className="text-[#38BDF8] print:text-black">{inferenceMs.toFixed(1)} ms</span></p>
+            <p>Model: <strong className="text-[#FFB703] print:text-black">{modelName}</strong></p>
+            <p>Latency: <span className="text-slate-300 print:text-black">{inferenceMs.toFixed(1)} ms</span></p>
           </div>
         </div>
 
         {/* Dynamic Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center font-mono">
-          <div className="p-3.5 bg-[#091522] border border-[#102436] rounded-xl print:border-gray-300">
-            <span className="text-[10px] text-[#94A3B8] uppercase block font-bold">TOTAL TARGETS</span>
+          <div className="p-3.5 bg-white/[0.02] border border-white/[0.08] rounded-xl print:border-gray-300">
+            <span className="text-[10px] text-slate-400 uppercase block font-bold">TOTAL TARGETS</span>
             <strong className="text-2xl font-black text-white print:text-black">{totalDetections}</strong>
-            <span className="text-[10px] text-[#00D4AA] block font-sans">YOLOv8s detections</span>
+            <span className="text-[10px] text-[#FFB703] block font-sans font-medium">YOLOv8s detections</span>
           </div>
 
-          <div className="p-3.5 bg-[#091522] border border-[#102436] rounded-xl print:border-gray-300">
-            <span className="text-[10px] text-[#00D4AA] uppercase block font-bold">GHOST NETS</span>
-            <strong className="text-2xl font-black text-[#00D4AA] print:text-black">
+          <div className="p-3.5 bg-white/[0.02] border border-white/[0.08] rounded-xl print:border-gray-300">
+            <span className="text-[10px] text-[#FFB703] uppercase block font-bold">GHOST NETS</span>
+            <strong className="text-2xl font-black text-[#FFB703] print:text-black">
               {activeScan ? activeScan.ghost_net_count : 1}
             </strong>
-            <span className="text-[10px] text-[#94A3B8] block font-sans">ALDFG Net Meshes</span>
+            <span className="text-[10px] text-slate-400 block font-sans font-medium">ALDFG Net Meshes</span>
           </div>
 
-          <div className="p-3.5 bg-[#091522] border border-[#102436] rounded-xl print:border-gray-300">
+          <div className="p-3.5 bg-white/[0.02] border border-white/[0.08] rounded-xl print:border-gray-300">
             <span className="text-[10px] text-[#F59E0B] uppercase block font-bold">ANTHROPOGENIC DEBRIS</span>
             <strong className="text-2xl font-black text-[#F59E0B] print:text-black">
               {activeScan ? activeScan.debris_count : 1}
             </strong>
-            <span className="text-[10px] text-[#94A3B8] block font-sans">Tires / Drums / Metal</span>
+            <span className="text-[10px] text-slate-400 block font-sans font-medium">Tires / Drums / Metal</span>
           </div>
 
-          <div className="p-3.5 bg-[#091522] border border-[#102436] rounded-xl print:border-gray-300">
+          <div className="p-3.5 bg-white/[0.02] border border-white/[0.08] rounded-xl print:border-gray-300">
             <span className="text-[10px] text-[#38BDF8] uppercase block font-bold">PIPELINE HAZARDS</span>
             <strong className="text-2xl font-black text-[#38BDF8] print:text-black">
               {activeScan ? activeScan.pipeline_count : 0}
             </strong>
-            <span className="text-[10px] text-[#94A3B8] block font-sans">Subsea Spans</span>
+            <span className="text-[10px] text-slate-400 block font-sans font-medium">Subsea Spans</span>
           </div>
         </div>
 
         {/* Flagship Hero Target Spotlight */}
-        <div className="p-4 bg-[#091522] border border-[#00D4AA]/40 rounded-xl space-y-3 print:border-gray-300">
+        <div className="p-4 bg-white/[0.02] border border-[#FFB703]/40 rounded-xl space-y-3 print:border-gray-300">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-black px-2.5 py-1 rounded bg-[#00D4AA] text-slate-950 uppercase">
+              <span className="text-xs font-black px-2.5 py-1 rounded bg-[#FFB703] text-[#05070B] uppercase font-mono">
                 PRIMARY TARGET: {heroTarget.id}
               </span>
               <h3 className="text-sm font-black text-white uppercase print:text-black">
                 {heroTarget.class}
               </h3>
             </div>
-            <span className="text-sm font-black text-[#00D4AA] font-mono print:text-black">
+            <span className="text-sm font-black text-[#FFB703] font-mono print:text-black">
               {(heroTarget.confidence * 100).toFixed(1)}% CONFIDENCE
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-            <div className="space-y-1.5 bg-[#050B14] p-3 rounded-xl border border-[#102436] font-mono print:border-gray-300">
-              <span className="text-[10px] text-[#94A3B8] uppercase block font-bold font-sans">GEOLOCATION & DIMENSIONS</span>
+            <div className="space-y-1.5 bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] font-mono print:border-gray-300">
+              <span className="text-[10px] text-slate-400 uppercase block font-bold font-sans">GEOLOCATION & DIMENSIONS</span>
               <p>Coordinates: <strong className="text-white print:text-black">{typeof heroTarget.lat === 'number' ? heroTarget.lat.toFixed(4) : heroTarget.lat}° N, {typeof heroTarget.lon === 'number' ? heroTarget.lon.toFixed(4) : heroTarget.lon}° E (WGS-84)</strong></p>
               <p>Seabed Depth: <strong className="text-white print:text-black">{heroTarget.depth} m</strong></p>
               <p>Target Dimensions: <strong className="text-white print:text-black">{heroTarget.length}m (L) × {heroTarget.width}m (W)</strong></p>
-              <p>Acoustic Shadow: <strong className="text-[#00D4AA] print:text-black">{heroTarget.shadowLength} m relief</strong></p>
+              <p>Acoustic Shadow: <strong className="text-[#FFB703] print:text-black">{heroTarget.shadowLength} m relief</strong></p>
             </div>
 
-            <div className="space-y-1.5 bg-[#050B14] p-3 rounded-xl border border-[#102436] font-mono print:border-gray-300">
-              <span className="text-[10px] text-[#94A3B8] uppercase block font-bold font-sans">EVIDENCE SCORES</span>
-              <p>YOLO BBox Precision: <strong className="text-[#00D4AA] print:text-black">{(heroTarget.confidence * 100).toFixed(1)}%</strong></p>
-              <p>Acoustic Shadow Relief: <strong className="text-[#00D4AA] print:text-black">96% Verified</strong></p>
-              <p>Backscatter Signature: <strong className="text-[#00D4AA] print:text-black">94% Matched</strong></p>
+            <div className="space-y-1.5 bg-white/[0.02] p-3 rounded-xl border border-white/[0.08] font-mono print:border-gray-300">
+              <span className="text-[10px] text-slate-400 uppercase block font-bold font-sans">EVIDENCE SCORES</span>
+              <p>YOLO BBox Precision: <strong className="text-[#FFB703] print:text-black">{(heroTarget.confidence * 100).toFixed(1)}%</strong></p>
+              <p>Acoustic Shadow Relief: <strong className="text-[#FFB703] print:text-black">96% Verified</strong></p>
+              <p>Backscatter Signature: <strong className="text-[#FFB703] print:text-black">94% Matched</strong></p>
             </div>
           </div>
         </div>
@@ -385,8 +379,8 @@ export const ReportsPage: React.FC = () => {
             </h4>
 
             {/* Category Filter Chips */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-              <span className="text-[10px] font-bold text-[#94A3B8] uppercase mr-1">FILTER:</span>
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-mono">
+              <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">FILTER:</span>
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
@@ -394,10 +388,10 @@ export const ReportsPage: React.FC = () => {
                     setSelectedCategory(cat);
                     setCurrentPage(1);
                   }}
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-bold transition-all cursor-pointer whitespace-nowrap ${
                     selectedCategory === cat
-                      ? 'bg-[#00D4AA] text-[#030B14] shadow-[0_0_10px_rgba(0,212,170,0.3)]'
-                      : 'bg-[#091522] border border-[#102436] text-[#94A3B8] hover:text-[#E0F7F4] hover:border-[#00D4AA]/40'
+                      ? 'bg-[#FFB703] text-[#05070B] shadow-[0_0_10px_rgba(255,183,3,0.3)]'
+                      : 'bg-white/[0.04] border border-white/[0.08] text-slate-400 hover:text-white hover:border-[#FFB703]/40'
                   }`}
                 >
                   {cat}
@@ -406,79 +400,79 @@ export const ReportsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-[#102436] bg-[#050B14] print:border-gray-300">
+          <div className="overflow-x-auto rounded-xl border border-white/[0.08] bg-white/[0.02] print:border-gray-300">
             <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-[#091522] text-[#94A3B8] border-b border-[#102436] print:bg-gray-100 print:text-black select-none">
+              <thead className="bg-white/[0.04] text-slate-400 border-b border-white/[0.08] print:bg-gray-100 print:text-black select-none">
                 <tr>
                   <th
                     onClick={() => handleSort('id')}
-                    className="py-2.5 px-3 cursor-pointer hover:text-[#00D4AA] transition-colors"
+                    className="py-2.5 px-3 cursor-pointer hover:text-[#FFB703] transition-colors"
                   >
                     <div className="flex items-center gap-1">
                       <span>ID</span>
-                      {sortField === 'id' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                      {sortField === 'id' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#FFB703]" /> : <ChevronDown className="w-3 h-3 text-[#FFB703]" />)}
                     </div>
                   </th>
                   <th
                     onClick={() => handleSort('class')}
-                    className="py-2.5 px-3 cursor-pointer hover:text-[#00D4AA] transition-colors"
+                    className="py-2.5 px-3 cursor-pointer hover:text-[#FFB703] transition-colors"
                   >
                     <div className="flex items-center gap-1">
                       <span>CLASS</span>
-                      {sortField === 'class' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                      {sortField === 'class' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#FFB703]" /> : <ChevronDown className="w-3 h-3 text-[#FFB703]" />)}
                     </div>
                   </th>
                   <th
                     onClick={() => handleSort('confidence')}
-                    className="py-2.5 px-3 text-right cursor-pointer hover:text-[#00D4AA] transition-colors"
+                    className="py-2.5 px-3 text-right cursor-pointer hover:text-[#FFB703] transition-colors"
                   >
                     <div className="flex items-center justify-end gap-1">
                       <span>CONFIDENCE</span>
-                      {sortField === 'confidence' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                      {sortField === 'confidence' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#FFB703]" /> : <ChevronDown className="w-3 h-3 text-[#FFB703]" />)}
                     </div>
                   </th>
                   <th className="py-2.5 px-3">LATITUDE</th>
                   <th className="py-2.5 px-3">LONGITUDE</th>
                   <th
                     onClick={() => handleSort('depth')}
-                    className="py-2.5 px-3 text-right cursor-pointer hover:text-[#00D4AA] transition-colors"
+                    className="py-2.5 px-3 text-right cursor-pointer hover:text-[#FFB703] transition-colors"
                   >
                     <div className="flex items-center justify-end gap-1">
                       <span>DEPTH</span>
-                      {sortField === 'depth' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                      {sortField === 'depth' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#FFB703]" /> : <ChevronDown className="w-3 h-3 text-[#FFB703]" />)}
                     </div>
                   </th>
                   <th className="py-2.5 px-3">SIZE</th>
                   <th
                     onClick={() => handleSort('risk')}
-                    className="py-2.5 px-3 cursor-pointer hover:text-[#00D4AA] transition-colors"
+                    className="py-2.5 px-3 cursor-pointer hover:text-[#FFB703] transition-colors"
                   >
                     <div className="flex items-center gap-1">
                       <span>PRIORITY</span>
-                      {sortField === 'risk' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#00D4AA]" /> : <ChevronDown className="w-3 h-3 text-[#00D4AA]" />)}
+                      {sortField === 'risk' && (sortOrder === 'asc' ? <ChevronUp className="w-3 h-3 text-[#FFB703]" /> : <ChevronDown className="w-3 h-3 text-[#FFB703]" />)}
                     </div>
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#102436] print:divide-gray-200">
+              <tbody className="divide-y divide-white/[0.06] print:divide-gray-200">
                 {paginatedList.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-6 text-center text-[#94A3B8]">
+                    <td colSpan={8} className="py-6 text-center text-slate-500">
                       No contacts found matching filter "{selectedCategory}".
                     </td>
                   </tr>
                 ) : (
                   paginatedList.map((t) => (
-                    <tr key={t.id} className="hover:bg-[#091522] transition-colors">
-                      <td className="py-2.5 px-3 font-bold text-[#00D4AA] print:text-black">{t.id}</td>
+                    <tr key={t.id} className="hover:bg-white/[0.03] transition-colors">
+                      <td className="py-2.5 px-3 font-bold text-[#FFB703] print:text-black">{t.id}</td>
                       <td className="py-2.5 px-3 text-white font-sans font-semibold print:text-black">{t.class}</td>
-                      <td className="py-2.5 px-3 text-right font-bold text-[#38BDF8] print:text-black">
+                      <td className="py-2.5 px-3 text-right font-bold text-white print:text-black">
                         {(t.confidence * 100).toFixed(1)}%
                       </td>
-                      <td className="py-2.5 px-3 text-[#94A3B8] print:text-black">{typeof t.lat === 'number' ? t.lat.toFixed(4) : t.lat}° N</td>
-                      <td className="py-2.5 px-3 text-[#94A3B8] print:text-black">{typeof t.lon === 'number' ? t.lon.toFixed(4) : t.lon}° E</td>
-                      <td className="py-2.5 px-3 text-right text-[#94A3B8] print:text-black">{typeof t.depth === 'number' ? t.depth.toFixed(1) : t.depth}m</td>
-                      <td className="py-2.5 px-3 text-[#94A3B8] print:text-black">{t.length}m × {t.width}m</td>
+                      <td className="py-2.5 px-3 text-slate-400 print:text-black">{typeof t.lat === 'number' ? t.lat.toFixed(4) : t.lat}° N</td>
+                      <td className="py-2.5 px-3 text-slate-400 print:text-black">{typeof t.lon === 'number' ? t.lon.toFixed(4) : t.lon}° E</td>
+                      <td className="py-2.5 px-3 text-right text-slate-400 print:text-black">{typeof t.depth === 'number' ? t.depth.toFixed(1) : t.depth}m</td>
+                      <td className="py-2.5 px-3 text-slate-400 print:text-black">{t.length}m × {t.width}m</td>
                       <td className="py-2.5 px-3 font-bold">
                         <span
                           className={`text-[10px] px-2 py-0.5 rounded font-mono ${
@@ -499,7 +493,7 @@ export const ReportsPage: React.FC = () => {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-2 px-1 text-xs text-[#94A3B8]">
+            <div className="flex items-center justify-between pt-2 px-1 text-xs text-slate-400">
               <div>
                 Showing {(currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, filteredAndSortedList.length)} of {filteredAndSortedList.length} targets
               </div>
@@ -508,19 +502,19 @@ export const ReportsPage: React.FC = () => {
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="p-1 rounded bg-[#091522] border border-[#102436] hover:border-[#00D4AA] disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-[#E0F7F4]"
+                  className="p-1 rounded bg-white/[0.04] border border-white/[0.08] hover:border-[#FFB703] disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-white"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
 
-                <div className="px-2 font-mono font-bold text-[#00D4AA]">
+                <div className="px-2 font-mono font-bold text-[#FFB703]">
                   Page {currentPage} of {totalPages}
                 </div>
 
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="p-1 rounded bg-[#091522] border border-[#102436] hover:border-[#00D4AA] disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-[#E0F7F4]"
+                  className="p-1 rounded bg-white/[0.04] border border-white/[0.08] hover:border-[#FFB703] disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-white"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

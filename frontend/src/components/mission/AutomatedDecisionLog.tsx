@@ -46,13 +46,13 @@ export const AutomatedDecisionLog: React.FC<AutomatedDecisionLogProps> = ({ logs
       {/* Header */}
       <div className="flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-[#32E6D1]" />
+          <Terminal className="w-4 h-4 text-[#FFB703]" />
           <h3 className="text-xs font-black text-[#E4F2F5] tracking-wider uppercase font-sans">
             AUTOMATED DECISION LOG
           </h3>
           {isLive && (
-            <span className="flex items-center gap-1 text-[8px] font-bold px-1.5 py-0.2 rounded bg-[#32E6D1]/20 text-[#32E6D1] border border-[#32E6D1]/40 animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#32E6D1]" />
+            <span className="flex items-center gap-1 text-[8px] font-bold px-1.5 py-0.2 rounded bg-[#FFB703]/20 text-[#FFB703] border border-[#FFB703]/40 animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703]" />
               STREAMING
             </span>
           )}
@@ -68,7 +68,7 @@ export const AutomatedDecisionLog: React.FC<AutomatedDecisionLogProps> = ({ logs
                 onClick={() => setFilterLevel(f)}
                 className={`px-2 py-0.5 font-bold transition-colors cursor-pointer ${
                   filterLevel === f
-                    ? 'bg-[#32E6D1] text-[#03070B]'
+                    ? 'bg-[#FFB703] text-[#03070B]'
                     : 'text-[#6F8992] hover:text-[#E4F2F5]'
                 }`}
               >
@@ -79,7 +79,7 @@ export const AutomatedDecisionLog: React.FC<AutomatedDecisionLogProps> = ({ logs
 
           <button
             onClick={handleCopyLogs}
-            className="p-1 rounded-lg bg-[#0C171E] border border-[#16303B] text-[#6F8992] hover:text-[#32E6D1] transition-colors cursor-pointer"
+            className="p-1 rounded-lg bg-[#0C171E] border border-[#16303B] text-[#6F8992] hover:text-[#FFB703] transition-colors cursor-pointer"
             title="Copy decision log"
           >
             {copied ? <Check className="w-3 h-3 text-[#65D391]" /> : <Copy className="w-3 h-3" />}
@@ -102,8 +102,8 @@ export const AutomatedDecisionLog: React.FC<AutomatedDecisionLogProps> = ({ logs
             let stageBadgeColor = 'bg-[#16303B] text-[#6F8992]';
 
             if (log.level === 'success') {
-              textColor = 'text-[#32E6D1] font-semibold';
-              stageBadgeColor = 'bg-[#32E6D1]/20 text-[#32E6D1] border border-[#32E6D1]/40';
+              textColor = 'text-[#FFB703] font-semibold';
+              stageBadgeColor = 'bg-[#FFB703]/20 text-[#FFB703] border border-[#FFB703]/40';
             } else if (log.level === 'reject') {
               textColor = 'text-[#FF5D5D]';
               stageBadgeColor = 'bg-[#FF5D5D]/20 text-[#FF5D5D] border border-[#FF5D5D]/40';
@@ -128,8 +128,8 @@ export const AutomatedDecisionLog: React.FC<AutomatedDecisionLogProps> = ({ logs
 
         {/* Live Blinking Terminal Cursor */}
         {isLive && (
-          <div className="flex items-center gap-1 text-[#32E6D1] pt-1">
-            <span className="inline-block w-2 h-3.5 bg-[#32E6D1] animate-pulse" />
+          <div className="flex items-center gap-1 text-[#FFB703] pt-1">
+            <span className="inline-block w-2 h-3.5 bg-[#FFB703] animate-pulse" />
           </div>
         )}
       </div>

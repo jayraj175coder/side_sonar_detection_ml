@@ -60,10 +60,10 @@ export const LiveGeotagMapPanel: React.FC<LiveGeotagMapPanelProps> = ({
         [18.935, 72.832],
       ];
       L.polygon(polygonCoords, {
-        color: '#32E6D1',
+        color: '#FFB703',
         weight: 1,
         dashArray: '4, 4',
-        fillColor: '#32E6D1',
+        fillColor: '#FFB703',
         fillOpacity: 0.04,
       }).addTo(map);
 
@@ -94,7 +94,7 @@ export const LiveGeotagMapPanel: React.FC<LiveGeotagMapPanelProps> = ({
 
       let markerColor = '#65D391';
       if (isFiltered) markerColor = '#FF5D5D';
-      else if (box.classCode === 'NET') markerColor = '#32E6D1';
+      else if (box.classCode === 'NET') markerColor = '#FFB703';
       else if (box.classCode === 'GEAR') markerColor = '#FFB547';
       else if (box.classCode === 'PIPE') markerColor = '#29B6F6';
 
@@ -157,7 +157,7 @@ export const LiveGeotagMapPanel: React.FC<LiveGeotagMapPanelProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-[#32E6D1]" />
+          <MapPin className="w-4 h-4 text-[#FFB703]" />
           <h3 className="text-xs font-black text-[#E4F2F5] tracking-wider uppercase font-sans">
             LIVE GEOTAGGED SUBSEA MAP
           </h3>
@@ -174,7 +174,7 @@ export const LiveGeotagMapPanel: React.FC<LiveGeotagMapPanelProps> = ({
         {/* Legend Overlay */}
         <div className="absolute bottom-2 left-2 p-1.5 rounded-lg bg-[#081118]/90 border border-[#16303B] backdrop-blur-md flex items-center gap-3 text-[8px] text-[#E4F2F5] z-[1000]">
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-[#32E6D1]" />
+            <span className="w-2 h-2 rounded-full bg-[#FFB703]" />
             <span>Ghost Net</span>
           </span>
           <span className="flex items-center gap-1">

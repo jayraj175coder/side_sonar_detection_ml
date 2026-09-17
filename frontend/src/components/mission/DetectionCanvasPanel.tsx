@@ -24,11 +24,11 @@ export const DetectionCanvasPanel: React.FC<DetectionCanvasPanelProps> = ({
       {/* Header with KPI & Filters */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Crosshair className="w-4 h-4 text-[#32E6D1]" />
+          <Crosshair className="w-4 h-4 text-[#FFB703]" />
           <h3 className="text-xs font-black text-[#E4F2F5] tracking-wider uppercase font-sans">
             AI DETECTION & CALIBRATED RETICLES
           </h3>
-          <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-[#32E6D1]/15 text-[#32E6D1] border border-[#32E6D1]/30">
+          <span className="text-[9px] font-bold px-2 py-0.5 rounded-md bg-[#FFB703]/15 text-[#FFB703] border border-[#FFB703]/30">
             {detections.filter((d) => d.status === 'ACCEPTED').length} ACCEPTED
           </span>
         </div>
@@ -52,8 +52,8 @@ export const DetectionCanvasPanel: React.FC<DetectionCanvasPanelProps> = ({
         <div className="absolute inset-0 bg-acoustic-grid opacity-80" />
 
         {/* Center Nadir Line */}
-        <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-8 bg-[#020408] border-x border-[#32E6D1]/20 flex items-center justify-center">
-          <span className="[writing-mode:vertical-lr] text-[7px] text-[#32E6D1]/40 font-mono tracking-widest">
+        <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-8 bg-[#020408] border-x border-[#FFB703]/20 flex items-center justify-center">
+          <span className="[writing-mode:vertical-lr] text-[7px] text-[#FFB703]/40 font-mono tracking-widest">
             NADIR TRACK
           </span>
         </div>
@@ -159,7 +159,7 @@ export const DetectionCanvasPanel: React.FC<DetectionCanvasPanelProps> = ({
         {/* Range Ruler Ticks */}
         <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[8px] text-[#6F8992] font-mono border-t border-[#16303B] pt-1">
           <span>PORT (-37.5m)</span>
-          <span className="text-[#32E6D1]">0m NADIR</span>
+          <span className="text-[#FFB703]">0m NADIR</span>
           <span>STARBOARD (+37.5m)</span>
         </div>
       </div>

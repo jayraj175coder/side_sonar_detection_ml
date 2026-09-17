@@ -24,7 +24,7 @@ export const NeuralTensorFlowDiagram: React.FC = () => {
       title: 'CSPDarknet Backbone',
       dim: 'P3 / P4 / P5 Tensors',
       tech: 'Cross-Stage Partial Conv',
-      color: '#00D4AA',
+      color: '#FFB703',
       desc: 'Extracts multi-scale acoustic textural features & shadow gradients',
     },
     {
@@ -54,15 +54,15 @@ export const NeuralTensorFlowDiagram: React.FC = () => {
   ];
 
   return (
-    <div className="p-4 sm:p-5 rounded-2xl bg-[#030914] border border-[#0D2E4A] space-y-4 relative overflow-hidden font-mono text-xs select-none">
-      <div className="flex items-center justify-between border-b border-[#0D2E4A] pb-3">
+    <div className="p-4 sm:p-5 rounded-2xl bg-[#030914] border border-[#162136] space-y-4 relative overflow-hidden font-mono text-xs select-none">
+      <div className="flex items-center justify-between border-b border-[#162136] pb-3">
         <div className="flex items-center gap-2 text-cyan-400">
           <Cpu className="w-4 h-4 animate-pulse" />
           <span className="font-extrabold uppercase tracking-wider text-[11px] text-cyan-300">
             YOLOv8s ONNX Neural Tensor Pipeline
           </span>
         </div>
-        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#00D4AA]/15 text-[#00D4AA] border border-[#00D4AA]/40">
+        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-[#FFB703]/15 text-[#FFB703] border border-[#FFB703]/40">
           END-TO-END INFERENCE: 14.5ms
         </span>
       </div>
@@ -115,7 +115,7 @@ export const NeuralTensorFlowDiagram: React.FC = () => {
       </div>
 
       {/* Pulsing Light Carrier Line */}
-      <div className="relative h-1.5 w-full bg-[#061220] rounded-full overflow-hidden border border-[#0D2E4A]">
+      <div className="relative h-1.5 w-full bg-[#061220] rounded-full overflow-hidden border border-[#162136]">
         <div
           className="h-full w-1/3 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full shadow-[0_0_12px_#06B6D4] animate-laser-scan"
           style={{ width: '35%' }}

@@ -156,13 +156,13 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
         ctx.save();
         const scanY = (t * 220) % H; // Sweeps down at 220px/s
         
-        ctx.fillStyle = 'rgba(0, 212, 170, 0.15)';
+        ctx.fillStyle = 'rgba(255, 183, 3, )';
         ctx.fillRect(0, 0, W, scanY);
         
-        ctx.strokeStyle = '#00D4AA';
+        ctx.strokeStyle = '#FFB703';
         ctx.lineWidth = 2;
         ctx.shadowBlur = 15;
-        ctx.shadowColor = '#00D4AA';
+        ctx.shadowColor = '#FFB703';
         ctx.beginPath();
         ctx.moveTo(0, scanY);
         ctx.lineTo(W, scanY);
@@ -172,7 +172,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
 
       // 3. Draw Centerline Nadir Track
       ctx.save();
-      ctx.strokeStyle = 'rgba(0, 212, 170, 0.4)';
+      ctx.strokeStyle = 'rgba(255, 183, 3, )';
       ctx.setLineDash([6, 6]);
       ctx.lineWidth = 1;
       ctx.beginPath();
@@ -224,12 +224,12 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             ctx.closePath();
             ctx.fill();
 
-            ctx.strokeStyle = isSelected ? 'rgba(0, 212, 170, 0.45)' : 'rgba(13, 46, 74, 0.6)';
+            ctx.strokeStyle = isSelected ? 'rgba(255, 183, 3, )' : 'rgba(13, 46, 74, 0.6)';
             ctx.lineWidth = 1;
             ctx.stroke();
 
             if (isSelected && (!isDemoRunning || demoPhaseStep >= 4)) {
-              ctx.fillStyle = '#00D4AA';
+              ctx.fillStyle = '#FFB703';
               ctx.font = 'bold 8px monospace';
               ctx.fillText(
                 `ACOUSTIC SHADOW (${target.shadowLength}m RELIEF)`,
@@ -240,8 +240,8 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           }
 
           // ── B. DRAW HIGH SPECULAR BACKSCATTER OBJECT ──
-          let col = '#00D4AA';
-          if (target.priority === 'HIGH') col = '#00D4AA';
+          let col = '#FFB703';
+          if (target.priority === 'HIGH') col = '#FFB703';
           else if (target.priority === 'MEDIUM') col = '#38BDF8';
           else if (target.priority === 'LOW') col = '#F59E0B';
           else if (isFiltered) col = '#64748B';
@@ -276,7 +276,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             ctx.setLineDash([]);
 
             if (isHovered || isSelected) {
-              ctx.fillStyle = '#05121F';
+              ctx.fillStyle = '#080D17';
               ctx.fillRect(cx - 30, ty - objH / 2 - 16, 60, 13);
               ctx.strokeStyle = '#EF4444';
               ctx.strokeRect(cx - 30, ty - objH / 2 - 16, 60, 13);
@@ -287,10 +287,10 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
               ctx.textAlign = 'left';
             }
           } else if (isSelected) {
-            ctx.strokeStyle = '#00D4AA';
+            ctx.strokeStyle = '#FFB703';
             ctx.lineWidth = 2;
             ctx.strokeRect(cx - objW / 2 - 6, ty - objH / 2 - 6, objW + 12, objH + 12);
-            ctx.fillStyle = 'rgba(0, 212, 170, 0.14)';
+            ctx.fillStyle = 'rgba(255, 183, 3, )';
             ctx.fillRect(cx - objW / 2 - 6, ty - objH / 2 - 6, objW + 12, objH + 12);
 
             const labelW = 160;
@@ -298,13 +298,13 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             const labelX = cx - labelW / 2;
             const labelY = ty - objH / 2 - labelH - 10;
 
-            ctx.fillStyle = '#030B14';
+            ctx.fillStyle = '#05070B';
             ctx.fillRect(labelX, labelY, labelW, labelH);
-            ctx.strokeStyle = '#00D4AA';
+            ctx.strokeStyle = '#FFB703';
             ctx.lineWidth = 1.5;
             ctx.strokeRect(labelX, labelY, labelW, labelH);
 
-            ctx.fillStyle = '#E0F7F4';
+            ctx.fillStyle = '#F8FAFC';
             ctx.font = 'bold 10px monospace';
             ctx.textAlign = 'center';
             ctx.fillText(target.label.toUpperCase(), cx, labelY + 13);
@@ -314,7 +314,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             ctx.fillText(target.id, cx, labelY + 25);
 
             const displayConf = isDemoRunning ? heroConfidence.toFixed(1) : (target.confidence * 100).toFixed(1);
-            ctx.fillStyle = '#00D4AA';
+            ctx.fillStyle = '#FFB703';
             ctx.font = '900 10.5px monospace';
             ctx.fillText(`${displayConf}% CONFIDENCE`, cx, labelY + 39);
             ctx.textAlign = 'left';
@@ -323,7 +323,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             ctx.strokeStyle = col;
             ctx.lineWidth = 1.5;
             ctx.strokeRect(cx - objW / 2 - 2, ty - objH / 2 - 2, objW + 4, objH + 4);
-            ctx.fillStyle = '#05121F';
+            ctx.fillStyle = '#080D17';
             ctx.fillRect(cx - 20, ty - objH / 2 - 15, 40, 12);
             ctx.strokeStyle = col;
             ctx.strokeRect(cx - 20, ty - objH / 2 - 15, 40, 12);
@@ -337,7 +337,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             ctx.strokeRect(cx - objW / 2 - 2, ty - objH / 2 - 2, objW + 4, objH + 4);
 
             if (isHovered) {
-              ctx.fillStyle = '#05121F';
+              ctx.fillStyle = '#080D17';
               ctx.fillRect(cx - 20, ty - objH / 2 - 15, 40, 12);
               ctx.strokeStyle = col;
               ctx.strokeRect(cx - 20, ty - objH / 2 - 15, 40, 12);
@@ -446,21 +446,21 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
   return (
     <div className="flex-1 flex flex-col bg-[#01050A] relative overflow-hidden font-sans select-none">
       {/* ── VIEWER HEADER BAR ── */}
-      <div className="h-10 px-4 bg-[#030B14] border-b border-[#0D2E4A] flex items-center justify-between z-10 relative">
+      <div className="h-10 px-4 bg-[#05070B] border-b border-[#162136] flex items-center justify-between z-10 relative">
         <div className="flex items-center gap-3">
-          <span className="text-xs font-black tracking-wider text-[#E0F7F4] uppercase">
+          <span className="text-xs font-black tracking-wider text-[#F8FAFC] uppercase">
             SIDE-SCAN SONAR
           </span>
-          <span className="text-[#2A5060]">|</span>
-          <div className="text-[10px] text-[#4A8090] flex items-center gap-2">
+          <span className="text-[#64748B]">|</span>
+          <div className="text-[10px] text-[#94A3B8] flex items-center gap-2">
             {/* Interactive Frequency Mode Selector */}
-            <div className="flex items-center gap-0.5 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded text-[8px] font-mono">
+            <div className="flex items-center gap-0.5 bg-[#080D17] border border-[#162136] p-0.5 rounded text-[8px] font-mono">
               <span className="text-[#94A3B8] px-1 uppercase hidden md:inline">FREQ:</span>
               <button
                 onClick={() => setSonarFrequency(450)}
                 className={`px-1.5 py-0.5 rounded-xs font-bold transition-all cursor-pointer ${
                   sonarFrequency === 450
-                    ? 'bg-[#38BDF8] text-[#030B14] shadow-sm font-black'
+                    ? 'bg-[#38BDF8] text-[#05070B] shadow-sm font-black'
                     : 'text-[#94A3B8] hover:text-white'
                 }`}
                 title="450 kHz (150m Swath · Deep Ocean Search · λ=3.33mm)"
@@ -471,7 +471,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
                 onClick={() => setSonarFrequency(900)}
                 className={`px-1.5 py-0.5 rounded-xs font-bold transition-all cursor-pointer ${
                   sonarFrequency === 900
-                    ? 'bg-[#00D4AA] text-[#030B14] shadow-sm font-black'
+                    ? 'bg-[#FFB703] text-[#05070B] shadow-sm font-black'
                     : 'text-[#94A3B8] hover:text-white'
                 }`}
                 title="900 kHz (75m Swath · Tactical Profiling · λ=1.67mm)"
@@ -492,14 +492,14 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             </div>
 
             <span>·</span>
-            <span><strong className="text-[#E0F7F4]">{FREQUENCY_PROFILES[sonarFrequency].swathM}</strong> m SWATH</span>
+            <span><strong className="text-[#F8FAFC]">{FREQUENCY_PROFILES[sonarFrequency].swathM}</strong> m SWATH</span>
             <span>·</span>
             <span title="Acoustic Wavelength λ = c/f (c=1500m/s in seawater)">
-              <strong className="text-[#00D4AA]">λ={FREQUENCY_PROFILES[sonarFrequency].lambdaMm}</strong> mm
+              <strong className="text-[#FFB703]">λ={FREQUENCY_PROFILES[sonarFrequency].lambdaMm}</strong> mm
             </span>
             <span>·</span>
             <span className="flex items-center gap-1">
-              STATUS: <strong className={isDemoRunning ? 'text-[#00D4AA] animate-pulse' : 'text-[#E0F7F4]'}>
+              STATUS: <strong className={isDemoRunning ? 'text-[#FFB703] animate-pulse' : 'text-[#F8FAFC]'}>
                 {isDemoRunning ? 'LIVE SCAN' : 'IDLE'}
               </strong>
             </span>
@@ -508,22 +508,22 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
 
         {/* Compact Toolbar Controls */}
         <div className="flex items-center gap-1.5 shrink-0">
-          <button onClick={() => setZoomLevel(1.0)} className="panel-btn hover:text-[#00D4AA]" title="Fit to Screen">FIT</button>
-          <button onClick={() => setZoomLevel((z) => Math.min(2.0, z + 0.2))} className="panel-btn hover:text-[#00D4AA]" title="Zoom In"><ZoomIn className="w-3 h-3" /></button>
-          <button onClick={() => setZoomLevel((z) => Math.max(0.6, z - 0.2))} className="panel-btn hover:text-[#00D4AA]" title="Zoom Out"><ZoomOut className="w-3 h-3" /></button>
+          <button onClick={() => setZoomLevel(1.0)} className="panel-btn hover:text-[#FFB703]" title="Fit to Screen">FIT</button>
+          <button onClick={() => setZoomLevel((z) => Math.min(2.0, z + 0.2))} className="panel-btn hover:text-[#FFB703]" title="Zoom In"><ZoomIn className="w-3 h-3" /></button>
+          <button onClick={() => setZoomLevel((z) => Math.max(0.6, z - 0.2))} className="panel-btn hover:text-[#FFB703]" title="Zoom Out"><ZoomOut className="w-3 h-3" /></button>
           <button onClick={() => { setZoomLevel(1.0); setMeasurePoints([]); setMeasureActive(false); }} className="panel-btn hover:text-[#EF4444]" title="Reset View"><RotateCcw className="w-3 h-3" /></button>
 
-          <div className="h-3 w-px bg-[#0D2E4A] mx-0.5" />
+          <div className="h-3 w-px bg-[#162136] mx-0.5" />
 
-          <button onClick={() => setShowTargetsToggle((v) => !v)} className={`panel-btn ${showTargetsToggle ? 'text-[#00D4AA] border-[#00D4AA]/60 bg-[#082830]' : 'text-[#4A8090]'}`} title="Toggle Detected Targets Overlay">
+          <button onClick={() => setShowTargetsToggle((v) => !v)} className={`panel-btn ${showTargetsToggle ? 'text-[#FFB703] border-[#FFB703]/60 bg-[#131B2A]' : 'text-[#94A3B8]'}`} title="Toggle Detected Targets Overlay">
             <Crosshair className="w-3 h-3 mr-1" /><span>TARGETS</span>
           </button>
 
-          <button onClick={() => { setMeasureActive((v) => !v); setMeasurePoints([]); }} className={`panel-btn ${measureActive ? 'text-[#FBBF24] border-[#FBBF24]/60 bg-[#1A1808]' : 'text-[#4A8090]'}`} title="Measure Distance Tool">
+          <button onClick={() => { setMeasureActive((v) => !v); setMeasurePoints([]); }} className={`panel-btn ${measureActive ? 'text-[#FBBF24] border-[#FBBF24]/60 bg-[#1A1808]' : 'text-[#94A3B8]'}`} title="Measure Distance Tool">
             MEASURE
           </button>
 
-          <button onClick={() => setContrastEnhanced((v) => !v)} className={`panel-btn ${contrastEnhanced ? 'text-[#00D4AA] border-[#00D4AA]/60 bg-[#082830]' : 'text-[#4A8090]'}`} title="Toggle Raw Sonar vs Bilateral CLAHE Denoised Sonar">
+          <button onClick={() => setContrastEnhanced((v) => !v)} className={`panel-btn ${contrastEnhanced ? 'text-[#FFB703] border-[#FFB703]/60 bg-[#131B2A]' : 'text-[#94A3B8]'}`} title="Toggle Raw Sonar vs Bilateral CLAHE Denoised Sonar">
             <Sliders className="w-3 h-3 mr-1" /><span>{contrastEnhanced ? 'DENOISED' : 'RAW'}</span>
           </button>
         </div>
@@ -532,14 +532,14 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
       {/* ── SONAR VIEWER CANVAS WORKSPACE (VISUAL HERO) ── */}
       <div className="flex-1 relative overflow-hidden bg-[#01050A] flex items-center justify-center perspective-[1000px]">
         {/* Floating Acoustic HUD: Palette Switcher & SRC Ground Rectification */}
-        <div className="absolute top-3 left-3 bg-[#030914]/90 backdrop-blur-md border border-[#0D2E4A] px-2 py-1 rounded-xl flex items-center gap-2 shadow-2xl z-20 pointer-events-auto">
+        <div className="absolute top-3 left-3 bg-[#030914]/90 backdrop-blur-md border border-[#162136] px-2 py-1 rounded-xl flex items-center gap-2 shadow-2xl z-20 pointer-events-auto">
           <div className="flex items-center gap-1">
             <span className="text-[7.5px] font-mono font-bold text-[#94A3B8] uppercase">PALETTE:</span>
             <button
               onClick={() => setAcousticPalette('amber')}
               className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
                 acousticPalette === 'amber'
-                  ? 'bg-[#F59E0B] text-[#030B14] font-black shadow-md'
+                  ? 'bg-[#F59E0B] text-[#05070B] font-black shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
               title="Kongsberg Copper / Amber Palette (Hydrographic Standard)"
@@ -550,7 +550,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
               onClick={() => setAcousticPalette('emerald')}
               className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
                 acousticPalette === 'emerald'
-                  ? 'bg-[#10B981] text-[#030B14] font-black shadow-md'
+                  ? 'bg-[#10B981] text-[#05070B] font-black shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
               title="Naval Submarine Phosphor Green"
@@ -561,7 +561,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
               onClick={() => setAcousticPalette('cobalt')}
               className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
                 acousticPalette === 'cobalt'
-                  ? 'bg-[#38BDF8] text-[#030B14] font-black shadow-md'
+                  ? 'bg-[#38BDF8] text-[#05070B] font-black shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
               title="EdgeTech Deep-Sea Cyan"
@@ -572,7 +572,7 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
               onClick={() => setAcousticPalette('grayscale')}
               className={`px-1.5 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
                 acousticPalette === 'grayscale'
-                  ? 'bg-[#E2E8F0] text-[#030B14] font-black shadow-md'
+                  ? 'bg-[#E2E8F0] text-[#05070B] font-black shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
               title="Inverted Scientific Paper Grayscale"
@@ -581,14 +581,14 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             </button>
           </div>
 
-          <div className="h-3 w-px bg-[#0D2E4A]" />
+          <div className="h-3 w-px bg-[#162136]" />
 
           <button
             onClick={() => setIsSrcActive((v) => !v)}
             className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold cursor-pointer transition-all ${
               isSrcActive
-                ? 'bg-[#00D4AA] text-[#030B14] font-black shadow-[0_0_8px_rgba(0,212,170,0.4)]'
-                : 'bg-[#082830] text-[#94A3B8] border border-[#0D2E4A] hover:text-white'
+                ? 'bg-[#FFB703] text-[#05070B] font-black shadow-[0_0_8px_rgba(255, 183, 3, )]'
+                : 'bg-[#131B2A] text-[#94A3B8] border border-[#162136] hover:text-white'
             }`}
             title="Slant-to-Ground Range Rectification (Compensates Nadir Water Column)"
           >
@@ -598,8 +598,8 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
 
         {/* Slant-Range Correction (SRC) Active Watermark Indicator */}
         {isSrcActive && (
-          <div className="absolute top-3 right-3 bg-[#05121F]/90 border border-[#00D4AA]/50 px-2.5 py-1 rounded-md text-[9px] font-mono font-bold text-[#00D4AA] flex items-center gap-1.5 shadow-[0_0_12px_rgba(0,212,170,0.25)] z-20 pointer-events-none">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] animate-ping" />
+          <div className="absolute top-3 right-3 bg-[#080D17]/90 border border-[#FFB703]/50 px-2.5 py-1 rounded-md text-[9px] font-mono font-bold text-[#FFB703] flex items-center gap-1.5 shadow-[0_0_12px_rgba(255, 183, 3, )] z-20 pointer-events-none">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
             <span>SRC ACTIVE · NADIR RECTIFIED · Rg = √(Rs² - H²)</span>
           </div>
         )}
@@ -627,42 +627,42 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
 
         {/* Dynamic HUD Pipeline Summary Ribbon */}
         {isDemoRunning && demoPhaseStep >= 2 && (
-          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 bg-[#030B14]/90 border border-[#00D4AA]/40 px-4 py-2 text-[10px] text-[#7C98A6] flex items-center gap-4 shadow-[0_0_20px_rgba(0,212,170,0.25)] rounded-xs transform transition-all duration-500 z-20">
+          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 bg-[#05070B]/90 border border-[#FFB703]/40 px-4 py-2 text-[10px] text-[#94A3B8] flex items-center gap-4 shadow-[0_0_20px_rgba(255, 183, 3, )] rounded-xs transform transition-all duration-500 z-20">
             <span className="flex items-center gap-2">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D4AA] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D4AA]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFB703] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FFB703]"></span>
               </span>
               AI SCANNING ACTIVE
             </span>
             {demoPhaseStep >= 2 && (
               <>
-                <span className="text-[#00D4AA]">→</span>
-                <span>DETECTED: <strong className="text-[#E0F7F4]">8 CANDIDATES</strong></span>
+                <span className="text-[#FFB703]">→</span>
+                <span>DETECTED: <strong className="text-[#F8FAFC]">8 CANDIDATES</strong></span>
               </>
             )}
             {demoPhaseStep >= 3 && (
               <>
-                <span className="text-[#00D4AA]">→</span>
+                <span className="text-[#FFB703]">→</span>
                 <span>FILTER: <strong className="text-[#EF4444]">4 REJECTED</strong></span>
               </>
             )}
             {demoPhaseStep >= 4 && (
               <>
-                <span className="text-[#00D4AA]">→</span>
-                <span>VERIFIED: <strong className="text-[#00D4AA] font-black">4 CONFIRMED</strong></span>
+                <span className="text-[#FFB703]">→</span>
+                <span>VERIFIED: <strong className="text-[#FFB703] font-black">4 CONFIRMED</strong></span>
               </>
             )}
           </div>
         )}
 
         {/* Dynamic HUD Telemetry Indicator */}
-        <div className="absolute bottom-3 right-3 bg-[#030B14]/85 border border-[#0D2E4A] px-2.5 py-1 text-[8.5px] text-[#4A8090] flex items-center gap-3 rounded-xs z-20 pointer-events-none">
-          <span>TOWFISH SPEED: <strong className="text-[#00D4AA]">4.1 kts</strong></span>
+        <div className="absolute bottom-3 right-3 bg-[#05070B]/85 border border-[#162136] px-2.5 py-1 text-[8.5px] text-[#94A3B8] flex items-center gap-3 rounded-xs z-20 pointer-events-none">
+          <span>TOWFISH SPEED: <strong className="text-[#FFB703]">4.1 kts</strong></span>
           <span>·</span>
-          <span>ALTITUDE: <strong className="text-[#E0F7F4]">8.4 m</strong></span>
+          <span>ALTITUDE: <strong className="text-[#F8FAFC]">8.4 m</strong></span>
           <span>·</span>
-          <span>LAMBERTIAN TVG: <strong className="text-[#00D4AA]">ON</strong></span>
+          <span>LAMBERTIAN TVG: <strong className="text-[#FFB703]">ON</strong></span>
         </div>
       </div>
     </div>

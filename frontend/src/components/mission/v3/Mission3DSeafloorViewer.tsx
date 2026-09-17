@@ -150,7 +150,7 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
         // Depth-based bathymetric color
         const depthFactor = Math.max(0, Math.min(1, (z1 + 25) / 50));
         const gridStroke = wireframeOnly
-          ? 'rgba(0, 212, 170, 0.45)'
+          ? 'rgba(255, 183, 3, )'
           : `rgba(${Math.floor(10 + depthFactor * 30)}, ${Math.floor(50 + depthFactor * 160)}, ${Math.floor(90 + depthFactor * 150)}, 0.55)`;
 
         ctx.strokeStyle = gridStroke;
@@ -193,8 +193,8 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
     const swathLeft = project(-cellSize * 5, 0, getHeight(-5, 0));
     const swathRight = project(cellSize * 5, 0, getHeight(5, 0));
 
-    ctx.fillStyle = 'rgba(0, 212, 170, 0.08)';
-    ctx.strokeStyle = 'rgba(0, 212, 170, 0.35)';
+    ctx.fillStyle = 'rgba(255, 183, 3, )';
+    ctx.strokeStyle = 'rgba(255, 183, 3, )';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(tfPos.x, tfPos.y);
@@ -205,12 +205,12 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
     ctx.stroke();
 
     // Towfish vessel marker
-    ctx.fillStyle = '#00D4AA';
+    ctx.fillStyle = '#FFB703';
     ctx.beginPath();
     ctx.arc(tfPos.x, tfPos.y, 4.5, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#E0F7F4';
+    ctx.fillStyle = '#F8FAFC';
     ctx.font = 'bold 8.5px monospace';
     ctx.fillText('AUV TOWFISH (+8.4m ALT)', tfPos.x + 8, tfPos.y - 4);
 
@@ -232,7 +232,7 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
       const shadowEnd = project((gx + shadowDir * 1.6) * cellSize, gy * cellSize, seabedZ);
 
       ctx.fillStyle = 'rgba(1, 5, 10, 0.85)'; // True acoustic absorption shadow
-      ctx.strokeStyle = isSelected ? 'rgba(0, 212, 170, 0.6)' : 'rgba(13, 46, 74, 0.7)';
+      ctx.strokeStyle = isSelected ? 'rgba(255, 183, 3, )' : 'rgba(13, 46, 74, 0.7)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(basePos.x - 6, basePos.y);
@@ -243,12 +243,12 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
       ctx.stroke();
 
       // Vertical 3D relief stalk
-      let col = '#00D4AA';
+      let col = '#FFB703';
       if (target.priority === 'HIGH') col = '#EF4444';
       else if (target.priority === 'MEDIUM') col = '#F59E0B';
       else if (target.status === 'FILTERED') col = '#64748B';
 
-      ctx.strokeStyle = isGhostNet ? '#00D4AA' : col;
+      ctx.strokeStyle = isGhostNet ? '#FFB703' : col;
       ctx.lineWidth = isSelected || isGhostNet ? 2 : 1;
       ctx.beginPath();
       ctx.moveTo(basePos.x, basePos.y);
@@ -257,7 +257,7 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
 
       // Pulsating 3D Ring on Hero Target
       if (isGhostNet || isSelected) {
-        ctx.strokeStyle = '#00D4AA';
+        ctx.strokeStyle = '#FFB703';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(peakPos.x, peakPos.y, 12, 0, Math.PI * 2);
@@ -265,24 +265,24 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
       }
 
       // Top Beacon Sphere
-      ctx.fillStyle = isGhostNet ? '#00D4AA' : col;
+      ctx.fillStyle = isGhostNet ? '#FFB703' : col;
       ctx.beginPath();
       ctx.arc(peakPos.x, peakPos.y, isGhostNet || isSelected ? 5 : 3.5, 0, Math.PI * 2);
       ctx.fill();
 
       // 3D Callout Card
       if (isGhostNet || isSelected) {
-        ctx.fillStyle = '#030B14';
+        ctx.fillStyle = '#05070B';
         ctx.fillRect(peakPos.x + 8, peakPos.y - 30, 140, 28);
-        ctx.strokeStyle = '#00D4AA';
+        ctx.strokeStyle = '#FFB703';
         ctx.lineWidth = 1;
         ctx.strokeRect(peakPos.x + 8, peakPos.y - 30, 140, 28);
 
-        ctx.fillStyle = '#E0F7F4';
+        ctx.fillStyle = '#F8FAFC';
         ctx.font = 'bold 8.5px monospace';
         ctx.fillText(`${target.id} // ${target.label.toUpperCase()}`, peakPos.x + 12, peakPos.y - 18);
 
-        ctx.fillStyle = '#00D4AA';
+        ctx.fillStyle = '#FFB703';
         ctx.font = '7.5px monospace';
         ctx.fillText(`DEPTH: -${target.depth.toFixed(1)}m · RELIEF: ${target.shadowLength.toFixed(2)}m`, peakPos.x + 12, peakPos.y - 6);
       }
@@ -303,13 +303,13 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
   return (
     <div className="flex-1 flex flex-col bg-[#01050A] relative overflow-hidden font-mono select-none">
       {/* Top 3D Header Bar & Camera Controls */}
-      <div className="h-10 px-4 bg-[#030B14] border-b border-[#0D2E4A] flex items-center justify-between z-10">
+      <div className="h-10 px-4 bg-[#05070B] border-b border-[#162136] flex items-center justify-between z-10">
         <div className="flex items-center gap-3">
           {/* 3-Way Viewport Switcher */}
-          <div className="flex items-center gap-1 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded-xs">
+          <div className="flex items-center gap-1 bg-[#080D17] border border-[#162136] p-0.5 rounded-xs">
             <button
               onClick={onBackToSonar}
-              className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
+              className="px-2 py-0.5 text-[#94A3B8] hover:text-[#FFB703] hover:bg-[#131B2A] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
               title="Return to Sonar Waterfall"
             >
               📻 SONAR
@@ -317,23 +317,23 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
             {onViewMissionMap && (
               <button
                 onClick={onViewMissionMap}
-                className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
+                className="px-2 py-0.5 text-[#94A3B8] hover:text-[#FFB703] hover:bg-[#131B2A] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
                 title="View Subsea Mission Map"
               >
                 🗺️ MAP
               </button>
             )}
             <button
-              className="px-2 py-0.5 bg-[#00D4AA] text-[#030B14] font-bold text-[8.5px] rounded-xs cursor-default shadow-[0_0_8px_rgba(0,212,170,0.3)]"
+              className="px-2 py-0.5 bg-[#FFB703] text-[#05070B] font-bold text-[8.5px] rounded-xs cursor-default shadow-[0_0_8px_rgba(255, 183, 3, )]"
             >
               🌐 3D VIEW
             </button>
           </div>
 
-          <span className="text-[#2A5060]">|</span>
-          <span className="text-xs font-black tracking-wider text-[#E0F7F4] uppercase flex items-center gap-2">
+          <span className="text-[#64748B]">|</span>
+          <span className="text-xs font-black tracking-wider text-[#F8FAFC] uppercase flex items-center gap-2">
             <span>3D SEAFLOOR BATHYMETRY</span>
-            <span className="text-[9px] px-1.5 py-0.2 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded-xs">
+            <span className="text-[9px] px-1.5 py-0.2 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded-xs">
               MUMBAI SHELF SECTOR B
             </span>
           </span>
@@ -345,20 +345,20 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
             onClick={() => setAutoRotate((v) => !v)}
             className={`flex items-center gap-1 px-2 py-1 border transition-colors cursor-pointer rounded-xs ${
               autoRotate
-                ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA] font-bold'
-                : 'bg-[#05121F] border-[#0D2E4A] text-[#4A8090]'
+                ? 'bg-[#131B2A] border-[#FFB703] text-[#FFB703] font-bold'
+                : 'bg-[#080D17] border-[#162136] text-[#94A3B8]'
             }`}
           >
             <RotateCw className={`w-3 h-3 ${autoRotate ? 'animate-spin' : ''}`} />
             <span>{autoRotate ? 'ROTATING' : 'ROTATE'}</span>
           </button>
 
-          <div className="h-3 w-px bg-[#0D2E4A] mx-0.5" />
+          <div className="h-3 w-px bg-[#162136] mx-0.5" />
 
           <button
             onClick={handlePresetIso}
             className={`px-2 py-1 border transition-colors cursor-pointer rounded-xs ${
-              viewPreset === 'iso' ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] font-bold' : 'bg-[#05121F] border-[#0D2E4A] text-[#4A8090]'
+              viewPreset === 'iso' ? 'bg-[#FFB703] text-[#05070B] border-[#FFB703] font-bold' : 'bg-[#080D17] border-[#162136] text-[#94A3B8]'
             }`}
           >
             ISOMETRIC
@@ -366,7 +366,7 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
           <button
             onClick={handlePresetTop}
             className={`px-2 py-1 border transition-colors cursor-pointer rounded-xs ${
-              viewPreset === 'top' ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] font-bold' : 'bg-[#05121F] border-[#0D2E4A] text-[#4A8090]'
+              viewPreset === 'top' ? 'bg-[#FFB703] text-[#05070B] border-[#FFB703] font-bold' : 'bg-[#080D17] border-[#162136] text-[#94A3B8]'
             }`}
           >
             TOP-DOWN
@@ -374,18 +374,18 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
           <button
             onClick={handlePresetProfile}
             className={`px-2 py-1 border transition-colors cursor-pointer rounded-xs ${
-              viewPreset === 'profile' ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] font-bold' : 'bg-[#05121F] border-[#0D2E4A] text-[#4A8090]'
+              viewPreset === 'profile' ? 'bg-[#FFB703] text-[#05070B] border-[#FFB703] font-bold' : 'bg-[#080D17] border-[#162136] text-[#94A3B8]'
             }`}
           >
             PROFILE
           </button>
 
-          <div className="h-3 w-px bg-[#0D2E4A] mx-0.5" />
+          <div className="h-3 w-px bg-[#162136] mx-0.5" />
 
           <button
             onClick={() => setWireframeOnly((v) => !v)}
             className={`px-2 py-1 border transition-colors cursor-pointer rounded-xs ${
-              wireframeOnly ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA]' : 'bg-[#05121F] border-[#0D2E4A] text-[#4A8090]'
+              wireframeOnly ? 'bg-[#131B2A] border-[#FFB703] text-[#FFB703]' : 'bg-[#080D17] border-[#162136] text-[#94A3B8]'
             }`}
           >
             WIREFRAME
@@ -393,7 +393,7 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
 
           <button
             onClick={() => setReliefExaggeration((r) => (r >= 2.5 ? 1.0 : r + 0.75))}
-            className="px-2 py-1 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/40 text-[#4A8090] hover:text-[#00D4AA] cursor-pointer rounded-xs"
+            className="px-2 py-1 bg-[#080D17] border border-[#162136] hover:border-[#FFB703]/40 text-[#94A3B8] hover:text-[#FFB703] cursor-pointer rounded-xs"
           >
             {reliefExaggeration.toFixed(1)}× RELIEF
           </button>
@@ -411,12 +411,12 @@ export const Mission3DSeafloorViewer: React.FC<Mission3DSeafloorViewerProps> = (
         />
 
         {/* 3D HUD Telemetry Overlay */}
-        <div className="absolute bottom-4 left-4 bg-[#030B14]/90 border border-[#0D2E4A] px-3 py-1.5 text-[9px] text-[#4A8090] flex items-center gap-4">
-          <span>BATHYMETRY: <strong className="text-[#00D4AA]">35.0m – 52.4m</strong></span>
+        <div className="absolute bottom-4 left-4 bg-[#05070B]/90 border border-[#162136] px-3 py-1.5 text-[9px] text-[#94A3B8] flex items-center gap-4">
+          <span>BATHYMETRY: <strong className="text-[#FFB703]">35.0m – 52.4m</strong></span>
           <span>·</span>
-          <span>ELEVATION EXAGGERATION: <strong className="text-[#E0F7F4]">{reliefExaggeration.toFixed(1)}×</strong></span>
+          <span>ELEVATION EXAGGERATION: <strong className="text-[#F8FAFC]">{reliefExaggeration.toFixed(1)}×</strong></span>
           <span>·</span>
-          <span>HERO TARGET: <strong className="text-[#00D4AA]">SX-T07 GHOST NET (-43.1m)</strong></span>
+          <span>HERO TARGET: <strong className="text-[#FFB703]">SX-T07 GHOST NET (-43.1m)</strong></span>
         </div>
       </div>
     </div>

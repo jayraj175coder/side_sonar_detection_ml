@@ -54,7 +54,7 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
       ctx.lineTo(x, H);
       ctx.stroke();
 
-      ctx.fillStyle = '#2A5060';
+      ctx.fillStyle = '#64748B';
       ctx.font = '8px monospace';
       ctx.fillText(`${(72.812 + (x / W) * 0.024).toFixed(4)}° E`, x + 3, H - 6);
     }
@@ -64,14 +64,14 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
       ctx.lineTo(W, y);
       ctx.stroke();
 
-      ctx.fillStyle = '#2A5060';
+      ctx.fillStyle = '#64748B';
       ctx.font = '8px monospace';
       ctx.fillText(`${(18.914 + (y / H) * 0.016).toFixed(4)}° N`, 6, y - 4);
     }
     ctx.setLineDash([]);
 
     // Survey Vessel Towpath Track
-    ctx.strokeStyle = 'rgba(0, 212, 170, 0.35)';
+    ctx.strokeStyle = 'rgba(255, 183, 3, )';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(W * 0.1, H * 0.9);
@@ -79,8 +79,8 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
     ctx.stroke();
 
     // Swath boundary envelope (75m corridor)
-    ctx.fillStyle = 'rgba(0, 212, 170, 0.035)';
-    ctx.strokeStyle = 'rgba(0, 212, 170, 0.15)';
+    ctx.fillStyle = 'rgba(255, 183, 3, )';
+    ctx.strokeStyle = 'rgba(255, 183, 3, )';
     ctx.beginPath();
     ctx.moveTo(W * 0.04, H * 0.9);
     ctx.lineTo(W * 0.82, H * 0.12);
@@ -106,33 +106,33 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
 
       // Pulse beacon for SX-T07 Ghost Net or Selected Target
       if (isGhostNet || isSelected) {
-        ctx.strokeStyle = isGhostNet ? '#00D4AA' : color;
+        ctx.strokeStyle = isGhostNet ? '#FFB703' : color;
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.arc(px, py, 16, 0, Math.PI * 2);
         ctx.stroke();
 
-        ctx.strokeStyle = 'rgba(0, 212, 170, 0.4)';
+        ctx.strokeStyle = 'rgba(255, 183, 3, )';
         ctx.beginPath();
         ctx.arc(px, py, 26, 0, Math.PI * 2);
         ctx.stroke();
       }
 
       // Pin core
-      ctx.fillStyle = isGhostNet ? '#00D4AA' : color;
+      ctx.fillStyle = isGhostNet ? '#FFB703' : color;
       ctx.beginPath();
       ctx.arc(px, py, isSelected || isGhostNet ? 5 : 3.5, 0, Math.PI * 2);
       ctx.fill();
 
       // Pin border
-      ctx.strokeStyle = '#030B14';
+      ctx.strokeStyle = '#05070B';
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
       // Pin Label Badge
       if (isGhostNet || isSelected || target.priority === 'HIGH') {
         ctx.fillStyle = 'rgba(5, 18, 31, 0.9)';
-        ctx.strokeStyle = isGhostNet ? '#00D4AA' : color;
+        ctx.strokeStyle = isGhostNet ? '#FFB703' : color;
         ctx.lineWidth = 1;
 
         const badgeW = isGhostNet ? 116 : 84;
@@ -140,7 +140,7 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
         ctx.fillRect(px + 8, py - 22, badgeW, badgeH);
         ctx.strokeRect(px + 8, py - 22, badgeW, badgeH);
 
-        ctx.fillStyle = isGhostNet ? '#00D4AA' : '#E0F7F4';
+        ctx.fillStyle = isGhostNet ? '#FFB703' : '#F8FAFC';
         ctx.font = 'bold 8.5px monospace';
         ctx.fillText(
           `${target.id} ${isGhostNet ? '★ GHOST NET' : target.label.slice(0, 10)}`,
@@ -180,26 +180,26 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
   return (
     <div className="flex-1 flex flex-col bg-[#01050A] relative overflow-hidden font-mono select-none">
       {/* Top Map Header & Controls */}
-      <div className="h-10 px-4 bg-[#030B14] border-b border-[#0D2E4A] flex items-center justify-between z-10">
+      <div className="h-10 px-4 bg-[#05070B] border-b border-[#162136] flex items-center justify-between z-10">
         <div className="flex items-center gap-3">
           {/* 3-Way Viewport Switcher */}
-          <div className="flex items-center gap-1 bg-[#05121F] border border-[#0D2E4A] p-0.5 rounded-xs">
+          <div className="flex items-center gap-1 bg-[#080D17] border border-[#162136] p-0.5 rounded-xs">
             <button
               onClick={onBackToSonar}
-              className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
+              className="px-2 py-0.5 text-[#94A3B8] hover:text-[#FFB703] hover:bg-[#131B2A] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
               title="Return to Sonar Waterfall"
             >
               📻 SONAR
             </button>
             <button
-              className="px-2 py-0.5 bg-[#00D4AA] text-[#030B14] font-bold text-[8.5px] rounded-xs cursor-default shadow-[0_0_8px_rgba(0,212,170,0.3)]"
+              className="px-2 py-0.5 bg-[#FFB703] text-[#05070B] font-bold text-[8.5px] rounded-xs cursor-default shadow-[0_0_8px_rgba(255, 183, 3, )]"
             >
               🗺️ MAP
             </button>
             {onView3D && (
               <button
                 onClick={onView3D}
-                className="px-2 py-0.5 text-[#4A8090] hover:text-[#00D4AA] hover:bg-[#082830] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
+                className="px-2 py-0.5 text-[#94A3B8] hover:text-[#FFB703] hover:bg-[#131B2A] text-[8.5px] font-bold rounded-xs cursor-pointer transition-colors"
                 title="View 3D Seafloor Bathymetry"
               >
                 🌐 3D VIEW
@@ -207,10 +207,10 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
             )}
           </div>
 
-          <span className="text-[#2A5060]">|</span>
-          <span className="text-xs font-black tracking-wider text-[#E0F7F4] uppercase flex items-center gap-1.5">
+          <span className="text-[#64748B]">|</span>
+          <span className="text-xs font-black tracking-wider text-[#F8FAFC] uppercase flex items-center gap-1.5">
             <span>SUBSEA MISSION MAP</span>
-            <span className="text-[9px] px-1.5 py-0.2 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded-xs">
+            <span className="text-[9px] px-1.5 py-0.2 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded-xs">
               17 TARGETS PLOTTED
             </span>
           </span>
@@ -231,8 +231,8 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
             <span className="text-[#94A3B8]">FILTERED (7)</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-[#00D4AA] animate-ping" />
-            <span className="text-[#00D4AA] font-bold">HERO TARGET (SX-T07)</span>
+            <span className="w-2 h-2 rounded-full bg-[#FFB703] animate-ping" />
+            <span className="text-[#FFB703] font-bold">HERO TARGET (SX-T07)</span>
           </div>
         </div>
       </div>
@@ -248,19 +248,19 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
         />
 
         {/* Closing "Mission Accomplished" Callout Banner */}
-        <div className="absolute bottom-4 left-4 right-4 bg-[#030B14]/95 border border-[#00D4AA]/60 p-3 rounded shadow-[0_0_24px_rgba(0,212,170,0.2)] flex items-center justify-between">
+        <div className="absolute bottom-4 left-4 right-4 bg-[#05070B]/95 border border-[#FFB703]/60 p-3 rounded shadow-[0_0_24px_rgba(255, 183, 3, )] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-[#082830] border border-[#00D4AA] flex items-center justify-center text-[#00D4AA]">
+            <div className="w-8 h-8 rounded bg-[#131B2A] border border-[#FFB703] flex items-center justify-center text-[#FFB703]">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-xs font-black text-[#E0F7F4] uppercase tracking-wider flex items-center gap-2">
+              <div className="text-xs font-black text-[#F8FAFC] uppercase tracking-wider flex items-center gap-2">
                 <span>MISSION ACCOMPLISHED · 17 TARGETS PINPOINTED</span>
-                <span className="text-[9px] px-1.5 py-0.2 bg-[#00D4AA] text-[#030B14] font-bold rounded-xs">
+                <span className="text-[9px] px-1.5 py-0.2 bg-[#FFB703] text-[#05070B] font-bold rounded-xs">
                   READY FOR ROV RETRIEVAL
                 </span>
               </div>
-              <div className="text-[9.5px] text-[#4A8090]">
+              <div className="text-[9.5px] text-[#94A3B8]">
                 All acoustic anomalies georeferenced via USBL to WGS-84 coordinates. Top hazard: SX-T07 Ghost Net (43.1m depth).
               </div>
             </div>
@@ -268,7 +268,7 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
 
           <button
             onClick={onExportReport}
-            className="shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00D4AA] text-[#030B14] font-black text-xs cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_12px_rgba(0,212,170,0.3)] rounded-xs"
+            className="shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FFB703] text-[#05070B] font-black text-xs cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-[0_0_12px_rgba(255, 183, 3, )] rounded-xs"
           >
             <FileText className="w-3.5 h-3.5" />
             <span>EXPORT INCIDENT DOSSIER</span>

@@ -146,11 +146,11 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
     const W = canvas.width;
     const H = canvas.height;
 
-    ctx.fillStyle = '#030B14';
+    ctx.fillStyle = '#05070B';
     ctx.fillRect(0, 0, W, H);
 
     // Bathymetric depth contours
-    ctx.strokeStyle = '#0D2E4A';
+    ctx.strokeStyle = '#162136';
     ctx.lineWidth = 1;
     for (let r = 25; r < W; r += 32) {
       ctx.beginPath();
@@ -166,7 +166,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
       ctx.moveTo(x, 0);
       ctx.lineTo(x, H);
       ctx.stroke();
-      ctx.fillStyle = '#4A8090';
+      ctx.fillStyle = '#94A3B8';
       ctx.font = '7px monospace';
       ctx.fillText(`${(target.longitude - 0.008 + (x / W) * 0.016).toFixed(3)}°E`, x + 2, H - 4);
     }
@@ -175,15 +175,15 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
       ctx.moveTo(0, y);
       ctx.lineTo(W, y);
       ctx.stroke();
-      ctx.fillStyle = '#4A8090';
+      ctx.fillStyle = '#94A3B8';
       ctx.font = '7px monospace';
       ctx.fillText(`${(target.latitude - 0.006 + (y / H) * 0.012).toFixed(3)}°N`, 4, y - 2);
     }
     ctx.setLineDash([]);
 
     // Survey Corridor Bounding Polygon
-    ctx.fillStyle = 'rgba(0, 212, 170, 0.04)';
-    ctx.strokeStyle = 'rgba(0, 212, 170, 0.25)';
+    ctx.fillStyle = 'rgba(255, 183, 3, )';
+    ctx.strokeStyle = 'rgba(255, 183, 3, )';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(W * 0.15, H * 0.9);
@@ -195,7 +195,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
     ctx.stroke();
 
     // Towfish Trackline
-    ctx.strokeStyle = 'rgba(0, 212, 170, 0.45)';
+    ctx.strokeStyle = 'rgba(255, 183, 3, )';
     ctx.lineWidth = 1.8;
     ctx.beginPath();
     ctx.moveTo(W * 0.21, H * 0.9);
@@ -297,7 +297,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           if (j === -gridSize) ctx.moveTo(p.x, p.y);
           else ctx.lineTo(p.x, p.y);
         }
-        ctx.strokeStyle = i === 0 ? 'rgba(0, 212, 170, 0.4)' : 'rgba(13, 46, 74, 0.55)';
+        ctx.strokeStyle = i === 0 ? 'rgba(255, 183, 3, )' : 'rgba(13, 46, 74, 0.55)';
         ctx.stroke();
 
         // Grid lines along Z
@@ -313,7 +313,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           if (j === -gridSize) ctx.moveTo(p.x, p.y);
           else ctx.lineTo(p.x, p.y);
         }
-        ctx.strokeStyle = i === 0 ? 'rgba(0, 212, 170, 0.4)' : 'rgba(13, 46, 74, 0.55)';
+        ctx.strokeStyle = i === 0 ? 'rgba(255, 183, 3, )' : 'rgba(13, 46, 74, 0.55)';
         ctx.stroke();
       }
 
@@ -348,8 +348,8 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
       const t3 = project(-9, 25 - targetH, 9);
 
       // Target faces
-      ctx.fillStyle = 'rgba(0, 212, 170, 0.35)';
-      ctx.strokeStyle = '#00D4AA';
+      ctx.fillStyle = 'rgba(255, 183, 3, )';
+      ctx.strokeStyle = '#FFB703';
       ctx.lineWidth = 1.5;
 
       // Top face
@@ -416,7 +416,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
       ctx.font = 'bold 8px monospace';
       ctx.fillText('TOWFISH (H=8.4m)', tfCenter.x - 36, tfCenter.y - 8);
 
-      ctx.fillStyle = '#00D4AA';
+      ctx.fillStyle = '#FFB703';
       ctx.fillText(`TARGET: ${target.id} (h=1.42m)`, t0.x - 20, t0.y - 8);
 
       ctx.fillStyle = '#EF4444';
@@ -431,9 +431,9 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
   }, [activeTab, activeGeoTab, yaw, pitch, autoRotate, isDragging3D, target]);
 
   return (
-    <aside className="w-72 xl:w-80 2xl:w-88 bg-[#05121F] border-l border-[#0D2E4A] flex flex-col font-sans select-none overflow-y-auto shrink-0 z-20">
+    <aside className="w-72 xl:w-80 2xl:w-88 bg-[#080D17] border-l border-[#162136] flex flex-col font-sans select-none overflow-y-auto shrink-0 z-20">
       {/* ── 1. HEADER & HERO CONFIDENCE DISPLAY ── */}
-      <div className="p-3 border-b border-[#0D2E4A] bg-[#030B14] space-y-2">
+      <div className="p-3 border-b border-[#162136] bg-[#05070B] space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest">
             TARGET INTELLIGENCE
@@ -441,8 +441,8 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           <span
             className={`text-[9px] font-bold px-2 py-0.5 border uppercase rounded transition-all duration-300 ${
               isVerified
-                ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] shadow-[0_0_12px_rgba(0,212,170,0.4)] font-black'
-                : 'bg-[#082830] text-[#94A3B8] border-[#0D2E4A]'
+                ? 'bg-[#FFB703] text-[#05070B] border-[#FFB703] shadow-[0_0_12px_rgba(255, 183, 3, )] font-black'
+                : 'bg-[#131B2A] text-[#94A3B8] border-[#162136]'
             }`}
           >
             {isVerified ? '✓ VERIFIED' : 'PENDING'}
@@ -451,11 +451,11 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
 
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-sm font-black text-[#E0F7F4] tracking-tight">
+            <div className="text-sm font-black text-[#F8FAFC] tracking-tight">
               {target.id} // {target.label.toUpperCase()}
             </div>
             <div className="text-[10px] text-[#94A3B8]">
-              CATEGORY: <strong className="text-[#00D4AA]">{target.category}</strong>
+              CATEGORY: <strong className="text-[#FFB703]">{target.category}</strong>
             </div>
           </div>
 
@@ -473,9 +473,9 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
         </div>
 
         {/* Hero Confidence Card */}
-        <div className="p-2.5 bg-[#082830] border border-[#00D4AA]/60 rounded shadow-[0_0_15px_rgba(0,212,170,0.12)] flex items-center justify-between">
+        <div className="p-2.5 bg-[#131B2A] border border-[#FFB703]/60 rounded shadow-[0_0_15px_rgba(255, 183, 3, )] flex items-center justify-between">
           <div>
-            <div className="text-[28px] leading-none font-black text-[#00D4AA] tracking-tighter">
+            <div className="text-[28px] leading-none font-black text-[#FFB703] tracking-tighter">
               {displayConfidence.toFixed(1)}%
             </div>
             <div className="text-[9px] text-[#94A3B8] font-bold mt-1 uppercase">
@@ -483,25 +483,25 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
             </div>
           </div>
 
-          <div className="text-right text-[10px] text-[#E0F7F4] font-semibold space-y-0.5">
-            <div>STATUS: <span className="text-[#00D4AA]">CONFIRMED</span></div>
-            <div>VERDICT: <span className="text-[#00D4AA] font-bold">CERTAIN</span></div>
+          <div className="text-right text-[10px] text-[#F8FAFC] font-semibold space-y-0.5">
+            <div>STATUS: <span className="text-[#FFB703]">CONFIRMED</span></div>
+            <div>VERDICT: <span className="text-[#FFB703] font-bold">CERTAIN</span></div>
           </div>
         </div>
 
         {/* Confidence Progress Bar */}
         <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden">
           <div
-            className="h-full bg-[#00D4AA] transition-all duration-300 shadow-[0_0_8px_rgba(0,212,170,0.4)]"
+            className="h-full bg-[#FFB703] transition-all duration-300 shadow-[0_0_8px_rgba(255, 183, 3, )]"
             style={{ width: `${displayConfidence}%` }}
           />
         </div>
 
         {/* Human-in-the-Loop Analyst Triage & Active Learning Strip */}
-        <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded-lg space-y-1.5 font-mono text-[9px]">
+        <div className="p-2 bg-[#080D17] border border-[#162136] rounded-lg space-y-1.5 font-mono text-[9px]">
           <div className="flex items-center justify-between">
             <span className="text-slate-400 font-bold uppercase flex items-center gap-1 text-[8.5px]">
-              <Cpu className="w-3 h-3 text-[#00D4AA]" />
+              <Cpu className="w-3 h-3 text-[#FFB703]" />
               HUMAN TRIAGE / ACTIVE LEARNING
             </span>
             <span
@@ -555,7 +555,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
 
           <button
             onClick={handleExportActiveLearning}
-            className="w-full py-1 bg-[#0A1A2E] hover:bg-[#00D4AA]/15 border border-[#0D2E4A] hover:border-[#00D4AA]/40 text-[#00D4AA] rounded text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer"
+            className="w-full py-1 bg-[#0A1A2E] hover:bg-[#FFB703]/15 border border-[#162136] hover:border-[#FFB703]/40 text-[#FFB703] rounded text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer"
           >
             <Download className="w-2.5 h-2.5" />
             <span>EXPORT ACTIVE LEARNING (YOLO)</span>
@@ -564,13 +564,13 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
       </div>
 
       {/* ── 2. MERGED 3-TAB PANEL SELECTOR ── */}
-      <div className="flex items-center border-b border-[#0D2E4A] bg-[#030B14] text-xs font-bold shrink-0">
+      <div className="flex items-center border-b border-[#162136] bg-[#05070B] text-xs font-bold shrink-0">
         <button
           onClick={() => setActiveTab('evidence')}
           className={`flex-1 py-1.5 px-1 text-center transition-all cursor-pointer border-b-2 text-[10px] font-mono font-bold truncate ${
             activeTab === 'evidence'
-              ? 'border-[#00D4AA] text-[#00D4AA] bg-[#082830]/50'
-              : 'border-transparent text-[#94A3B8] hover:text-[#E0F7F4]'
+              ? 'border-[#FFB703] text-[#FFB703] bg-[#131B2A]/50'
+              : 'border-transparent text-[#94A3B8] hover:text-[#F8FAFC]'
           }`}
         >
           EVIDENCE
@@ -579,8 +579,8 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           onClick={() => setActiveTab('specs')}
           className={`flex-1 py-1.5 px-1 text-center transition-all cursor-pointer border-b-2 text-[10px] font-mono font-bold truncate ${
             activeTab === 'specs'
-              ? 'border-[#00D4AA] text-[#00D4AA] bg-[#082830]/50'
-              : 'border-transparent text-[#94A3B8] hover:text-[#E0F7F4]'
+              ? 'border-[#FFB703] text-[#FFB703] bg-[#131B2A]/50'
+              : 'border-transparent text-[#94A3B8] hover:text-[#F8FAFC]'
           }`}
         >
           SPECS
@@ -589,8 +589,8 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           onClick={() => setActiveTab('geotag')}
           className={`flex-1 py-1.5 px-1 text-center transition-all cursor-pointer border-b-2 text-[10px] font-mono font-bold truncate ${
             activeTab === 'geotag'
-              ? 'border-[#00D4AA] text-[#00D4AA] bg-[#082830]/50'
-              : 'border-transparent text-[#94A3B8] hover:text-[#E0F7F4]'
+              ? 'border-[#FFB703] text-[#FFB703] bg-[#131B2A]/50'
+              : 'border-transparent text-[#94A3B8] hover:text-[#F8FAFC]'
           }`}
         >
           GEOTAG
@@ -603,11 +603,11 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
         {activeTab === 'evidence' && (
           <div className="p-3.5 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-[#00D4AA] uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#00D4AA]" />
+              <span className="text-[10px] font-bold text-[#FFB703] uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#FFB703]" />
                 <span>AI EVIDENCE SCORES</span>
               </span>
-              <span className="text-[8.5px] font-bold px-1.5 py-0.5 bg-[#082830] text-[#94A3B8] border border-[#00D4AA]/40 rounded">
+              <span className="text-[8.5px] font-bold px-1.5 py-0.5 bg-[#131B2A] text-[#94A3B8] border border-[#FFB703]/40 rounded">
                 YOLOv8 + Heuristics
               </span>
             </div>
@@ -622,14 +622,14 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                 return (
                   <div
                     key={idx}
-                    className="p-2 bg-[#030B14] border border-[#0D2E4A] hover:border-[#00D4AA]/40 rounded flex items-start justify-between gap-2 transition-all"
+                    className="p-2 bg-[#05070B] border border-[#162136] hover:border-[#FFB703]/40 rounded flex items-start justify-between gap-2 transition-all"
                   >
                     <div className="flex items-start gap-2">
-                      <div className="p-1 rounded bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/30 shrink-0 mt-0.5">
+                      <div className="p-1 rounded bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/30 shrink-0 mt-0.5">
                         <IconComponent className="w-3 h-3" />
                       </div>
                       <div>
-                        <div className="text-[10px] font-bold text-[#E0F7F4] leading-tight">
+                        <div className="text-[10px] font-bold text-[#F8FAFC] leading-tight">
                           {chip.title}
                         </div>
                         <div className="text-[9px] text-[#94A3B8] mt-0.5 leading-tight">
@@ -638,7 +638,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                       </div>
                     </div>
 
-                    <span className="text-[9px] font-black text-[#00D4AA] shrink-0 font-mono">
+                    <span className="text-[9px] font-black text-[#FFB703] shrink-0 font-mono">
                       {chip.metric}
                     </span>
                   </div>
@@ -647,13 +647,13 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
             </div>
 
             {/* Explainable AI: Acoustic Evidence Decomposition (XAI) */}
-            <div className="p-3 bg-[#030B14] border border-[#0D2E4A] rounded-xl space-y-2 font-mono text-[9.5px]">
-              <div className="flex items-center justify-between text-[#00D4AA] font-bold">
+            <div className="p-3 bg-[#05070B] border border-[#162136] rounded-xl space-y-2 font-mono text-[9.5px]">
+              <div className="flex items-center justify-between text-[#FFB703] font-bold">
                 <span className="flex items-center gap-1.5 uppercase text-[9px]">
-                  <Shield className="w-3.5 h-3.5 text-[#00D4AA]" />
+                  <Shield className="w-3.5 h-3.5 text-[#FFB703]" />
                   <span>XAI ACOUSTIC EVIDENCE DECOMPOSITION</span>
                 </span>
-                <span className="text-[8px] px-1.5 py-0.5 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded font-bold">
+                <span className="text-[8px] px-1.5 py-0.5 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded font-bold">
                   94.7% NON-GEOLOGICAL
                 </span>
               </div>
@@ -662,10 +662,10 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                 <div>
                   <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
                     <span>1. SPECULAR BACKSCATTER INTENSITY</span>
-                    <span className="text-[#00D4AA] font-bold">+18.4 dB (+14.2 dB vs Rock)</span>
+                    <span className="text-[#FFB703] font-bold">+18.4 dB (+14.2 dB vs Rock)</span>
                   </div>
                   <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
-                    <div className="h-full bg-[#00D4AA] w-[88%]" />
+                    <div className="h-full bg-[#FFB703] w-[88%]" />
                   </div>
                 </div>
 
@@ -692,49 +692,49 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                 <div>
                   <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
                     <span>4. CAVITY / NATURAL PIT EXCLUSION</span>
-                    <span className="text-[#00D4AA] font-bold">12% (DEPRESSION RULED OUT)</span>
+                    <span className="text-[#FFB703] font-bold">12% (DEPRESSION RULED OUT)</span>
                   </div>
                   <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
-                    <div className="h-full bg-[#00D4AA] w-[12%]" />
+                    <div className="h-full bg-[#FFB703] w-[12%]" />
                   </div>
                 </div>
               </div>
 
-              <div className="p-1.5 bg-[#082830] border border-[#00D4AA]/30 rounded text-[8px] text-[#94A3B8] leading-tight">
+              <div className="p-1.5 bg-[#131B2A] border border-[#FFB703]/30 rounded text-[8px] text-[#94A3B8] leading-tight">
                 Verdict: Specular intensity and high shadow hardness rule out natural basalt rock and sand dunes with 94.7% confidence.
               </div>
             </div>
 
             {/* Platt-Calibrated True Probability Gauge (ECE Benchmark vs Competitors) */}
-            <div className="p-3 bg-[#030B14] border border-[#00D4AA]/40 rounded-xl space-y-2 font-mono text-[9px]">
-              <div className="flex items-center justify-between text-[#00D4AA] font-bold">
+            <div className="p-3 bg-[#05070B] border border-[#FFB703]/40 rounded-xl space-y-2 font-mono text-[9px]">
+              <div className="flex items-center justify-between text-[#FFB703] font-bold">
                 <span className="flex items-center gap-1.5 uppercase text-[8.5px]">
-                  <Activity className="w-3.5 h-3.5 text-[#00D4AA]" />
+                  <Activity className="w-3.5 h-3.5 text-[#FFB703]" />
                   <span>PLATT PROBABILITY CALIBRATION GAUGE</span>
                 </span>
-                <span className="text-[7.5px] px-1.5 py-0.5 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded font-bold">
+                <span className="text-[7.5px] px-1.5 py-0.5 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded font-bold">
                   ECE: 0.028 (CALIBRATED)
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[9px]">
-                <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded">
+                <div className="p-2 bg-[#080D17] border border-[#162136] rounded">
                   <span className="text-slate-400 text-[7.5px] block uppercase">RAW SOFTMAX SCORE</span>
                   <span className="text-base font-black text-slate-200">88.0%</span>
                   <span className="text-[7px] text-slate-500 block">Uncalibrated Output</span>
                 </div>
-                <div className="p-2 bg-[#05121F] border border-[#00D4AA]/50 rounded">
-                  <span className="text-[#00D4AA] text-[7.5px] block uppercase font-bold">PLATT POSTERIOR</span>
-                  <span className="text-base font-black text-[#00D4AA]">94.7%</span>
+                <div className="p-2 bg-[#080D17] border border-[#FFB703]/50 rounded">
+                  <span className="text-[#FFB703] text-[7.5px] block uppercase font-bold">PLATT POSTERIOR</span>
+                  <span className="text-base font-black text-[#FFB703]">94.7%</span>
                   <span className="text-[7px] text-emerald-400 block font-bold">True Probability P(Y=1|z)</span>
                 </div>
               </div>
 
               {/* Mathematical Equation & Temp Scaling Badge */}
-              <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded text-[8px] text-slate-300 space-y-0.5">
+              <div className="p-2 bg-[#080D17] border border-[#162136] rounded text-[8px] text-slate-300 space-y-0.5">
                 <div className="flex justify-between text-slate-400">
                   <span>LOGISTIC SIGMOID SCALING:</span>
-                  <span className="text-[#00D4AA] font-bold">P = 1 / (1 + e^-(Az+B))</span>
+                  <span className="text-[#FFB703] font-bold">P = 1 / (1 + e^-(Az+B))</span>
                 </div>
                 <div className="text-[7.5px] text-slate-400">
                   T = 0.84 · Brier Score 0.041 · Countering overconfidence in side-scan backscatter
@@ -744,13 +744,13 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
 
             {/* Environmental Impact Metrics */}
             <div className="grid grid-cols-2 gap-2 pt-1 text-[10px]">
-              <div className="p-2 bg-[#030B14] border border-[#0D2E4A] rounded">
+              <div className="p-2 bg-[#05070B] border border-[#162136] rounded">
                 <span className="text-[#94A3B8] text-[8.5px] uppercase block">VOLUMETRIC FOOTPRINT</span>
-                <strong className="text-sm font-bold text-[#00D4AA]">
+                <strong className="text-sm font-bold text-[#FFB703]">
                   {(target.length * target.width * target.shadowLength * 0.5).toFixed(1)} m³
                 </strong>
               </div>
-              <div className="p-2 bg-[#030B14] border border-[#0D2E4A] rounded">
+              <div className="p-2 bg-[#05070B] border border-[#162136] rounded">
                 <span className="text-[#94A3B8] text-[8.5px] uppercase block">PLASTIC MITIGATION</span>
                 <strong className="text-sm font-bold text-[#38BDF8]">
                   {(target.length * target.width * 14.2).toFixed(0)} kg
@@ -762,7 +762,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
             {onOpenDispatch && (
               <button
                 onClick={() => onOpenDispatch(target)}
-                className="w-full mt-2 py-2.5 bg-[#00D4AA] text-[#030B14] font-black text-xs rounded cursor-pointer hover:bg-[#00c098] shadow-[0_0_12px_rgba(0,212,170,0.3)] transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                className="w-full mt-2 py-2.5 bg-[#FFB703] text-[#05070B] font-black text-xs rounded cursor-pointer hover:bg-[#00c098] shadow-[0_0_12px_rgba(255, 183, 3, )] transition-all flex items-center justify-center gap-1.5 active:scale-95"
               >
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>DISPATCH REMEDIATION ROV UNIT</span>
@@ -779,67 +779,67 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded space-y-0.5">
+              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
                 <span className="text-[#94A3B8] text-[9px] uppercase block">SEABED DEPTH</span>
-                <strong className="text-sm font-bold text-[#E0F7F4]">{target.depth.toFixed(1)} m</strong>
-                <span className="text-[8.5px] text-[#4A8090] block">Pressure 4.3 atm</span>
+                <strong className="text-sm font-bold text-[#F8FAFC]">{target.depth.toFixed(1)} m</strong>
+                <span className="text-[8.5px] text-[#94A3B8] block">Pressure 4.3 atm</span>
               </div>
 
-              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded space-y-0.5">
+              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
                 <span className="text-[#94A3B8] text-[9px] uppercase block">DIMENSIONS (L × W)</span>
-                <strong className="text-sm font-bold text-[#E0F7F4]">{target.dimensions}</strong>
-                <span className="text-[8.5px] text-[#4A8090] block">Aspect ratio {(target.length / target.width).toFixed(1)}:1</span>
+                <strong className="text-sm font-bold text-[#F8FAFC]">{target.dimensions}</strong>
+                <span className="text-[8.5px] text-[#94A3B8] block">Aspect ratio {(target.length / target.width).toFixed(1)}:1</span>
               </div>
 
-              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded space-y-0.5">
+              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
                 <span className="text-[#94A3B8] text-[9px] uppercase block">SHADOW RELIEF</span>
-                <strong className="text-sm font-bold text-[#00D4AA]">{target.shadowLength.toFixed(2)} m</strong>
-                <span className="text-[8.5px] text-[#4A8090] block">Trigonometric Void</span>
+                <strong className="text-sm font-bold text-[#FFB703]">{target.shadowLength.toFixed(2)} m</strong>
+                <span className="text-[8.5px] text-[#94A3B8] block">Trigonometric Void</span>
               </div>
 
-              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded space-y-0.5">
+              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
                 <span className="text-[#94A3B8] text-[9px] uppercase block">ESTIMATED HEIGHT</span>
                 <strong className="text-sm font-bold text-[#38BDF8]">
                   {(target.shadowLength * 0.35).toFixed(2)} m PROUD
                 </strong>
-                <span className="text-[8.5px] text-[#4A8090] block">Above Benthic Plane</span>
+                <span className="text-[8.5px] text-[#94A3B8] block">Above Benthic Plane</span>
               </div>
 
-              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded space-y-0.5">
+              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
                 <span className="text-[#94A3B8] text-[9px] uppercase block">ACOUSTIC STRENGTH</span>
                 <strong className="text-sm font-bold text-[#F59E0B]">-14.2 dB</strong>
-                <span className="text-[8.5px] text-[#4A8090] block">Specular Return</span>
+                <span className="text-[8.5px] text-[#94A3B8] block">Specular Return</span>
               </div>
 
-              <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded space-y-0.5">
+              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
                 <span className="text-[#94A3B8] text-[9px] uppercase block">CLASSIFICATION</span>
-                <strong className="text-sm font-bold text-[#E0F7F4]">{target.category}</strong>
-                <span className="text-[8.5px] text-[#4A8090] block">Taxonomy #26057</span>
+                <strong className="text-sm font-bold text-[#F8FAFC]">{target.category}</strong>
+                <span className="text-[8.5px] text-[#94A3B8] block">Taxonomy #26057</span>
               </div>
             </div>
 
             {/* Physics-Informed Acoustic Shadow Ray-Tracer Diagram & Live Equation */}
-            <div className="p-3 bg-[#030B14] border border-[#0D2E4A] rounded-xl space-y-2 font-mono">
+            <div className="p-3 bg-[#05070B] border border-[#162136] rounded-xl space-y-2 font-mono">
               <div className="flex items-center justify-between text-[9px]">
-                <span className="font-bold text-[#00D4AA] uppercase flex items-center gap-1.5">
-                  <Ruler className="w-3.5 h-3.5 text-[#00D4AA]" />
+                <span className="font-bold text-[#FFB703] uppercase flex items-center gap-1.5">
+                  <Ruler className="w-3.5 h-3.5 text-[#FFB703]" />
                   <span>PHYSICS-INFORMED SHADOW RAY-TRACER</span>
                 </span>
-                <span className="text-[8px] px-1.5 py-0.5 bg-[#082830] text-[#38BDF8] border border-[#38BDF8]/40 rounded font-bold">
+                <span className="text-[8px] px-1.5 py-0.5 bg-[#131B2A] text-[#38BDF8] border border-[#38BDF8]/40 rounded font-bold">
                   PI-AI CALC
                 </span>
               </div>
 
               {/* SVG Ray-Tracing Cross-Section Diagram */}
-              <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded-lg">
+              <div className="p-2 bg-[#080D17] border border-[#162136] rounded-lg">
                 <svg viewBox="0 0 280 110" className="w-full h-24">
                   {/* Water Surface Baseline */}
-                  <line x1="10" y1="15" x2="270" y2="15" stroke="#0D2E4A" strokeWidth="1" strokeDasharray="3,3" />
+                  <line x1="10" y1="15" x2="270" y2="15" stroke="#162136" strokeWidth="1" strokeDasharray="3,3" />
                   <text x="12" y="12" fill="#94A3B8" fontSize="6.5">WATER SURFACE</text>
 
                   {/* Sonar Transducer Towfish */}
-                  <circle cx="35" cy="28" r="4" fill="#00D4AA" />
-                  <text x="44" y="30" fill="#00D4AA" fontSize="7" fontWeight="bold">TOWFISH (H = 8.4m)</text>
+                  <circle cx="35" cy="28" r="4" fill="#FFB703" />
+                  <text x="44" y="30" fill="#FFB703" fontSize="7" fontWeight="bold">TOWFISH (H = 8.4m)</text>
 
                   {/* Seafloor Bedline */}
                   <line x1="10" y1="95" x2="270" y2="95" stroke="#1A4E6A" strokeWidth="2" />
@@ -850,8 +850,8 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                   <text x="70" y="50" fill="#38BDF8" fontSize="6.5" transform="rotate(25, 70, 50)">Slant Range Rs = 25.0m</text>
 
                   {/* Target Object on Seafloor */}
-                  <rect x="135" y="82" width="12" height="13" fill="#00D4AA" rx="1" />
-                  <text x="124" y="78" fill="#E0F7F4" fontSize="7" fontWeight="bold">TARGET</text>
+                  <rect x="135" y="82" width="12" height="13" fill="#FFB703" rx="1" />
+                  <text x="124" y="78" fill="#F8FAFC" fontSize="7" fontWeight="bold">TARGET</text>
 
                   {/* Cast Acoustic Shadow Wedge on Seabed */}
                   <polygon points="147,95 240,95 147,82" fill="#01050A" stroke="#EF4444" strokeWidth="1" strokeDasharray="2,2" />
@@ -859,21 +859,21 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                   <text x="160" y="105" fill="#F59E0B" fontSize="6.5" fontWeight="bold">Shadow Ls = {target.shadowLength.toFixed(2)}m</text>
 
                   {/* Height Extrusion Arrow */}
-                  <line x1="130" y1="82" x2="130" y2="95" stroke="#00D4AA" strokeWidth="1.5" />
-                  <text x="96" y="90" fill="#00D4AA" fontSize="7" fontWeight="bold">h = {((target.shadowLength * 8.4) / (25.0 + target.shadowLength)).toFixed(2)}m</text>
+                  <line x1="130" y1="82" x2="130" y2="95" stroke="#FFB703" strokeWidth="1.5" />
+                  <text x="96" y="90" fill="#FFB703" fontSize="7" fontWeight="bold">h = {((target.shadowLength * 8.4) / (25.0 + target.shadowLength)).toFixed(2)}m</text>
                 </svg>
               </div>
 
               {/* Physics Formula Breakdown */}
-              <div className="p-2 bg-[#05121F] border border-[#0D2E4A] rounded text-[8.5px] space-y-1">
+              <div className="p-2 bg-[#080D17] border border-[#162136] rounded text-[8.5px] space-y-1">
                 <div className="flex justify-between text-[#94A3B8]">
                   <span>GOVERNING ACOUSTIC EQUATION:</span>
-                  <span className="text-[#00D4AA] font-bold">h = (Ls × H) / (Rs + Ls)</span>
+                  <span className="text-[#FFB703] font-bold">h = (Ls × H) / (Rs + Ls)</span>
                 </div>
-                <div className="text-[#E0F7F4] font-mono text-[9px]">
-                  h = ({target.shadowLength.toFixed(2)}m × 8.40m) / (25.00m + {target.shadowLength.toFixed(2)}m) = <span className="text-[#00D4AA] font-black text-xs">{((target.shadowLength * 8.4) / (25.0 + target.shadowLength)).toFixed(2)}m</span> proud of seabed
+                <div className="text-[#F8FAFC] font-mono text-[9px]">
+                  h = ({target.shadowLength.toFixed(2)}m × 8.40m) / (25.00m + {target.shadowLength.toFixed(2)}m) = <span className="text-[#FFB703] font-black text-xs">{((target.shadowLength * 8.4) / (25.0 + target.shadowLength)).toFixed(2)}m</span> proud of seabed
                 </div>
-                <div className="flex items-center justify-between pt-1 border-t border-[#0D2E4A] text-[8px]">
+                <div className="flex items-center justify-between pt-1 border-t border-[#162136] text-[8px]">
                   <span className="text-[#94A3B8]">BENTHIC HAZARD RATING:</span>
                   <span className="text-[#EF4444] font-bold">CRITICAL SUBSEA NAVIGATION RISK</span>
                 </div>
@@ -886,12 +886,12 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
         {activeTab === 'geotag' && (
           <div className="p-3.5 space-y-3">
             {/* Geotag Coordinates Header */}
-            <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] rounded space-y-1">
+            <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-1">
               <div className="flex items-center justify-between text-[9px] text-[#94A3B8]">
                 <span className="uppercase font-bold">WGS84 COORDINATES</span>
-                <span className="text-[#00D4AA] font-mono font-bold">USBL FIXED</span>
+                <span className="text-[#FFB703] font-mono font-bold">USBL FIXED</span>
               </div>
-              <div className="text-xs font-mono font-bold text-[#E0F7F4]">
+              <div className="text-xs font-mono font-bold text-[#F8FAFC]">
                 {target.latitude.toFixed(4)}° N, {target.longitude.toFixed(4)}° E
               </div>
               <div className="text-[8.5px] text-[#94A3B8]">
@@ -901,13 +901,13 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
 
             {/* Map / 3D Canvas Switcher */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 bg-[#030B14] p-0.5 border border-[#0D2E4A] rounded">
+              <div className="flex items-center gap-1 bg-[#05070B] p-0.5 border border-[#162136] rounded">
                 <button
                   onClick={() => setActiveGeoTab('map')}
                   className={`px-2 py-0.5 rounded text-[9px] font-bold transition-all cursor-pointer ${
                     activeGeoTab === 'map'
-                      ? 'bg-[#00D4AA] text-[#030B14]'
-                      : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+                      ? 'bg-[#FFB703] text-[#05070B]'
+                      : 'text-[#94A3B8] hover:text-[#F8FAFC]'
                   }`}
                 >
                   MAP VIEW
@@ -916,8 +916,8 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                   onClick={() => setActiveGeoTab('3d')}
                   className={`px-2 py-0.5 rounded text-[9px] font-bold transition-all cursor-pointer ${
                     activeGeoTab === '3d'
-                      ? 'bg-[#00D4AA] text-[#030B14]'
-                      : 'text-[#94A3B8] hover:text-[#E0F7F4]'
+                      ? 'bg-[#FFB703] text-[#05070B]'
+                      : 'text-[#94A3B8] hover:text-[#F8FAFC]'
                   }`}
                 >
                   3D MESH
@@ -930,7 +930,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
             </div>
 
             {/* Canvas Viewport */}
-            <div className="h-44 rounded border border-[#0D2E4A] overflow-hidden bg-[#030B14] relative">
+            <div className="h-44 rounded border border-[#162136] overflow-hidden bg-[#05070B] relative">
               {activeGeoTab === 'map' ? (
                 <canvas
                   ref={mapCanvasRef}
@@ -965,8 +965,8 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                       onClick={() => setAutoRotate((r) => !r)}
                       className={`px-1.5 py-0.5 rounded text-[7.5px] font-mono font-bold border transition-all cursor-pointer ${
                         autoRotate
-                          ? 'bg-[#00D4AA]/20 text-[#00D4AA] border-[#00D4AA]/40'
-                          : 'bg-[#05121F] text-slate-400 border-[#0D2E4A]'
+                          ? 'bg-[#FFB703]/20 text-[#FFB703] border-[#FFB703]/40'
+                          : 'bg-[#080D17] text-slate-400 border-[#162136]'
                       }`}
                     >
                       {autoRotate ? 'ORBIT: ON' : 'ORBIT: OFF'}
@@ -976,7 +976,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                         setYaw(0.75);
                         setPitch(0.55);
                       }}
-                      className="px-1.5 py-0.5 rounded text-[7.5px] font-mono text-slate-400 bg-[#05121F] border border-[#0D2E4A] hover:text-white transition-all cursor-pointer"
+                      className="px-1.5 py-0.5 rounded text-[7.5px] font-mono text-slate-400 bg-[#080D17] border border-[#162136] hover:text-white transition-all cursor-pointer"
                       title="Reset 3D View"
                     >
                       RESET
@@ -991,19 +991,19 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
 
             {/* Geotagging Pipeline Sequence */}
             <div className="flex items-center gap-1 text-[8px] text-[#94A3B8] overflow-x-auto py-1">
-              <span className="px-1.5 py-0.5 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 font-bold shrink-0 rounded">
+              <span className="px-1.5 py-0.5 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 font-bold shrink-0 rounded">
                 SONAR
               </span>
               <span>→</span>
-              <span className="px-1 py-0.5 bg-[#0A1E30] text-[#E0F7F4] border border-[#0D2E4A] shrink-0 rounded">
+              <span className="px-1 py-0.5 bg-[#0A1E30] text-[#F8FAFC] border border-[#162136] shrink-0 rounded">
                 PING #0184
               </span>
               <span>→</span>
-              <span className="px-1 py-0.5 bg-[#0A1E30] text-[#E0F7F4] border border-[#0D2E4A] shrink-0 rounded">
+              <span className="px-1 py-0.5 bg-[#0A1E30] text-[#F8FAFC] border border-[#162136] shrink-0 rounded">
                 USBL
               </span>
               <span>→</span>
-              <span className="px-1 py-0.5 bg-[#0A1E30] text-[#00D4AA] border border-[#0D2E4A] font-bold shrink-0 rounded">
+              <span className="px-1 py-0.5 bg-[#0A1E30] text-[#FFB703] border border-[#162136] font-bold shrink-0 rounded">
                 WGS84
               </span>
             </div>
@@ -1012,12 +1012,12 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
       </div>
 
       {/* MoES Clearance Certificate Trigger Button */}
-      <div className="p-2.5 border-t border-[#0D2E4A] bg-[#030B14] shrink-0">
+      <div className="p-2.5 border-t border-[#162136] bg-[#05070B] shrink-0">
         <button
           onClick={() => setIsCertModalOpen(true)}
-          className="w-full py-2 bg-[#0D2640] border border-[#00D4AA]/60 hover:bg-[#00D4AA]/15 text-[#00D4AA] font-mono font-bold text-[10.5px] rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(0,212,170,0.15)]"
+          className="w-full py-2 bg-[#0D2640] border border-[#FFB703]/60 hover:bg-[#FFB703]/15 text-[#FFB703] font-mono font-bold text-[10.5px] rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(255, 183, 3, )]"
         >
-          <Award className="w-3.5 h-3.5 text-[#00D4AA]" />
+          <Award className="w-3.5 h-3.5 text-[#FFB703]" />
           <span>MoES CERTIFICATE (SHA-256)</span>
         </button>
       </div>

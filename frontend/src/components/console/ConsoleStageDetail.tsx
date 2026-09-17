@@ -181,16 +181,16 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
   }, [selectedCandidate]);
 
   return (
-    <div className="w-80 lg:w-96 bg-[#05121F] border-l border-[#0D2E4A] flex flex-col justify-between select-none font-mono text-[11px] shrink-0 overflow-y-auto">
+    <div className="w-80 lg:w-96 bg-[#080D17] border-l border-[#162136] flex flex-col justify-between select-none font-mono text-[11px] shrink-0 overflow-y-auto">
       <div className="p-3 space-y-3 flex-1">
         {/* 1. Header: 0X [STAGE NAME] + Count Badge */}
-        <div className="flex items-center justify-between pb-2 border-b border-[#0D2E4A]">
+        <div className="flex items-center justify-between pb-2 border-b border-[#162136]">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-black text-[#E0F7F4] tracking-wider uppercase">
+            <span className="text-sm font-black text-[#F8FAFC] tracking-wider uppercase">
               {stage.id} {stage.name}
             </span>
           </div>
-          <span className="text-[9px] font-bold px-2 py-0.5 border border-[#00D4AA]/60 bg-[#082830] text-[#00D4AA] shadow-[0_0_10px_rgba(0,212,170,0.2)]">
+          <span className="text-[9px] font-bold px-2 py-0.5 border border-[#FFB703]/60 bg-[#131B2A] text-[#FFB703] shadow-[0_0_10px_rgba(255, 183, 3, )]">
             {stage.countBadge}
           </span>
         </div>
@@ -198,11 +198,11 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
         {/* 2. Dynamic Metric Row: 3 Animated Funnel Tiles */}
         <div className="grid grid-cols-3 gap-1.5 text-center">
           {/* RAW / M1 */}
-          <div className="p-2 border border-[#0D2E4A] bg-[#030B14] space-y-0.5 transition-all">
-            <span className="text-[7.5px] text-[#4A8090] uppercase block truncate font-bold">
+          <div className="p-2 border border-[#162136] bg-[#05070B] space-y-0.5 transition-all">
+            <span className="text-[7.5px] text-[#94A3B8] uppercase block truncate font-bold">
               RAW DETECTIONS
             </span>
-            <strong className="text-xs font-black text-[#E0F7F4] block font-mono">
+            <strong className="text-xs font-black text-[#F8FAFC] block font-mono">
               <AnimatedNumber value={rawCount} />
             </strong>
           </div>
@@ -218,39 +218,39 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
           </div>
 
           {/* CONFIRMED / M3 */}
-          <div className="p-2 border border-[#00D4AA]/60 bg-[#083040] space-y-0.5 transition-all shadow-[0_0_10px_rgba(0,212,170,0.12)]">
-            <span className="text-[7.5px] text-[#00D4AA] uppercase block truncate font-bold">
+          <div className="p-2 border border-[#FFB703]/60 bg-[#083040] space-y-0.5 transition-all shadow-[0_0_10px_rgba(255, 183, 3, )]">
+            <span className="text-[7.5px] text-[#FFB703] uppercase block truncate font-bold">
               CONFIRMED DEBRIS
             </span>
-            <strong className="text-xs font-black text-[#00D4AA] block font-mono">
+            <strong className="text-xs font-black text-[#FFB703] block font-mono">
               <AnimatedNumber value={confirmedCount} />
             </strong>
           </div>
         </div>
 
         {/* Funnel ratio indicator */}
-        <div className="flex items-center justify-between px-1 text-[8px] text-[#4A8090] font-mono">
+        <div className="flex items-center justify-between px-1 text-[8px] text-[#94A3B8] font-mono">
           <span>FUNNEL EFFICIENCY:</span>
-          <span className="text-[#00D4AA] font-bold">
+          <span className="text-[#FFB703] font-bold">
             {rawCount > 0 ? `${((confirmedCount / rawCount) * 100).toFixed(0)}% RECOVERY YIELD` : '0%'}
           </span>
         </div>
 
         {/* 3. DYNAMIC INTERACTIVE FILTER ENGINE PANEL */}
-        <div className="p-2.5 bg-[#030B14] border border-[#0D2E4A] space-y-2.5">
-          <div className="flex items-center justify-between pb-1 border-b border-[#0D2E4A]/80">
-            <div className="flex items-center gap-1.5 text-[8.5px] font-bold text-[#00D4AA] uppercase tracking-wider">
-              <Sliders className="w-3 h-3 text-[#00D4AA]" />
+        <div className="p-2.5 bg-[#05070B] border border-[#162136] space-y-2.5">
+          <div className="flex items-center justify-between pb-1 border-b border-[#162136]/80">
+            <div className="flex items-center gap-1.5 text-[8.5px] font-bold text-[#FFB703] uppercase tracking-wider">
+              <Sliders className="w-3 h-3 text-[#FFB703]" />
               <span>DYNAMIC FILTER ENGINE</span>
             </div>
-            <span className="text-[7.5px] text-[#00D4AA] font-bold animate-pulse">LIVE RECOMPUTE</span>
+            <span className="text-[7.5px] text-[#FFB703] font-bold animate-pulse">LIVE RECOMPUTE</span>
           </div>
 
           {/* Slider: Confidence Cutoff */}
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[8px] font-bold">
-              <span className="text-[#4A8090]">CONFIDENCE THRESHOLD:</span>
-              <span className="text-[#00D4AA] font-mono text-[9px] px-1.5 py-0.2 bg-[#082830] border border-[#00D4AA]/50 shadow-[0_0_8px_rgba(0,212,170,0.2)]">
+              <span className="text-[#94A3B8]">CONFIDENCE THRESHOLD:</span>
+              <span className="text-[#FFB703] font-mono text-[9px] px-1.5 py-0.2 bg-[#131B2A] border border-[#FFB703]/50 shadow-[0_0_8px_rgba(255, 183, 3, )]">
                 {(confidenceThreshold * 100).toFixed(0)}%
               </span>
             </div>
@@ -261,9 +261,9 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
               step="0.01"
               value={confidenceThreshold}
               onChange={(e) => onChangeConfidenceThreshold(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-[#0A1E30] appearance-none cursor-pointer accent-[#00D4AA]"
+              className="w-full h-1.5 bg-[#0A1E30] appearance-none cursor-pointer accent-[#FFB703]"
             />
-            <div className="flex justify-between text-[7px] text-[#2A5060]">
+            <div className="flex justify-between text-[7px] text-[#64748B]">
               <span>0% (Permissive)</span>
               <span>50%</span>
               <span>100% (Strict)</span>
@@ -275,15 +275,15 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
             onClick={onToggleShadowFilter}
             className={`flex items-center justify-between p-2 border cursor-pointer transition-all ${
               shadowFilterEnabled
-                ? 'bg-[#082830] border-[#00D4AA]/80 text-[#E0F7F4] shadow-[0_0_10px_rgba(0,212,170,0.15)]'
-                : 'bg-[#0A1E30] border-[#0D2E4A] text-[#4A8090] hover:border-[#00D4AA]/40'
+                ? 'bg-[#131B2A] border-[#FFB703]/80 text-[#F8FAFC] shadow-[0_0_10px_rgba(255, 183, 3, )]'
+                : 'bg-[#0A1E30] border-[#162136] text-[#94A3B8] hover:border-[#FFB703]/40'
             }`}
           >
             <div className="flex items-center gap-1.5 text-[8px]">
-              <ShieldCheck className={`w-3.5 h-3.5 ${shadowFilterEnabled ? 'text-[#00D4AA]' : 'text-[#4A8090]'}`} />
+              <ShieldCheck className={`w-3.5 h-3.5 ${shadowFilterEnabled ? 'text-[#FFB703]' : 'text-[#94A3B8]'}`} />
               <div className="flex flex-col text-left">
                 <span className="font-bold">ACOUSTIC SHADOW VERIFICATION</span>
-                <span className="text-[7px] text-[#4A8090]">
+                <span className="text-[7px] text-[#94A3B8]">
                   {shadowFilterEnabled ? 'Filters 0m shadow relief & aspect > 6.0' : 'Bypassed — restores geometric rejects'}
                 </span>
               </div>
@@ -291,8 +291,8 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
             <span
               className={`text-[8px] font-bold px-1.5 py-0.5 border ${
                 shadowFilterEnabled
-                  ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA]'
-                  : 'bg-[#030B14] text-[#2A5060] border-[#0D2E4A]'
+                  ? 'bg-[#FFB703] text-[#05070B] border-[#FFB703]'
+                  : 'bg-[#05070B] text-[#64748B] border-[#162136]'
               }`}
             >
               {shadowFilterEnabled ? 'ACTIVE' : 'OFF'}
@@ -301,9 +301,9 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
 
           {/* Category Filter Pills */}
           <div className="space-y-1">
-            <div className="flex items-center justify-between text-[7.5px] text-[#4A8090] font-bold uppercase">
+            <div className="flex items-center justify-between text-[7.5px] text-[#94A3B8] font-bold uppercase">
               <div className="flex items-center gap-1">
-                <Filter className="w-2.5 h-2.5 text-[#00D4AA]" />
+                <Filter className="w-2.5 h-2.5 text-[#FFB703]" />
                 <span>TAXONOMY FILTER:</span>
               </div>
               <span>Dims non-matching to 15%</span>
@@ -317,8 +317,8 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                     onClick={() => onChangeCategory(tab.id)}
                     className={`py-0.5 text-[7.5px] font-bold border transition-all cursor-pointer text-center ${
                       isActive
-                        ? 'bg-[#00D4AA] text-[#030B14] border-[#00D4AA] shadow-[0_0_8px_rgba(0,212,170,0.3)]'
-                        : 'bg-[#0A1E30] text-[#4A8090] border-[#0D2E4A] hover:text-[#E0F7F4] hover:border-[#00D4AA]/40'
+                        ? 'bg-[#FFB703] text-[#05070B] border-[#FFB703] shadow-[0_0_8px_rgba(255, 183, 3, )]'
+                        : 'bg-[#0A1E30] text-[#94A3B8] border-[#162136] hover:text-[#F8FAFC] hover:border-[#FFB703]/40'
                     }`}
                   >
                     {tab.label}
@@ -331,13 +331,13 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
 
         {/* 4. Candidate Register (Sorted by Verdict with Drift Action) */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-[8.5px] text-[#4A8090] font-bold uppercase tracking-wider">
+          <div className="flex items-center justify-between text-[8.5px] text-[#94A3B8] font-bold uppercase tracking-wider">
             <span>CANDIDATE REGISTER</span>
             <div className="flex items-center gap-2">
-              <span className="text-[#00D4AA]">showing {sortedCandidates.length} of {candidates.length} total</span>
+              <span className="text-[#FFB703]">showing {sortedCandidates.length} of {candidates.length} total</span>
               <button
                 onClick={handleExportCSV}
-                className="hover:text-[#00D4AA] cursor-pointer flex items-center gap-0.5"
+                className="hover:text-[#FFB703] cursor-pointer flex items-center gap-0.5"
                 title="Export register to CSV"
               >
                 <FileSpreadsheet className="w-2.5 h-2.5" />
@@ -346,9 +346,9 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
             </div>
           </div>
 
-          <div className="border border-[#0D2E4A] bg-[#030B14] overflow-hidden max-h-48 overflow-y-auto">
+          <div className="border border-[#162136] bg-[#05070B] overflow-hidden max-h-48 overflow-y-auto">
             <table className="w-full text-[9px] text-left">
-              <thead className="bg-[#0A1E30] text-[#4A8090] border-b border-[#0D2E4A] sticky top-0 z-10">
+              <thead className="bg-[#0A1E30] text-[#94A3B8] border-b border-[#162136] sticky top-0 z-10">
                 <tr>
                   <th className="py-1 px-1.5 font-normal">ID</th>
                   <th className="py-1 px-1.5 font-normal text-right">CONF</th>
@@ -358,14 +358,14 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                   <th className="py-1 px-1 font-normal text-right">DRIFT</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#0D2E4A]">
+              <tbody className="divide-y divide-[#162136]">
                 {sortedCandidates.map((item) => {
                   const isSelected = selectedCandidateId === item.id;
                   const isHovered = hoveredCandidateId === item.id;
                   const isConfirmed = item.status === 'CONFIRMED';
                   const isDriftActive = projectDriftCandidateId === item.id;
 
-                  let confBadgeClass = 'bg-[#00D4AA]/20 text-[#00D4AA] border-[#00D4AA]/40';
+                  let confBadgeClass = 'bg-[#FFB703]/20 text-[#FFB703] border-[#FFB703]/40';
                   if (item.confidence < 0.4) {
                     confBadgeClass = 'bg-[#ef4444]/20 text-[#ef4444] border-[#ef4444]/40';
                   } else if (item.confidence < 0.7) {
@@ -380,14 +380,14 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                       onMouseLeave={() => onHoverCandidate && onHoverCandidate(null)}
                       className={`cursor-pointer transition-colors ${
                         isSelected
-                          ? 'bg-[#082830] text-[#00D4AA] font-bold'
+                          ? 'bg-[#131B2A] text-[#FFB703] font-bold'
                           : isHovered
-                          ? 'bg-[#0A1E30] text-[#E0F7F4]'
-                          : 'text-[#E0F7F4] hover:bg-[#0A1E30]'
+                          ? 'bg-[#0A1E30] text-[#F8FAFC]'
+                          : 'text-[#F8FAFC] hover:bg-[#0A1E30]'
                       }`}
                     >
                       <td className="py-1 px-1.5 font-bold flex items-center gap-1">
-                        {isSelected && <span className="text-[#00D4AA]">▶</span>}
+                        {isSelected && <span className="text-[#FFB703]">▶</span>}
                         <span>{item.id}</span>
                       </td>
                       <td className="py-1 px-1.5 text-right font-mono">
@@ -395,17 +395,17 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                           {(item.confidence * 100).toFixed(0)}%
                         </span>
                       </td>
-                      <td className="py-1 px-1.5 text-right font-mono text-[#4A8090]">
+                      <td className="py-1 px-1.5 text-right font-mono text-[#94A3B8]">
                         {item.aspectRatio.toFixed(1)}
                       </td>
-                      <td className="py-1 px-1.5 text-right font-mono text-[#4A8090]">
+                      <td className="py-1 px-1.5 text-right font-mono text-[#94A3B8]">
                         {item.shadowLengthM}m
                       </td>
                       <td className="py-1 px-1.5 text-right">
                         <span
                           className={`text-[7.5px] px-1 py-0.2 font-bold ${
                             isConfirmed
-                              ? 'bg-[#00D4AA]/20 text-[#00D4AA] border border-[#00D4AA]/40'
+                              ? 'bg-[#FFB703]/20 text-[#FFB703] border border-[#FFB703]/40'
                               : 'bg-[#ef4444]/20 text-[#ef4444] border border-[#ef4444]/40'
                           }`}
                         >
@@ -421,15 +421,15 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                             }}
                             className={`px-1 py-0.2 text-[7px] font-bold border transition-all cursor-pointer ${
                               isDriftActive
-                                ? 'bg-[#38bdf8] text-[#030B14] border-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]'
-                                : 'bg-[#05121F] text-[#38bdf8] border-[#38bdf8]/40 hover:bg-[#38bdf8]/20'
+                                ? 'bg-[#38bdf8] text-[#05070B] border-[#38bdf8] shadow-[0_0_8px_rgba(56,189,248,0.4)]'
+                                : 'bg-[#080D17] text-[#38bdf8] border-[#38bdf8]/40 hover:bg-[#38bdf8]/20'
                             }`}
                             title="Project drift vector (SARAT / INCOIS)"
                           >
                             {isDriftActive ? 'ON' : 'DRIFT'}
                           </button>
                         ) : (
-                          <span className="text-[#2A5060] text-[7px]">—</span>
+                          <span className="text-[#64748B] text-[7px]">—</span>
                         )}
                       </td>
                     </tr>
@@ -442,14 +442,14 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
 
         {/* 5. Selected Candidate Focused Dossier with Drift & Action Directives */}
         {selectedCandidate && (
-          <div className="p-2.5 bg-[#0A1E30] border border-[#0D2E4A] text-[8.5px] space-y-2">
-            <div className="flex items-center justify-between text-[#00D4AA] font-bold">
+          <div className="p-2.5 bg-[#0A1E30] border border-[#162136] text-[8.5px] space-y-2">
+            <div className="flex items-center justify-between text-[#FFB703] font-bold">
               <span>TARGET DOSSIER: {selectedCandidate.id}</span>
-              <span className="text-[#E0F7F4]">{selectedCandidate.dimensions}</span>
+              <span className="text-[#F8FAFC]">{selectedCandidate.dimensions}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#4A8090]">CLASSIFICATION:</span>
-              <strong className="text-[#00D4AA]">{selectedCandidate.class}</strong>
+              <span className="text-[#94A3B8]">CLASSIFICATION:</span>
+              <strong className="text-[#FFB703]">{selectedCandidate.class}</strong>
             </div>
 
             {selectedCandidate.status === 'REJECTED' ? (
@@ -457,17 +457,17 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                 <strong>WHY REJECTED:</strong> {getDynamicRejectReason(selectedCandidate)}
               </div>
             ) : (
-              <div className="p-1.5 bg-[#082830] border border-[#00D4AA]/40 text-[#00D4AA] text-[8px] flex items-center justify-between">
+              <div className="p-1.5 bg-[#131B2A] border border-[#FFB703]/40 text-[#FFB703] text-[8px] flex items-center justify-between">
                 <span>VERDICT: CONFIRMED DEBRIS</span>
                 <span>ASPECT {selectedCandidate.aspectRatio.toFixed(1)} · SHADOW {selectedCandidate.shadowLengthM}m</span>
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-1 text-[#4A8090] text-[8px] pt-0.5">
-              <div>CONFIDENCE: <strong className="text-[#E0F7F4]">{(selectedCandidate.confidence * 100).toFixed(1)}%</strong></div>
-              <div>DEPTH: <strong className="text-[#E0F7F4]">{selectedCandidate.depthM}m</strong></div>
+            <div className="grid grid-cols-2 gap-1 text-[#94A3B8] text-[8px] pt-0.5">
+              <div>CONFIDENCE: <strong className="text-[#F8FAFC]">{(selectedCandidate.confidence * 100).toFixed(1)}%</strong></div>
+              <div>DEPTH: <strong className="text-[#F8FAFC]">{selectedCandidate.depthM}m</strong></div>
               <div className="col-span-2">
-                GEOTAG: <strong className="text-[#00D4AA]">{selectedCandidate.lat.toFixed(4)}°N, {selectedCandidate.lon.toFixed(4)}°E</strong>
+                GEOTAG: <strong className="text-[#FFB703]">{selectedCandidate.lat.toFixed(4)}°N, {selectedCandidate.lon.toFixed(4)}°E</strong>
               </div>
             </div>
 
@@ -483,8 +483,8 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                     onClick={() => onToggleProjectDrift && onToggleProjectDrift(selectedCandidate.id)}
                     className={`px-1.5 py-0.5 text-[7px] font-bold border transition-all cursor-pointer ${
                       projectDriftCandidateId === selectedCandidate.id
-                        ? 'bg-[#38bdf8] text-[#030B14] border-[#38bdf8]'
-                        : 'bg-[#05121F] text-[#38bdf8] border-[#38bdf8]/60 hover:bg-[#38bdf8]/20'
+                        ? 'bg-[#38bdf8] text-[#05070B] border-[#38bdf8]'
+                        : 'bg-[#080D17] text-[#38bdf8] border-[#38bdf8]/60 hover:bg-[#38bdf8]/20'
                     }`}
                   >
                     {projectDriftCandidateId === selectedCandidate.id ? 'HIDE MAP VECTOR' : 'PROJECT ON MAP'}
@@ -503,8 +503,8 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                       }`}
                     >
                       <div className="text-[#38bdf8] font-bold">{node.timeLabel} (+{node.driftNm}nm)</div>
-                      <div className="text-[#E0F7F4]">{node.lat}°N</div>
-                      <div className="text-[#E0F7F4]">{node.lon}°E</div>
+                      <div className="text-[#F8FAFC]">{node.lat}°N</div>
+                      <div className="text-[#F8FAFC]">{node.lon}°E</div>
                     </div>
                   ))}
                 </div>
@@ -514,7 +514,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                   <strong>Recommended Intercept Window:</strong> [{driftData.recommendedInterceptWindow}] near {driftData.recommendedInterceptCoords}
                 </div>
 
-                <div className="text-[6.5px] text-[#4A8090]">
+                <div className="text-[6.5px] text-[#94A3B8]">
                   * {driftData.disclaimer}
                 </div>
               </div>
@@ -524,7 +524,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
             <div className="space-y-1 pt-1">
               <button
                 onClick={() => handleExportSingleTarget(selectedCandidate)}
-                className="w-full flex items-center justify-center gap-1.5 py-1 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/60 text-[#00D4AA] text-[8px] font-bold cursor-pointer transition-colors"
+                className="w-full flex items-center justify-center gap-1.5 py-1 bg-[#080D17] border border-[#162136] hover:border-[#FFB703]/60 text-[#FFB703] text-[8px] font-bold cursor-pointer transition-colors"
               >
                 <Download className="w-2.5 h-2.5" />
                 <span>EXPORT SINGLE TARGET DOSSIER (JSON)</span>
@@ -533,7 +533,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
               {onExportIncidentReport && (
                 <button
                   onClick={onExportIncidentReport}
-                  className="w-full flex items-center justify-center gap-1.5 py-1 bg-[#0c2538] border border-[#38bdf8]/60 hover:bg-[#38bdf8] hover:text-[#030b14] text-[#38bdf8] text-[8px] font-bold cursor-pointer transition-colors shadow-[0_0_10px_rgba(56,189,248,0.2)]"
+                  className="w-full flex items-center justify-center gap-1.5 py-1 bg-[#0c2538] border border-[#38bdf8]/60 hover:bg-[#38bdf8] hover:text-[#05070B] text-[#38bdf8] text-[8px] font-bold cursor-pointer transition-colors shadow-[0_0_10px_rgba(56,189,248,0.2)]"
                 >
                   <FileText className="w-2.5 h-2.5" />
                   <span>EXPORT OFFICIAL INCIDENT REPORT (MoES / INCOIS)</span>
@@ -545,9 +545,9 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
       </div>
 
       {/* 6. Event State Strip at Bottom */}
-      <div className="p-2 border-t border-[#0D2E4A] bg-[#030B14] text-[8.5px] text-[#4A8090] flex items-center justify-between">
+      <div className="p-2 border-t border-[#162136] bg-[#05070B] text-[8.5px] text-[#94A3B8] flex items-center justify-between">
         <span className="truncate">{stage.eventState}</span>
-        <span className="text-[#00D4AA] font-bold shrink-0 ml-2">NODE-04 OK</span>
+        <span className="text-[#FFB703] font-bold shrink-0 ml-2">NODE-04 OK</span>
       </div>
     </div>
   );

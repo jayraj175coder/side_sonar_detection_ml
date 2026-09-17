@@ -303,14 +303,14 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
             </button>
 
             {/* Acoustic Frequency Selector */}
-            <div className="flex items-center gap-1 bg-[#091522] border border-[#102436] rounded-xl p-1">
+            <div className="flex items-center gap-1 bg-[#0B111D] border border-[#1A2436] rounded-xl p-1">
               <span className="text-[9px] font-mono text-slate-500 uppercase px-1 hidden sm:inline">FREQ:</span>
               <button
                 type="button"
                 onClick={() => setTransducerFreq(450)}
                 className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
                   transducerFreq === 450
-                    ? 'bg-[#38BDF8] text-[#030B14] shadow-sm'
+                    ? 'bg-[#38BDF8] text-[#05070B] shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
                 title="450 kHz (Deep Swath Search)"
@@ -322,7 +322,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                 onClick={() => setTransducerFreq(900)}
                 className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
                   transducerFreq === 900
-                    ? 'bg-[#00D4AA] text-[#030B14] shadow-sm'
+                    ? 'bg-[#FFB703] text-[#05070B] shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
                 title="900 kHz (Tactical Profiling)"
@@ -344,7 +344,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
             </div>
 
             {/* Palette Switcher */}
-            <div className="flex items-center gap-1 bg-[#091522] border border-[#102436] rounded-xl p-1">
+            <div className="flex items-center gap-1 bg-[#0B111D] border border-[#1A2436] rounded-xl p-1">
               <span className="text-[9px] font-mono text-slate-500 uppercase px-1 hidden sm:inline">PALETTE:</span>
               <button
                 type="button"

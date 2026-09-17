@@ -62,13 +62,13 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
       <div className="p-3.5 border-b border-[#16303B] bg-[#0C171E] shrink-0 space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Crosshair className="w-4 h-4 text-[#32E6D1]" />
+            <Crosshair className="w-4 h-4 text-[#FFB703]" />
             <h3 className="text-xs font-black text-[#E4F2F5] tracking-widest uppercase font-sans">
               SURVEY TARGETS
             </h3>
           </div>
           <div className="flex items-center gap-1 text-[9px]">
-            <span className="px-1.5 py-0.5 rounded bg-[#32E6D1]/15 text-[#32E6D1] font-bold border border-[#32E6D1]/30">
+            <span className="px-1.5 py-0.5 rounded bg-[#FFB703]/15 text-[#FFB703] font-bold border border-[#FFB703]/30">
               {totalDetections} DETECTIONS
             </span>
           </div>
@@ -92,7 +92,7 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
               onClick={() => setActiveFilter(chip.id as any)}
               className={`flex-1 py-1 rounded-lg text-[8px] font-bold transition-all cursor-pointer text-center ${
                 activeFilter === chip.id
-                  ? 'bg-[#32E6D1] text-[#03070B] shadow-[0_0_10px_rgba(50,230,209,0.3)]'
+                  ? 'bg-[#FFB703] text-[#03070B] shadow-[0_0_10px_rgba(50,230,209,0.3)]'
                   : 'bg-[#081118] text-[#6F8992] hover:text-[#E4F2F5] border border-[#16303B]'
               }`}
             >
@@ -111,7 +111,7 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
             placeholder="Search debris class, ID, net..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#0C171E] border border-[#16303B] rounded-lg pl-7 pr-2.5 py-1.5 text-[10px] text-[#E4F2F5] placeholder-[#6F8992]/60 focus:outline-none focus:border-[#32E6D1]/60 font-mono shadow-inner"
+            className="w-full bg-[#0C171E] border border-[#16303B] rounded-lg pl-7 pr-2.5 py-1.5 text-[10px] text-[#E4F2F5] placeholder-[#6F8992]/60 focus:outline-none focus:border-[#FFB703]/60 font-mono shadow-inner"
           />
         </div>
       </div>
@@ -129,10 +129,10 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
               onClick={() => handleSelectTarget(target)}
               className={`p-2.5 rounded-xl border transition-all cursor-pointer relative group ${
                 isSelected
-                  ? 'bg-gradient-to-r from-[#32E6D1]/20 to-[#29B6F6]/10 border-[#32E6D1] shadow-[0_0_15px_rgba(50,230,209,0.2)]'
+                  ? 'bg-gradient-to-r from-[#FFB703]/20 to-[#29B6F6]/10 border-[#FFB703] shadow-[0_0_15px_rgba(50,230,209,0.2)]'
                   : isFilteredOut
                   ? 'bg-[#0C171E]/40 border-[#16303B]/60 opacity-60 hover:opacity-100'
-                  : 'bg-[#0C171E] border-[#16303B] hover:border-[#32E6D1]/50'
+                  : 'bg-[#0C171E] border-[#16303B] hover:border-[#FFB703]/50'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -140,7 +140,7 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
                   <span
                     className={`text-[9px] font-black font-mono px-1.5 py-0.5 rounded ${
                       isSelected
-                        ? 'bg-[#32E6D1] text-[#03070B]'
+                        ? 'bg-[#FFB703] text-[#03070B]'
                         : 'bg-[#081118] text-[#6F8992] border border-[#16303B]'
                     }`}
                   >
@@ -160,7 +160,7 @@ export const MissionHierarchyTree: React.FC<{ onCollapse?: () => void }> = ({ on
                   <span
                     className={`text-[10px] font-mono font-extrabold ${
                       target.confidence >= 0.9
-                        ? 'text-[#32E6D1]'
+                        ? 'text-[#FFB703]'
                         : target.confidence >= 0.8
                         ? 'text-[#FFB547]'
                         : 'text-[#6F8992]'

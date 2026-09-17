@@ -82,7 +82,7 @@ export const HeroSonarWaterfall: React.FC = () => {
         const v = Math.floor(adjusted * 255);
         return `rgb(${v},${v},${v})`;
       } else {
-        // High-end Scientific Sonar Cyan #32E6D1
+        // High-end Scientific Sonar Cyan #FFB703
         const r = Math.floor(adjusted * 50);
         const gVal = Math.floor(adjusted * 230);
         const b = Math.floor(adjusted * 209);
@@ -253,7 +253,7 @@ export const HeroSonarWaterfall: React.FC = () => {
           const classColor = isFilteredOut
             ? '#6F8992'
             : isGhostNet
-            ? '#32E6D1'
+            ? '#FFB703'
             : isDebris
             ? '#FFB547'
             : '#29B6F6';
@@ -265,8 +265,8 @@ export const HeroSonarWaterfall: React.FC = () => {
           // Synthetic echo render on mosaic
           if (isGhostNet) {
             // Irregular netting cluster
-            ctx.fillStyle = '#32E6D1';
-            ctx.shadowColor = '#32E6D1';
+            ctx.fillStyle = '#FFB703';
+            ctx.shadowColor = '#FFB703';
             ctx.shadowBlur = isSelected ? 16 : 8;
             ctx.beginPath();
             ctx.ellipse(targetX, targetY, boxW * 0.35, boxH * 0.3, 0.4, 0, Math.PI * 2);
@@ -274,7 +274,7 @@ export const HeroSonarWaterfall: React.FC = () => {
           }
 
           // Bounding Box
-          ctx.strokeStyle = isSelected ? '#32E6D1' : classColor;
+          ctx.strokeStyle = isSelected ? '#FFB703' : classColor;
           ctx.lineWidth = isSelected ? 2.5 : 1;
 
           if (isFilteredOut) {
@@ -286,7 +286,7 @@ export const HeroSonarWaterfall: React.FC = () => {
           }
 
           if (isSelected) {
-            ctx.shadowColor = '#32E6D1';
+            ctx.shadowColor = '#FFB703';
             ctx.shadowBlur = 14;
             // Crosshair guidelines
             ctx.setLineDash([2, 4]);
@@ -359,12 +359,12 @@ export const HeroSonarWaterfall: React.FC = () => {
       });
 
       ctx.textAlign = 'left';
-      ctx.fillStyle = '#32E6D1';
+      ctx.fillStyle = '#FFB703';
       ctx.font = 'bold 9px "JetBrains Mono", monospace';
       ctx.fillText('◀ PORT SWATH (37.5m)', 12, H - 8);
 
       ctx.textAlign = 'right';
-      ctx.fillStyle = '#32E6D1';
+      ctx.fillStyle = '#FFB703';
       ctx.fillText('STARBOARD SWATH (37.5m) ▶', W - 12, H - 8);
 
       frameCount++;
@@ -427,7 +427,7 @@ export const HeroSonarWaterfall: React.FC = () => {
       {/* 1. High-End Scientific Sonar Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-[#081118] border-b border-[#16303B] shrink-0 z-10">
         <div className="flex items-center gap-2.5">
-          <Activity className="w-4 h-4 text-[#32E6D1]" />
+          <Activity className="w-4 h-4 text-[#FFB703]" />
           <h2 className="text-xs font-black text-[#E4F2F5] uppercase tracking-wider font-sans">
             SIDE-SCAN SONAR
           </h2>
@@ -442,21 +442,21 @@ export const HeroSonarWaterfall: React.FC = () => {
           <div className="flex items-center rounded-lg border border-[#16303B] bg-[#0C171E] overflow-hidden">
             <button
               onClick={() => setZoomLevel(1.0)}
-              className="px-2 py-1 hover:text-[#32E6D1] text-[8px] font-bold border-r border-[#16303B] cursor-pointer"
+              className="px-2 py-1 hover:text-[#FFB703] text-[8px] font-bold border-r border-[#16303B] cursor-pointer"
               title="Fit to window"
             >
               FIT
             </button>
             <button
               onClick={() => setZoomLevel((z) => Math.min(z + 0.25, 2.5))}
-              className="p-1 hover:text-[#32E6D1] cursor-pointer"
+              className="p-1 hover:text-[#FFB703] cursor-pointer"
               title="Zoom In"
             >
               <ZoomIn className="w-3 h-3" />
             </button>
             <button
               onClick={() => setZoomLevel((z) => Math.max(z - 0.25, 0.75))}
-              className="p-1 hover:text-[#32E6D1] cursor-pointer"
+              className="p-1 hover:text-[#FFB703] cursor-pointer"
               title="Zoom Out"
             >
               <ZoomOut className="w-3 h-3" />
@@ -473,9 +473,9 @@ export const HeroSonarWaterfall: React.FC = () => {
               step={0.1}
               value={gain}
               onChange={(e) => setGain(Number(e.target.value))}
-              className="w-12 h-1 accent-[#32E6D1] cursor-pointer"
+              className="w-12 h-1 accent-[#FFB703] cursor-pointer"
             />
-            <span className="text-[#32E6D1] font-bold w-6">{gain.toFixed(1)}×</span>
+            <span className="text-[#FFB703] font-bold w-6">{gain.toFixed(1)}×</span>
           </div>
 
           {/* Contrast slider */}
@@ -488,9 +488,9 @@ export const HeroSonarWaterfall: React.FC = () => {
               step={0.1}
               value={contrast}
               onChange={(e) => setContrast(Number(e.target.value))}
-              className="w-12 h-1 accent-[#32E6D1] cursor-pointer"
+              className="w-12 h-1 accent-[#FFB703] cursor-pointer"
             />
-            <span className="text-[#32E6D1] font-bold w-6">{contrast.toFixed(1)}×</span>
+            <span className="text-[#FFB703] font-bold w-6">{contrast.toFixed(1)}×</span>
           </div>
 
           {/* Palette Switcher */}
@@ -501,7 +501,7 @@ export const HeroSonarWaterfall: React.FC = () => {
                 onClick={() => setPalette(p)}
                 className={`px-2 py-1 text-[8px] font-bold uppercase transition-colors cursor-pointer ${
                   palette === p
-                    ? 'bg-[#32E6D1] text-[#03070B]'
+                    ? 'bg-[#FFB703] text-[#03070B]'
                     : 'text-[#6F8992] hover:text-[#E4F2F5]'
                 }`}
               >
@@ -515,7 +515,7 @@ export const HeroSonarWaterfall: React.FC = () => {
             onClick={() => setShowOverlays(!showOverlays)}
             className={`px-2 py-1 rounded-lg border text-[8px] font-bold transition-colors cursor-pointer flex items-center gap-1 ${
               showOverlays
-                ? 'bg-[#32E6D1]/20 border-[#32E6D1] text-[#32E6D1]'
+                ? 'bg-[#FFB703]/20 border-[#FFB703] text-[#FFB703]'
                 : 'bg-[#0C171E] border-[#16303B] text-[#6F8992]'
             }`}
             title="Toggle AI Detection Bounding Boxes"
@@ -529,7 +529,7 @@ export const HeroSonarWaterfall: React.FC = () => {
             onClick={() => setFocusedPanel(focusedPanel === 'waterfall' ? null : 'waterfall')}
             className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
               focusedPanel === 'waterfall'
-                ? 'bg-[#32E6D1]/20 border-[#32E6D1] text-[#32E6D1]'
+                ? 'bg-[#FFB703]/20 border-[#FFB703] text-[#FFB703]'
                 : 'bg-[#0C171E] border-[#16303B] text-[#6F8992] hover:text-[#E4F2F5]'
             }`}
             title={focusedPanel === 'waterfall' ? 'Restore panel layout' : 'Maximize Waterfall View'}

@@ -80,16 +80,16 @@ ${waypointsXml}
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in font-sans">
-      <div className="bg-[#050C16] border border-[#00D4AA]/40 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-[0_0_50px_rgba(0,212,170,0.2)] overflow-hidden">
+      <div className="bg-[#050C16] border border-[#FFB703]/40 rounded-3xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-[0_0_50px_rgba(255, 183, 3, )] overflow-hidden">
         {/* Header */}
-        <div className="p-4 bg-[#081524] border-b border-[#0D2E4A] flex items-center justify-between">
+        <div className="p-4 bg-[#081524] border-b border-[#162136] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#00D4AA]/10 border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_15px_rgba(0,212,170,0.3)]">
+            <div className="w-10 h-10 rounded-2xl bg-[#FFB703]/10 border border-[#FFB703]/40 flex items-center justify-center text-[#FFB703] shadow-[0_0_15px_rgba(255, 183, 3, )]">
               <Navigation className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-[#00D4AA] tracking-wider uppercase">
+                <span className="text-xs font-mono font-bold text-[#FFB703] tracking-wider uppercase">
                   MoES Deep Ocean Mission
                 </span>
                 <span className="px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/40 text-[9px] font-mono text-emerald-300 font-bold">
@@ -105,7 +105,7 @@ ${waypointsXml}
           <div className="flex items-center gap-2">
             <button
               onClick={handleExportGPX}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#00D4AA] text-[#030B14] text-xs font-mono font-black shadow-lg hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FFB703] text-[#05070B] text-xs font-mono font-black shadow-lg hover:brightness-110 active:scale-95 transition-all cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>EXPORT GPX</span>
@@ -120,12 +120,12 @@ ${waypointsXml}
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-4 bg-[#06101E] border-b border-[#0D2E4A] flex items-center gap-2 text-xs font-mono">
+        <div className="px-4 bg-[#06101E] border-b border-[#162136] flex items-center gap-2 text-xs font-mono">
           <button
             onClick={() => setActiveTab('plan')}
             className={`py-2.5 px-3 border-b-2 font-bold transition-all cursor-pointer ${
               activeTab === 'plan'
-                ? 'border-[#00D4AA] text-[#00D4AA]'
+                ? 'border-[#FFB703] text-[#FFB703]'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -135,7 +135,7 @@ ${waypointsXml}
             onClick={() => setActiveTab('waypoints')}
             className={`py-2.5 px-3 border-b-2 font-bold transition-all cursor-pointer ${
               activeTab === 'waypoints'
-                ? 'border-[#00D4AA] text-[#00D4AA]'
+                ? 'border-[#FFB703] text-[#FFB703]'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -145,7 +145,7 @@ ${waypointsXml}
             onClick={() => setActiveTab('tooling')}
             className={`py-2.5 px-3 border-b-2 font-bold transition-all cursor-pointer ${
               activeTab === 'tooling'
-                ? 'border-[#00D4AA] text-[#00D4AA]'
+                ? 'border-[#FFB703] text-[#FFB703]'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -157,9 +157,9 @@ ${waypointsXml}
         <div className="p-5 overflow-y-auto space-y-4 flex-1">
           {/* Quick Metrics Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3 bg-[#081524] border border-[#0D2E4A] rounded-2xl">
+            <div className="p-3 bg-[#081524] border border-[#162136] rounded-2xl">
               <div className="flex items-center gap-2 text-slate-400 text-[10px] font-mono">
-                <Compass className="w-3.5 h-3.5 text-[#00D4AA]" />
+                <Compass className="w-3.5 h-3.5 text-[#FFB703]" />
                 <span>FLIGHTPATH LENGTH</span>
               </div>
               <p className="text-xl font-extrabold text-white font-mono mt-1">
@@ -167,7 +167,7 @@ ${waypointsXml}
               </p>
             </div>
 
-            <div className="p-3 bg-[#081524] border border-[#0D2E4A] rounded-2xl">
+            <div className="p-3 bg-[#081524] border border-[#162136] rounded-2xl">
               <div className="flex items-center gap-2 text-slate-400 text-[10px] font-mono">
                 <Clock className="w-3.5 h-3.5 text-cyan-400" />
                 <span>ESTIMATED DURATION</span>
@@ -177,7 +177,7 @@ ${waypointsXml}
               </p>
             </div>
 
-            <div className="p-3 bg-[#081524] border border-[#0D2E4A] rounded-2xl">
+            <div className="p-3 bg-[#081524] border border-[#162136] rounded-2xl">
               <div className="flex items-center gap-2 text-slate-400 text-[10px] font-mono">
                 <BatteryCharging className="w-3.5 h-3.5 text-amber-400" />
                 <span>BATTERY PROJECTION</span>
@@ -187,7 +187,7 @@ ${waypointsXml}
               </p>
             </div>
 
-            <div className="p-3 bg-[#081524] border border-[#0D2E4A] rounded-2xl">
+            <div className="p-3 bg-[#081524] border border-[#162136] rounded-2xl">
               <div className="flex items-center gap-2 text-slate-400 text-[10px] font-mono">
                 <Anchor className="w-3.5 h-3.5 text-purple-400" />
                 <span>TARGETS SCHEDULED</span>
@@ -201,13 +201,13 @@ ${waypointsXml}
           {activeTab === 'plan' && (
             <div className="space-y-4">
               {/* Interactive Vector Map of Subsea Flightpath */}
-              <div className="p-4 bg-[#030912] border border-[#0D2E4A] rounded-2xl relative overflow-hidden">
+              <div className="p-4 bg-[#030912] border border-[#162136] rounded-2xl relative overflow-hidden">
                 <div className="flex items-center justify-between mb-3 text-xs font-mono">
                   <span className="text-slate-400 uppercase font-bold flex items-center gap-1.5">
-                    <Navigation className="w-3.5 h-3.5 text-[#00D4AA]" />
+                    <Navigation className="w-3.5 h-3.5 text-[#FFB703]" />
                     OPTIMAL TRAJECTORY MESH (NEAREST-NEIGHBOR TSP HEURISTIC)
                   </span>
-                  <span className="text-[10px] text-[#00D4AA] bg-[#00D4AA]/10 px-2 py-0.5 rounded border border-[#00D4AA]/30 font-bold">
+                  <span className="text-[10px] text-[#FFB703] bg-[#FFB703]/10 px-2 py-0.5 rounded border border-[#FFB703]/30 font-bold">
                     SURVEY VESSEL LAUNCH: 18.9150° N, 72.8100° E
                   </span>
                 </div>
@@ -241,7 +241,7 @@ ${waypointsXml}
                           })
                           .join(' ')} L 560 120`}
                         fill="none"
-                        stroke="#00D4AA"
+                        stroke="#FFB703"
                         strokeWidth="2.5"
                         strokeDasharray="4,4"
                         className="animate-pulse"
@@ -279,13 +279,13 @@ ${waypointsXml}
 
                 <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mt-2">
                   <span>Legend: 🔵 Surface Tether · 🔴 Critical Snag (ALDFG Net) · 🟡 Debris Bundle · 🟢 Recovery Basket</span>
-                  <span className="text-[#00D4AA]">Path Clearance Factor: 98.4%</span>
+                  <span className="text-[#FFB703]">Path Clearance Factor: 98.4%</span>
                 </div>
               </div>
 
               {/* Mission Briefing Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="p-3.5 bg-[#081524] border border-[#0D2E4A] rounded-2xl space-y-2">
+                <div className="p-3.5 bg-[#081524] border border-[#162136] rounded-2xl space-y-2">
                   <div className="flex items-center gap-2 text-xs font-mono font-bold text-cyan-300 uppercase">
                     <ShieldCheck className="w-4 h-4 text-cyan-400" />
                     <span>ACOUSTIC NAVIGATION PROFILE</span>
@@ -296,7 +296,7 @@ ${waypointsXml}
                   </p>
                 </div>
 
-                <div className="p-3.5 bg-[#081524] border border-[#0D2E4A] rounded-2xl space-y-2">
+                <div className="p-3.5 bg-[#081524] border border-[#162136] rounded-2xl space-y-2">
                   <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-300 uppercase">
                     <AlertTriangle className="w-4 h-4 text-amber-400" />
                     <span>HAZARD MITIGATION PROTOCOL</span>
@@ -312,10 +312,10 @@ ${waypointsXml}
 
           {activeTab === 'waypoints' && (
             <div className="space-y-3">
-              <div className="border border-[#0D2E4A] rounded-2xl overflow-hidden bg-[#030912]">
+              <div className="border border-[#162136] rounded-2xl overflow-hidden bg-[#030912]">
                 <table className="w-full text-left border-collapse text-xs font-mono">
                   <thead>
-                    <tr className="bg-[#081524] border-b border-[#0D2E4A] text-slate-400">
+                    <tr className="bg-[#081524] border-b border-[#162136] text-slate-400">
                       <th className="p-3">WP</th>
                       <th className="p-3">TARGET ID</th>
                       <th className="p-3">CATEGORY</th>
@@ -328,7 +328,7 @@ ${waypointsXml}
                   <tbody className="divide-y divide-[#0A1F33]">
                     {salvageTargets.map((t, idx) => (
                       <tr key={t.id} className="hover:bg-[#071626] transition-colors">
-                        <td className="p-3 font-bold text-[#00D4AA]">WP-{String(idx + 1).padStart(2, '0')}</td>
+                        <td className="p-3 font-bold text-[#FFB703]">WP-{String(idx + 1).padStart(2, '0')}</td>
                         <td className="p-3 font-bold text-white">{t.id}</td>
                         <td className="p-3 text-slate-300">{t.category}</td>
                         <td className="p-3 text-cyan-300 font-bold">{t.depth.toFixed(1)} m</td>
@@ -357,7 +357,7 @@ ${waypointsXml}
 
           {activeTab === 'tooling' && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="p-4 bg-[#081524] border border-[#0D2E4A] rounded-2xl space-y-2">
+              <div className="p-4 bg-[#081524] border border-[#162136] rounded-2xl space-y-2">
                 <div className="w-9 h-9 rounded-xl bg-purple-950/70 border border-purple-500/40 flex items-center justify-center text-purple-300 mb-2">
                   <Wrench className="w-5 h-5" />
                 </div>
@@ -367,12 +367,12 @@ ${waypointsXml}
                 <p className="text-xs text-slate-300 leading-relaxed">
                   Heavy-duty 120 kN subsea wire and poly-rope shear. Prescribed for releasing fouled fishing gillnets and mooring lines.
                 </p>
-                <div className="text-[10px] font-mono text-purple-300 font-bold pt-2 border-t border-[#0D2E4A]">
+                <div className="text-[10px] font-mono text-purple-300 font-bold pt-2 border-t border-[#162136]">
                   STATUS: MOUNTED ON ROV ARM 1
                 </div>
               </div>
 
-              <div className="p-4 bg-[#081524] border border-[#0D2E4A] rounded-2xl space-y-2">
+              <div className="p-4 bg-[#081524] border border-[#162136] rounded-2xl space-y-2">
                 <div className="w-9 h-9 rounded-xl bg-cyan-950/70 border border-cyan-500/40 flex items-center justify-center text-cyan-300 mb-2">
                   <Cpu className="w-5 h-5" />
                 </div>
@@ -382,12 +382,12 @@ ${waypointsXml}
                 <p className="text-xs text-slate-300 leading-relaxed">
                   Interlocking titanium manipulator claw for securing metallic barrels, pipe fragments, and high-density debris drums.
                 </p>
-                <div className="text-[10px] font-mono text-cyan-300 font-bold pt-2 border-t border-[#0D2E4A]">
+                <div className="text-[10px] font-mono text-cyan-300 font-bold pt-2 border-t border-[#162136]">
                   STATUS: MOUNTED ON ROV ARM 2
                 </div>
               </div>
 
-              <div className="p-4 bg-[#081524] border border-[#0D2E4A] rounded-2xl space-y-2">
+              <div className="p-4 bg-[#081524] border border-[#162136] rounded-2xl space-y-2">
                 <div className="w-9 h-9 rounded-xl bg-emerald-950/70 border border-emerald-500/40 flex items-center justify-center text-emerald-300 mb-2">
                   <Anchor className="w-5 h-5" />
                 </div>
@@ -397,7 +397,7 @@ ${waypointsXml}
                 <p className="text-xs text-slate-300 leading-relaxed">
                   Subsea collapsible payload basket with 2,500 kg buoyant payload lift capacity deployed directly from ship winch crane.
                 </p>
-                <div className="text-[10px] font-mono text-emerald-300 font-bold pt-2 border-t border-[#0D2E4A]">
+                <div className="text-[10px] font-mono text-emerald-300 font-bold pt-2 border-t border-[#162136]">
                   STATUS: DECK STAGED · WINCH 02
                 </div>
               </div>
@@ -406,14 +406,14 @@ ${waypointsXml}
         </div>
 
         {/* Footer actions */}
-        <div className="p-4 bg-[#081524] border-t border-[#0D2E4A] flex items-center justify-between text-xs font-mono">
+        <div className="p-4 bg-[#081524] border-t border-[#162136] flex items-center justify-between text-xs font-mono">
           <span className="text-slate-400">
             Exported coordinates compatible with Kongsberg HiPAP, BlueRobotics ArduSub, & Seaeye Falcon ROVs.
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={handleExportGPX}
-              className="px-4 py-2 bg-[#00D4AA] text-[#030B14] rounded-xl font-bold hover:brightness-110 active:scale-95 transition-all shadow-md cursor-pointer"
+              className="px-4 py-2 bg-[#FFB703] text-[#05070B] rounded-xl font-bold hover:brightness-110 active:scale-95 transition-all shadow-md cursor-pointer"
             >
               DOWNLOAD FLIGHT PLAN (.GPX)
             </button>

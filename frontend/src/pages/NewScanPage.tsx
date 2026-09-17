@@ -26,6 +26,7 @@ import {
   MapPin,
   Layers,
 } from 'lucide-react';
+import { SonarxLogoIcon } from '../components/common/SonarxLogo';
 import { sonarAudio } from '../utils/sonarAudio';
 
 const SAMPLE_SONAR_SCANS = [
@@ -34,7 +35,7 @@ const SAMPLE_SONAR_SCANS = [
     name: 'CASE 01: Gulf of Mannar — Ghost Net (ALDFG)',
     region: 'Tamil Nadu Coral Biosphere · 900 kHz',
     tag: 'Ghost Net (ALDFG)',
-    color: '#00D4AA',
+    color: '#FFB703',
     lat: '9.1367',
     lon: '79.2122',
     fileMock: 'sih_ghost_net_aldfg_swath.png',
@@ -436,17 +437,15 @@ export const NewScanPage: React.FC = () => {
       )}
 
       {/* ── 1. COMPACT TOP ACTION BAR: Title + Auto/Manual Mode + Deliverable Status Pills ── */}
-      <div className="p-3.5 bg-[#050B14] border border-[#102436] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-lg">
+      <div className="p-4 subpixel-card rounded-2xl border border-white/[0.08] flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-lg">
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="w-7 h-7 rounded-lg bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
-            <Radio className="w-4 h-4 animate-pulse" />
-          </div>
+          <SonarxLogoIcon size={26} animated={true} />
           <div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-extrabold text-white uppercase tracking-wide">
                 MARINE DEBRIS INSPECTOR
               </span>
-              <span className="text-[9px] font-mono px-2 py-0.5 bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-bold rounded">
+              <span className="text-[9px] font-mono px-2 py-0.5 bg-[#FFB703]/10 border border-[#FFB703]/30 text-[#FFB703] font-bold rounded">
                 MoES SIH 26057
               </span>
             </div>
@@ -465,10 +464,10 @@ export const NewScanPage: React.FC = () => {
               return (
                 <div
                   key={d.num}
-                  className={`px-2 py-1 rounded border ${
+                  className={`px-2.5 py-1 rounded-md border ${
                     done
-                      ? 'bg-cyan-950/80 border-cyan-500/40 text-cyan-300 font-bold'
-                      : 'bg-slate-900/60 border-slate-800 text-slate-500'
+                      ? 'bg-[#FFB703]/10 border-[#FFB703]/40 text-[#FFB703] font-bold'
+                      : 'bg-white/[0.02] border-white/[0.08] text-slate-500'
                   }`}
                   title={d.sub}
                 >
@@ -479,12 +478,12 @@ export const NewScanPage: React.FC = () => {
           </div>
 
           {/* AUTO / MANUAL MODE TOGGLE */}
-          <div className="flex items-center gap-1 bg-[#091522] p-1 rounded-xl border border-[#102436]">
+          <div className="flex items-center gap-1 bg-white/[0.04] p-1 rounded-xl border border-white/[0.08]">
             <button
               onClick={() => setPipelineMode('auto')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 pipelineMode === 'auto'
-                  ? 'bg-cyan-400 text-slate-950 shadow-md'
+                  ? 'bg-[#FFB703] text-[#05070B] shadow-md font-extrabold'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -495,7 +494,7 @@ export const NewScanPage: React.FC = () => {
               onClick={() => setPipelineMode('manual')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                 pipelineMode === 'manual'
-                  ? 'bg-amber-400 text-slate-950 shadow-md'
+                  ? 'bg-white text-slate-950 shadow-md font-extrabold'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -508,10 +507,10 @@ export const NewScanPage: React.FC = () => {
 
       {/* ── 2. QUICK LOAD SAMPLE SWATHS (Compact Horizontal Strip) ── */}
       {!isShowingActiveScanResult && !isAnalyzing && (
-        <div className="p-3 bg-[#050B14] border border-[#102436] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-2 shadow-md">
+        <div className="p-3.5 subpixel-card rounded-2xl border border-white/[0.08] flex flex-col md:flex-row md:items-center justify-between gap-2 shadow-md">
           <div className="flex items-center gap-2 shrink-0">
-            <Zap className="w-4 h-4 text-cyan-400 animate-pulse" />
-            <span className="text-xs font-bold text-white uppercase tracking-wide">
+            <Zap className="w-4 h-4 text-[#FFB703] animate-pulse" />
+            <span className="text-xs font-bold text-white uppercase tracking-wide font-mono">
               QUICK-LOAD SAMPLES:
             </span>
           </div>
@@ -521,12 +520,12 @@ export const NewScanPage: React.FC = () => {
               <button
                 key={sample.id}
                 onClick={() => handleSelectSample(sample)}
-                className="px-3 py-1.5 bg-[#091522] border border-[#102436] hover:border-cyan-500/50 rounded-xl text-left transition-all cursor-pointer group flex items-center justify-between"
+                className="px-3 py-1.5 bg-white/[0.03] border border-white/[0.08] hover:border-[#FFB703]/50 rounded-xl text-left transition-all cursor-pointer group flex items-center justify-between"
               >
-                <span className="text-xs font-bold text-slate-200 truncate group-hover:text-cyan-300">
+                <span className="text-xs font-bold text-slate-200 truncate group-hover:text-[#FFB703]">
                   {sample.tag}
                 </span>
-                <span className="text-[10px] font-mono text-cyan-400 font-bold shrink-0 ml-1">LOAD</span>
+                <span className="text-[10px] font-mono text-[#FFB703] font-bold shrink-0 ml-1">LOAD</span>
               </button>
             ))}
           </div>
@@ -554,12 +553,12 @@ export const NewScanPage: React.FC = () => {
                     key={st.id}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${
                       isDone
-                        ? 'bg-cyan-950 border-cyan-500/60 text-cyan-300'
+                        ? 'bg-[#FFB703]/10 border-[#FFB703]/40 text-[#FFB703]'
                         : isWaiting
                         ? 'bg-amber-950/80 border-amber-400 text-amber-300 animate-pulse'
                         : isActive
-                        ? 'bg-cyan-950 border-cyan-400 text-cyan-300'
-                        : 'bg-[#091522] border-[#102436] text-slate-500'
+                        ? 'bg-[#FFB703] border-[#FFB703] text-[#05070B]'
+                        : 'bg-white/[0.02] border-white/[0.08] text-slate-500'
                     }`}
                   >
                     <span>{isDone ? '✓' : isWaiting ? '⏸' : '○'}</span>
@@ -572,7 +571,7 @@ export const NewScanPage: React.FC = () => {
             {manualWaiting && (
               <button
                 onClick={handleManualAdvance}
-                className="flex items-center gap-2 px-4 py-2 bg-amber-400 text-slate-950 rounded-xl font-bold text-xs cursor-pointer hover:brightness-110 active:scale-95 transition-all shadow-lg"
+                className="flex items-center gap-2 px-4 py-2 bg-[#FFB703] text-[#05070B] rounded-xl font-bold text-xs cursor-pointer hover:bg-[#FCD34D] active:scale-95 transition-all shadow-lg"
               >
                 <ChevronRight className="w-4 h-4" />
                 <span>RUN NEXT STAGE</span>
@@ -637,10 +636,10 @@ export const NewScanPage: React.FC = () => {
 
           {/* ANOMALY DOSSIER READY CARD — Displays directly next to the image when analysis finishes */}
           {isShowingActiveScanResult && currentScan && (
-            <div className="p-4 bg-[#050B14] border border-cyan-500/50 rounded-2xl space-y-3 shadow-xl">
-              <div className="pb-3 border-b border-[#102436]">
+            <div className="p-4 subpixel-card border border-[#FFB703]/40 rounded-2xl space-y-3 shadow-xl">
+              <div className="pb-3 border-b border-white/[0.08]">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-cyan-400" />
+                  <CheckCircle2 className="w-5 h-5 text-[#FFB703]" />
                   <span className="font-extrabold text-white text-sm uppercase tracking-wide">
                     ANOMALY DOSSIER READY
                   </span>
@@ -652,36 +651,36 @@ export const NewScanPage: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                <div className="p-3 rounded-xl bg-[#091522] border border-[#102436] space-y-1.5 text-xs">
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-1.5 text-xs font-mono">
                   <div className="flex justify-between text-slate-300 font-semibold">
                     <span>Ghost Net / ALDFG:</span>
-                    <span className="text-cyan-400 font-bold">{currentScan.ghost_net_count}</span>
+                    <span className="text-[#FFB703] font-bold">{currentScan.ghost_net_count}</span>
                   </div>
                   <div className="flex justify-between text-slate-300 font-semibold">
                     <span>Anthropogenic Debris:</span>
-                    <span className="text-amber-400 font-bold">{currentScan.debris_count}</span>
+                    <span className="text-[#F59E0B] font-bold">{currentScan.debris_count}</span>
                   </div>
                   <div className="flex justify-between text-slate-300 font-semibold">
                     <span>Pipeline Hazards:</span>
-                    <span className="text-blue-400 font-bold">{currentScan.pipeline_count}</span>
+                    <span className="text-[#38BDF8] font-bold">{currentScan.pipeline_count}</span>
                   </div>
                   <div className="flex justify-between text-slate-300 font-semibold">
                     <span>Seafloor Anomalies:</span>
-                    <span className="text-teal-400 font-bold">{currentScan.anomaly_count}</span>
+                    <span className="text-white font-bold">{currentScan.anomaly_count}</span>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <button
                     onClick={() => handleDownloadReport('json')}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-cyan-400 text-slate-950 font-extrabold text-xs rounded-xl hover:brightness-110 cursor-pointer transition-all shadow-md"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#FFB703] text-[#05070B] font-extrabold text-xs rounded-xl hover:bg-[#FCD34D] cursor-pointer transition-all shadow-md"
                   >
                     <FileJson className="w-4 h-4" />
                     <span>DOWNLOAD DOSSIER (JSON)</span>
                   </button>
                   <button
                     onClick={() => handleDownloadReport('csv')}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#091522] border border-[#102436] text-slate-300 font-bold text-xs rounded-xl hover:text-white hover:border-cyan-500/40 cursor-pointer transition-all"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white/[0.04] border border-white/[0.1] text-slate-300 font-bold text-xs rounded-xl hover:text-white hover:border-[#FFB703]/40 cursor-pointer transition-all"
                   >
                     <FileSpreadsheet className="w-4 h-4" />
                     <span>DOWNLOAD TARGET REGISTER (CSV)</span>
@@ -691,7 +690,7 @@ export const NewScanPage: React.FC = () => {
 
               <button
                 onClick={handleResetScan}
-                className="flex items-center justify-center gap-2 px-3 py-2 bg-[#091522] border border-[#102436] text-slate-400 text-xs font-semibold rounded-xl hover:text-white cursor-pointer transition-all w-full mt-2"
+                className="flex items-center justify-center gap-2 px-3 py-2 bg-white/[0.04] border border-white/[0.08] text-slate-400 text-xs font-semibold rounded-xl hover:text-white cursor-pointer transition-all w-full mt-2"
               >
                 <UploadCloud className="w-4 h-4" />
                 <span>UPLOAD NEW SONAR SWATH</span>

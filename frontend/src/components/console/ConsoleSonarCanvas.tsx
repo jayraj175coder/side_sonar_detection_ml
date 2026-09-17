@@ -8,7 +8,7 @@ import { calculateDriftProjection } from '../../utils/driftProjection';
 type DemoPhase = 'idle' | 'running' | 'done';
 
 const CLASS_COLORS: Record<string, string> = {
-  'Ghost Net (ALDFG)':            '#00D4AA',
+  'Ghost Net (ALDFG)':            '#FFB703',
   'Lost Fishing Trawl Gear':      '#38bdf8',
   'Anthropogenic Debris Bundle':  '#f59e0b',
   'Subsea Pipeline Free-Span':    '#fb923c',
@@ -104,7 +104,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
       // High speckle noise for raw sonar
       if (noisy) {
-        ctx.fillStyle = '#00D4AA';
+        ctx.fillStyle = '#FFB703';
         for (let i = 0; i < 900; i++) {
           const rx = Math.random() * W;
           const ry = Math.random() * H;
@@ -124,7 +124,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       ctx.fillStyle = '#01050A';
       ctx.fillRect(midX - 14, 0, 28, H);
 
-      ctx.strokeStyle = 'rgba(0,212,170,0.3)';
+      ctx.strokeStyle = 'rgba(255, 183, 3, )';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(midX - 14, 0);
@@ -134,7 +134,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       ctx.stroke();
 
       // Nadir track centerline
-      ctx.strokeStyle = '#00D4AA';
+      ctx.strokeStyle = '#FFB703';
       ctx.lineWidth = 1;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
@@ -143,7 +143,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = '#4A8090';
+      ctx.fillStyle = '#94A3B8';
       ctx.font = '7px monospace';
       ctx.save();
       ctx.translate(midX - 3, H / 2);
@@ -157,7 +157,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
     // Drone survey trajectory
     const drawDroneTrack = () => {
       ctx.save();
-      ctx.strokeStyle = 'rgba(0,212,170,0.45)';
+      ctx.strokeStyle = 'rgba(255, 183, 3, )';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 4]);
       ctx.beginPath();
@@ -171,15 +171,15 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       const vy = H * 0.06 + (H * 0.94 - H * 0.06) * t;
 
       // AUV vehicle glyph with radar pulse
-      ctx.fillStyle = '#00D4AA';
-      ctx.shadowColor = '#00D4AA';
+      ctx.fillStyle = '#FFB703';
+      ctx.shadowColor = '#FFB703';
       ctx.shadowBlur = 12;
       ctx.beginPath();
       ctx.arc(vx, vy, 5, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      ctx.fillStyle = '#00D4AA';
+      ctx.fillStyle = '#FFB703';
       ctx.font = 'bold 8px monospace';
       ctx.fillText('◈ AUV TOWFISH', vx + 8, vy + 3);
       ctx.restore();
@@ -193,7 +193,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
         const isConfirmed = cand.status === 'CONFIRMED';
         const isSelected = selectedCandidateId === cand.id;
         const isHovered = hoveredCandidateId === cand.id;
-        const color = isConfirmed ? (CLASS_COLORS[cand.class] || '#00D4AA') : REJECT_COLOR;
+        const color = isConfirmed ? (CLASS_COLORS[cand.class] || '#FFB703') : REJECT_COLOR;
 
         // Check if candidate matches taxonomy filter
         const matchesCategory =
@@ -215,7 +215,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
         // 1. Raw proposal bounding box (controlled by layers.rawDetections)
         if (layers.rawDetections) {
-          ctx.strokeStyle = isConfirmed ? 'rgba(0,212,170,0.35)' : 'rgba(239,68,68,0.35)';
+          ctx.strokeStyle = isConfirmed ? 'rgba(255, 183, 3, )' : 'rgba(239,68,68,0.35)';
           ctx.lineWidth = 0.8;
           ctx.setLineDash([2, 2]);
           ctx.strokeRect(cx - 26, cy - 18, 52, 36);
@@ -284,7 +284,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
             ctx.fill();
 
             ctx.shadowBlur = 0;
-            ctx.fillStyle = '#05121F';
+            ctx.fillStyle = '#080D17';
             ctx.fillRect(cx - 40, cy - 48, 80, 20);
             ctx.strokeStyle = color;
             ctx.lineWidth = 0.8;
@@ -340,7 +340,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
               const ny = cy + dy * frac;
 
               // Node dot
-              ctx.fillStyle = '#030B14';
+              ctx.fillStyle = '#05070B';
               ctx.strokeStyle = '#38bdf8';
               ctx.lineWidth = 1.8;
               ctx.beginPath();
@@ -349,7 +349,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
               ctx.stroke();
 
               // Inner pulse
-              ctx.fillStyle = node.hours === 48 ? '#00D4AA' : '#38bdf8';
+              ctx.fillStyle = node.hours === 48 ? '#FFB703' : '#38bdf8';
               ctx.beginPath();
               ctx.arc(nx, ny, 2, 0, Math.PI * 2);
               ctx.fill();
@@ -361,11 +361,11 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
               ctx.fillStyle = 'rgba(5, 18, 31, 0.95)';
               ctx.fillRect(nx + 6, ny - 8, textW, 16);
-              ctx.strokeStyle = node.hours === 48 ? '#00D4AA' : '#38bdf8';
+              ctx.strokeStyle = node.hours === 48 ? '#FFB703' : '#38bdf8';
               ctx.lineWidth = 0.8;
               ctx.strokeRect(nx + 6, ny - 8, textW, 16);
 
-              ctx.fillStyle = node.hours === 48 ? '#00D4AA' : '#38bdf8';
+              ctx.fillStyle = node.hours === 48 ? '#FFB703' : '#38bdf8';
               ctx.fillText(tagText, nx + 10, ny + 3);
             });
 
@@ -389,7 +389,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
               boxY + 14
             );
 
-            ctx.fillStyle = '#4A8090';
+            ctx.fillStyle = '#94A3B8';
             ctx.font = '7px monospace';
             ctx.fillText(drift.disclaimer, boxX + 6, boxY + 26);
 
@@ -430,14 +430,14 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
       ctx.save();
       ctx.fillStyle = 'rgba(3,11,20,0.65)';
       ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = '#00D4AA';
+      ctx.fillStyle = '#FFB703';
       ctx.font = 'bold 15px monospace';
       ctx.textAlign = 'center';
       ctx.fillText('● AWAITING MISSION TRIGGER', W / 2, H / 2 - 18);
-      ctx.fillStyle = '#4A8090';
+      ctx.fillStyle = '#94A3B8';
       ctx.font = '10.5px monospace';
       ctx.fillText('Press  [ ▶ START LIVE DEMO ]  or  [SPACE]  to begin', W / 2, H / 2 + 8);
-      ctx.fillStyle = '#2A5060';
+      ctx.fillStyle = '#64748B';
       ctx.font = '9px monospace';
       ctx.fillText('Interactive Autonomous Side-Scan Sonar Perception Pipeline', W / 2, H / 2 + 28);
       ctx.textAlign = 'left';
@@ -512,16 +512,16 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
   return (
     <div className="flex-1 bg-[#01050A] flex flex-col relative select-none font-mono overflow-hidden">
       {/* Canvas Top Bar */}
-      <div className="h-7 bg-[#05121F] border-b border-[#0D2E4A] px-3 flex items-center justify-between text-[9px] text-[#4A8090] shrink-0 z-10">
+      <div className="h-7 bg-[#080D17] border-b border-[#162136] px-3 flex items-center justify-between text-[9px] text-[#94A3B8] shrink-0 z-10">
         <div className="flex items-center gap-2">
-          <Crosshair className="w-3 h-3 text-[#00D4AA]" />
-          <span className="text-[#E0F7F4] font-bold">
+          <Crosshair className="w-3 h-3 text-[#FFB703]" />
+          <span className="text-[#F8FAFC] font-bold">
             {demoPhase === 'idle'
               ? 'SONAR MOSAIC // AWAITING'
               : STAGE_LABELS[String(stageNum)] || `STAGE ${currentStageId}`}
           </span>
-          <span className="text-[#2A5060]">|</span>
-          <span className="text-[#00D4AA] font-bold">
+          <span className="text-[#64748B]">|</span>
+          <span className="text-[#FFB703] font-bold">
             {stageNum <= 2 ? 'ACQUISITION PHASE' : `${filteredCandidates.length} OF ${candidates.length} TARGETS PLOTTED`}
           </span>
         </div>
@@ -532,21 +532,21 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
           </span>
           <button
             onClick={() => setZoomLevel((z) => Math.min(z + 0.2, 2.0))}
-            className="p-1 hover:text-[#00D4AA] cursor-pointer"
+            className="p-1 hover:text-[#FFB703] cursor-pointer"
             title="Zoom In"
           >
             <ZoomIn className="w-3 h-3" />
           </button>
           <button
             onClick={() => setZoomLevel((z) => Math.max(z - 0.2, 0.8))}
-            className="p-1 hover:text-[#00D4AA] cursor-pointer"
+            className="p-1 hover:text-[#FFB703] cursor-pointer"
             title="Zoom Out"
           >
             <ZoomOut className="w-3 h-3" />
           </button>
           <button
             onClick={() => setZoomLevel(1.0)}
-            className="p-1 hover:text-[#00D4AA] cursor-pointer"
+            className="p-1 hover:text-[#FFB703] cursor-pointer"
             title="Reset Zoom"
           >
             <RotateCcw className="w-3 h-3" />
@@ -565,16 +565,16 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
         />
 
         {/* 4 Corner Coordinates with authentic site bounds */}
-        <div className="absolute top-2 left-2 text-[8px] text-[#2A5060] bg-[#030B14]/90 px-1.5 py-0.5 border border-[#0D2E4A]">
+        <div className="absolute top-2 left-2 text-[8px] text-[#64748B] bg-[#05070B]/90 px-1.5 py-0.5 border border-[#162136]">
           PORT FLANK: {activeSite.latRange[1].toFixed(4)}°N, {activeSite.lonRange[0].toFixed(4)}°E
         </div>
-        <div className="absolute top-2 right-2 text-[8px] text-[#2A5060] bg-[#030B14]/90 px-1.5 py-0.5 border border-[#0D2E4A]">
+        <div className="absolute top-2 right-2 text-[8px] text-[#64748B] bg-[#05070B]/90 px-1.5 py-0.5 border border-[#162136]">
           STBD FLANK: {activeSite.latRange[1].toFixed(4)}°N, {activeSite.lonRange[1].toFixed(4)}°E
         </div>
-        <div className="absolute bottom-6 left-2 text-[8px] text-[#2A5060] bg-[#030B14]/90 px-1.5 py-0.5 border border-[#0D2E4A]">
+        <div className="absolute bottom-6 left-2 text-[8px] text-[#64748B] bg-[#05070B]/90 px-1.5 py-0.5 border border-[#162136]">
           PORT TOW: {activeSite.latRange[0].toFixed(4)}°N, {activeSite.lonRange[0].toFixed(4)}°E
         </div>
-        <div className="absolute bottom-6 right-2 text-[8px] text-[#2A5060] bg-[#030B14]/90 px-1.5 py-0.5 border border-[#0D2E4A]">
+        <div className="absolute bottom-6 right-2 text-[8px] text-[#64748B] bg-[#05070B]/90 px-1.5 py-0.5 border border-[#162136]">
           STBD TOW: {activeSite.latRange[0].toFixed(4)}°N, {activeSite.lonRange[1].toFixed(4)}°E
         </div>
 
@@ -596,7 +596,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
             const isSelected = selectedCandidateId === cand.id;
             const isHovered = hoveredCandidateId === cand.id;
-            const color = isConfirmed ? (CLASS_COLORS[cand.class] || '#00D4AA') : REJECT_COLOR;
+            const color = isConfirmed ? (CLASS_COLORS[cand.class] || '#FFB703') : REJECT_COLOR;
 
             return (
               <div
@@ -625,7 +625,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
                 ) : (
                   <div
                     className={`w-6 h-6 border border-dashed flex items-center justify-center transition-all ${
-                      isSelected ? 'scale-125 border-[#EF4444] bg-[#EF4444]/25' : 'border-[#EF4444]/60 bg-[#05121F]/80'
+                      isSelected ? 'scale-125 border-[#EF4444] bg-[#EF4444]/25' : 'border-[#EF4444]/60 bg-[#080D17]/80'
                     }`}
                   >
                     <span className="text-[8px] text-[#EF4444] font-bold">✕</span>
@@ -635,7 +635,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
                 {/* Cybernetic Hover Class Pill / Tooltip */}
                 {(isSelected || isHovered) && (
                   <div
-                    className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 whitespace-nowrap text-[8px] font-bold border bg-[#05121F] shadow-lg flex items-center gap-1.5 pointer-events-none"
+                    className="absolute -top-7 left-1/2 -translate-x-1/2 px-1.5 py-0.5 whitespace-nowrap text-[8px] font-bold border bg-[#080D17] shadow-lg flex items-center gap-1.5 pointer-events-none"
                     style={{ color, borderColor: color }}
                   >
                     <span className="font-mono">{cand.id}</span>
@@ -651,8 +651,8 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
 
         {/* Dynamic Class Legend (Visible in Stage 5 & 6) */}
         {layers.classLabels && demoPhase !== 'idle' && stageNum >= 5 && (
-          <div className="absolute bottom-8 left-2 bg-[#05121F]/95 border border-[#0D2E4A] px-2 py-1.5 text-[8px] font-mono space-y-0.5 z-20">
-            <div className="text-[#4A8090] font-bold mb-0.5 uppercase">ACOUSTIC TAXONOMY</div>
+          <div className="absolute bottom-8 left-2 bg-[#080D17]/95 border border-[#162136] px-2 py-1.5 text-[8px] font-mono space-y-0.5 z-20">
+            <div className="text-[#94A3B8] font-bold mb-0.5 uppercase">ACOUSTIC TAXONOMY</div>
             {Object.entries(CLASS_COLORS)
               .filter(([, c]) => c !== '#6b7280')
               .map(([label, color]) => (
@@ -669,8 +669,8 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
         )}
 
         {/* Sensor Scale Bar */}
-        <div className="absolute bottom-1 right-2 flex items-center gap-1.5 text-[8px] text-[#00D4AA]">
-          <div className="w-12 h-1 bg-[#00D4AA]" />
+        <div className="absolute bottom-1 right-2 flex items-center gap-1.5 text-[8px] text-[#FFB703]">
+          <div className="w-12 h-1 bg-[#FFB703]" />
           <span>10 m SCALE</span>
         </div>
       </div>

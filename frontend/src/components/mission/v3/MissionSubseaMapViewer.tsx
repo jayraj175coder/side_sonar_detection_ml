@@ -209,9 +209,9 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
 
           <span className="text-[#64748B]">|</span>
           <span className="text-xs font-black tracking-wider text-[#F8FAFC] uppercase flex items-center gap-1.5">
-            <span>SUBSEA MISSION MAP</span>
-            <span className="text-[9px] px-1.5 py-0.2 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded-xs">
-              17 TARGETS PLOTTED
+            <span>DRONE SURVEY TRACK & SUBSEA MAP</span>
+            <span className="text-[9px] px-1.5 py-0.5 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded-xs">
+              DRONE USV-04 // 17 TARGETS
             </span>
           </span>
         </div>

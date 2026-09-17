@@ -448,9 +448,14 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
       {/* ── VIEWER HEADER BAR ── */}
       <div className="h-10 px-4 bg-[#05070B] border-b border-[#162136] flex items-center justify-between z-10 relative">
         <div className="flex items-center gap-3">
-          <span className="text-xs font-black tracking-wider text-[#F8FAFC] uppercase">
-            SIDE-SCAN SONAR
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black tracking-wider text-[#F8FAFC] uppercase">
+              DRONE SIDE-SCAN SONAR
+            </span>
+            <span className="px-2 py-0.5 rounded bg-[#FFB703]/15 border border-[#FFB703]/35 text-[9px] font-mono font-bold text-[#FFB703] uppercase tracking-wide">
+              AUTONOMOUS DRONE USV-04
+            </span>
+          </div>
           <span className="text-[#64748B]">|</span>
           <div className="text-[10px] text-[#94A3B8] flex items-center gap-2">
             {/* Interactive Frequency Mode Selector */}
@@ -496,6 +501,10 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
             <span>·</span>
             <span title="Acoustic Wavelength λ = c/f (c=1500m/s in seawater)">
               <strong className="text-[#FFB703]">λ={FREQUENCY_PROFILES[sonarFrequency].lambdaMm}</strong> mm
+            </span>
+            <span>·</span>
+            <span className="hidden lg:inline text-emerald-400 font-mono text-[9.5px]">
+              DRONE ALT: <strong className="text-white">8.4m</strong> · BATT: <strong className="text-emerald-300">94%</strong>
             </span>
             <span>·</span>
             <span className="flex items-center gap-1">
@@ -596,13 +605,27 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           </button>
         </div>
 
-        {/* Slant-Range Correction (SRC) Active Watermark Indicator */}
-        {isSrcActive && (
-          <div className="absolute top-3 right-3 bg-[#080D17]/90 border border-[#FFB703]/50 px-2.5 py-1 rounded-md text-[9px] font-mono font-bold text-[#FFB703] flex items-center gap-1.5 shadow-[0_0_12px_rgba(255, 183, 3, )] z-20 pointer-events-none">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
-            <span>SRC ACTIVE · NADIR RECTIFIED · Rg = √(Rs² - H²)</span>
+        {/* Floating Autonomous Drone Flight & Sonar Telemetry HUD */}
+        <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 z-20 pointer-events-none font-mono text-[9px]">
+          <div className="bg-[#030914]/90 backdrop-blur-md border border-white/[0.1] px-2.5 py-1 rounded-lg flex items-center gap-2 shadow-2xl text-slate-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+            <span className="text-emerald-400 font-bold">DRONE USV-04</span>
+            <span className="text-slate-600">·</span>
+            <span>ALT: <strong className="text-white">8.4m</strong></span>
+            <span className="text-slate-600">·</span>
+            <span>SPD: <strong className="text-white">3.5kt</strong></span>
+            <span className="text-slate-600">·</span>
+            <span>BATT: <strong className="text-emerald-300">94%</strong></span>
           </div>
-        )}
+
+          {/* Slant-Range Correction (SRC) Active Watermark Indicator */}
+          {isSrcActive && (
+            <div className="bg-[#080D17]/90 border border-[#FFB703]/50 px-2.5 py-1 rounded-md text-[9px] font-mono font-bold text-[#FFB703] flex items-center gap-1.5 shadow-[0_0_12px_rgba(255,183,3,0.2)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
+              <span>SRC ACTIVE · NADIR RECTIFIED · Rg = √(Rs² - H²)</span>
+            </div>
+          )}
+        </div>
         <div 
           className="w-full h-full flex items-center justify-center"
           style={{

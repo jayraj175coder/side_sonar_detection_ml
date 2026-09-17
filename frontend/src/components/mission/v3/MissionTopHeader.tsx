@@ -100,9 +100,11 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#131B2A] border border-[#FFB703]/40 text-[#FFB703] rounded">
               MX-026
             </span>
-            <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 bg-[#080D17] border border-[#162136] rounded text-[9px] font-bold text-[#FFB703]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
-              <span className="text-[#94A3B8]">LIVE</span>
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 bg-[#080D17] border border-[#162136] rounded text-[9px] font-bold font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-white">DRONE USV-04</span>
+              <span className="text-slate-500">·</span>
+              <span className="text-[#FFB703]">SSS STREAM LIVE</span>
             </div>
           </div>
         </div>

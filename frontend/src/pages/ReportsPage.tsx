@@ -296,10 +296,9 @@ export const ReportsPage: React.FC = () => {
 
           {/* Mission & Sensor Specifications */}
           <div className="text-right text-xs font-mono space-y-1 text-slate-400 print:text-gray-600">
-            <p>Vessel: <strong className="text-white print:text-black">ORV Sagar Nidhi (NIOT)</strong></p>
-            <p>Sector: <span className="text-[#FFB703] print:text-black">IN-MH-01 (Mumbai Shelf)</span></p>
             <p>Scan ID: <strong className="text-white print:text-black">{scanId}</strong></p>
-            <p>File Swath: <span className="text-slate-300 print:text-black">{filename}</span></p>
+            <p>File Swath: <span className="text-[#FFB703] print:text-black">{filename}</span></p>
+            <p>Date: <span className="text-white print:text-black">{createdAt}</span></p>
             <p>Model: <strong className="text-[#FFB703] print:text-black">{modelName}</strong></p>
             <p>Latency: <span className="text-slate-300 print:text-black">{inferenceMs.toFixed(1)} ms</span></p>
           </div>
@@ -522,30 +521,6 @@ export const ReportsPage: React.FC = () => {
               </div>
             </div>
           )}
-
-          {/* 4. MoES Official Hydrographic Certification Block */}
-          <div className="mt-8 pt-6 border-t border-white/[0.08] print:border-gray-300 grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-            <div className="space-y-1.5 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] print:border-gray-200">
-              <span className="text-[10px] text-[#FFB703] uppercase font-bold block">SURVEY VESSEL & PLATFORM</span>
-              <p className="text-white font-bold print:text-black">ORV Sagar Nidhi (NIOT Chennai)</p>
-              <p className="text-slate-400 text-[10px] print:text-gray-600">Dual-Frequency Towfish 450/900 kHz CHIRP</p>
-              <p className="text-slate-400 text-[10px] print:text-gray-600">Indian EEZ Continental Shelf Sector IN-MH-01</p>
-            </div>
-
-            <div className="space-y-1.5 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] print:border-gray-200">
-              <span className="text-[10px] text-[#00F5D4] uppercase font-bold block">ACOUSTIC SHADOW COMPLIANCE</span>
-              <p className="text-white font-bold print:text-black">IHO S-44 Order 1A Certified</p>
-              <p className="text-slate-400 text-[10px] print:text-gray-600">Shadow Height Formula: H = (Ls × Ha) / Rs</p>
-              <p className="text-slate-400 text-[10px] print:text-gray-600">Sound Velocity: 1,514 m/s (Arabian Sea Layer)</p>
-            </div>
-
-            <div className="space-y-1.5 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] print:border-gray-200">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block">AUTHENTICATION & TAMPER SEAL</span>
-              <p className="text-[#FFB703] font-bold text-[11px]">SHA-256: 8f4a1c9e2b4d8a17... [VALID]</p>
-              <p className="text-slate-400 text-[10px] print:text-gray-600">MoES Deep Ocean Mission Protocol 26057</p>
-              <p className="text-emerald-400 text-[10px] font-bold">DIGITALLY SIGNED & VERIFIED</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

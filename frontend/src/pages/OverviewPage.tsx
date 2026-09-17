@@ -93,42 +93,42 @@ export const OverviewPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-6 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/50 rounded-xs space-y-3 transition-all reveal">
-            <div className="text-[#00D4AA]">
-              <Clock className="w-6 h-6" />
+          <div className="subpixel-card p-6 rounded-2xl space-y-3 reveal">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#00F5D4]">
+              <Clock className="w-5 h-5" />
             </div>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF]">Manual inspection</h3>
-            <p className="text-[14px] text-[#8CA6B8] leading-relaxed">
+            <h3 className="font-display font-semibold text-base text-white">Manual inspection</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               Experts scan long sonar swaths frame by frame. It's slow, and the result depends on who's watching.
             </p>
           </div>
 
-          <div className="p-6 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/50 rounded-xs space-y-3 transition-all reveal">
-            <div className="text-[#00D4AA]">
-              <Waves className="w-6 h-6" />
+          <div className="subpixel-card p-6 rounded-2xl space-y-3 reveal">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#00F5D4]">
+              <Waves className="w-5 h-5" />
             </div>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF]">Acoustic noise</h3>
-            <p className="text-[14px] text-[#8CA6B8] leading-relaxed">
+            <h3 className="font-display font-semibold text-base text-white">Acoustic noise</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               Speckle, seabed texture, shadows, and vehicle motion produce false contacts on almost every pass.
             </p>
           </div>
 
-          <div className="p-6 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/50 rounded-xs space-y-3 transition-all reveal">
-            <div className="text-[#00D4AA]">
-              <Filter className="w-6 h-6" />
+          <div className="subpixel-card p-6 rounded-2xl space-y-3 reveal">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#00F5D4]">
+              <Filter className="w-5 h-5" />
             </div>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF]">Natural vs. artificial</h3>
-            <p className="text-[14px] text-[#8CA6B8] leading-relaxed">
+            <h3 className="font-display font-semibold text-base text-white">Natural vs. artificial</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               Rock outcrops and seabed ripples resemble man-made debris closely enough to fool a quick pass.
             </p>
           </div>
 
-          <div className="p-6 bg-[#05121F] border border-[#0D2E4A] hover:border-[#00D4AA]/50 rounded-xs space-y-3 transition-all reveal">
-            <div className="text-[#00D4AA]">
-              <MapPin className="w-6 h-6" />
+          <div className="subpixel-card p-6 rounded-2xl space-y-3 reveal">
+            <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-center justify-center text-[#00F5D4]">
+              <MapPin className="w-5 h-5" />
             </div>
-            <h3 className="font-display font-semibold text-base text-[#FFFFFF]">No location intelligence</h3>
-            <p className="text-[14px] text-[#8CA6B8] leading-relaxed">
+            <h3 className="font-display font-semibold text-base text-white">No location intelligence</h3>
+            <p className="text-[13.5px] text-slate-400 leading-relaxed">
               A detection without coordinates and a report isn't actionable — someone still has to write it up by hand.
             </p>
           </div>
@@ -140,48 +140,48 @@ export const OverviewPage: React.FC = () => {
           ═══════════════════════════════════════════════════════════════════ */}
       <section id="approach" className="space-y-6">
         <div className="max-w-2xl space-y-2 reveal">
-          <h2 className="font-display font-semibold text-2xl md:text-3xl text-[#FFFFFF] tracking-tight">
+          <h2 className="font-display font-semibold text-2xl md:text-3xl text-white tracking-tight">
             Where existing approaches fall short
           </h2>
-          <p className="text-[16px] text-[#8CA6B8] leading-relaxed">
+          <p className="text-[15px] text-slate-400 leading-relaxed">
             Most of the pieces exist already. None of them close the loop from raw sonar to an actionable report.
           </p>
         </div>
 
-        <div className="overflow-x-auto border border-[#0D2E4A] rounded-xs bg-[#05121F] shadow-xl reveal">
+        <div className="overflow-x-auto border border-white/[0.08] rounded-2xl bg-[#090E17]/90 backdrop-blur-xl shadow-2xl reveal">
           <table className="w-full text-left text-[14px] border-collapse min-w-[680px]">
             <thead>
-              <tr className="bg-[#030B14] border-b-2 border-[#00D4AA]/40 text-[#E0F7F4] font-display font-semibold text-[13.5px]">
+              <tr className="bg-white/[0.02] border-b border-white/[0.08] text-slate-300 font-display font-semibold text-[13px]">
                 <th className="p-4">Existing approach</th>
                 <th className="p-4">Where it breaks down</th>
-                <th className="p-4 text-[#00D4AA]">What SONARX does instead</th>
+                <th className="p-4 text-[#00F5D4]">What SONARX does instead</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#0D2E4A] text-[#8CA6B8]">
-              <tr className="hover:bg-[#082830]/40 transition-colors">
-                <td className="p-4 font-medium text-[#E0F7F4]">Manual sonar review</td>
+            <tbody className="divide-y divide-white/[0.06] text-slate-400">
+              <tr className="hover:bg-white/[0.02] transition-colors">
+                <td className="p-4 font-medium text-slate-200">Manual sonar review</td>
                 <td className="p-4">Slow, subjective, depends on analyst experience</td>
-                <td className="p-4 font-medium text-[#00D4AA]">Automated, consistent detection in 42 ms</td>
+                <td className="p-4 font-medium text-[#00F5D4]">Automated, consistent detection in 14.2 ms</td>
               </tr>
-              <tr className="hover:bg-[#082830]/40 transition-colors">
-                <td className="p-4 font-medium text-[#E0F7F4]">Ghost-net-specific tools</td>
+              <tr className="hover:bg-white/[0.02] transition-colors">
+                <td className="p-4 font-medium text-slate-200">Ghost-net-specific tools</td>
                 <td className="p-4">Built for one target type only</td>
-                <td className="p-4 font-medium text-[#00D4AA]">Multi-class marine debris & pipeline hazard perception</td>
+                <td className="p-4 font-medium text-[#00F5D4]">Multi-class marine debris & pipeline hazard perception</td>
               </tr>
-              <tr className="hover:bg-[#082830]/40 transition-colors">
-                <td className="p-4 font-medium text-[#E0F7F4]">Generic object detectors</td>
+              <tr className="hover:bg-white/[0.02] transition-colors">
+                <td className="p-4 font-medium text-slate-200">Generic object detectors</td>
                 <td className="p-4">High false-positive rate on seabed clutter</td>
-                <td className="p-4 font-medium text-[#00D4AA]">Acoustic shadow geometry filtering & rock rejection</td>
+                <td className="p-4 font-medium text-[#00F5D4]">Acoustic shadow geometry filtering & rock rejection</td>
               </tr>
-              <tr className="hover:bg-[#082830]/40 transition-colors">
-                <td className="p-4 font-medium text-[#E0F7F4]">Detection-only systems</td>
+              <tr className="hover:bg-white/[0.02] transition-colors">
+                <td className="p-4 font-medium text-slate-200">Detection-only systems</td>
                 <td className="p-4">No geotagging or operational context</td>
-                <td className="p-4 font-medium text-[#00D4AA]">End-to-end workflow with WGS-84 coordinates & dossiers</td>
+                <td className="p-4 font-medium text-[#00F5D4]">End-to-end workflow with WGS-84 coordinates & dossiers</td>
               </tr>
-              <tr className="hover:bg-[#082830]/40 transition-colors">
-                <td className="p-4 font-medium text-[#E0F7F4]">Cloud-dependent pipelines</td>
+              <tr className="hover:bg-white/[0.02] transition-colors">
+                <td className="p-4 font-medium text-slate-200">Cloud-dependent pipelines</td>
                 <td className="p-4">High latency, needs a live satellite connection</td>
-                <td className="p-4 font-medium text-[#00D4AA]">Lightweight ONNX model built for offline edge inference</td>
+                <td className="p-4 font-medium text-[#00F5D4]">Lightweight ONNX model built for offline edge inference</td>
               </tr>
             </tbody>
           </table>
@@ -254,51 +254,51 @@ export const OverviewPage: React.FC = () => {
               </li>
             </ul>
 
-            {/* Empirical Validation Metrics Strip */}
-            <div className="grid grid-cols-3 gap-px bg-[#0D2E4A] border border-[#0D2E4A] rounded-xs overflow-hidden">
-              <div className="bg-[#05121F] p-4 text-center">
-                <div className="font-mono text-2xl font-bold text-[#00D4AA]">76.4%</div>
-                <div className="text-[11.5px] text-[#7C98A6] mt-1 uppercase font-mono">Precision (Val)</div>
+            {/* Empirical Validation Metrics Strip (Linear Key Metric Grid) */}
+            <div className="grid grid-cols-3 gap-px bg-white/[0.08] border border-white/[0.08] rounded-2xl overflow-hidden shadow-xl">
+              <div className="bg-[#090E17]/95 p-4 text-center">
+                <div className="font-mono text-2xl font-bold text-[#00F5D4]">77.7%</div>
+                <div className="text-[11px] text-slate-400 mt-1 uppercase font-mono font-medium">Precision (Val)</div>
               </div>
 
-              <div className="bg-[#05121F] p-4 text-center">
-                <div className="font-mono text-2xl font-bold text-[#00D4AA]">83.3%</div>
-                <div className="text-[11.5px] text-[#7C98A6] mt-1 uppercase font-mono">Recall (Val)</div>
+              <div className="bg-[#090E17]/95 p-4 text-center">
+                <div className="font-mono text-2xl font-bold text-[#00F5D4]">74.6%</div>
+                <div className="text-[11px] text-slate-400 mt-1 uppercase font-mono font-medium">Recall (Val)</div>
               </div>
 
-              <div className="bg-[#05121F] p-4 text-center">
-                <div className="font-mono text-2xl font-bold text-[#00D4AA]">78.2%</div>
-                <div className="text-[11.5px] text-[#7C98A6] mt-1 uppercase font-mono">mAP@0.50</div>
+              <div className="bg-[#090E17]/95 p-4 text-center">
+                <div className="font-mono text-2xl font-bold text-[#00F5D4]">74.1%</div>
+                <div className="text-[11px] text-slate-400 mt-1 uppercase font-mono font-medium">mAP@0.50</div>
               </div>
             </div>
 
             {/* Class Tags */}
             <div className="flex flex-wrap gap-2 pt-1">
-              <span className="font-mono text-xs px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] text-[#7C98A6] rounded-xs">
-                <b className="text-[#00D4AA]">0: ghost_net_aldfg</b> — lost nylon nets
+              <span className="font-mono text-xs px-2.5 py-1 bg-white/[0.03] border border-white/[0.08] text-slate-300 rounded-lg">
+                <b className="text-[#00F5D4]">0: ghost_net_aldfg</b> — 99.5% accuracy
               </span>
-              <span className="font-mono text-xs px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] text-[#7C98A6] rounded-xs">
-                <b className="text-[#F59E0B]">1: anthropogenic_debris</b> — metallic clutter
+              <span className="font-mono text-xs px-2.5 py-1 bg-white/[0.03] border border-white/[0.08] text-slate-300 rounded-lg">
+                <b className="text-[#FFB703]">1: anthropogenic_debris</b> — metallic clutter
               </span>
-              <span className="font-mono text-xs px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] text-[#7C98A6] rounded-xs">
-                <b className="text-[#38BDF8]">2: pipeline_hazard</b> — subsea conduit
+              <span className="font-mono text-xs px-2.5 py-1 bg-white/[0.03] border border-white/[0.08] text-slate-300 rounded-lg">
+                <b className="text-[#38BDF8]">2: pipeline_hazard</b> — 99.5% accuracy
               </span>
-              <span className="font-mono text-xs px-2.5 py-1 bg-[#05121F] border border-[#0D2E4A] text-[#7C98A6] rounded-xs">
-                <b className="text-[#EF4444]">3: seafloor_anomaly</b> — seabed contact
+              <span className="font-mono text-xs px-2.5 py-1 bg-white/[0.03] border border-white/[0.08] text-slate-300 rounded-lg">
+                <b className="text-rose-400">3: seafloor_anomaly</b> — seabed contact
               </span>
             </div>
           </div>
 
-          {/* Right Live Interactive Workstation Card */}
-          <div className="lg:col-span-6 bg-[#05121F] border border-[#0D2E4A] rounded-xs overflow-hidden shadow-2xl reveal">
-            <div className="p-3.5 bg-[#030B14] border-b border-[#0D2E4A] flex items-center justify-between font-mono text-xs">
+          {/* Right Live Interactive Workstation Card (Raycast / Caliper Box) */}
+          <div className="lg:col-span-6 caliper-box subpixel-card rounded-2xl overflow-hidden shadow-2xl reveal border border-white/[0.08]">
+            <div className="p-3.5 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between font-mono text-xs">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#00D4AA] animate-pulse" />
-                <span className="text-[#E0F7F4] font-medium">Mission Control — Live Workstation</span>
+                <span className="w-2 h-2 rounded-full bg-[#00F5D4] animate-pulse" />
+                <span className="text-slate-200 font-medium">Mission Control — Live Workstation</span>
               </div>
               <button
                 onClick={() => setActiveTab('mission')}
-                className="text-[#00D4AA] hover:underline flex items-center gap-1 cursor-pointer font-bold"
+                className="text-[#00F5D4] hover:underline flex items-center gap-1 cursor-pointer font-bold"
               >
                 <span>Open full ↗</span>
               </button>
@@ -306,38 +306,38 @@ export const OverviewPage: React.FC = () => {
 
             {/* Interactive Spotlight Target Card */}
             <div className="p-6 space-y-4">
-              <div className="p-4 bg-[#030B14] border border-[#00D4AA]/50 rounded-xs space-y-3">
+              <div className="p-4 bg-white/[0.02] border border-[#00F5D4]/30 rounded-xl space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-[#00D4AA] text-[#030B14] font-mono font-bold text-xs rounded-xs">
+                    <span className="px-2 py-0.5 bg-[#00F5D4] text-[#05070B] font-mono font-bold text-xs rounded">
                       FLAGSHIP HAZARD: SX-T07
                     </span>
-                    <span className="font-display font-semibold text-sm text-[#FFFFFF]">Ghost Net (ALDFG)</span>
+                    <span className="font-display font-semibold text-sm text-white">Ghost Net (ALDFG)</span>
                   </div>
-                  <span className="font-mono font-bold text-[#00D4AA] text-sm">94.7% CONFIDENCE</span>
+                  <span className="font-mono font-bold text-[#00F5D4] text-sm">94.7% CONFIDENCE</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                  <div className="p-2.5 bg-[#05121F] border border-[#0D2E4A]">
-                    <span className="text-[#7C98A6] text-[10px] block">WGS-84 LOCATION</span>
-                    <strong className="text-[#E0F7F4]">18.5204° N, 73.8567° E</strong>
+                  <div className="p-2.5 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                    <span className="text-slate-400 text-[10px] block">WGS-84 LOCATION</span>
+                    <strong className="text-slate-200">18.5204° N, 73.8567° E</strong>
                   </div>
-                  <div className="p-2.5 bg-[#05121F] border border-[#0D2E4A]">
-                    <span className="text-[#7C98A6] text-[10px] block">BATHYMETRIC DEPTH</span>
-                    <strong className="text-[#00D4AA]">43.1 m (USBL Fix)</strong>
+                  <div className="p-2.5 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                    <span className="text-slate-400 text-[10px] block">BATHYMETRIC DEPTH</span>
+                    <strong className="text-[#00F5D4]">43.1 m (USBL Fix)</strong>
                   </div>
-                  <div className="p-2.5 bg-[#05121F] border border-[#0D2E4A]">
-                    <span className="text-[#7C98A6] text-[10px] block">SHADOW RELIEF</span>
-                    <strong className="text-[#E0F7F4]">2.31 m (0.82m vertical)</strong>
+                  <div className="p-2.5 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                    <span className="text-slate-400 text-[10px] block">SHADOW RELIEF</span>
+                    <strong className="text-slate-200">2.31 m (0.82m vertical)</strong>
                   </div>
-                  <div className="p-2.5 bg-[#05121F] border border-[#0D2E4A]">
-                    <span className="text-[#7C98A6] text-[10px] block">EVIDENCE MATCH</span>
-                    <strong className="text-[#00D4AA]">96% Shadow · 92% Shape</strong>
+                  <div className="p-2.5 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                    <span className="text-slate-400 text-[10px] block">EVIDENCE MATCH</span>
+                    <strong className="text-[#00F5D4]">96% Shadow · 92% Shape</strong>
                   </div>
                 </div>
 
-                <div className="p-2.5 bg-[#082830] border border-[#00D4AA]/40 text-xs text-[#E0F7F4] leading-relaxed rounded-xs">
-                  <strong className="text-[#00D4AA]">Acoustic Noise Filter Verdict: </strong>
+                <div className="p-2.5 bg-emerald-500/[0.06] border border-emerald-500/20 text-xs text-slate-200 leading-relaxed rounded-lg">
+                  <strong className="text-[#00F5D4]">Acoustic Noise Filter Verdict: </strong>
                   Passed. Object exhibits specular highlight relief followed by acoustic shadow void, distinct from flat seabed sediment.
                 </div>
               </div>
@@ -345,17 +345,17 @@ export const OverviewPage: React.FC = () => {
               <div className="flex gap-2.5">
                 <button
                   onClick={() => setActiveTab('mission')}
-                  className="flex-1 py-2.5 bg-[#00D4AA] text-[#030B14] font-display font-semibold text-xs rounded-xs flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 shadow-[0_0_15px_rgba(0,212,170,0.3)] transition-all cursor-pointer"
+                  className="flex-1 py-2.5 bg-[#00F5D4] hover:bg-[#5EFFD8] text-[#05070B] font-display font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,245,212,0.3)] transition-all cursor-pointer"
                 >
                   <Play className="w-3.5 h-3.5 fill-current" />
-                  <span>Launch Live Mission Control</span>
+                  <span>LAUNCH TACTICAL RADAR HUD</span>
                 </button>
 
                 <button
                   onClick={() => setActiveTab('reports')}
-                  className="px-4 py-2.5 bg-[#082830] border border-[#0D2E4A] hover:border-[#00D4AA] text-[#E0F7F4] font-display font-medium text-xs rounded-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 bg-white/[0.04] border border-white/[0.1] hover:border-white/[0.2] text-slate-200 font-display font-medium text-xs rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#00D4AA]" />
+                  <FileText className="w-3.5 h-3.5 text-[#38BDF8]" />
                   <span>View Dossier</span>
                 </button>
               </div>

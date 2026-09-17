@@ -4,59 +4,65 @@
 @layer base {
   :root {
     /* ──────────────────────────────────────────────────────────────────
-       SONARX — Ocean Bioluminescent Theme
-       Inspired by real deep-sea sonar instrument software (Kongsberg/Klein)
-       Primary: bioluminescent teal  |  Background: abyssal ocean black-blue
+       SONARX — 2026 Linear & Raycast Elite SaaS Design System
+       Obsidian canvas, sub-pixel border sheens, quiet chrome, high density
     ────────────────────────────────────────────────────────────────── */
-    --bg-abyss:       #030B14;   /* deepest ocean — main background */
-    --bg-primary:     #05121F;   /* panel background */
-    --bg-secondary:   #0A1E30;   /* hover / subtle fill */
-    --bg-elevated:    #0D2640;   /* card / elevated panel */
+    --bg-canvas:          #05070B;   /* purest obsidian dark canvas */
+    --bg-surface:         #0A0F18;   /* primary card / panel surface */
+    --bg-surface-elevated:#101726;   /* hover / popover elevation */
+    --bg-surface-active:  #162136;   /* active / focus states */
 
-    --border-main:    #0D2E4A;   /* panel borders */
-    --border-bright:  #1A4E6A;   /* highlighted border */
-    --border-glow:    rgba(0, 212, 170, 0.35);  /* teal glow */
+    --border-subtle:      rgba(255, 255, 255, 0.08); /* 1px sub-pixel border */
+    --border-sheen:       rgba(255, 255, 255, 0.16); /* highlighted top border sheen */
+    --border-glow:        rgba(0, 245, 212, 0.35);    /* luminous acoustic emerald glow */
 
-    --text-primary:   #E0F7F4;   /* bright text (seafoam white) */
-    --text-secondary: #94A3B8;   /* high contrast gray (WCAG AA > 4.5:1) */
-    --text-muted:     #64748B;   /* legible muted slate */
+    --text-primary:       #F8FAFC;   /* high contrast pure crisp white */
+    --text-secondary:     #94A3B8;   /* balanced slate */
+    --text-muted:         #64748B;   /* legible muted slate */
 
-    --teal-primary:   #00D4AA;   /* bioluminescent teal — primary accent */
-    --teal-dim:       #00A882;   /* dimmer teal */
-    --teal-bright:    #5EFFD8;   /* bright teal highlight */
-    --teal-glow-bg:   #082830;   /* teal-tinted bg for active states */
-    --teal-subtle:    #0A3028;   /* subtle teal bg */
+    --accent-emerald:     #00F5D4;   /* active acoustic telemetry */
+    --accent-amber:       #FFB703;   /* naval sonar phosphor gold */
+    --accent-cyan:        #38BDF8;   /* GEBCO bathymetric contours */
+    --accent-rose:        #F43F5E;   /* critical hazard reject */
 
-    --amber-warning:  #F59E0B;
-    --amber-bright:   #FBBF24;
-    --red-reject:     #EF4444;
-    --sonar-blue:     #38BDF8;
-
-    /* Legacy aliases (keep existing components working) */
-    --phosphor-green:   #00D4AA;
-    --phosphor-dim:     #00A882;
-    --phosphor-bright:  #5EFFD8;
-    --surface-console:  #030B14;
-    --surface-panel:    #05121F;
-    --surface-panel-raised: #0A1E30;
-    --surface-border:   #0D2E4A;
-    --sonar-cyan:       #00D4AA;
-    --signal-live:      #00D4AA;
-    --contact-confidence-high: #00D4AA;
-    --contact-confidence-med:  #F59E0B;
-    --contact-confidence-low:  #4A8090;
-    --warning:    #F59E0B;
-    --critical:   #EF4444;
-    --success:    #00D4AA;
+    /* Legacy mapping for backward compatibility */
+    --bg-abyss:           #05070B;
+    --bg-primary:         #0A0F18;
+    --bg-secondary:       #101726;
+    --bg-elevated:        #162136;
+    --border-main:        rgba(255, 255, 255, 0.09);
+    --border-bright:      rgba(0, 245, 212, 0.4);
+    --teal-primary:       #00F5D4;
+    --teal-dim:           #059669;
+    --teal-bright:        #5EFFD8;
+    --teal-glow-bg:       rgba(0, 245, 212, 0.08);
+    --teal-subtle:        rgba(0, 245, 212, 0.04);
+    --phosphor-green:     #00F5D4;
+    --phosphor-dim:       #059669;
+    --phosphor-bright:    #5EFFD8;
+    --surface-console:    #05070B;
+    --surface-panel:      #0A0F18;
+    --surface-panel-raised: #101726;
+    --surface-border:     rgba(255, 255, 255, 0.09);
+    --sonar-cyan:         #00F5D4;
+    --signal-live:        #00F5D4;
+    --amber-warning:      #FFB703;
+    --amber-bright:       #FCD34D;
+    --red-reject:         #F43F5E;
+    --warning:            #FFB703;
+    --critical:           #F43F5E;
+    --success:            #00F5D4;
   }
 
   body {
-    background-color: #030B14;
-    color: #E0F7F4;
-    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #05070B;
+    color: #F8FAFC;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display {
@@ -114,26 +120,65 @@
   transform: translateY(0);
 }
 
-.btn-secondary {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background-color: rgba(5, 18, 31, 0.6);
-  backdrop-filter: blur(8px);
-  color: #E0F7F4;
-  padding: 11px 20px;
-  border-radius: 2px;
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 500;
-  font-size: 14.5px;
+/* ── 2026 Elite SaaS Utilities (Linear / Raycast Inspired) ── */
+.subpixel-border {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+}
+
+.subpixel-card {
+  background: linear-gradient(180deg, rgba(14, 21, 34, 0.85) 0%, rgba(10, 15, 24, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1), 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.subpixel-card:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.18), 0 15px 35px -10px rgba(0, 245, 212, 0.08);
+  transform: translateY(-1px);
+}
+
+.keycap {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.15s ease;
+  justify-content: center;
+  padding: 1px 5px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94A3B8;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
-.btn-secondary:hover {
-  border-color: rgba(0, 212, 170, 0.6);
-  color: #00D4AA;
-  background-color: rgba(8, 40, 48, 0.5);
-  transform: translateY(-1px);
+
+/* Tactical Corner Calipers */
+.caliper-box {
+  position: relative;
+}
+.caliper-box::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #00F5D4;
+  border-left: 2px solid #00F5D4;
+  pointer-events: none;
+}
+.caliper-box::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-bottom: 2px solid #00F5D4;
+  border-right: 2px solid #00F5D4;
+  pointer-events: none;
 }
 
 

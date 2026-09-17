@@ -61,46 +61,46 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Main Sidebar */}
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col bg-[#050B14] border-r border-[#102436] transition-all duration-300 ease-in-out font-sans select-none shadow-2xl ${
+        className={`fixed md:static inset-y-0 left-0 z-50 flex flex-col bg-[#05070B] border-r border-white/[0.08] transition-all duration-300 ease-in-out font-sans select-none shadow-2xl ${
           isSidebarCollapsed ? 'w-20' : 'w-64'
         } ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         {/* Top Sidebar Header Logo */}
-        <div className="h-16 border-b border-[#102436] px-4 flex items-center justify-between shrink-0 bg-[#07111D]/80">
+        <div className="h-13 border-b border-white/[0.08] px-4 flex items-center justify-between shrink-0 bg-[#070B12]/80">
           {!isSidebarCollapsed ? (
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_15px_rgba(0,212,170,0.25)]">
-                <Radio className="w-4 h-4 animate-pulse" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-[#00F5D4]/30 flex items-center justify-center text-[#00F5D4] shadow-[0_0_12px_rgba(0,245,212,0.2)]">
+                <Radio className="w-3.5 h-3.5 animate-pulse" />
               </div>
               <div>
-                <div className="text-base font-extrabold text-white tracking-wider flex items-center gap-2">
+                <div className="text-[13px] font-extrabold text-white tracking-wider flex items-center gap-1.5">
                   <span>SONARX</span>
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 rounded">
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-500/10 text-[#00F5D4] border border-emerald-500/20">
                     SIH 26057
                   </span>
                 </div>
-                <div className="text-[10px] text-[#94A3B8] font-medium">MoES Subsea Perception</div>
+                <div className="text-[10px] text-slate-400 font-medium">MoES Subsea Intelligence</div>
               </div>
             </div>
           ) : (
-            <div className="mx-auto w-9 h-9 rounded-lg bg-[#082830] border border-[#00D4AA]/40 flex items-center justify-center text-[#00D4AA] shadow-[0_0_15px_rgba(0,212,170,0.25)]">
-              <Radio className="w-5 h-5 animate-pulse" />
+            <div className="mx-auto w-8 h-8 rounded-lg bg-emerald-500/10 border border-[#00F5D4]/30 flex items-center justify-center text-[#00F5D4] shadow-[0_0_12px_rgba(0,245,212,0.2)]">
+              <Radio className="w-4 h-4 animate-pulse" />
             </div>
           )}
         </div>
 
         {/* Navigation Items */}
-        <div className="flex-1 overflow-y-auto px-3 py-5 space-y-6">
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4">
           <div>
             {!isSidebarCollapsed && (
-              <p className="px-3 text-[10px] font-bold text-[#00D4AA] uppercase tracking-widest mb-3">
-                PERCEPTION NAVIGATION
+              <p className="px-3 text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest mb-2.5">
+                PLATFORM MODULES
               </p>
             )}
-            <nav className="space-y-1.5">
-              {primaryNavItems.map((item) => {
+            <nav className="space-y-1">
+              {primaryNavItems.map((item, index) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 return (
@@ -108,35 +108,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     key={item.id}
                     onClick={() => handleNavClick(item.id)}
                     title={item.tooltip || item.label}
-                    className={`w-full relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer group ${
+                    className={`w-full relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 cursor-pointer group ${
                       isActive
-                        ? 'bg-[#082830] border border-[#00D4AA]/40 text-white font-bold shadow-[0_0_20px_rgba(0,212,170,0.15)]'
-                        : 'text-[#94A3B8] hover:text-white hover:bg-[#0A1926]'
+                        ? 'bg-white/[0.08] text-white font-semibold border border-white/[0.12] shadow-sm'
+                        : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
                     } ${isSidebarCollapsed ? 'justify-center px-0' : ''}`}
                   >
                     {/* Active Left Indicator Bar */}
                     {isActive && (
-                      <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#00D4AA] rounded-r shadow-[0_0_10px_#00D4AA]" />
+                      <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-[#00F5D4] rounded-r shadow-[0_0_8px_#00F5D4]" />
                     )}
 
                     <Icon
-                      className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
-                        isActive ? 'text-[#00D4AA] drop-shadow-[0_0_8px_rgba(0,212,170,0.6)]' : 'text-[#94A3B8] group-hover:text-slate-200'
+                      className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-105 ${
+                        isActive ? 'text-[#00F5D4] drop-shadow-[0_0_6px_rgba(0,245,212,0.5)]' : 'text-slate-400 group-hover:text-slate-200'
                       }`}
                     />
                     {!isSidebarCollapsed && (
                       <span className="truncate flex-1 text-left tracking-wide">{item.label}</span>
                     )}
+                    
                     {!isSidebarCollapsed && item.badge && (
                       <span
                         title={item.tooltip}
-                        className={`text-[9.5px] font-mono px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                        className={`text-[9px] font-mono px-1.5 py-0.2 rounded font-bold uppercase tracking-wider ${
                           isActive
-                            ? 'bg-[#00D4AA] text-[#030B14] shadow-sm'
-                            : 'bg-[#082830] border border-[#0D2E4A] text-[#94A3B8] group-hover:border-[#00D4AA]/40 group-hover:text-[#00D4AA]'
+                            ? 'bg-[#00F5D4] text-[#05070B] shadow-xs'
+                            : 'bg-white/[0.04] border border-white/[0.08] text-slate-400 group-hover:text-slate-200'
                         }`}
                       >
                         {item.badge}
+                      </span>
+                    )}
+
+                    {!isSidebarCollapsed && !item.badge && (
+                      <span className="keycap opacity-0 group-hover:opacity-100 transition-opacity">
+                        {index + 1}
                       </span>
                     )}
                   </button>
@@ -147,33 +154,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Footer Diagnostics & MoES Seal */}
-        <div className="p-3.5 border-t border-[#102436] bg-[#040810] shrink-0 space-y-2.5">
+        <div className="p-3 border-t border-white/[0.08] bg-[#070B12]/80 shrink-0 space-y-2">
           {!isSidebarCollapsed ? (
             <>
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#091522] border border-[#102436]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-                  <span className="text-slate-200 text-xs font-semibold">AI Perception Engine</span>
+              <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+                  <span className="text-slate-300 text-xs font-medium">Perception Engine</span>
                 </div>
-                <span className="text-[10px] font-mono font-extrabold text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded border border-cyan-500/30">ONLINE</span>
+                <span className="text-[9px] font-mono font-bold text-[#00F5D4] bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                  ONNX 14.2ms
+                </span>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-gradient-to-b from-[#091827] to-[#050C16] border border-cyan-500/30 text-xs space-y-1">
-                <div className="flex items-center justify-between text-cyan-300 font-bold">
-                  <span className="flex items-center gap-1">
-                    <ShieldAlert className="w-3.5 h-3.5 text-cyan-400" />
+              <div className="p-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs space-y-0.5">
+                <div className="flex items-center justify-between text-slate-300 font-semibold">
+                  <span className="flex items-center gap-1 text-[#38BDF8]">
+                    <ShieldAlert className="w-3.5 h-3.5 text-[#38BDF8]" />
                     MoES // INDIA EEZ
                   </span>
-                  <span className="text-teal-400 font-mono text-[10px]">NIOT COMPLIANT</span>
+                  <span className="text-[#00F5D4] font-mono text-[9px]">ORDER 1A</span>
                 </div>
-                <div className="text-[10px] text-slate-300 leading-tight">
-                  WGS84 Subsea Debris & Anomaly Perception Protocol
+                <div className="text-[9.5px] text-slate-400 leading-tight font-mono">
+                  WGS84 Subsea Debris Protocol
                 </div>
               </div>
             </>
           ) : (
-            <div className="flex justify-center py-2">
-              <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#34d399]" />
+            <div className="flex justify-center py-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
             </div>
           )}
         </div>

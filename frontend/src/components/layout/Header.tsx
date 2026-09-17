@@ -10,7 +10,9 @@ import {
   FileText,
   MoreVertical,
   Cpu,
-  Download,
+  Compass,
+  Maximize2,
+  Activity,
   ShieldCheck,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
@@ -40,6 +42,14 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     setIsAudioMuted(muted);
   };
 
+  const handleToggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
   // Close overflow menu on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,82 +62,144 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   }, []);
 
   return (
-    <header className="h-12 bg-[#050B14]/90 backdrop-blur-md border-b border-[#102436] px-4 flex items-center justify-between sticky top-0 z-30 font-sans select-none shadow-md transition-all">
-      {/* 1. Left: Sidebar Toggle + Logo + Current Survey ID + Live Dot */}
+    <header className="h-13 bg-[#05070B]/85 backdrop-blur-xl border-b border-white/[0.08] px-4 flex items-center justify-between sticky top-0 z-30 font-sans select-none transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+      {/* 1. Left: Sidebar Toggle + Logo + Survey ID Badge */}
       <div className="flex items-center gap-3">
         <button
           onClick={toggleSidebar}
-          className="hidden md:flex p-1 bg-[#0A1E30] border border-[#0D2E4A] text-[#94A3B8] hover:text-[#00D4AA] hover:border-[#00D4AA]/40 rounded transition-all cursor-pointer"
+          className="hidden md:flex p-1.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-slate-400 hover:text-white rounded-md transition-all cursor-pointer"
           title={isSidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
         >
           {isSidebarCollapsed ? (
-            <PanelLeftOpen className="w-3.5 h-3.5 text-[#00D4AA]" />
+            <PanelLeftOpen className="w-4 h-4 text-[#00F5D4]" />
           ) : (
-            <PanelLeftClose className="w-3.5 h-3.5" />
+            <PanelLeftClose className="w-4 h-4" />
           )}
         </button>
 
         {onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}
-            className="md:hidden p-1 bg-[#0A1E30] border border-[#0D2E4A] text-[#E0F7F4] hover:text-[#00D4AA] rounded cursor-pointer"
+            className="md:hidden p-1.5 bg-white/[0.04] border border-white/[0.08] text-slate-300 hover:text-white rounded-md cursor-pointer"
             title="Open Menu"
           >
             <Menu className="w-4 h-4" />
           </button>
         )}
 
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-[#082830] border border-[#00D4AA]/40 rounded flex items-center justify-center text-[#00D4AA] shrink-0">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-[#00F5D4]/30 flex items-center justify-center text-[#00F5D4] shadow-[0_0_12px_rgba(0,245,212,0.2)]">
             <Radio className="w-3.5 h-3.5 animate-pulse" />
           </div>
 
-          <span className="text-sm font-black text-[#00D4AA] tracking-[0.15em] uppercase">
-            SONARX
-          </span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[13px] font-extrabold text-white tracking-[0.16em] uppercase">
+              SONARX
+            </span>
+            <span className="hidden sm:inline-block text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-slate-400">
+              v2.6
+            </span>
+          </div>
 
-          {/* Survey ID Pill */}
-          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#082830] text-[#00D4AA] border border-[#00D4AA]/40 tracking-wide">
-            MX-026
-          </span>
-
-          {/* Live Status Dot */}
-          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-[#05121F] border border-[#0D2E4A] rounded text-[9px] font-bold text-[#00D4AA]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] animate-ping" />
-            <span className="text-[#94A3B8] uppercase">{isBackendConnected ? 'ONLINE' : 'ACTIVE'}</span>
+          {/* Mission Telemetry Pill */}
+          <div className="hidden lg:flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/[0.08] border border-emerald-500/20 text-[10px] font-mono font-semibold text-[#00F5D4]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-ping" />
+            <span>SIH26057</span>
           </div>
         </div>
       </div>
 
-      {/* 2. Right: Kebab Overflow Menu */}
+      {/* 2. Center: Linear-style Live Telemetry Ticker (Quiet Chrome) */}
+      <div className="hidden xl:flex items-center gap-4 text-[11px] font-mono text-slate-400 bg-white/[0.02] border border-white/[0.06] px-3 py-1 rounded-full shadow-inner">
+        <div className="flex items-center gap-1.5">
+          <Activity className="w-3 h-3 text-[#00F5D4] animate-pulse" />
+          <span className="text-slate-300 font-semibold">ACOUSTIC CHIRP:</span>
+          <span className="text-[#00F5D4]">900 kHz</span>
+        </div>
+
+        <span className="w-1 h-1 rounded-full bg-slate-700" />
+
+        <div className="flex items-center gap-1.5">
+          <Compass className="w-3 h-3 text-[#FFB703]" />
+          <span className="text-slate-300">POSITION:</span>
+          <span className="text-slate-200">18.9217° N, 72.8214° E</span>
+        </div>
+
+        <span className="w-1 h-1 rounded-full bg-slate-700" />
+
+        <div className="flex items-center gap-1.5">
+          <ShieldCheck className="w-3 h-3 text-[#38BDF8]" />
+          <span className="text-slate-300">STANDARDS:</span>
+          <span className="text-[#38BDF8]">IHO S-44 ORDER 1A</span>
+        </div>
+      </div>
+
+      {/* 3. Right: Fast Action Buttons, Audio Toggle & Overflow Menu */}
       <div className="flex items-center gap-2">
+        {/* Fullscreen Button with F11 Keycap */}
+        <button
+          onClick={handleToggleFullscreen}
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-xs text-slate-300 hover:text-white transition-all cursor-pointer"
+          title="Toggle Fullscreen Mode"
+        >
+          <Maximize2 className="w-3.5 h-3.5 text-slate-400" />
+          <span className="text-[11px] font-medium hidden md:inline">Full HUD</span>
+          <span className="keycap">F11</span>
+        </button>
+
+        {/* Sonar Audio Feedback Button */}
+        <button
+          onClick={handleToggleAudio}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border transition-all cursor-pointer ${
+            !isAudioMuted
+              ? 'bg-emerald-500/10 border-[#00F5D4]/40 text-[#00F5D4] shadow-[0_0_10px_rgba(0,245,212,0.15)]'
+              : 'bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]'
+          }`}
+          title={!isAudioMuted ? 'Mute Sonar Audio' : 'Unmute Sonar Audio'}
+        >
+          {!isAudioMuted ? (
+            <Volume2 className="w-3.5 h-3.5 text-[#00F5D4]" />
+          ) : (
+            <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+          )}
+          <span className="text-[11px] font-mono font-medium hidden md:inline">
+            {!isAudioMuted ? 'AUDIO LIVE' : 'MUTED'}
+          </span>
+        </button>
+
         {/* KEBAB OVERFLOW MENU (...) */}
         <div className="relative" ref={overflowRef}>
           <button
             onClick={() => setIsOverflowOpen(!isOverflowOpen)}
             className={`p-1.5 rounded-md border transition-all cursor-pointer ${
               isOverflowOpen
-                ? 'bg-[#082830] border-[#00D4AA] text-[#00D4AA]'
-                : 'bg-[#0A1E30] border-[#0D2E4A] text-[#94A3B8] hover:text-[#E0F7F4] hover:border-[#00D4AA]/40'
+                ? 'bg-white/[0.1] border-white/[0.2] text-white'
+                : 'bg-white/[0.03] border-white/[0.08] text-slate-400 hover:text-white hover:border-white/[0.16]'
             }`}
             title="Secondary Actions & Settings"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
 
-          {/* Dropdown Menu Panel */}
+          {/* Dropdown Menu Panel (Raycast Style) */}
           {isOverflowOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-[#05121F] border border-[#0D2E4A] rounded-xl shadow-2xl py-1.5 text-xs text-[#E0F7F4] z-50 divide-y divide-[#0D2E4A]">
+            <div className="absolute right-0 mt-2 w-60 bg-[#0A0F18]/95 backdrop-blur-2xl border border-white/[0.12] rounded-xl shadow-2xl py-1.5 text-xs text-slate-200 z-50 divide-y divide-white/[0.06]">
+              <div className="px-3 py-1.5 text-[10px] font-mono text-slate-400 font-semibold tracking-wider uppercase">
+                Quick Navigation
+              </div>
               <div className="py-1">
                 <button
                   onClick={() => {
                     setActiveTab('scan');
                     setIsOverflowOpen(false);
                   }}
-                  className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                  className="w-full px-3.5 py-2 flex items-center justify-between hover:bg-white/[0.06] hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  <UploadCloud className="w-3.5 h-3.5 text-[#00D4AA]" />
-                  <span>Upload & Analyze Swath</span>
+                  <div className="flex items-center gap-2.5">
+                    <UploadCloud className="w-3.5 h-3.5 text-[#00F5D4]" />
+                    <span>Upload & Analyze Swath</span>
+                  </div>
+                  <span className="keycap">2</span>
                 </button>
 
                 <button
@@ -135,10 +207,13 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
                     setActiveTab('reports');
                     setIsOverflowOpen(false);
                   }}
-                  className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
+                  className="w-full px-3.5 py-2 flex items-center justify-between hover:bg-white/[0.06] hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  <FileText className="w-3.5 h-3.5 text-[#38BDF8]" />
-                  <span>Export Reports Dossier</span>
+                  <div className="flex items-center gap-2.5">
+                    <FileText className="w-3.5 h-3.5 text-[#38BDF8]" />
+                    <span>Export Reports Dossier</span>
+                  </div>
+                  <span className="keycap">6</span>
                 </button>
 
                 <button
@@ -146,31 +221,13 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
                     setActiveTab('model');
                     setIsOverflowOpen(false);
                   }}
-                  className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#082830] hover:text-[#00D4AA] transition-colors text-left cursor-pointer"
-                >
-                  <Cpu className="w-3.5 h-3.5 text-[#F59E0B]" />
-                  <span>Model Intel (YOLOv8s)</span>
-                </button>
-              </div>
-
-              <div className="py-1">
-                <button
-                  onClick={() => {
-                    handleToggleAudio();
-                  }}
-                  className="w-full px-3.5 py-2 flex items-center justify-between hover:bg-[#082830] transition-colors text-left cursor-pointer"
+                  className="w-full px-3.5 py-2 flex items-center justify-between hover:bg-white/[0.06] hover:text-white transition-colors text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-2.5">
-                    {!isAudioMuted ? (
-                      <Volume2 className="w-3.5 h-3.5 text-[#00D4AA]" />
-                    ) : (
-                      <VolumeX className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    )}
-                    <span>Sonar Audio Feedback</span>
+                    <Cpu className="w-3.5 h-3.5 text-[#FFB703]" />
+                    <span>Model Intel (YOLOv8s)</span>
                   </div>
-                  <span className={`text-[10px] font-mono font-bold ${!isAudioMuted ? 'text-[#00D4AA]' : 'text-[#94A3B8]'}`}>
-                    {!isAudioMuted ? 'ON' : 'MUTED'}
-                  </span>
+                  <span className="keycap">7</span>
                 </button>
               </div>
             </div>

@@ -240,109 +240,111 @@ export const MarineSurveyHero: React.FC = () => {
 
       {/* ═══════════════════════════════════════════════════════════════════
           SECTION 2 — THE TWO ELEVATED ANALYSIS MODE CARDS (MOD-01 & MOD-02)
+          2026 Linear & Raycast Inspired Spotlight Cards
           ═══════════════════════════════════════════════════════════════════ */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
         {/* ── CARD 1: MANUAL ANALYSIS (MOD-01) ── */}
         <div
           onMouseEnter={() => setActiveModeHover('manual')}
           onMouseLeave={() => setActiveModeHover('none')}
-          className={`relative rounded-xl bg-[#051124]/90 backdrop-blur-xl border transition-all duration-300 overflow-hidden flex flex-col justify-between shadow-2xl ${
+          className={`caliper-box relative rounded-2xl bg-gradient-to-b from-[#0A0F18]/95 to-[#06090F]/95 backdrop-blur-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
             activeModeHover === 'manual'
-              ? 'border-[#00F0FF] shadow-[0_0_40px_rgba(0,240,255,0.3)] scale-[1.01]'
-              : 'border-[#1E3A5F]/60 hover:border-[#00F0FF]/60'
+              ? 'border-white/[0.22] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_50px_-12px_rgba(0,245,212,0.12)] translate-y-[-2px]'
+              : 'border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_15px_35px_-10px_rgba(0,0,0,0.6)] hover:border-white/[0.16]'
           }`}
         >
-          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#00F0FF]/15 to-transparent pointer-events-none" />
+          {/* Subtle Ambient Radial Spotlight */}
+          <div className="absolute top-0 left-1/4 right-1/4 h-32 bg-[radial-gradient(ellipse_at_top,rgba(0,245,212,0.12),transparent_70%)] pointer-events-none" />
 
-          <div className="p-7 sm:p-9 space-y-6 relative z-10">
+          <div className="p-7 sm:p-8 space-y-6 relative z-10">
             <div className="flex items-start justify-between">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#0284C7]/30 to-[#00F0FF]/15 border border-[#00F0FF]/40 flex items-center justify-center shadow-[0_0_20px_rgba(0,240,255,0.25)]">
-                <UploadCloud className="w-7 h-7 text-[#00F0FF]" />
+              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.1] flex items-center justify-center shadow-inner group-hover:border-[#00F5D4]/40">
+                <UploadCloud className="w-6 h-6 text-[#00F5D4]" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-[#0284C7]/20 border border-[#0284C7]/50 text-[#38BDF8]">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#00F5D4]/10 border border-[#00F5D4]/25 text-[#00F5D4]">
                   MOD-01
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-[#032030] text-[#94A3B8] border border-[#0E4466]">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium bg-white/[0.03] text-slate-400 border border-white/[0.08]">
                   BATCH INGESTION
                 </span>
               </div>
             </div>
 
             <div className="space-y-2">
-              <h2 className="font-display font-bold text-2xl sm:text-3xl text-white">
+              <h2 className="font-display font-bold text-2xl sm:text-3xl text-white tracking-tight">
                 Manual Analysis
               </h2>
-              <p className="text-[14.5px] text-[#94A3B8] leading-relaxed">
+              <p className="text-[14px] text-slate-400 leading-relaxed">
                 Upload raw Side-Scan Sonar imagery and companion ping logs to localize, classify, and inspect potential underwater anomalies with AI.
               </p>
             </div>
 
-            <div className="space-y-3.5 pt-2 border-t border-[#1E3A5F]/50">
+            <div className="space-y-3 pt-4 border-t border-white/[0.06]">
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#00F0FF]/15 border border-[#00F0FF]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F0FF]" />
+                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white flex items-center gap-2">
+                  <div className="text-[13.5px] font-semibold text-slate-200 flex items-center gap-2">
                     <span>SSS Image Upload</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#0A2640] text-[#38BDF8] border border-[#00F0FF]/30 rounded">
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 bg-white/[0.04] text-slate-400 border border-white/[0.08] rounded">
                       .XTF · .JSF · .TIFF · .PNG
                     </span>
                   </div>
-                  <p className="text-[12.5px] text-[#64748B]">Multi-swath waterfall tiles with automatic channel separation</p>
+                  <p className="text-[12px] text-slate-400">Multi-swath waterfall tiles with automatic channel separation</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#00F0FF]/15 border border-[#00F0FF]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F0FF]" />
+                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white">YOLOv8s Deep Marine Perception</div>
-                  <p className="text-[12.5px] text-[#64748B]">11.2M parameter anchor-free neural detector trained on 5,205 SSS tiles</p>
+                  <div className="text-[13.5px] font-semibold text-slate-200">YOLOv8s Deep Marine Perception</div>
+                  <p className="text-[12px] text-slate-400">11.2M parameter anchor-free neural detector trained on 5,205 SSS tiles</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#00F0FF]/15 border border-[#00F0FF]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F0FF]" />
+                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white">Platt-Calibrated Confidence Scoring</div>
-                  <p className="text-[12.5px] text-[#64748B]">Multi-class bounding box, ECE 0.028 benchmark & acoustic evidence breakdown</p>
+                  <div className="text-[13.5px] font-semibold text-slate-200">Platt-Calibrated Confidence Scoring</div>
+                  <p className="text-[12px] text-slate-400">Multi-class bounding box, ECE 0.028 benchmark & acoustic evidence breakdown</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#00F0FF]/15 border border-[#00F0FF]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F0FF]" />
+                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white">Automated WGS84 Geotagged Coordinates</div>
-                  <p className="text-[12.5px] text-[#64748B]">Slant-to-ground range conversion ($G = \sqrt{'{'}R^2 - H^2{'}'}$) & companion ping navigation</p>
+                  <div className="text-[13.5px] font-semibold text-slate-200">Automated WGS84 Geotagged Coordinates</div>
+                  <p className="text-[12px] text-slate-400">Slant-to-ground range conversion ($G = \sqrt{'{'}R^2 - H^2{'}'}$) & companion ping navigation</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#00F0FF]/15 border border-[#00F0FF]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F0FF]" />
+                <div className="w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#00F5D4]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white">Enterprise Standardized Export</div>
-                  <p className="text-[12.5px] text-[#64748B]">1-Click Google Earth KML, QGIS GeoJSON, IHO S-44 CSV & formal PDF dossiers</p>
+                  <div className="text-[13.5px] font-semibold text-slate-200">Enterprise Standardized Export</div>
+                  <p className="text-[12px] text-slate-400">1-Click Google Earth KML, QGIS GeoJSON, IHO S-44 CSV & formal PDF dossiers</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="p-7 sm:p-9 pt-0 relative z-10">
+          <div className="p-7 sm:p-8 pt-0 relative z-10">
             <button
               onClick={() => setActiveTab('scan')}
-              className="w-full py-3.5 px-6 rounded-lg bg-gradient-to-r from-[#0284C7] to-[#00F0FF] hover:from-[#0369A1] hover:to-[#00D4AA] text-[#030914] font-bold text-sm tracking-wide flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(0,240,255,0.3)] transition-all cursor-pointer group"
+              className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-[#00F5D4] hover:from-emerald-400 hover:to-[#5EFFD8] text-[#05070B] font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,245,212,0.25)] hover:shadow-[0_0_25px_rgba(0,245,212,0.4)] transition-all cursor-pointer group"
             >
               <span>LAUNCH MANUAL UPLOAD & ANALYZE</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1.5" />
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
         </div>
@@ -351,104 +353,105 @@ export const MarineSurveyHero: React.FC = () => {
         <div
           onMouseEnter={() => setActiveModeHover('live')}
           onMouseLeave={() => setActiveModeHover('none')}
-          className={`relative rounded-xl bg-[#051124]/90 backdrop-blur-xl border transition-all duration-300 overflow-hidden flex flex-col justify-between shadow-2xl ${
+          className={`caliper-box relative rounded-2xl bg-gradient-to-b from-[#0A0F18]/95 to-[#06090F]/95 backdrop-blur-2xl border transition-all duration-300 overflow-hidden flex flex-col justify-between ${
             activeModeHover === 'live'
-              ? 'border-[#10B981] shadow-[0_0_40px_rgba(16,185,129,0.3)] scale-[1.01]'
-              : 'border-[#1E3A5F]/60 hover:border-[#10B981]/60'
+              ? 'border-white/[0.22] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2),0_25px_50px_-12px_rgba(56,189,248,0.12)] translate-y-[-2px]'
+              : 'border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_15px_35px_-10px_rgba(0,0,0,0.6)] hover:border-white/[0.16]'
           }`}
         >
-          <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#10B981]/15 to-transparent pointer-events-none" />
+          {/* Subtle Ambient Radial Spotlight */}
+          <div className="absolute top-0 left-1/4 right-1/4 h-32 bg-[radial-gradient(ellipse_at_top,rgba(56,189,248,0.12),transparent_70%)] pointer-events-none" />
 
-          <div className="p-7 sm:p-9 space-y-6 relative z-10">
+          <div className="p-7 sm:p-8 space-y-6 relative z-10">
             <div className="flex items-start justify-between">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#059669]/30 to-[#10B981]/15 border border-[#10B981]/40 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.25)]">
-                <Radio className="w-7 h-7 text-[#10B981] animate-pulse" />
+              <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/[0.1] flex items-center justify-center shadow-inner group-hover:border-[#38BDF8]/40">
+                <Radio className="w-6 h-6 text-[#38BDF8] animate-pulse" />
               </div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-[#059669]/20 border border-[#10B981]/50 text-[#34D399]">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#38BDF8]/10 border border-[#38BDF8]/25 text-[#38BDF8]">
                   MOD-02
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-[#062419] text-[#10B981] border border-[#065F46] animate-pulse">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-emerald-500/10 text-[#00F5D4] border border-emerald-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-ping" />
                   LIVE STREAM
                 </span>
               </div>
             </div>
 
             <div className="space-y-2">
-              <h2 className="font-display font-bold text-2xl sm:text-3xl text-white">
+              <h2 className="font-display font-bold text-2xl sm:text-3xl text-white tracking-tight">
                 Live Analysis
               </h2>
-              <p className="text-[14.5px] text-[#94A3B8] leading-relaxed">
+              <p className="text-[14px] text-slate-400 leading-relaxed">
                 Continuously analyze live real-time sonar waterfall streams from underwater Autonomous Underwater Vehicles (AUVs) & towfish surveys.
               </p>
             </div>
 
-            <div className="space-y-3.5 pt-2 border-t border-[#1E3A5F]/50">
+            <div className="space-y-3 pt-4 border-t border-white/[0.06]">
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#10B981]/15 border border-[#10B981]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white flex items-center gap-2">
+                  <div className="text-[13.5px] font-semibold text-slate-200 flex items-center gap-2">
                     <span>Continuous Sonar Stream Ingestion</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 bg-[#062419] text-[#34D399] border border-[#10B981]/30 rounded">
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 bg-white/[0.04] text-slate-400 border border-white/[0.08] rounded">
                       UDP / RTSP / SIM
                     </span>
                   </div>
-                  <p className="text-[12.5px] text-[#64748B]">Real-time high-throughput acoustic packet streaming parser</p>
+                  <p className="text-[12px] text-slate-400">Real-time high-throughput acoustic packet streaming parser</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#10B981]/15 border border-[#10B981]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white">Real-Time Acoustic Waterfall Detection</div>
-                  <p className="text-[12.5px] text-[#64748B]">On-the-fly sliding segmentation window with ~35.2 ms CPU edge latency</p>
+                  <div className="text-[13.5px] font-semibold text-slate-200">Real-Time Acoustic Waterfall Detection</div>
+                  <p className="text-[12px] text-slate-400">On-the-fly sliding segmentation window with ~14.2 ms ONNX edge latency</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#10B981]/15 border border-[#10B981]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white">Active Mission Monitoring & Telemetry Lock</div>
-                  <p className="text-[12.5px] text-[#64748B]">Vessel track sync, heading vector, towfish layback & USBL ping-log lock</p>
+                  <div className="text-[13.5px] font-semibold text-slate-200">Active Mission Monitoring & Telemetry Lock</div>
+                  <p className="text-[12px] text-slate-400">Vessel track sync, heading vector, towfish layback & USBL ping-log lock</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#10B981]/15 border border-[#10B981]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white">Tactical Stream Pause & Ring Buffer</div>
-                  <p className="text-[12.5px] text-[#64748B]">Low-latency 120s tactical ring-buffer inspect, rewind & frame-by-frame scrub</p>
+                  <div className="text-[13.5px] font-semibold text-slate-200">Tactical Stream Pause & Ring Buffer</div>
+                  <p className="text-[12px] text-slate-400">Low-latency 120s tactical ring-buffer inspect, rewind & frame-by-frame scrub</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#10B981]/15 border border-[#10B981]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                <div className="w-5 h-5 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#38BDF8]" />
                 </div>
                 <div>
-                  <div className="text-[13.5px] font-semibold text-white">Real-Time Acoustic Operator Alerts</div>
-                  <p className="text-[12.5px] text-[#64748B]">Immediate high-priority hazard warning, audio cues & active learning triage queue</p>
+                  <div className="text-[13.5px] font-semibold text-slate-200">Real-Time Acoustic Operator Alerts</div>
+                  <p className="text-[12px] text-slate-400">Immediate high-priority hazard warning, audio cues & active learning triage queue</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="p-7 sm:p-9 pt-0 relative z-10">
+          <div className="p-7 sm:p-8 pt-0 relative z-10">
             <button
               onClick={() => setActiveTab('mission')}
-              className="w-full py-3.5 px-6 rounded-lg bg-gradient-to-r from-[#059669] to-[#10B981] hover:from-[#047857] hover:to-[#34D399] text-[#030914] font-bold text-sm tracking-wide flex items-center justify-center gap-2 shadow-[0_0_25px_rgba(16,185,129,0.3)] transition-all cursor-pointer group"
+              className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-[#38BDF8] hover:from-sky-400 hover:to-sky-300 text-[#05070B] font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(56,189,248,0.25)] hover:shadow-[0_0_25px_rgba(56,189,248,0.4)] transition-all cursor-pointer group"
             >
               <span>ENTER MISSION CONTROL STREAM</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1.5" />
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
         </div>

@@ -80,6 +80,51 @@ export const OverviewPage: React.FC = () => {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
+          MoES SWACHH SAGAR & DEEP OCEAN MISSION ECOLOGICAL IMPACT RIBBON
+          ═══════════════════════════════════════════════════════════════════ */}
+      <section className="reveal subpixel-card rounded-2xl p-6 md:p-7 border border-[#FFB703]/30 bg-gradient-to-br from-[#070B14] via-[#0A101D] to-[#070B14] shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#FFB703]/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-2 max-w-xl">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#FFB703]/15 border border-[#FFB703]/35 text-[10px] font-mono font-bold text-[#FFB703] uppercase tracking-wider">
+                MoES · Deep Ocean Mission Theme 2
+              </span>
+              <span className="text-xs font-mono text-slate-400">Swachh Sagar Surakshit Sagar Protocol</span>
+            </div>
+            <h3 className="font-display font-bold text-xl md:text-2xl text-white tracking-tight">
+              Protecting India's Continental Shelf Marine Ecosystem
+            </h3>
+            <p className="text-[14px] text-slate-300 leading-relaxed">
+              Autonomous identification of Abandoned, Lost, or Discarded Fishing Gear (ALDFG) preventing severe wildlife entanglement across the 2.37M sq km Indian EEZ.
+            </p>
+          </div>
+
+          {/* 3 Impact Stat Boxes */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 shrink-0 lg:w-auto w-full font-mono">
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.08] text-center">
+              <span className="text-[10px] text-[#FFB703] uppercase block font-bold">GHOST NET ACCURACY</span>
+              <strong className="text-2xl font-black text-white">99.5%</strong>
+              <span className="text-[10px] text-slate-400 block font-sans">IUCN Red List Protection</span>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.08] text-center">
+              <span className="text-[10px] text-[#00F5D4] uppercase block font-bold">CRUISE LOG SPEED</span>
+              <strong className="text-2xl font-black text-[#00F5D4]">14.2 ms</strong>
+              <span className="text-[10px] text-slate-400 block font-sans">Replaces 18h manual log</span>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.08] text-center">
+              <span className="text-[10px] text-[#38BDF8] uppercase block font-bold">HYDROGRAPHIC SPECS</span>
+              <strong className="text-2xl font-black text-[#38BDF8]">IHO S-44</strong>
+              <span className="text-[10px] text-slate-400 block font-sans">Order 1A Bathymetry</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
           SECTION 1 — THE PROBLEM: EASY TO COLLECT, HARD TO READ IN TIME
           ═══════════════════════════════════════════════════════════════════ */}
       <section id="problem" className="space-y-8">

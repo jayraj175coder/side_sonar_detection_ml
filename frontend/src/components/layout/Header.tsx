@@ -14,10 +14,15 @@ import {
   Maximize2,
   Activity,
   ShieldCheck,
+  ChevronDown,
+  Ruler,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { sonarAudio } from '../../utils/sonarAudio';
 import { SonarxLogo } from '../common/SonarxLogo';
+import { INDIAN_SURVEY_SECTORS, SurveySector, DEFAULT_SURVEY_SECTOR } from '../../data/surveySectors';
+import { MoESBriefingModal } from '../common/MoESBriefingModal';
+import { AcousticShadowCalculatorModal } from '../common/AcousticShadowCalculatorModal';
 
 interface HeaderProps {
   title?: string;
@@ -36,7 +41,12 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
 
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(sonarAudio.isMuted);
   const [isOverflowOpen, setIsOverflowOpen] = useState<boolean>(false);
+  const [isMoESModalOpen, setIsMoESModalOpen] = useState<boolean>(false);
+  const [isShadowCalcOpen, setIsShadowCalcOpen] = useState<boolean>(false);
+  const [isSectorDropdownOpen, setIsSectorDropdownOpen] = useState<boolean>(false);
+  const [selectedSector, setSelectedSector] = useState<SurveySector>(DEFAULT_SURVEY_SECTOR);
   const overflowRef = useRef<HTMLDivElement>(null);
+  const sectorRef = useRef<HTMLDivElement>(null);
 
   const handleToggleAudio = () => {
     const muted = sonarAudio.toggleMute();
@@ -51,11 +61,14 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     }
   };
 
-  // Close overflow menu on outside click
+  // Close menus on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (overflowRef.current && !overflowRef.current.contains(event.target as Node)) {
         setIsOverflowOpen(false);
+      }
+      if (sectorRef.current && !sectorRef.current.contains(event.target as Node)) {
+        setIsSectorDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -97,11 +110,15 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
             onClick={() => setActiveTab('overview')}
           />
 
-          {/* Mission Telemetry Pill */}
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/25 text-[10px] font-mono font-semibold text-[#FFB703]">
+          {/* Mission Telemetry & MoES Briefing Pill */}
+          <button
+            onClick={() => setIsMoESModalOpen(true)}
+            className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFB703]/15 hover:bg-[#FFB703]/25 border border-[#FFB703]/40 text-[10px] font-mono font-bold text-[#FFB703] transition-all cursor-pointer shadow-[0_0_12px_rgba(255,183,3,0.2)] hover:scale-105 active:scale-95"
+            title="Open MoES Deep Ocean Mission Evaluation Dossier"
+          >
             <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
-            <span>SIH26057 // MoES</span>
-          </div>
+            <span>🏛️ MoES PROTOCOL // EVAL BRIEF</span>
+          </button>
         </div>
       </div>
 
@@ -110,15 +127,60 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         <div className="flex items-center gap-1.5">
           <Activity className="w-3 h-3 text-[#FFB703] animate-pulse" />
           <span className="text-slate-300 font-semibold">ACOUSTIC CHIRP:</span>
-          <span className="text-[#FFB703]">900 kHz</span>
+          <span className="text-[#FFB703]">{selectedSector.acousticChirpKhz} kHz</span>
         </div>
 
         <span className="w-1 h-1 rounded-full bg-slate-700" />
 
-        <div className="flex items-center gap-1.5">
-          <Compass className="w-3 h-3 text-[#FFB703]" />
-          <span className="text-slate-300">POSITION:</span>
-          <span className="text-slate-200">18.9217° N, 72.8214° E</span>
+        {/* Interactive Indian EEZ Survey Sector Selector */}
+        <div className="relative" ref={sectorRef}>
+          <button
+            onClick={() => setIsSectorDropdownOpen(!isSectorDropdownOpen)}
+            className="flex items-center gap-1.5 text-slate-300 hover:text-white transition-colors cursor-pointer py-0.5 px-2 rounded hover:bg-white/[0.06]"
+            title="Switch Indian Continental Shelf Survey Sector"
+          >
+            <Compass className="w-3 h-3 text-[#FFB703]" />
+            <span className="text-slate-400">SECTOR:</span>
+            <span className="text-white font-bold">{selectedSector.shortName}</span>
+            <span className="text-slate-400 text-[10px]">({selectedSector.coordString})</span>
+            <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${isSectorDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {isSectorDropdownOpen && (
+            <div className="absolute left-0 mt-2 w-80 bg-[#0A0F18]/98 backdrop-blur-2xl border border-white/[0.15] rounded-xl shadow-2xl py-2 text-xs text-slate-200 z-50 divide-y divide-white/[0.06] animate-in fade-in slide-in-from-top-2">
+              <div className="px-3.5 py-1 text-[10px] font-mono text-[#FFB703] font-bold tracking-wider uppercase flex items-center justify-between">
+                <span>Indian EEZ Survey Sectors</span>
+                <span className="text-slate-400">MoES / NIOT</span>
+              </div>
+              <div className="py-1">
+                {INDIAN_SURVEY_SECTORS.map((sec) => (
+                  <button
+                    key={sec.id}
+                    onClick={() => {
+                      setSelectedSector(sec);
+                      setIsSectorDropdownOpen(false);
+                    }}
+                    className={`w-full px-3.5 py-2 flex flex-col text-left hover:bg-white/[0.06] transition-colors cursor-pointer ${
+                      selectedSector.id === sec.id ? 'bg-[#FFB703]/10 border-l-2 border-[#FFB703]' : ''
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-white text-xs">{sec.shortName}</span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.04] text-slate-400">{sec.code}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-slate-400 mt-0.5">
+                      <span className="text-[#FFB703]">{sec.coordString}</span>
+                      <span>·</span>
+                      <span>{sec.depthRange}</span>
+                      <span>·</span>
+                      <span className="text-slate-300">{sec.acousticChirpKhz} kHz</span>
+                    </div>
+                    <span className="text-[9px] text-slate-500 truncate mt-0.5">{sec.surveyVessel}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <span className="w-1 h-1 rounded-full bg-slate-700" />
@@ -132,6 +194,16 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
 
       {/* 3. Right: Fast Action Buttons, Audio Toggle & Overflow Menu */}
       <div className="flex items-center gap-2">
+        {/* Acoustic Shadow Calculator Button */}
+        <button
+          onClick={() => setIsShadowCalcOpen(true)}
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.03] hover:bg-[#FFB703]/10 border border-white/[0.08] hover:border-[#FFB703]/40 text-xs text-slate-300 hover:text-[#FFB703] transition-all cursor-pointer"
+          title="Open Hydrographic Acoustic Shadow Calculator (IHO S-44)"
+        >
+          <Ruler className="w-3.5 h-3.5 text-[#FFB703]" />
+          <span className="text-[11px] font-medium hidden md:inline">Shadow Calc</span>
+        </button>
+
         {/* Fullscreen Button with F11 Keycap */}
         <button
           onClick={handleToggleFullscreen}
@@ -230,6 +302,19 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           )}
         </div>
       </div>
+
+      {/* MoES Deep Ocean Mission Briefing Modal */}
+      <MoESBriefingModal
+        isOpen={isMoESModalOpen}
+        onClose={() => setIsMoESModalOpen(false)}
+        onOpenShadowCalc={() => setIsShadowCalcOpen(true)}
+      />
+
+      {/* Interactive Hydrographic Acoustic Shadow Calculator */}
+      <AcousticShadowCalculatorModal
+        isOpen={isShadowCalcOpen}
+        onClose={() => setIsShadowCalcOpen(false)}
+      />
     </header>
   );
 };

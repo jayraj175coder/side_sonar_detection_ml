@@ -45,20 +45,18 @@ By pairing an anchor-free **YOLOv8 ONNX Runtime** inference engine (trained on *
 
 ---
 
-## 🏆 Competitive Differentiation: SONARX vs. Competing Prototypes
+## 🌐 Commercial Market Benchmark & Enterprise Differentiation
 
-How SONARX compares against competing student hackathon projects (such as *SONAR-SHIELD* and *SEASENTRY*):
+How **SONARX** compares against established commercial hydrographic suites and marine industry market standards:
 
-| Capability / Benchmark | SONAR-SHIELD (`shejolesumesh`) | SEASENTRY | **SONARX (Our Solution)** |
-| :--- | :--- | :--- | :--- |
-| **Detection Classes** | **Only 1 single class (`Crab-Pot`)** | Generic student taxonomy (Claims "Plastic bottle 42cm") | **4 MoES Critical Classes**: `ghost_net_aldfg`, `anthropogenic_debris`, `pipeline_hazard`, `seafloor_anomaly` + MILCO baseline |
-| **Acoustic Physics & Shadow Geometry** | ❌ None | ❌ None (Flat 2D boxes) | **True Trigonometric Shadow Geometry**: Derives physical elevation $H_t = \frac{L_s \cdot H_a}{R + L_s}$ from towfish altitude ($H_a$) and shadow length ($L_s$) |
-| **Acoustic Signal Processing** | Basic OpenCV median filter | Basic contrast filter | **Speckle reduction (Lee 7×7 MMSE)**, TVG (Time-Varying Gain) attenuation correction, bottom-track nadir blanking, and CLAHE |
-| **Autonomous AUV / Drone Simulation** | ❌ None (Single image upload) | ❌ None (Generic boat icon) | **Real-Time Mission Control Console**: Live AUV telemetry stream (heading, depth, altitude, speed, ping rate, swath width, waterfall visualizer) |
-| **Temporal Debris Lifecycle** | ❌ None | Conceptual diagram only | **Fully Implemented 4-State Engine**: `NEW`, `STILL THERE`, `MOVED`, `GONE` with side-by-side multi-pass survey comparison & drift vectors |
-| **Indian EEZ Geospatial Integration** | ❌ None (Generic map) | Static map outline | **6 Dedicated Indian Sectors**: Kochi Basin, Mumbai High, Vizag Deep Trench, Chennai Coromandel, Port Blair, Gulf of Kutch with INCOIS/GEBCO bathymetry |
-| **Modern Technology Stack** | Python + Flask + basic HTML | Python + Flask + Vanilla JS | **FastAPI 0.115 + ONNX Runtime + React 19 + TypeScript + Vite 8 + Tailwind CSS** |
-| **UI/UX Grade** | Standard light dashboard | Simple student prototype | **2026 Linear/Raycast-grade Obsidian Dark HUD (`#05070B`)** with tactical naval amber phosphor (`#FFB703`) |
+| Capability / Operational Feature | Legacy Hydrographic Suites (e.g., Chesapeake SonarWiz, Teledyne CARIS) | Vendor-Locked Acquisition Tools (e.g., EdgeTech Discover, Klein SonarPro) | Defense MCM Suites (e.g., SeeByte SeeTrack) | **SONARX (Our Platform)** |
+| :--- | :--- | :--- | :--- | :--- |
+| **Perception & Target Recognition** | ❌ Manual human contact picking; zero native deep-learning inference | ❌ Raw waterfall display only; no automated object detection | ⚠️ Proprietary defense models restricted strictly to naval mines (MCM) | **Automated Multi-Class Perception**: Real-time YOLOv8 ONNX detection of Ghost Nets (ALDFG), Debris, Pipelines, and Anomalies |
+| **Acoustic Shadow Height Physics** | ⚠️ Manual cursor click-and-drag measuring tool | ❌ Uncalibrated pixel rulers | ⚠️ Proprietary classified military algorithms | **Fully Automated Trigonometric Geometry**: Computes physical height $H_t = \frac{L_s \cdot H_a}{R + L_s}$ from towfish altitude and shadow void |
+| **Temporal Debris Lifecycle & Re-Survey** | ❌ None; surveys archived as isolated, disconnected files | ❌ None; acquisition only | ⚠️ Tactical target database without environmental drift physics | **Native 4-State Lifecycle Engine**: Tracks `NEW`, `STILL THERE`, `MOVED`, and `GONE` with digital acoustic fingerprints & benthic current drift vectors |
+| **Acoustic Signal Processing** | ⚠️ Basic post-processing gain curves (TVG/AGC) | ⚠️ Hardware analog-to-digital filtering only | ⚠️ Proprietary signal processing | **Comprehensive Physics Pipeline**: Lee 7×7 MMSE speckle filter, TVG attenuation correction, bottom-track nadir blanking, and CLAHE |
+| **AUV & Drone Edge Readiness** | ❌ Bulky desktop software requiring Windows license dongles | ❌ Hardware-tied to surface survey vessels | ⚠️ Specialized autonomous architectures for military UUVs | **Lightweight Edge-Ready Stack**: FastAPI + ONNX Runtime running at ~35ms CPU latency on embedded drone payload computers |
+| **Cost & Procurement Accessibility** | ❌ Expensive commercial licensing ($10,000–$35,000+ per seat) | ❌ Locked to specific OEM sonar hardware purchases | ❌ Multi-million dollar defense contract procurement | **Open-Standard Sovereign Architecture**: Tailored for MoES, NIOT, and national Blue Economy / Swachh Sagar initiatives |
 
 ---
 

@@ -216,29 +216,47 @@ Evaluated on the held-out test split of **700 unseen SSS tiles**:
 | `seafloor_anomaly` | **0.5559** | **0.2799** | Complex natural seafloor background |
 | `anthropogenic_debris` | **0.4178** | **0.2439** | Highly variable irregular geometry |
 
+### 7.3 Digital Acoustic Fingerprinting & 4-Phase Temporal Lifecycle Engine
+
+Oceanic debris does not remain static. Benthic currents displace abandoned fishing nets, and salvage operations actively clear hazards. SONARX introduces **Digital Acoustic Fingerprinting (AFP)**:
+1. **Acoustic Hash Formulation:** Each detection is mapped to a cryptographic identifier:
+   $$\text{AFP-Hash} = \text{SHA256}(Lat_0, Lon_0, \text{Depth}, \sigma_{backscatter}, L_s, H_t)$$
+2. **Multi-Pass Survey Difference Engine:** When an autonomous AUV or survey vessel re-scans a sector, contacts are evaluated across 4 deterministic states:
+   * 🟢 **`NEW`**: Fresh hazard discovered in current survey pass; zero historical contacts within geodetic clustering radius ($r_{match} \le 5.0\text{ m}$).
+   * 🔵 **`STILL_THERE` (PERSISTENT)**: Confirmed stationary hazard across multi-pass surveys ($\Delta r < 1.0\text{ m}$).
+   * 🟠 **`MOVED` (DRIFTED)**: Buoyant ghost net or debris displaced by benthic tidal currents. Computes displacement distance:
+     $$\Delta r = 2 R_{earth} \arcsin \sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos \phi_1 \cos \phi_2 \sin^2\left(\frac{\Delta \lambda}{2}\right)}$$
+     Calculates drift bearing $\theta$, drift velocity in knots, and correlates movement with regional hydrodynamic currents (e.g., SW Monsoon Undercurrent).
+   * 🟣 **`GONE` (SALVAGED)**: Confirmed absent in subsequent re-survey following cleanup operations; automatically bound to a **MoES Swachh Sagar Salvage Verification Ticket**.
+
+### 7.4 Autonomous Drone / AUV Mission Telemetry & Real-Time Waterfall Visualizer
+
+SONARX includes a native **Mission Control Workstation** simulating an operational AUV deployment:
+* **Live Telemetry Stream:** Ingests heading ($^\circ$), depth ($m$), towfish altitude ($m$), ground speed ($kt$), acoustic frequency ($kHz$), and ping rate ($Hz$).
+* **Real-Time Sonar Waterfall:** Streaming hydrographic visualization synchronized with drone position.
+* **Indian EEZ Sector Deployment:** Tailored for 6 strategic maritime sectors: Kochi Basin, Mumbai High, Vizag Deep Trench, Chennai Coromandel Coast, Port Blair Swell, and Gulf of Kutch.
+
 ---
 
-## 8. Competitive Differentiation Matrix
+## 8. Commercial Market Differentiation Matrix
 
-Comparing SONARX against state-of-the-art subsea perception benchmarks:
+Benchmarking SONARX against established commercial hydrographic suites and marine industry standards:
 
-| Feature | Baseline Standard | Conventional SSS Pipeline | **SONARX (Our Solution)** |
-|---|---|---|---|
-| **Mission Mandate** | OPR-26057 | OPR-26057 | **OPR-26057** |
-| **Dataset Size** | ~100 synthetic tiles | 5,205 tiles | **5,205 tiles (Multi-Source)** |
-| **Model Architecture** | Vanilla YOLOv8n | YOLOv8s | **YOLOv8s ONNX (Optimized)** |
-| **mAP@50 Score** | ~0.45 - 0.55 (unverified) | 0.6410 | **0.7409 (Empirical)** |
-| **Precision** | ~0.60 | 0.7340 | **0.7773** |
-| **Noise Filtering** | Threshold only | Shadow formula | **Multi-Rule Acoustic Noise Filter** |
-| **UI Dashboard** | Basic upload form | Upload + Map list | **Interactive SonarViewer + Mission Control HUD + Leaflet Map** |
-| **Edge Deployment** | Cloud dependent | CPU ONNX (~90ms) | **CPU ONNX (~35ms / tile, Jetson/Pi Ready)** |
+| Capability / Operational Feature | Legacy Hydrographic Suites (e.g., Chesapeake SonarWiz, Teledyne CARIS) | Vendor-Locked Acquisition Tools (e.g., EdgeTech Discover, Klein SonarPro) | Defense MCM Suites (e.g., SeeByte SeeTrack) | **SONARX (Our Solution)** |
+| :--- | :--- | :--- | :--- | :--- |
+| **Perception & Target Recognition** | ❌ Manual human contact picking; zero native deep-learning inference | ❌ Raw waterfall display only; no automated object detection | ⚠️ Proprietary defense models restricted strictly to naval mines (MCM) | **Automated Multi-Class Perception**: Real-time YOLOv8 ONNX detection of Ghost Nets (ALDFG), Debris, Pipelines, and Anomalies |
+| **Acoustic Shadow Height Physics** | ⚠️ Manual cursor click-and-drag measuring tool | ❌ Uncalibrated pixel rulers | ⚠️ Proprietary classified military algorithms | **Fully Automated Trigonometric Geometry**: Computes physical height $H_t = \frac{L_s \cdot H_a}{R + L_s}$ from towfish altitude and shadow void |
+| **Temporal Debris Lifecycle & Re-Survey** | ❌ None; surveys archived as isolated, disconnected files | ❌ None; acquisition only | ⚠️ Tactical target database without environmental drift physics | **Native 4-State Lifecycle Engine**: Tracks `NEW`, `STILL THERE`, `MOVED`, and `GONE` with digital acoustic fingerprints & benthic current drift vectors |
+| **Acoustic Signal Processing** | ⚠️ Basic post-processing gain curves (TVG/AGC) | ⚠️ Hardware analog-to-digital filtering only | ⚠️ Proprietary signal processing | **Comprehensive Physics Pipeline**: Lee 7×7 MMSE speckle filter, TVG attenuation correction, bottom-track nadir blanking, and CLAHE |
+| **AUV & Drone Edge Readiness** | ❌ Bulky desktop software requiring Windows license dongles | ❌ Hardware-tied to surface survey vessels | ⚠️ Specialized autonomous architectures for military UUVs | **Lightweight Edge-Ready Stack**: FastAPI + ONNX Runtime running at ~35ms CPU latency on embedded drone payload computers |
+| **Cost & Procurement Accessibility** | ❌ Expensive commercial licensing ($10,000–$35,000+ per seat) | ❌ Locked to specific OEM sonar hardware purchases | ❌ Multi-million dollar defense contract procurement | **Open-Standard Sovereign Architecture**: Tailored for MoES, NIOT, and national Blue Economy / Swachh Sagar initiatives |
 
 ---
 
 ## 9. Judge Q&A & Technical Defense Guide
 
 ### Q1: "How do you distinguish man-made debris from natural rocks?"
-> *"Generic computer vision relies on brightness alone. SONARX uses a 3-layer defense: first, Lee speckle filtering suppresses Rayleigh noise; second, YOLOv8s extracts acoustic features; third, our `AcousticNoiseFilter` enforces geometric aspect ratio bounds and verifies that a dark acoustic shadow void exists adjacent to the highlight, opposite the nadir axis."*
+> *"Generic computer vision relies on brightness alone. SONARX uses a 3-layer defense: first, Lee speckle filtering suppresses Rayleigh noise; second, YOLOv8s extracts acoustic features; third, our `AcousticNoiseFilter` enforces geometric aspect ratio bounds and verifies that a dark acoustic shadow void exists adjacent to the highlight, opposite the nadir axis ($L = \frac{h \cdot G}{H - h}$)."*
 
 ### Q2: "Can this system run on an AUV or marine drone without cloud connection?"
 > *"Yes. SONARX uses ONNX Runtime with CPU execution providers. The entire inference model is 44.7 MB (or 22 MB in FP16), taking ~35ms per tile on a standard CPU. It runs completely offline on an NVIDIA Jetson Nano or Raspberry Pi onboard a towfish or AUV."*
@@ -248,3 +266,9 @@ Comparing SONARX against state-of-the-art subsea perception benchmarks:
 
 ### Q4: "How does geotagging work when GPS is unavailable underwater?"
 > *"GPS signals do not penetrate water. Our geotag parser reads towfish USBL/INS navigation logs or ping headers. It computes ground range from slant range and altitude ($G=\sqrt{R^2-H^2}$), then projects pixel coordinates along the vessel heading vector into WGS84 latitude/longitude."*
+
+### Q5: "How does SONARX compare against commercial software like Chesapeake SonarWiz or Teledyne CARIS?"
+> *"Commercial suites like SonarWiz and CARIS HIPS/SIPS are legacy desktop tools costing \$10,000–\$35,000 per seat that require human operators to manually scroll through waterfall imagery and click on contacts—they have zero native deep-learning perception. SONARX is an edge-native AI platform: it detects, classifies, and calculates shadow elevations automatically in 35ms, runs onboard an AUV without proprietary dongles, and provides automated 4-phase temporal drift tracking that legacy suites do not offer."*
+
+### Q6: "How do you track whether debris has drifted or was already recovered between surveys?"
+> *"We implement Digital Acoustic Fingerprinting (AFP). Each detected target receives a cryptographic acoustic hash combining geodetic coordinates, backscatter return (dB), and physical shadow geometry. When our autonomous AUV re-surveys the sector months later, our temporal diff engine compares sequential passes across 4 deterministic states: NEW, STILL THERE, MOVED, and GONE. For drifting ghost nets, it automatically calculates the displacement distance, drift bearing, velocity in knots, and correlates the movement with local benthic tidal currents."*

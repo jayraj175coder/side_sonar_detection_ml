@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   Maximize2,
+  Fingerprint,
 } from 'lucide-react';
 import { PredictionResponse, Detection } from '../../types';
 import { Badge } from '../common/Badge';
@@ -641,9 +642,10 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
-              <thead className="bg-[#080E1C]/80 text-slate-400 border-b border-slate-800 uppercase tracking-wider">
+              <thead className="bg-[#080E1C]/80 text-slate-400 border-b border-slate-800 uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="py-3 px-3">Target ID</th>
+                  <th className="py-3 px-3">Acoustic Fingerprint</th>
                   <th className="py-3 px-3">Classification</th>
                   <th className="py-3 px-3">Confidence</th>
                   <th className="py-3 px-3">Bounding Box</th>
@@ -668,8 +670,14 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                         isSelected ? 'bg-[#FFB703]/10 text-amber-200 ring-1 ring-[#FFB703]/30' : 'text-slate-300'
                       }`}
                     >
-                      <td className="py-3 px-3 text-slate-400 font-semibold">
+                      <td className="py-3 px-3 text-slate-400 font-semibold font-mono">
                         {det.id}
+                      </td>
+                      <td className="py-3 px-3">
+                        <span className="px-2 py-0.5 rounded bg-[#FFB703]/10 border border-[#FFB703]/30 text-[#FFB703] font-mono text-[10px] font-bold inline-flex items-center gap-1">
+                          <Fingerprint className="w-3 h-3 text-[#FFB703]" />
+                          AFP-{det.id.slice(-4).toUpperCase()}
+                        </span>
                       </td>
                       <td className="py-3 px-3">
                         <Badge

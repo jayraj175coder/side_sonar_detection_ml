@@ -14,13 +14,20 @@ import {
   Boxes,
   Layers,
   FileSpreadsheet,
+  Fingerprint,
+  Compass,
+  Anchor,
+  CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Badge } from '../components/common/Badge';
 import { PredictionResponse } from '../types';
+import { TemporalDebrisTracker } from '../components/history/TemporalDebrisTracker';
 
 export const ScanHistoryPage: React.FC = () => {
   const { scans, setCurrentScan, setActiveTab, deleteScan } = useApp();
+  const [activeSubView, setActiveSubView] = useState<'TEMPORAL_AUDIT' | 'SCAN_LEDGER'>('TEMPORAL_AUDIT');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterClass, setFilterClass] = useState<'ALL' | 'GHOST_NET' | 'DEBRIS' | 'PIPELINE'>('ALL');
   const [sortBy, setSortBy] = useState<'date' | 'detections' | 'confidence'>('date');
@@ -66,80 +73,137 @@ export const ScanHistoryPage: React.FC = () => {
 
   return (
     <div className="space-y-6 font-mono select-none text-slate-200">
-      {/* 1. Top Search & Filter Bar */}
-      <div className="p-4 rounded-2xl subpixel-card flex flex-wrap items-center justify-between gap-4 border border-white/[0.08] shadow-lg">
-        {/* Search Input */}
-        <div className="relative flex-1 min-w-[240px]">
-          <Search className="w-4 h-4 text-[#FFB703] absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search by Scan ID or image filename..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs font-mono rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-slate-500 focus:outline-none focus:border-[#FFB703]"
-          />
+      {/* ── Top Subsea Audit Mode Switcher ── */}
+      <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-white/[0.08]">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveSubView('TEMPORAL_AUDIT')}
+            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeSubView === 'TEMPORAL_AUDIT'
+                ? 'bg-[#FFB703] text-[#05070B] shadow-[0_0_20px_rgba(255,183,3,0.35)]'
+                : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.08]'
+            }`}
+          >
+            <Fingerprint className="w-4 h-4" />
+            <span>Temporal Debris & Drift Audit</span>
+            <span
+              className={`text-[9px] px-1.5 py-0.5 rounded font-black ${
+                activeSubView === 'TEMPORAL_AUDIT'
+                  ? 'bg-black/30 text-[#05070B]'
+                  : 'bg-[#FFB703]/20 text-[#FFB703]'
+              }`}
+            >
+              4-STATE LIFECYCLE
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubView('SCAN_LEDGER')}
+            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 ${
+              activeSubView === 'SCAN_LEDGER'
+                ? 'bg-[#FFB703] text-[#05070B] shadow-[0_0_20px_rgba(255,183,3,0.35)]'
+                : 'bg-white/[0.04] text-slate-400 hover:text-white border border-white/[0.08]'
+            }`}
+          >
+            <History className="w-4 h-4" />
+            <span>Raw Scan Ledger</span>
+            <span className="text-[10px] text-slate-500 font-normal">
+              ({scans.length} records)
+            </span>
+          </button>
         </div>
 
-        {/* Filter Badges */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex rounded-xl bg-white/[0.03] border border-white/[0.08] p-0.5 text-xs font-mono">
-            <button
-              onClick={() => setFilterClass('ALL')}
-              className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
-                filterClass === 'ALL'
-                  ? 'bg-[#FFB703] text-[#05070B] font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              All ({scans.length})
-            </button>
-            <button
-              onClick={() => setFilterClass('GHOST_NET')}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
-                filterClass === 'GHOST_NET'
-                  ? 'bg-[#FFB703]/20 text-[#FFB703] font-bold border border-[#FFB703]/40'
-                  : 'text-slate-400 hover:text-[#FFB703]'
-              }`}
-            >
-              <AlertTriangle className="w-3 h-3 text-[#FFB703]" />
-              <span>Ghost Nets</span>
-            </button>
-            <button
-              onClick={() => setFilterClass('DEBRIS')}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
-                filterClass === 'DEBRIS'
-                  ? 'bg-[#F59E0B]/20 text-[#F59E0B] font-bold border border-[#F59E0B]/40'
-                  : 'text-slate-400 hover:text-[#F59E0B]'
-              }`}
-            >
-              <Boxes className="w-3 h-3 text-[#F59E0B]" />
-              <span>Debris</span>
-            </button>
-            <button
-              onClick={() => setFilterClass('PIPELINE')}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
-                filterClass === 'PIPELINE'
-                  ? 'bg-[#38BDF8]/20 text-[#38BDF8] font-bold border border-[#38BDF8]/40'
-                  : 'text-slate-400 hover:text-[#38BDF8]'
-              }`}
-            >
-              <Layers className="w-3 h-3 text-[#38BDF8]" />
-              <span>Pipelines</span>
-            </button>
-          </div>
-
-          {/* Sort Dropdown */}
-          <select
-            value={sortBy}
-            onChange={(e: any) => setSortBy(e.target.value)}
-            className="px-3 py-2 text-xs font-mono rounded-xl bg-white/[0.03] border border-white/[0.08] text-white focus:outline-none focus:border-[#FFB703] cursor-pointer"
-          >
-            <option value="date" className="bg-[#0A0F18] text-white">Sort: Newest First</option>
-            <option value="detections" className="bg-[#0A0F18] text-white">Sort: Highest Targets</option>
-            <option value="confidence" className="bg-[#0A0F18] text-white">Sort: Peak Confidence</option>
-          </select>
+        <div className="text-[10px] text-slate-400 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>MoES Multi-Pass Geographic Delta Engine Active</span>
         </div>
       </div>
+
+      {activeSubView === 'TEMPORAL_AUDIT' ? (
+        /* Render the Full Temporal Debris Lifecycle & Fingerprint Component */
+        <TemporalDebrisTracker />
+      ) : (
+        <>
+          {/* 1. Top Search & Filter Bar */}
+          <div className="p-4 rounded-2xl subpixel-card flex flex-wrap items-center justify-between gap-4 border border-white/[0.08] shadow-lg">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-[240px]">
+              <Search className="w-4 h-4 text-[#FFB703] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search by Scan ID or image filename..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 text-xs font-mono rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-slate-500 focus:outline-none focus:border-[#FFB703]"
+              />
+            </div>
+
+            {/* Filter Badges */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex rounded-xl bg-white/[0.03] border border-white/[0.08] p-0.5 text-xs font-mono">
+                <button
+                  onClick={() => setFilterClass('ALL')}
+                  className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                    filterClass === 'ALL'
+                      ? 'bg-[#FFB703] text-[#05070B] font-bold shadow-sm'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  All ({scans.length})
+                </button>
+                <button
+                  onClick={() => setFilterClass('GHOST_NET')}
+                  className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
+                    filterClass === 'GHOST_NET'
+                      ? 'bg-[#FFB703]/20 text-[#FFB703] font-bold border border-[#FFB703]/40'
+                      : 'text-slate-400 hover:text-[#FFB703]'
+                  }`}
+                >
+                  <AlertTriangle className="w-3 h-3 text-[#FFB703]" />
+                  <span>Ghost Nets</span>
+                </button>
+                <button
+                  onClick={() => setFilterClass('DEBRIS')}
+                  className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
+                    filterClass === 'DEBRIS'
+                      ? 'bg-[#F59E0B]/20 text-[#F59E0B] font-bold border border-[#F59E0B]/40'
+                      : 'text-slate-400 hover:text-[#F59E0B]'
+                  }`}
+                >
+                  <Boxes className="w-3 h-3 text-[#F59E0B]" />
+                  <span>Debris</span>
+                </button>
+                <button
+                  onClick={() => setFilterClass('PIPELINE')}
+                  className={`px-3 py-1 rounded-lg flex items-center gap-1 transition-all cursor-pointer ${
+                    filterClass === 'PIPELINE'
+                      ? 'bg-[#38BDF8]/20 text-[#38BDF8] font-bold border border-[#38BDF8]/40'
+                      : 'text-slate-400 hover:text-[#38BDF8]'
+                  }`}
+                >
+                  <Layers className="w-3 h-3 text-[#38BDF8]" />
+                  <span>Pipelines</span>
+                </button>
+              </div>
+
+              {/* Sort Dropdown */}
+              <select
+                value={sortBy}
+                onChange={(e: any) => setSortBy(e.target.value)}
+                className="px-3 py-2 text-xs font-mono rounded-xl bg-white/[0.03] border border-white/[0.08] text-white focus:outline-none focus:border-[#FFB703] cursor-pointer"
+              >
+                <option value="date" className="bg-[#0A0F18] text-white">
+                  Sort: Newest First
+                </option>
+                <option value="detections" className="bg-[#0A0F18] text-white">
+                  Sort: Highest Targets
+                </option>
+                <option value="confidence" className="bg-[#0A0F18] text-white">
+                  Sort: Peak Confidence
+                </option>
+              </select>
+            </div>
+          </div>
 
       {/* 2. Main Scans Table */}
       <div className="rounded-2xl subpixel-card overflow-hidden shadow-2xl border border-white/[0.08]">
@@ -168,6 +232,7 @@ export const ScanHistoryPage: React.FC = () => {
               <thead className="bg-white/[0.04] text-slate-400 border-b border-white/[0.08] uppercase tracking-wider text-[10px]">
                 <tr>
                   <th className="py-3.5 px-4">Scan ID</th>
+                  <th className="py-3.5 px-4">Acoustic Fingerprint</th>
                   <th className="py-3.5 px-4">Source Track</th>
                   <th className="py-3.5 px-4">Date & Time</th>
                   <th className="py-3.5 px-4">Targets</th>
@@ -191,6 +256,12 @@ export const ScanHistoryPage: React.FC = () => {
                     >
                       <td className="py-3.5 px-4 font-bold text-[#FFB703]">
                         {scan.scan_id}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="px-2 py-0.5 rounded bg-[#FFB703]/10 border border-[#FFB703]/30 text-[#FFB703] font-bold text-[10px] inline-flex items-center gap-1 font-mono">
+                          <Fingerprint className="w-3 h-3 text-[#FFB703]" />
+                          AFP-{scan.scan_id.slice(-4).toUpperCase()}
+                        </span>
                       </td>
                       <td className="py-3.5 px-4 font-medium text-white max-w-[180px] truncate">
                         {scan.filename}
@@ -286,6 +357,8 @@ export const ScanHistoryPage: React.FC = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
+  )}
+</div>
   );
 };

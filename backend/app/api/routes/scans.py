@@ -172,18 +172,24 @@ def get_printable_html_report(scan_id: str):
         .badge.high {{ background: rgba(45,212,191,0.2); color: #2dd4bf; border: 1px solid #2dd4bf; }}
         .badge.medium {{ background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid #fb923c; }}
         .footer {{ font-size: 10px; color: #64748b; margin-top: 30px; text-align: center; border-top: 1px solid #334155; padding-top: 16px; }}
-        @media print {{
-            body {{ background: white; color: black; padding: 0; }}
-            .card {{ background: white; border: 1px solid #ccc; color: black; box-shadow: none; }}
-            .metric-box {{ background: #f8fafc; border: 1px solid #ccc; color: black; }}
-            .metric-val {{ color: #0f766e; }}
-            th {{ background: #f1f5f9; color: black; }}
-            td {{ border-bottom: 1px solid #ddd; }}
-        }}
+        .no-print { display: flex; }
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .card { background: white; border: 1px solid #ccc; color: black; box-shadow: none; }
+            .metric-box { background: #f8fafc; border: 1px solid #ccc; color: black; }
+            .metric-val { color: #0f766e; }
+            th { background: #f1f5f9; color: black; }
+            td { border-bottom: 1px solid #ddd; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div style="max-width: 900px; margin: 0 auto 16px auto; display: flex; justify-content: flex-end; gap: 10px;" class="no-print">
+        <button onclick="window.print()" style="background: #0284c7; color: white; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">🖨️ Print / Save as PDF</button>
+        <button onclick="window.close()" style="background: #334155; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;">Close</button>
+    </div>
+    <div class="card" style="max-width: 900px; margin: 0 auto;">
         <div class="header">
             <div>
                 <div class="title">SONARX // SUBSEA INTELLIGENCE DOSSIER</div>
@@ -242,6 +248,13 @@ def get_printable_html_report(scan_id: str):
             Powered by SONARX YOLOv8s ONNX Engine · Evaluated on 5,205 Multi-Source Side-Scan Sonar Tiles (74.1% mAP50)
         </div>
     </div>
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.print();
+            }, 300);
+        });
+    </script>
 </body>
 </html>"""
 

@@ -10,6 +10,7 @@ import {
   Cpu,
   Radio,
   FileSpreadsheet,
+  FileCode,
   Check,
   ShieldCheck,
   Zap,
@@ -23,6 +24,7 @@ import {
 import { useApp } from '../context/AppContext';
 import { MISSION_TARGETS } from '../data/targets';
 import { SonarxLogo } from '../components/common/SonarxLogo';
+import { openPrintableDossier, downloadDossierHTML } from '../utils/dossierReportGenerator';
 
 type SortField = 'id' | 'class' | 'confidence' | 'depth' | 'risk';
 type SortOrder = 'asc' | 'desc';
@@ -31,6 +33,7 @@ export const ReportsPage: React.FC = () => {
   const { currentScan, scans, isBackendConnected } = useApp();
   const [downloadJsonSuccess, setDownloadJsonSuccess] = useState<boolean>(false);
   const [downloadCsvSuccess, setDownloadCsvSuccess] = useState<boolean>(false);
+  const [downloadHtmlSuccess, setDownloadHtmlSuccess] = useState<boolean>(false);
 
   // Sorting, Filtering & Pagination State
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -150,12 +153,29 @@ export const ReportsPage: React.FC = () => {
     risk: 'CRITICAL',
   };
 
+  const getDossierData = () => ({
+    scanId,
+    filename,
+    createdAt,
+    modelName,
+    inferenceMs,
+    totalDetections,
+    ghostNetCount: activeScan?.ghost_net_count || 1,
+    debrisCount: activeScan?.debris_count || 1,
+    pipelineCount: activeScan?.pipeline_count || 0,
+    anomalyCount: activeScan?.anomaly_count || 0,
+    heroTarget,
+    targets: detectionList,
+  });
+
   const handlePrint = () => {
-    if (isBackendConnected && activeScan?.scan_id) {
-      window.open(`http://localhost:8000/api/v1/scans/${activeScan.scan_id}/report/html`, '_blank');
-    } else {
-      window.print();
-    }
+    openPrintableDossier(getDossierData());
+  };
+
+  const handleDownloadHtml = () => {
+    downloadDossierHTML(getDossierData());
+    setDownloadHtmlSuccess(true);
+    setTimeout(() => setDownloadHtmlSuccess(false), 3000);
   };
 
   const handleDownloadJson = () => {
@@ -225,7 +245,7 @@ export const ReportsPage: React.FC = () => {
       {/* 1. Header Toolbar */}
       <div className="p-4 subpixel-card rounded-2xl border border-white/[0.08] flex flex-col md:flex-row md:items-center justify-between gap-4 print:hidden shadow-lg">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shadow-[0_0_15px_rgba(255,183,3,0.2)]">
+          <div className="w-10 h-10 rounded-xl bg-[#0284c7]/20 border border-[#0284c7]/40 flex items-center justify-center text-[#38bdf8] shadow-[0_0_15px_rgba(2,132,199,0.25)]">
             <FileText className="w-5 h-5" />
           </div>
           <div>
@@ -239,7 +259,7 @@ export const ReportsPage: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 flex-wrap text-xs font-mono">
+        <div className="flex items-center gap-2.5 flex-wrap text-xs font-mono">
           <button
             onClick={handleDownloadJson}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.1] hover:border-[#FFB703]/60 text-slate-300 hover:text-[#FFB703] transition-colors cursor-pointer"
@@ -259,11 +279,21 @@ export const ReportsPage: React.FC = () => {
           </button>
 
           <button
-            onClick={handlePrint}
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#FFB703] text-[#05070B] font-black hover:bg-[#FCD34D] transition-all cursor-pointer shadow-[0_0_15px_rgba(255,183,3,0.3)] active:scale-95"
+            onClick={handleDownloadHtml}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.1] hover:border-[#38bdf8]/60 text-slate-300 hover:text-[#38bdf8] transition-colors cursor-pointer"
+            title="Download complete standalone HTML report dossier"
           >
-            <Printer className="w-3.5 h-3.5" />
-            <span>PRINT / PDF DOSSIER</span>
+            {downloadHtmlSuccess ? <Check className="w-3.5 h-3.5 text-[#38bdf8]" /> : <FileCode className="w-3.5 h-3.5" />}
+            <span>HTML DOSSIER</span>
+          </button>
+
+          <button
+            onClick={handlePrint}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white font-bold transition-all cursor-pointer shadow-[0_0_20px_rgba(2,132,199,0.35)] active:scale-95"
+            title="Open official A4 intelligence dossier with automatic PDF print dialog"
+          >
+            <Printer className="w-4 h-4" />
+            <span>PRINT / SAVE PDF</span>
           </button>
         </div>
       </div>

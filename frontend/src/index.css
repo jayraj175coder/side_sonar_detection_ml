@@ -363,3 +363,30 @@
 .animate-ping-wave {
   animation: pingWave 0.65s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
+
+/* ──────────────────────────────────────────────────────────────────
+   Global Print Stylesheet for High-Fidelity Reports & PDF Dossiers
+   ────────────────────────────────────────────────────────────────── */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  aside, header, nav, .print\:hidden, [class*="AmbientOceanBackdrop"], button {
+    display: none !important;
+  }
+  main, .subpixel-card {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  * {
+    text-shadow: none !important;
+  }
+}
+

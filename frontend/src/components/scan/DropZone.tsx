@@ -274,76 +274,101 @@ export const DropZone: React.FC<DropZoneProps> = ({
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center space-y-4 text-center max-w-md">
+          <div className="relative w-full flex flex-col items-center justify-center space-y-4 text-center max-w-md py-4">
+            {/* Background Subsea AUV / Bathymetric Illustration in Dropzone */}
+            <div className="absolute right-0 -bottom-6 w-56 h-28 pointer-events-none opacity-30 overflow-hidden">
+              <svg viewBox="0 0 200 100" className="w-full h-full">
+                {/* Sonar Beam */}
+                <polygon points="120,40 180,95 70,95" fill="url(#dropzoneBeamGrad)" opacity="0.6" />
+                <defs>
+                  <linearGradient id="dropzoneBeamGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#38BDF8" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                {/* AUV Hull */}
+                <ellipse cx="120" cy="40" rx="35" ry="12" fill="#0E2238" stroke="#38BDF8" strokeWidth="1.5" />
+                <ellipse cx="150" cy="40" rx="6" ry="10" fill="#0A1828" stroke="#38BDF8" strokeWidth="1" />
+                <circle cx="95" cy="40" r="3.5" fill="#FFB703" />
+              </svg>
+            </div>
+
             {/* Pulsing Sonar Ping Emitter Halo */}
             <div className="relative flex items-center justify-center">
-              <div className="absolute w-24 h-24 rounded-full border border-[#FFB703]/30 animate-sonar-ping-ripple pointer-events-none" />
-              <div className="w-16 h-16 rounded-2xl bg-[#0A101D] border border-white/[0.1] flex items-center justify-center text-[#FFB703] shadow-[0_0_20px_rgba(255,183,3,0.18)] group-hover:scale-110 group-hover:border-[#FFB703]/80 transition-all duration-300 z-10">
-                <UploadCloud className="w-8 h-8 animate-pulse" />
+              <div className="absolute w-20 h-20 rounded-full border border-[#38BDF8]/30 animate-ping pointer-events-none" />
+              <div className="w-14 h-14 rounded-2xl bg-[#0A101D] border border-white/[0.1] flex items-center justify-center text-[#38BDF8] shadow-[0_0_25px_rgba(56,189,248,0.25)] group-hover:scale-105 group-hover:border-[#38BDF8]/80 transition-all duration-300 z-10">
+                <UploadCloud className="w-7 h-7 animate-pulse text-[#38BDF8]" />
               </div>
             </div>
 
-            <div className="space-y-1">
-              <h3 className="text-sm font-black text-white uppercase tracking-wider">
-                DRAG & DROP RAW SONAR SWATH
+            <div className="space-y-1 z-10">
+              <h3 className="text-base font-black text-white uppercase tracking-wider">
+                Drag &amp; Drop Raw Sonar Swath
               </h3>
               <p className="text-xs text-slate-400">
-                Drop single image swath, multi-frame log, or click to browse.
+                Drop a single image swath, multi-frame log, or click to browse.
               </p>
             </div>
 
-            {/* Ingestion Mode Badges */}
-            <div className="flex items-center gap-2 text-[9px] font-mono text-slate-400 flex-wrap justify-center">
-              <span className="px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.08]">
-                PNG / JPG / TIFF
-              </span>
-              <span className="px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.08]">
-                900 kHz / 450 kHz
-              </span>
-              <span className="px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.08]">
-                Clipboard (Ctrl+V)
-              </span>
+            {/* Format Pills */}
+            <div className="flex items-center gap-1.5 text-[9.5px] font-mono text-slate-400 flex-wrap justify-center z-10">
+              {['PNG', 'JPG', 'TIFF', 'XTF', 'JSF'].map((fmt) => (
+                <span key={fmt} className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] font-semibold">
+                  {fmt}
+                </span>
+              ))}
+              <span className="text-slate-500 ml-1">Max size: 500 MB</span>
             </div>
 
-            {/* Tactical Debris Taxonomy Indicator Pill */}
-            <div className="flex items-center gap-2 text-[8px] font-mono flex-wrap justify-center pt-1">
-              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/30 font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
-                Ghost Nets (ALDFG)
-              </span>
-              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#38BDF8]/10 text-[#38BDF8] border border-[#38BDF8]/30 font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
-                Pipeline Hazards
-              </span>
-              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
-                Anthropogenic Debris
-              </span>
-              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/[0.04] text-slate-300 border border-white/[0.1] font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                Seafloor Anomalies
-              </span>
+            {/* Primary Action Button: Choose Files */}
+            <div className="pt-1 z-10">
+              <button
+                type="button"
+                onClick={handleOpenFilePicker}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white font-mono text-xs font-bold transition-all shadow-[0_4px_20px_rgba(2,132,199,0.4)] cursor-pointer hover:scale-105"
+              >
+                <FolderOpen className="w-4 h-4" />
+                <span>Choose Files</span>
+              </button>
             </div>
 
-            {/* Batch / Log Ingestion Button */}
-            <div className="flex items-center gap-2 pt-2">
+            {/* Sub Ingestion Buttons */}
+            <div className="flex items-center gap-2 pt-1 z-10">
               <button
                 type="button"
                 onClick={handleOpenBatchPicker}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.1] hover:border-[#FFB703]/60 text-slate-300 hover:text-[#FFB703] text-[9px] font-bold transition-all shadow-md cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-[#38BDF8]/60 text-slate-300 hover:text-white text-[9.5px] font-mono font-medium transition-all shadow-md cursor-pointer"
               >
-                <ListOrdered className="w-3.5 h-3.5" />
+                <ListOrdered className="w-3.5 h-3.5 text-[#38BDF8]" />
                 <span>Upload Sonar Image Log (Batch)</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleOpenPingLogPicker}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.1] hover:border-[#FFB703]/60 text-slate-300 hover:text-[#FFB703] text-[9px] font-bold transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-[#FFB703]/60 text-slate-300 hover:text-white text-[9.5px] font-mono font-medium transition-all cursor-pointer"
               >
-                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <FileSpreadsheet className="w-3.5 h-3.5 text-[#FFB703]" />
                 <span>Attach Ping Log CSV</span>
               </button>
+            </div>
+
+            {/* Bottom Subsea Telemetry Bar */}
+            <div className="w-full pt-4 mt-2 border-t border-white/[0.06] flex items-center justify-between text-[9px] font-mono text-slate-400 z-10">
+              <div className="flex items-center gap-1 text-slate-400 tracking-wider">
+                <span>DEEPER INSIGHTS</span>
+                <span className="text-slate-600">·</span>
+                <span>CLEANER OCEANS</span>
+                <span className="text-slate-600">·</span>
+                <span>SAFER TOMORROW</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span><strong className="text-white">900 kHz</strong> Side-Scan</span>
+                <span className="text-slate-600">·</span>
+                <span><strong className="text-white">120 m</strong> Swath</span>
+                <span className="text-slate-600">·</span>
+                <span><strong className="text-white">&lt; 15 m</strong> Resolution</span>
+              </div>
             </div>
           </div>
         )}

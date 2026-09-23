@@ -26,7 +26,7 @@ export const ImpactTranslationBanner: React.FC<ImpactTranslationBannerProps> = (
 
   return (
     <div className="bg-[#05070B] border-b border-[#162136] px-3 sm:px-4 py-1 select-none font-sans">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
         {/* Card 1: Debris Sites & Tonnage */}
         <div className="px-2.5 py-1 bg-[#080D17] border border-[#162136] rounded flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -37,7 +37,7 @@ export const ImpactTranslationBanner: React.FC<ImpactTranslationBannerProps> = (
               <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
                 <span className="text-[#EF4444]">{debrisCount}</span> SITES FLAGGED
               </div>
-              <div className="text-[8px] text-[#94A3B8] mt-0.5">est. 2.3 tons ghost gear</div>
+              <div className="text-[8px] text-[#94A3B8] mt-0.5">incl. 4 high-priority hazards</div>
             </div>
           </div>
           <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-[#EF4444]/20 text-[#EF4444] rounded">
@@ -53,7 +53,7 @@ export const ImpactTranslationBanner: React.FC<ImpactTranslationBannerProps> = (
             </div>
             <div>
               <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
-                <span className="text-[#FFB703]">4 MIN</span> <span className="text-[#94A3B8] text-[9px] font-normal">vs ~6 hrs dive</span>
+                <span className="text-[#FFB703]">4 MIN</span> <span className="text-[#94A3B8] text-[9px] font-normal">since last detection</span>
               </div>
               <div className="text-[8px] text-[#94A3B8] mt-0.5">Automated side-scan triage</div>
             </div>
@@ -73,11 +73,29 @@ export const ImpactTranslationBanner: React.FC<ImpactTranslationBannerProps> = (
               <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
                 <span className="text-[#38BDF8]">{coveragePct}%</span> COVERAGE
               </div>
-              <div className="text-[8px] text-[#94A3B8] mt-0.5">12.84 km² shelf swath surveyed</div>
+              <div className="text-[8px] text-[#94A3B8] mt-0.5">12.84 km² surveyed</div>
             </div>
           </div>
           <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-[#38BDF8]/20 text-[#38BDF8] rounded">
             SURVEY PASS
+          </span>
+        </div>
+
+        {/* Card 4: Shadow Gate Active */}
+        <div className="px-2.5 py-1 bg-[#080D17] border border-[#162136] rounded flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+              <Sparkles className="w-3 h-3" />
+            </div>
+            <div>
+              <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
+                <span className="text-emerald-400">SHADOW GATE</span>
+              </div>
+              <div className="text-[8px] text-[#94A3B8] mt-0.5">Active (v2.1 Physics Filter)</div>
+            </div>
+          </div>
+          <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded">
+            NOMINAL
           </span>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Target } from 'lucide-react';
 import { MissionTopHeader } from '../components/mission/v3/MissionTopHeader';
 import { SurveyTargetQueue } from '../components/mission/v3/SurveyTargetQueue';
 import { LargeSonarViewer } from '../components/mission/v3/LargeSonarViewer';
@@ -41,6 +42,7 @@ export const MissionPage: React.FC = () => {
 
   // Center Viewport Switcher ('sonar' | 'map' | '3d')
   const [centerViewMode, setCenterViewMode] = useState<'sonar' | 'map' | '3d'>('sonar');
+  const [isQueueOpen, setIsQueueOpen] = useState<boolean>(false);
 
   // Full-Screen Cinematic Story Demo Mode for Judges
   const [showCinematicDemo, setShowCinematicDemo] = useState<boolean>(false);
@@ -321,18 +323,40 @@ export const MissionPage: React.FC = () => {
         />
       ) : (
         <div className="flex-1 flex overflow-hidden relative">
-          {/* 1. LEFT — Survey + Detection Queue */}
-          <SurveyTargetQueue
-            targets={processedTargets}
-            selectedTargetId={selectedTargetId}
-            onSelectTarget={handleSelectTarget}
-            hoveredTargetId={hoveredTargetId}
-            onHoverTarget={setHoveredTargetId}
-            onFocusHeroTarget={runHeroSequence}
-            currentStageIndex={currentStageIndex}
-            confidenceThreshold={confidenceThreshold}
-            onChangeConfidenceThreshold={setConfidenceThreshold}
-          />
+          {/* 1. LEFT — Collapsible Survey & Detection Queue */}
+          {isQueueOpen ? (
+            <div className="relative shrink-0 flex z-20">
+              <SurveyTargetQueue
+                targets={processedTargets}
+                selectedTargetId={selectedTargetId}
+                onSelectTarget={handleSelectTarget}
+                hoveredTargetId={hoveredTargetId}
+                onHoverTarget={setHoveredTargetId}
+                onFocusHeroTarget={runHeroSequence}
+                currentStageIndex={currentStageIndex}
+                confidenceThreshold={confidenceThreshold}
+                onChangeConfidenceThreshold={setConfidenceThreshold}
+              />
+              <button
+                onClick={() => setIsQueueOpen(false)}
+                className="absolute top-2 right-2 p-1 rounded bg-[#0A1220] border border-white/[0.1] text-slate-400 hover:text-white z-30 cursor-pointer text-xs"
+                title="Collapse Target Queue"
+              >
+                ✕
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setIsQueueOpen(true)}
+              className="hidden lg:flex flex-col items-center justify-center gap-1.5 py-4 px-1.5 bg-[#070D18] hover:bg-[#0A1220] border-r border-y border-white/[0.08] text-[9.5px] font-mono text-slate-400 hover:text-[#FFB703] transition-colors cursor-pointer rounded-r-lg my-auto z-20"
+              title="Expand Target Queue (17 Contacts)"
+            >
+              <Target className="w-3.5 h-3.5 text-[#FFB703]" />
+              <span className="[writing-mode:vertical-rl] rotate-180 font-bold tracking-widest uppercase">
+                TARGETS ({processedTargets.length})
+              </span>
+            </button>
+          )}
 
         {/* 2. CENTER — 3-Way Hero Viewport (Sonar Waterfall | Subsea Mission Map | 3D Seafloor) */}
         {centerViewMode === 'sonar' ? (

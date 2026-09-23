@@ -74,7 +74,7 @@ This guide gives you the **exact script and step-by-step workflow** to present S
 ---
 
 ### Act 7: Temporal Debris Fingerprinting & Drift Audit (30 Seconds)
-1. Click on the **`History`** tab in the sidebar navigation (defaults to **Temporal Debris & Drift Audit**).
+1. Click on the **`Target Tracking`** tab in the sidebar navigation (keycap `6`).
 2. Point out:
    - **4-Phase MoES Lifecycle Counters**: 🟢 **NEW**, 🔵 **STILL THERE**, 🟠 **MOVED (DRIFTED)**, 🟣 **GONE (SALVAGED)**.
    - Click on the hero drifting net (`AFP-7F9A-KCH-ALDFG`): Show the **Multi-Pass Survey Comparison** (Pass #1 vs Pass #3).
@@ -82,6 +82,19 @@ This guide gives you the **exact script and step-by-step workflow** to present S
    - Click **`Log ROV Verification`** button to demonstrate Human-in-the-Loop salvage confirmation.
 3. Explain to judges:
    > *"Marine hazards drift over time. Every target in SONARX receives a digital acoustic fingerprint hash. When our AUV re-surveys months later, our temporal diff engine confirms whether hazards remained stationary, drifted with bottom tides, or were verified salvaged under Swachh Sagar Surakshit Sagar."*
+
+---
+
+### Act 8: Smart Multi-Vessel TSP Route Optimizer & Marine GPX Export (30 Seconds)
+1. Click on the **`Route Planner`** tab in the sidebar navigation (keycap `5`).
+2. Point out:
+   - **5 High-Level Mission KPIs**: Total Distance (`72.3 NM` vs 118.6 NM unoptimized · **-39.0%**), Est. Mission Hours (`14 hrs`), Energy Consumed (`101.2 kWh`), CO2 Emissions Saved (`813.8 kg`), Targets Scheduled (`5/5`).
+   - **Tactical Navigation Map**: Chennai Sector Leaflet chart with waypoints 0 to 5, red Restricted Area polygon, offshore platform, and 12 NM Territorial Waters boundary.
+   - **Turn-by-Turn Waypoint Leg Table**: Complete navigation logs for Legs 0→1 through 5→0 with bearings, distances, and actions (`LAUNCH`, `SURVEY & RECOVER`, `DOCK & OFF-LOAD`).
+   - **Bathymetric Depth Profile**: SVG elevation chart plotting seabed depth vs route distance.
+   - Click **`Export GPX / KML`** to demonstrate instant download of standard marine autopilot flight paths.
+3. Explain to judges:
+   > *"Detection is useless without retrieval. SONARX bridges the gap between perception and operational salvage with an integrated 2-Opt TSP Route Optimizer that cuts cleanup transit distance by 39%, prevents vessel collisions with restricted zones, and exports autopilot-ready GPX tracks for autonomous surface and subsea fleets."*
 
 ---
 

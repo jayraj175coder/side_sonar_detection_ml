@@ -41,7 +41,7 @@ By pairing an anchor-free **YOLOv8 ONNX Runtime** inference engine (trained on *
 | **Static "One-Time" Detection Flaw**: Existing prototypes only analyze a single snapshot without tracking whether hazardous debris has drifted or been cleaned up. | **4-Phase Temporal Debris Lifecycle & Fingerprinting**: Creates a cryptographic acoustic fingerprint (`AFP-XXXX-SHA`) per contact and compares multi-pass re-surveys to track **NEW**, **STILL THERE (PERSISTENT)**, **MOVED (DRIFTED)**, and **GONE (SALVAGED)** states. |
 | **Benthic Current Drift**: Buoyant debris and ghost nets move with deep-sea tides, making recovery difficult for salvage teams. | **Benthic Drift Vector Engine**: Calculates displacement distance ($\Delta r$), drift bearing ($\theta$), drift speed in knots, and aligns vectors with regional hydrodynamic currents (e.g., SW Monsoon Undercurrent). |
 | **Manual Geotagging Latency**: Disconnect between raw sonar waterfalls and navigation logs delays emergency salvage operations. | **Automated Ping-Log Geodetic Ingestion**: Parses companion CSV/JSON/XTF navigation logs, solves slant-to-ground range $G = \sqrt{R^2 - H^2}$, and projects precise WGS-84 coordinates. |
-| **Disconnected Salvage Operations**: Identifying hazards without mission-ready recovery flight paths leaves debris unaddressed on the seabed. | **Autonomous ROV Salvage Planner**: Computes optimal Traveling Salesperson (TSP) recovery trajectories, estimates battery consumption, and exports subsea autopilot GPX flight routes. |
+| **Disconnected Salvage Operations**: Identifying hazards without mission-ready recovery flight paths leaves debris unaddressed on the seabed. | **Smart Multi-Vessel TSP Route Optimizer**: Computes 2-Opt Traveling Salesperson (TSP) recovery trajectories, models vessel battery energy and CO2 savings, and exports autopilot-ready subsea GPX/KML flight routes. |
 
 ---
 
@@ -54,6 +54,7 @@ How **SONARX** compares against established commercial hydrographic suites and m
 | **Perception & Target Recognition** | ❌ Manual human contact picking; zero native deep-learning inference | ❌ Raw waterfall display only; no automated object detection | ⚠️ Proprietary defense models restricted strictly to naval mines (MCM) | **Automated Multi-Class Perception**: Real-time YOLOv8 ONNX detection of Ghost Nets (ALDFG), Debris, Pipelines, and Anomalies |
 | **Acoustic Shadow Height Physics** | ⚠️ Manual cursor click-and-drag measuring tool | ❌ Uncalibrated pixel rulers | ⚠️ Proprietary classified military algorithms | **Fully Automated Trigonometric Geometry**: Computes physical height $H_t = \frac{L_s \cdot H_a}{R + L_s}$ from towfish altitude and shadow void |
 | **Temporal Debris Lifecycle & Re-Survey** | ❌ None; surveys archived as isolated, disconnected files | ❌ None; acquisition only | ⚠️ Tactical target database without environmental drift physics | **Native 4-State Lifecycle Engine**: Tracks `NEW`, `STILL THERE`, `MOVED`, and `GONE` with digital acoustic fingerprints & benthic current drift vectors |
+| **Salvage Route Optimization** | ❌ None; manual waypoint entry in separate chartplotters | ❌ Acquisition only | ⚠️ Tactical route planning focused on mine clearance corridors | **Integrated Multi-Vessel TSP Optimizer**: 2-Opt shortest flight route solver, bathymetric profile charts, energy reserve budgeting, and GPX/KML export |
 | **Acoustic Signal Processing** | ⚠️ Basic post-processing gain curves (TVG/AGC) | ⚠️ Hardware analog-to-digital filtering only | ⚠️ Proprietary signal processing | **Comprehensive Physics Pipeline**: Lee 7×7 MMSE speckle filter, TVG attenuation correction, bottom-track nadir blanking, and CLAHE |
 | **AUV & Drone Edge Readiness** | ❌ Bulky desktop software requiring Windows license dongles | ❌ Hardware-tied to surface survey vessels | ⚠️ Specialized autonomous architectures for military UUVs | **Lightweight Edge-Ready Stack**: FastAPI + ONNX Runtime running at ~35ms CPU latency on embedded drone payload computers |
 | **Cost & Procurement Accessibility** | ❌ Expensive commercial licensing ($10,000–$35,000+ per seat) | ❌ Locked to specific OEM sonar hardware purchases | ❌ Multi-million dollar defense contract procurement | **Open-Standard Sovereign Architecture**: Tailored for MoES, NIOT, and national Blue Economy / Swachh Sagar initiatives |
@@ -96,24 +97,51 @@ flowchart TD
         StateGone["GONE (SALVAGED)"]
     end
 
-    subgraph Client ["5. Mission Control Console (React 19 + TypeScript + Vite)"]
-        HUD["Tactical Acoustic Waterfall HUD & Palette Filters"]
-        Console["Autonomous Drone Telemetry & Mission Flight Path"]
-        Tracker["Temporal Debris Fingerprint & Drift Audit Workbench"]
-        GISMap["Indian EEZ Bathymetric GIS Map (6 Sectors)"]
-        ROV["Autonomous ROV Salvage Flight Route Planner (TSP)"]
-        Report["MoES Swachh Sagar PDF / HTML / JSON Clearance Dossier"]
+    subgraph Client ["5. Operational Workstation (React 19 + TypeScript + Vite 8)"]
+        Dashboard["Command Center Dashboard (Telemetry & Fleet Readiness)"]
+        ScanWorkstation["Upload & Analyze Acoustic Workstation (ONNX Telemetry)"]
+        MissionControl["Mission Control 18/62/20 Console (Dual Waterfall + Target Intel)"]
+        GISMap["Subsea GIS Map (Indian EEZ 6 Sectors + Heatmaps)"]
+        RouteOptimizer["Smart Multi-Vessel TSP Route Optimizer (2-Opt + GPX Export)"]
+        TargetTracking["Temporal AFP Lifecycle Tracking & Benthic Drift Vectors"]
+        Reports["MoES Swachh Sagar Clearance Dossiers (PDF / HTML / JSON)"]
     end
 
     Image --> Letterbox --> TVG --> Lee --> CLAHE --> ONNX
     Log --> Geotag
-    AUV --> Console
+    AUV --> MissionControl
     ONNX --> NMS --> NoiseFilter --> Platt --> Geotag --> Fingerprint
     Fingerprint --> MultiPass --> Drift --> Lifecycle
     Lifecycle --> StateNew & StateStill & StateMoved & StateGone
-    StateNew & StateStill & StateMoved & StateGone --> Tracker
-    Fingerprint --> HUD & GISMap & ROV & Report
+    StateNew & StateStill & StateMoved & StateGone --> TargetTracking
+    Fingerprint --> Dashboard & ScanWorkstation & MissionControl & GISMap & RouteOptimizer & Reports
 ```
+
+---
+
+## 💻 9 Core Operational Workstation Modules
+
+SONARX delivers a full operational command-center suite built for marine survey engineers and MoES hydrographers:
+
+1. **`Dashboard` (Command Center)**: High-level overview of live survey missions, autonomous fleet readiness (AUV / USV), cumulative marine debris tally, and Indian EEZ sector summaries.
+2. **`Upload & Analyze` (Workstation)**: Dual-mode ingestion of raw sonar waterfalls with optional companion navigation ping logs (XTF / CSV / JSON), real-time ONNX tensor execution, and bounding box shadow inspection.
+3. **`Mission Control` (18% / 62% / 20% Flagship Console)**:
+   - **Left Queue (18%)**: Acoustic candidate triage, false-alarm rejection counter, live confidence threshold cutoff slider (40%), and shadow gate toggle.
+   - **Center Viewport (62%)**: Dual-flank acoustic waterfall canvas with center nadir line, Kongsberg copper amber / emerald / cobalt / B&W palettes, slant-to-ground range rectification ($R_g = \sqrt{R_s^2 - H^2}$), and live towfish/USV telemetry overlays.
+   - **Right Intel Panel (20%)**: Active contact inspection, Platt probability calibration gauge (ECE: 0.028), Human-in-the-Loop triage (`CONFIRM` / `REJECT` / `RE-CLASS`), Active Learning ground-truth export (YOLO format), shadow geometry ray-tracing ($h = \frac{L_s \cdot H}{R_s + L_s}$), and official MoES Certificate of Clearance (SHA-256).
+   - **Bottom Timeline**: 8-stage AI pipeline execution strip with synchronized frame scrubber and event log.
+4. **`Subsea Map` (GIS Reconnaissance)**: Interactive multi-layer marine GIS covering 6 Indian maritime sectors with bathymetric depth contours, 200 NM EEZ lines, offshore platform hazard zones, and contact heatmaps.
+5. **`Route Planner` (Smart Multi-Vessel TSP Optimizer)**:
+   - Automated 2-Opt Traveling Salesperson Problem (TSP) solver for subsea recovery fleets.
+   - 5 Mission KPIs: Total Distance (NM, showing % savings), Est. Mission Hours, Energy Consumed (kWh, battery reserve), CO2 Emissions Saved (kg vs diesel vessels), Targets Scheduled (5/5).
+   - Tactical Navigation Map: Waypoints 0 to 5, Restricted Area polygon enforcement, Offshore Platform markers, and Territorial Waters line.
+   - Turn-by-Turn Waypoint Leg Table: Leg distances, bearings, depths, and actions (`LAUNCH`, `SURVEY & RECOVER`, `DOCK & OFF-LOAD`).
+   - Bathymetric Seabed Depth Profile: Real-time SVG elevation curve vs route distance.
+   - Direct autopilot export in GPX / KML formats.
+6. **`Target Tracking` (Acoustic Fingerprinting & Temporal Drift)**: 4-phase lifecycle auditing (`NEW`, `STILL THERE`, `MOVED`, `GONE`) with benthic tidal current vectors and SHA-256 cryptographic hashes (`AFP-XXXX-SHA`).
+7. **`Analytics` (Hydrographic Data Intelligence)**: Depth vs mass correlations, debris class distributions, false positive reduction ratios, and sonar frequency performance breakdowns.
+8. **`Reports Dossier` (Swachh Sagar Official Clearance)**: One-click exportable hydrographic inspection dossiers in PDF, HTML, and JSON formats for the Ministry of Earth Sciences and port authorities.
+9. **`Model Intel` (Acoustic Backbone Validation)**: Real-time neural metrics, confusion matrix, precision-recall curves, and physical validation benchmarks for the YOLOv8s ONNX runtime model.
 
 ---
 
@@ -231,13 +259,25 @@ Each sector features bathymetric contour lines, 200 NM EEZ boundaries, range rin
 
 ---
 
-## 🖥️ User Interface & Experience (2026 Obsidian HUD)
+## 🖥️ User Interface & Operational Workstation Ergonomics
 
-Designed in an obsidian dark aesthetic inspired by modern enterprise design systems:
-* **Obsidian Palette**: Canvas (`#05070B`), Surface (`#0A0F18`), Elevated (`#101726`), with naval amber phosphor accents (`#FFB703`).
-* **Subsea Hydrographic Grid**: Subtle ambient bathymetry grid with hardware-accelerated transforms.
-* **Full-Height Responsive Viewport**: Map and telemetry dashboards dynamically fill the screen (`100vh - 90px`), eliminating unnecessary page scrolling.
-* **Acoustic Palettes**: 4 field-selectable waterfall color maps (**Amber Glow**, **Emerald Marine**, **Deep Cobalt**, **High-Contrast B&W**).
+SONARX is designed strictly as a **real-world marine defense and scientific hydrographic intelligence workstation** rather than a promotional landing page:
+* **Operational Palette**: Tactical Navy/Black Canvas (`#05070B`), Deep Control Surface (`#070B12`, `#0A0F18`), Elevated Cards (`#101726`), with naval amber phosphor accents (`#FFB703` / `#FFB800`) and emerald/cyan telemetry indicators.
+* **Tactical Sidebar Navigation**:
+  - Deep obsidian container with vertical luminous amber active edge indicator pills.
+  - Smooth amber glass hover transitions (`hover:bg-[#FFB703]/[0.07] hover:border-[#FFB703]/20`).
+  - Single-key instant navigation keycaps (`1` through `9`).
+  - Subsea system health monitors: Perception Engine (`ACTIVE`), AI Model (`YOLOv8s`), ONNX Runtime (`14.2 ms`), Geo-Localization (`WGS-84`).
+* **Decluttered Top Command Header**:
+  - Screen title breadcrumb with live module identifier.
+  - Real-time ticking UTC mission clock (`HH:MM:SS UTC`).
+  - Emerald blinking `SYSTEM ONLINE` heartbeat indicator.
+  - Rapid acoustic audio alert toggle (synthesized sonar pings and chimes).
+* **High Information-Density Layouts**:
+  - Full-height responsive viewports (`100vh - 56px`), maximizing primary visual data.
+  - 18% / 62% / 20% Mission Control split prioritizing dual-flank acoustic waterfall imagery and contact triage.
+  - 3-column TSP Route Optimizer with synchronized Leaflet navigation chart, waypoint leg logs, and interactive bathymetric depth profiles.
+* **Field-Selectable Acoustic Palettes**: 4 field-selectable waterfall color maps (**Kongsberg Amber Copper**, **Emerald Marine**, **Deep Cobalt**, **High-Contrast B&W**).
 
 ---
 

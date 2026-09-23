@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Radio,
   PanelLeftClose,
   PanelLeftOpen,
   Menu,
@@ -9,17 +8,13 @@ import {
   UploadCloud,
   FileText,
   MoreVertical,
-  Cpu,
-  Compass,
   Maximize2,
-  Activity,
-  ShieldCheck,
   Bell,
   Clock,
+  Cpu,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { sonarAudio } from '../../utils/sonarAudio';
-import { SonarxLogo } from '../common/SonarxLogo';
 
 interface HeaderProps {
   title?: string;
@@ -27,7 +22,7 @@ interface HeaderProps {
   onToggleMobileMenu?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
+export const Header: React.FC<HeaderProps> = ({ title, subtitle, onToggleMobileMenu }) => {
   const {
     activeTab,
     setActiveTab,
@@ -77,8 +72,8 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
 
   return (
     <header className="h-15 sm:h-16 bg-[#05070B]/90 backdrop-blur-xl border-b border-white/[0.08] px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 font-sans select-none transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
-      {/* 1. Left: Sidebar Toggle + Logo + Survey ID Badge */}
-      <div className="flex items-center gap-3.5">
+      {/* 1. Left: Sidebar Toggle + Active Module Title */}
+      <div className="flex items-center gap-3">
         <button
           onClick={toggleSidebar}
           className="hidden md:flex p-2 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-slate-300 hover:text-white rounded-xl transition-all cursor-pointer"
@@ -101,61 +96,18 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           </button>
         )}
 
-        <div className="flex items-center gap-3">
-          <SonarxLogo
-            size="sm"
-            subtitle=""
-            badge="v2.6"
-            animated={true}
-            onClick={() => setActiveTab('overview')}
-          />
-
-          {/* Mission Telemetry Pill */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/30 text-xs font-mono font-bold text-[#FFB703]">
-            <span className="w-2 h-2 rounded-full bg-[#FFB703] animate-ping" />
-            <span>SIH26057 // MoES</span>
-          </div>
-
-          {/* Mission ID & Live Status */}
-          <div className="hidden 2xl:flex items-center gap-2 font-mono text-[11px] text-slate-400 pl-1 border-l border-white/[0.08]">
-            <span className="text-slate-500">ID:</span>
-            <span className="text-white font-semibold">MX-026</span>
-            <span className="text-slate-600">•</span>
-            <span className="text-[#38bdf8] font-bold">SCAN: ACTIVE SWATH</span>
-          </div>
+        <div className="flex items-center gap-2.5">
+          <div className="w-2 h-2 rounded-full bg-[#FFB703]" />
+          <h2 className="text-sm font-bold font-mono text-white tracking-wide uppercase">
+            {title || 'SONAR X // Subsea Intelligence'}
+          </h2>
         </div>
       </div>
 
-      {/* 2. Center: Linear-style Live Telemetry Ticker */}
-      <div className="hidden xl:flex items-center gap-3.5 text-xs font-sans text-slate-300 bg-white/[0.04] border border-white/[0.08] px-3.5 py-1.5 rounded-full shadow-inner">
-        <div className="flex items-center gap-2">
-          <Activity className="w-3.5 h-3.5 text-[#FFB703] animate-pulse" />
-          <span className="text-slate-400 font-semibold text-[11px]">ACOUSTIC CHIRP:</span>
-          <span className="text-[#FFB703] font-mono font-bold text-[11px]">900 kHz</span>
-        </div>
-
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
-
-        <div className="flex items-center gap-2">
-          <Compass className="w-3.5 h-3.5 text-[#38bdf8]" />
-          <span className="text-slate-400 font-semibold text-[11px]">POSITION:</span>
-          <span className="text-slate-100 font-mono text-[11px]">18.9217° N, 72.8214° E</span>
-        </div>
-
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
-
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="text-slate-400 font-semibold text-[11px]">STANDARDS:</span>
-          <span className="text-emerald-400 font-bold text-[11px]">IHO S-44 ORDER 1A</span>
-        </div>
-
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
-
-        <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400">
-          <Clock className="w-3.5 h-3.5 text-slate-500" />
-          <span className="text-slate-200">{timeStr}</span>
-        </div>
+      {/* 2. Center: Minimal Clean Status Indicator */}
+      <div className="hidden lg:flex items-center gap-2 font-mono text-[11px] text-slate-400 bg-white/[0.03] border border-white/[0.06] px-3 py-1 rounded-full">
+        <Clock className="w-3.5 h-3.5 text-slate-500" />
+        <span className="text-slate-200">{timeStr}</span>
       </div>
 
       {/* 3. Right: Fast Action Buttons, Audio Toggle & Overflow Menu */}

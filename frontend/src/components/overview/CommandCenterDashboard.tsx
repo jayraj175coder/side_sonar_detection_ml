@@ -198,7 +198,11 @@ export const CommandCenterDashboard: React.FC = () => {
           {/* 2. VERIFIED TECHNICAL METRICS STRIP (5 TILES) */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {/* Tile 1: SSS Tiles */}
-            <div className="subpixel-card p-4 rounded-xl border border-white/[0.08] bg-[#090E17] flex items-center gap-3 shadow-md">
+            <div
+              onClick={() => setActiveTab('scan')}
+              className="subpixel-card p-4 rounded-xl border border-white/[0.08] hover:border-[#FFB703]/50 bg-[#090E17] flex items-center gap-3 shadow-md cursor-pointer transition-all hover:scale-102"
+              title="View Ingestion & Dataset"
+            >
               <div className="w-10 h-10 rounded-xl bg-[#FFB703]/10 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shrink-0">
                 <Database className="w-5 h-5" />
               </div>
@@ -209,7 +213,11 @@ export const CommandCenterDashboard: React.FC = () => {
             </div>
 
             {/* Tile 2: mAP@50 */}
-            <div className="subpixel-card p-4 rounded-xl border border-white/[0.08] bg-[#090E17] flex items-center gap-3 shadow-md">
+            <div
+              onClick={() => setActiveTab('model')}
+              className="subpixel-card p-4 rounded-xl border border-white/[0.08] hover:border-[#38BDF8]/50 bg-[#090E17] flex items-center gap-3 shadow-md cursor-pointer transition-all hover:scale-102"
+              title="View Model Benchmarks"
+            >
               <div className="w-10 h-10 rounded-xl bg-[#38BDF8]/10 border border-[#38BDF8]/30 flex items-center justify-center text-[#38BDF8] shrink-0">
                 <Activity className="w-5 h-5" />
               </div>
@@ -220,7 +228,11 @@ export const CommandCenterDashboard: React.FC = () => {
             </div>
 
             {/* Tile 3: Precision */}
-            <div className="subpixel-card p-4 rounded-xl border border-white/[0.08] bg-[#090E17] flex items-center gap-3 shadow-md relative overflow-hidden">
+            <div
+              onClick={() => setActiveTab('model')}
+              className="subpixel-card p-4 rounded-xl border border-white/[0.08] hover:border-emerald-400/50 bg-[#090E17] flex items-center gap-3 shadow-md relative overflow-hidden cursor-pointer transition-all hover:scale-102"
+              title="View Model Precision"
+            >
               <div className="w-10 h-10 rounded-xl bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center text-emerald-400 shrink-0">
                 <Target className="w-5 h-5" />
               </div>
@@ -232,7 +244,11 @@ export const CommandCenterDashboard: React.FC = () => {
             </div>
 
             {/* Tile 4: Recall */}
-            <div className="subpixel-card p-4 rounded-xl border border-white/[0.08] bg-[#090E17] flex items-center gap-3 shadow-md relative overflow-hidden">
+            <div
+              onClick={() => setActiveTab('model')}
+              className="subpixel-card p-4 rounded-xl border border-white/[0.08] hover:border-amber-400/50 bg-[#090E17] flex items-center gap-3 shadow-md relative overflow-hidden cursor-pointer transition-all hover:scale-102"
+              title="View Model Recall"
+            >
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
                 <BarChart2 className="w-5 h-5" />
               </div>
@@ -244,7 +260,11 @@ export const CommandCenterDashboard: React.FC = () => {
             </div>
 
             {/* Tile 5: ONNX Inference */}
-            <div className="subpixel-card p-4 rounded-xl border border-white/[0.08] bg-[#090E17] flex items-center gap-3 shadow-md relative overflow-hidden col-span-2 sm:col-span-1">
+            <div
+              onClick={() => setActiveTab('model')}
+              className="subpixel-card p-4 rounded-xl border border-white/[0.08] hover:border-purple-400/50 bg-[#090E17] flex items-center gap-3 shadow-md relative overflow-hidden col-span-2 sm:col-span-1 cursor-pointer transition-all hover:scale-102"
+              title="View Edge Latency Specs"
+            >
               <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
                 <Zap className="w-5 h-5" />
               </div>
@@ -392,7 +412,7 @@ export const CommandCenterDashboard: React.FC = () => {
                   <span><strong>14.2</strong> ms</span>
                   <span className="text-[#FFB703]"><strong>3</strong> Detections</span>
                   <button
-                    onClick={() => setActiveTab('sonar')}
+                    onClick={() => setActiveTab('mission')}
                     className="p-1 text-slate-400 hover:text-white cursor-pointer"
                     title="Open Fullscreen Sonar Waterfall Workstation"
                   >
@@ -414,7 +434,7 @@ export const CommandCenterDashboard: React.FC = () => {
                 <h3 className="text-sm font-bold text-white tracking-wide">Recent Detections</h3>
               </div>
               <button
-                onClick={() => setActiveTab('history')}
+                onClick={() => setActiveTab('tracking')}
                 className="text-xs font-mono text-[#38BDF8] hover:underline cursor-pointer flex items-center gap-1"
               >
                 <span>View All</span>
@@ -566,7 +586,11 @@ export const CommandCenterDashboard: React.FC = () => {
           </div>
 
           {/* 3. CLEANER OCEANS SUSTAINABILITY CARD */}
-          <div className="relative rounded-2xl border border-white/[0.08] bg-[#070D18] overflow-hidden p-5 shadow-xl space-y-3">
+          <div
+            onClick={() => setActiveTab('mission')}
+            className="relative rounded-2xl border border-white/[0.08] hover:border-[#00F5D4]/40 bg-[#070D18] overflow-hidden p-5 shadow-xl space-y-3 cursor-pointer transition-all hover:scale-[1.01]"
+            title="Launch Mission Control"
+          >
             <div className="space-y-1">
               <div className="text-sm font-display font-black text-white">
                 Cleaner Oceans

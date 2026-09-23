@@ -245,19 +245,6 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
             </div>
           )}
         </div>
-
-        {/* Operator Profile Badge */}
-        <div className="flex items-center gap-2 pl-2 border-l border-white/[0.08]">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0284c7] via-[#00F5D4] to-[#FFB703] p-0.5 shadow-[0_0_12px_rgba(2,132,199,0.3)]">
-            <div className="w-full h-full rounded-full bg-[#070D18] flex items-center justify-center text-[11px] font-mono font-bold text-white">
-              JS
-            </div>
-          </div>
-          <div className="hidden xl:block text-left text-xs leading-tight">
-            <div className="font-semibold text-white tracking-wide">Jayraj</div>
-            <div className="text-[9.5px] text-slate-400 font-mono">OPERATOR</div>
-          </div>
-        </div>
       </div>
     </header>
   );

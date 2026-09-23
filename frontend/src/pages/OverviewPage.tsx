@@ -77,6 +77,14 @@ export const OverviewPage: React.FC = () => {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
+          ANIMATED SURVEY VESSEL & BATHYMETRIC HERO
+          SURVEY VESSEL + TOW CABLE + TOWFISH + ACOUSTIC BEAM + MARINE WILDLIFE
+          ═══════════════════════════════════════════════════════════════════ */}
+      <div className="reveal">
+        <MarineSurveyHero />
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════
           LIVE AUTONOMOUS MARINE DEBRIS HOLOGRAPHIC RADAR SHOWCASE
           ═══════════════════════════════════════════════════════════════════ */}
       <div className="reveal">

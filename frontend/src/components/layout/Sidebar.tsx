@@ -108,15 +108,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     title={item.tooltip || item.label}
                     className={`w-full relative flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-[15px] font-medium transition-all duration-150 cursor-pointer group ${
                       isActive
-                        ? 'bg-[#0284c7] text-white font-semibold shadow-[0_4px_20px_rgba(2,132,199,0.4)] border border-sky-400/40'
-                        : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
+                        ? 'bg-[#FFB703]/15 text-white font-semibold shadow-[0_2px_16px_rgba(255,183,3,0.16)] border border-[#FFB703]/40'
+                        : 'text-slate-300 hover:text-white hover:bg-[#FFB703]/[0.07] hover:border-[#FFB703]/20 border border-transparent'
                     } ${isSidebarCollapsed ? 'justify-center px-0' : ''}`}
                   >
+                    {/* Active accent indicator bar */}
+                    {isActive && (
+                      <span className="absolute left-0 top-2 bottom-2 w-1 bg-[#FFB703] rounded-r-full shadow-[0_0_8px_#FFB703]" />
+                    )}
+
                     <Icon
-                      className={`w-5 h-5 shrink-0 transition-transform group-hover:scale-105 ${
+                      className={`w-5 h-5 shrink-0 transition-all group-hover:scale-105 ${
                         isActive
-                          ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]'
-                          : 'text-slate-400 group-hover:text-slate-100'
+                          ? 'text-[#FFB703] drop-shadow-[0_0_8px_rgba(255,183,3,0.6)]'
+                          : 'text-slate-400 group-hover:text-[#FFB703]'
                       }`}
                     />
                     {!isSidebarCollapsed && (
@@ -126,10 +131,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {!isSidebarCollapsed && item.badge && (
                       <span
                         title={item.tooltip}
-                        className={`text-[9.5px] font-mono px-2 py-0.5 rounded font-bold uppercase tracking-wider shrink-0 ${
+                        className={`text-[9.5px] font-mono px-2 py-0.5 rounded font-bold uppercase tracking-wider shrink-0 transition-colors ${
                           isActive
-                            ? 'bg-white/20 text-white border border-white/30 shadow-xs'
-                            : 'bg-white/[0.04] border border-white/[0.08] text-slate-400 group-hover:text-slate-200'
+                            ? 'bg-[#FFB703]/20 text-[#FFB703] border border-[#FFB703]/35 shadow-xs'
+                            : 'bg-white/[0.04] border border-white/[0.08] text-slate-400 group-hover:text-slate-200 group-hover:border-[#FFB703]/25'
                         }`}
                       >
                         {item.badge}
@@ -137,7 +142,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     )}
 
                     {!isSidebarCollapsed && !item.badge && (
-                      <span className={`keycap opacity-0 group-hover:opacity-60 transition-opacity text-[10px] ${isActive ? 'text-white/60 border-white/20' : ''}`}>
+                      <span className={`keycap opacity-0 group-hover:opacity-60 transition-opacity text-[10px] ${isActive ? 'text-[#FFB703]/80 border-[#FFB703]/30' : ''}`}>
                         {index + 1}
                       </span>
                     )}

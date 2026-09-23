@@ -14,6 +14,7 @@ import {
   Maximize2,
   Activity,
   ShieldCheck,
+  Bell,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { sonarAudio } from '../../utils/sonarAudio';
@@ -131,7 +132,13 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
       </div>
 
       {/* 3. Right: Fast Action Buttons, Audio Toggle & Overflow Menu */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
+        {/* System Status Pill */}
+        <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-mono font-bold text-emerald-400">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>SYSTEM ONLINE</span>
+        </div>
+
         {/* Fullscreen Button with F11 Keycap */}
         <button
           onClick={handleToggleFullscreen}
@@ -139,7 +146,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           title="Toggle Fullscreen Mode"
         >
           <Maximize2 className="w-3.5 h-3.5 text-slate-400" />
-          <span className="text-[11px] font-medium hidden md:inline">Full HUD</span>
+          <span className="text-[11px] font-medium hidden lg:inline">Full HUD</span>
           <span className="keycap">F11</span>
         </button>
 
@@ -161,6 +168,15 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           <span className="text-[11px] font-mono font-medium hidden md:inline">
             {!isAudioMuted ? 'AUDIO LIVE' : 'MUTED'}
           </span>
+        </button>
+
+        {/* Notifications Bell */}
+        <button
+          className="p-1.5 rounded-md bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-slate-300 hover:text-white transition-all cursor-pointer relative"
+          title="Tactical Alerts (3 New)"
+        >
+          <Bell className="w-3.5 h-3.5 text-slate-300" />
+          <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-pulse" />
         </button>
 
         {/* KEBAB OVERFLOW MENU (...) */}
@@ -228,6 +244,19 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Operator Profile Badge */}
+        <div className="flex items-center gap-2 pl-2 border-l border-white/[0.08]">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#0284c7] via-[#00F5D4] to-[#FFB703] p-0.5 shadow-[0_0_12px_rgba(2,132,199,0.3)]">
+            <div className="w-full h-full rounded-full bg-[#070D18] flex items-center justify-center text-[11px] font-mono font-bold text-white">
+              JS
+            </div>
+          </div>
+          <div className="hidden xl:block text-left text-xs leading-tight">
+            <div className="font-semibold text-white tracking-wide">Jayraj</div>
+            <div className="text-[9.5px] text-slate-400 font-mono">OPERATOR</div>
+          </div>
         </div>
       </div>
     </header>

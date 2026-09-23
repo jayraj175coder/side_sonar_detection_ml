@@ -147,6 +147,46 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </nav>
           </div>
         </div>
+
+        {/* System Health / Status Indicators at bottom */}
+        <div className="p-3 border-t border-white/[0.08] bg-[#070B12]/60 mt-auto">
+          {!isSidebarCollapsed ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest px-1">
+                <span>SYSTEM</span>
+                <span className="text-emerald-400 flex items-center gap-1 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  NOMINAL
+                </span>
+              </div>
+              <div className="space-y-1 text-[11px] font-mono text-slate-400 bg-white/[0.02] p-2 rounded-xl border border-white/[0.04]">
+                {[
+                  { name: 'Perception Engine', status: 'ACTIVE' },
+                  { name: 'AI Model (YOLOv8s)', status: 'ACTIVE' },
+                  { name: 'ONNX Runtime', status: '14.2ms' },
+                  { name: 'Geo-Localization', status: 'WGS-84' },
+                  { name: 'Acoustic Filter', status: 'PHYSICS' },
+                  { name: 'Tracking Module', status: 'READY' },
+                ].map((s) => (
+                  <div key={s.name} className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-slate-300">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      {s.name}
+                    </span>
+                    <span className="text-[9px] text-slate-500 font-bold">{s.status}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="px-1 text-[9px] font-mono text-slate-500 text-center tracking-wider pt-1">
+                MoES // INDIAN EEZ RECONNAISSANCE
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-1 py-1" title="System Status: All nominal">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            </div>
+          )}
+        </div>
       </aside>
     </>
   );

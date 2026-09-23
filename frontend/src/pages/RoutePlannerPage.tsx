@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Polygon, Tooltip, useMap } from 'react-leaflet';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Polyline, Polygon, Tooltip, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import {
   Navigation,
@@ -10,7 +10,6 @@ import {
   Check,
   MapPin,
   Play,
-  Share2,
   Sliders,
   TrendingDown,
   Clock,
@@ -26,98 +25,227 @@ import {
   Eye,
   ChevronDown,
   Target,
+  Pause,
+  X,
+  Radio,
+  ExternalLink,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { sonarAudio } from '../utils/sonarAudio';
-import { downloadGpxFile } from '../utils/tspSolver';
+import {
+  BASE_PORTS,
+  CLEANUP_FLEET,
+  NavPoint,
+  VesselProfile,
+  solveTspRoute,
+  downloadGpxFile,
+} from '../utils/tspSolver';
 
-/* ─── Target Definition ─────────────────────────────────────────────────── */
-interface RouteTarget {
-  id: string;
-  wpNum: number;
-  name: string;
-  lat: number;
-  lon: number;
-  type: 'ghost_net' | 'debris' | 'fishing_gear' | 'pipeline';
-  typeLabel: string;
-  depthM: number;
-  estimatedMassKg: number;
-}
-
-const CHENNAI_BASE = {
-  id: 'base-chennai',
-  name: 'Chennai Base Terminal & Port Trust',
-  lat: 13.085,
-  lon: 80.298,
-  description: 'Primary Tamil Nadu coast recovery station',
+/* ─── Sector Targets Database ────────────────────────────────────────────── */
+const SECTOR_TARGETS: Record<string, NavPoint[]> = {
+  'base-chennai': [
+    {
+      id: 'CHN-01',
+      name: '#01 Ennore Shoal Abandoned Gillnet',
+      lat: 13.214,
+      lon: 80.342,
+      type: 'ghost_net',
+      depthM: 18.5,
+      estimatedMassKg: 420,
+      notes: 'Submerged monofilament gillnet cluster draped across shoal ridge',
+    },
+    {
+      id: 'CHN-02',
+      name: '#02 Marina Pipeline Derelict Trawl Webbing',
+      lat: 13.102,
+      lon: 80.298,
+      type: 'ghost_net',
+      depthM: 24.3,
+      estimatedMassKg: 310,
+      notes: 'High acoustic shadow void opposite pipeline crossing fairway',
+    },
+    {
+      id: 'CHN-03',
+      name: '#03 Pulicat Lagoon Debris Field',
+      lat: 13.432,
+      lon: 80.32,
+      type: 'debris',
+      depthM: 12.1,
+      estimatedMassKg: 180,
+      notes: 'Metal cargo fragments and polymer aggregate container spill',
+    },
+    {
+      id: 'CHN-04',
+      name: '#04 Kattupalli Rope & Net Cluster',
+      lat: 13.26,
+      lon: 80.41,
+      type: 'debris',
+      depthM: 28.4,
+      estimatedMassKg: 265,
+      notes: 'Entangled hawser rope and submerged synthetic packing crates',
+    },
+    {
+      id: 'CHN-05',
+      name: '#05 Coromandel Lost Fishing Gear',
+      lat: 13.34,
+      lon: 80.52,
+      type: 'debris',
+      depthM: 34.2,
+      estimatedMassKg: 510,
+      notes: 'Submerged commercial longline gear anchor and steel floats',
+    },
+  ],
+  'base-vizag': [
+    {
+      id: 'VZG-01',
+      name: '#01 Dolphin Nose Wreck Cluster',
+      lat: 17.672,
+      lon: 83.335,
+      type: 'debris',
+      depthM: 31.0,
+      estimatedMassKg: 620,
+      notes: 'Colossal iron plating and structural hull scrap',
+    },
+    {
+      id: 'VZG-02',
+      name: '#02 Gangavaram Scour Hazard',
+      lat: 17.625,
+      lon: 83.255,
+      type: 'pipeline',
+      depthM: 19.5,
+      estimatedMassKg: 150,
+      notes: 'Unburied crude fuel conduit section',
+    },
+    {
+      id: 'VZG-03',
+      name: '#03 Rushikonda Drifting Net',
+      lat: 17.785,
+      lon: 83.41,
+      type: 'ghost_net',
+      depthM: 22.0,
+      estimatedMassKg: 380,
+      notes: 'Buoyant nylon mesh entangled with reef heads',
+    },
+    {
+      id: 'VZG-04',
+      name: '#04 Bheemunipatnam Sediment Anomaly',
+      lat: 17.892,
+      lon: 83.48,
+      type: 'debris',
+      depthM: 42.0,
+      estimatedMassKg: 290,
+      notes: 'Dense acoustic reflector on continental slope',
+    },
+  ],
+  'base-kochi': [
+    {
+      id: 'KCH-01',
+      name: '#01 Vypin Deep Drift Net (Hero ALDFG)',
+      lat: 9.992,
+      lon: 76.195,
+      type: 'ghost_net',
+      depthM: 38.5,
+      estimatedMassKg: 490,
+      notes: 'Major benthic drift net tracking across Southwest current',
+    },
+    {
+      id: 'KCH-02',
+      name: '#02 Fort Kochi Ballast Container',
+      lat: 9.955,
+      lon: 76.22,
+      type: 'debris',
+      depthM: 15.2,
+      estimatedMassKg: 850,
+      notes: 'Submerged steel ISO container shell',
+    },
+    {
+      id: 'KCH-03',
+      name: '#03 Chellanam Reef Entanglement',
+      lat: 9.812,
+      lon: 76.245,
+      type: 'ghost_net',
+      depthM: 26.8,
+      estimatedMassKg: 340,
+      notes: 'Monofilament gillnet smothering biogenic reef',
+    },
+    {
+      id: 'KCH-04',
+      name: '#04 Alappuzha Offshore Conduit Span',
+      lat: 9.51,
+      lon: 76.28,
+      type: 'pipeline',
+      depthM: 21.0,
+      estimatedMassKg: 200,
+      notes: 'Exposed subsea pipeline spanning acoustic scour trench',
+    },
+  ],
+  'base-mumbai': [
+    {
+      id: 'MUM-01',
+      name: '#01 ONGC Fairway Drill Scrap',
+      lat: 19.385,
+      lon: 71.355,
+      type: 'debris',
+      depthM: 65.0,
+      estimatedMassKg: 1400,
+      notes: 'Discarded drill casing section near offshore platform',
+    },
+    {
+      id: 'MUM-02',
+      name: '#02 Bandra Shoal Trawl Webbing',
+      lat: 19.045,
+      lon: 72.78,
+      type: 'ghost_net',
+      depthM: 18.0,
+      estimatedMassKg: 310,
+      notes: 'Derelict bottom trawl netting snagged on rock pinnacle',
+    },
+    {
+      id: 'MUM-03',
+      name: '#03 Uran Gas Pipeline Scour Hazard',
+      lat: 18.88,
+      lon: 72.88,
+      type: 'pipeline',
+      depthM: 14.5,
+      estimatedMassKg: 180,
+      notes: 'Unanchored conduit free-spanning over 12m',
+    },
+  ],
+  'base-portblair': [
+    {
+      id: 'PBL-01',
+      name: '#01 Ross Island Structural Hull Fragment',
+      lat: 11.675,
+      lon: 92.775,
+      type: 'debris',
+      depthM: 25.0,
+      estimatedMassKg: 780,
+      notes: 'Historical wreck fragment shedding acoustic shadow',
+    },
+    {
+      id: 'PBL-02',
+      name: '#02 Havelock Coral Reef Ghost Net',
+      lat: 11.98,
+      lon: 93.01,
+      type: 'ghost_net',
+      depthM: 19.2,
+      estimatedMassKg: 420,
+      notes: 'Coral sanctuary protective clearance target',
+    },
+  ],
 };
 
-const CHENNAI_TARGETS: RouteTarget[] = [
-  {
-    id: 'CHN-01',
-    wpNum: 1,
-    name: '#01 Ennore Shoal Abandoned Gillnet',
-    lat: 13.214,
-    lon: 80.342,
-    type: 'ghost_net',
-    typeLabel: 'GHOST NET',
-    depthM: 18.5,
-    estimatedMassKg: 420,
-  },
-  {
-    id: 'CHN-02',
-    wpNum: 2,
-    name: '#02 Marina Pipeline Derelict Trawl Webbing',
-    lat: 13.102,
-    lon: 80.298,
-    type: 'ghost_net',
-    typeLabel: 'GHOST NET',
-    depthM: 24.3,
-    estimatedMassKg: 310,
-  },
-  {
-    id: 'CHN-03',
-    wpNum: 3,
-    name: '#03 Pulicat Lagoon Debris Field',
-    lat: 13.432,
-    lon: 80.32,
-    type: 'debris',
-    typeLabel: 'DEBRIS',
-    depthM: 12.1,
-    estimatedMassKg: 180,
-  },
-  {
-    id: 'CHN-04',
-    wpNum: 4,
-    name: '#04 Kattupalli Rope & Net Cluster',
-    lat: 13.26,
-    lon: 80.41,
-    type: 'debris',
-    typeLabel: 'DEBRIS',
-    depthM: 28.4,
-    estimatedMassKg: 265,
-  },
-  {
-    id: 'CHN-05',
-    wpNum: 5,
-    name: '#05 Coromandel Lost Fishing Gear',
-    lat: 13.34,
-    lon: 80.52,
-    type: 'fishing_gear',
-    typeLabel: 'FISHING GEAR',
-    depthM: 34.2,
-    estimatedMassKg: 510,
-  },
-];
+/* ─── Custom Numbered Tactical Pins ─────────────────────────────────────── */
+const createNumberedPin = (num: number | string, isBase = false, isSelected = false) => {
+  const bg = isBase ? '#00F5D4' : isSelected ? '#ffffff' : '#FFB703';
+  const textColor = isBase ? '#05070B' : '#05070B';
+  const borderColor = isSelected ? '#FFB703' : '#ffffff';
+  const shadowGlow = isBase ? '#00F5D4' : isSelected ? '#ffffff' : '#FFB703';
 
-/* ─── Leaflet Circular Numbered Pin ─────────────────────────────────────── */
-const createNumberedPin = (num: number | string, isBase = false) => {
-  const bg = isBase ? '#0284c7' : '#FFB703';
-  const textColor = isBase ? '#ffffff' : '#05070B';
   const html = `
     <div style="
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: ${bg};
       color: ${textColor};
@@ -127,9 +255,11 @@ const createNumberedPin = (num: number | string, isBase = false) => {
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid #ffffff;
-      box-shadow: 0 0 10px ${bg}cc;
+      border: 2px solid ${borderColor};
+      box-shadow: 0 0 12px ${shadowGlow}cc;
       cursor: pointer;
+      transition: transform 0.2s ease;
+      ${isSelected ? 'transform: scale(1.2);' : ''}
     ">
       ${num}
     </div>
@@ -137,122 +267,103 @@ const createNumberedPin = (num: number | string, isBase = false) => {
   return L.divIcon({
     className: 'custom-route-pin',
     html,
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
   });
 };
 
-/* ─── Map Auto-Centering ─────────────────────────────────────────────────── */
-const MapAutoCenter: React.FC<{ coords: [number, number]; zoom: number }> = ({ coords, zoom }) => {
+/* ─── Map Controller for Programmatic Pan/Zoom ──────────────────────────── */
+const MapController: React.FC<{
+  center: [number, number];
+  zoom: number;
+  onMapReady: (map: L.Map) => void;
+}> = ({ center, zoom, onMapReady }) => {
   const map = useMap();
   useEffect(() => {
-    map.setView(coords, zoom);
-  }, [coords, zoom, map]);
+    onMapReady(map);
+  }, [map, onMapReady]);
+
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, [center, zoom, map]);
+
   return null;
 };
 
 export const RoutePlannerPage: React.FC = () => {
   const { setActiveTab } = useApp();
 
-  // State
+  // State: Base Port & Cleanup Fleet
+  const [selectedBasePortId, setSelectedBasePortId] = useState<string>('base-chennai');
+  const [isBaseDropdownOpen, setIsBaseDropdownOpen] = useState<boolean>(false);
+  const [selectedVesselId, setSelectedVesselId] = useState<string>('eco-rov-skimmer');
+  const [isVesselDropdownOpen, setIsVesselDropdownOpen] = useState<boolean>(false);
+
+  // State: Target Selections & Map
+  const basePort = useMemo(
+    () => BASE_PORTS.find((b) => b.id === selectedBasePortId) || BASE_PORTS[0],
+    [selectedBasePortId]
+  );
+  const vessel = useMemo(
+    () => CLEANUP_FLEET.find((v) => v.id === selectedVesselId) || CLEANUP_FLEET[0],
+    [selectedVesselId]
+  );
+
+  const sectorTargets = useMemo(
+    () => SECTOR_TARGETS[selectedBasePortId] || SECTOR_TARGETS['base-chennai'],
+    [selectedBasePortId]
+  );
+
+  const [selectedTargetIds, setSelectedTargetIds] = useState<string[]>(
+    sectorTargets.map((t) => t.id)
+  );
+
+  // Update selected targets when base port switches
+  useEffect(() => {
+    setSelectedTargetIds(sectorTargets.map((t) => t.id));
+  }, [sectorTargets]);
+
   const [mapMode, setMapMode] = useState<'dark_marine' | 'satellite'>('dark_marine');
-  const [selectedTargetIds, setSelectedTargetIds] = useState<string[]>(CHENNAI_TARGETS.map((t) => t.id));
   const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
   const [simStep, setSimStep] = useState<number>(0);
+  const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
+  const [isDeployModalOpen, setIsDeployModalOpen] = useState<boolean>(false);
+  const [isDeploying, setIsDeploying] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Layer Visibility
+  const [layerSettings, setLayerSettings] = useState({
+    restrictedArea: true,
+    offshorePlatform: true,
+    territorialLine: true,
+  });
+  const [isLayersMenuOpen, setIsLayersMenuOpen] = useState<boolean>(false);
+
+  const mapRef = useRef<L.Map | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Toggle target selection
-  const toggleTarget = (id: string) => {
-    setSelectedTargetIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = () => setSelectedTargetIds(CHENNAI_TARGETS.map((t) => t.id));
-  const handleClearAll = () => setSelectedTargetIds([]);
-
-  // Active targets
+  // Active targets array
   const activeTargets = useMemo(
-    () => CHENNAI_TARGETS.filter((t) => selectedTargetIds.includes(t.id)),
-    [selectedTargetIds]
+    () => sectorTargets.filter((t) => selectedTargetIds.includes(t.id)),
+    [sectorTargets, selectedTargetIds]
   );
 
-  // Turn-by-turn legs
-  const navigationLegs = [
-    {
-      leg: 'WP-0',
-      fromTo: 'Chennai (Base) → WP-1',
-      coords: '13.2140° N, 80.3420° E',
-      heading: '088°',
-      distNM: 8.6,
-      estTime: '1h 20m',
-      action: 'Transit',
-    },
-    {
-      leg: 'WP-1',
-      fromTo: 'WP-1 → WP-2',
-      coords: '13.1020° N, 80.2980° E',
-      heading: '175°',
-      distNM: 14.2,
-      estTime: '2h 10m',
-      action: 'Retrieve (Ghost Net)',
-    },
-    {
-      leg: 'WP-2',
-      fromTo: 'WP-2 → WP-3',
-      coords: '13.4320° N, 80.3200° E',
-      heading: '012°',
-      distNM: 18.5,
-      estTime: '3h 05m',
-      action: 'Retrieve (Debris)',
-    },
-    {
-      leg: 'WP-3',
-      fromTo: 'WP-3 → WP-4',
-      coords: '13.2600° N, 80.4100° E',
-      heading: '132°',
-      distNM: 12.7,
-      estTime: '1h 50m',
-      action: 'Retrieve (Debris)',
-    },
-    {
-      leg: 'WP-4',
-      fromTo: 'WP-4 → WP-5',
-      coords: '13.3400° N, 80.5200° E',
-      heading: '076°',
-      distNM: 16.1,
-      estTime: '2h 25m',
-      action: 'Retrieve (Fishing Gear)',
-    },
-    {
-      leg: 'WP-5',
-      fromTo: 'WP-5 → Chennai',
-      coords: '13.0850° N, 80.2980° E',
-      heading: '220°',
-      distNM: 22.1,
-      estTime: '3h 20m',
-      action: 'Return to Base',
-    },
-  ];
+  // Dynamic TSP Solver Execution
+  const tspSolution = useMemo(() => {
+    return solveTspRoute(basePort, activeTargets, vessel);
+  }, [basePort, activeTargets, vessel]);
 
-  // Route path coordinates for map
-  const routePolyline: [number, number][] = [
-    [CHENNAI_BASE.lat, CHENNAI_BASE.lon],
-    [CHENNAI_TARGETS[0].lat, CHENNAI_TARGETS[0].lon],
-    [CHENNAI_TARGETS[1].lat, CHENNAI_TARGETS[1].lon],
-    [CHENNAI_TARGETS[2].lat, CHENNAI_TARGETS[2].lon],
-    [CHENNAI_TARGETS[3].lat, CHENNAI_TARGETS[3].lon],
-    [CHENNAI_TARGETS[4].lat, CHENNAI_TARGETS[4].lon],
-    [CHENNAI_BASE.lat, CHENNAI_BASE.lon],
-  ];
+  // Route Polyline Coordinates
+  const routePolyline: [number, number][] = useMemo(() => {
+    return tspSolution.orderedPoints.map((p) => [p.lat, p.lon]);
+  }, [tspSolution]);
 
-  // Restricted Areas in Chennai Sector
+  // Restricted Areas (Chennai Sector)
   const restrictedAreaPolygon: [number, number][] = [
     [13.44, 80.62],
     [13.48, 80.78],
@@ -267,7 +378,6 @@ export const RoutePlannerPage: React.FC = () => {
     [13.14, 80.78],
   ];
 
-  // Territorial waters line
   const territorialWatersLine: [number, number][] = [
     [13.6, 80.44],
     [13.3, 80.46],
@@ -275,51 +385,81 @@ export const RoutePlannerPage: React.FC = () => {
     [12.8, 80.38],
   ];
 
-  // Re-optimize handler
+  // Target toggle handler
+  const toggleTarget = (id: string) => {
+    sonarAudio.playTargetBeep?.();
+    setSelectedTargetIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    sonarAudio.playTargetBeep?.();
+    setSelectedTargetIds(sectorTargets.map((t) => t.id));
+    showToast(`Selected all ${sectorTargets.length} sector targets`);
+  };
+
+  const handleClearAll = () => {
+    sonarAudio.playTargetBeep?.();
+    setSelectedTargetIds([]);
+    showToast('Cleared all retrieval targets');
+  };
+
+  // Re-optimize handler with dynamic TSP
   const handleReoptimize = () => {
     setIsOptimizing(true);
     sonarAudio.playSonarPing?.();
     setTimeout(() => {
       setIsOptimizing(false);
       sonarAudio.playLockBeep?.();
-      showToast('Route re-optimized: 2-Opt TSP found 72.3 NM global minimum (14 hrs)');
-    }, 600);
+      showToast(
+        `Route re-optimized: 2-Opt found ${tspSolution.totalDistanceNM} NM global minimum (${tspSolution.totalMissionHours} hrs)`
+      );
+    }, 450);
   };
 
   // Export GPX handler
   const handleExportGpxKml = () => {
     sonarAudio.playLockBeep?.();
-    const gpxData = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="SONAR-X-TSP-SOLVER">
-  <metadata>
-    <name>SONARX-CHENNAI-CLEANUP-ROUTE</name>
-    <time>${new Date().toISOString()}</time>
-  </metadata>
-  <rte>
-    <name>Eco-ROV-Optimal-72.3NM</name>
-    <rtept lat="${CHENNAI_BASE.lat}" lon="${CHENNAI_BASE.lon}"><name>BASE-CHENNAI</name></rtept>
-    ${CHENNAI_TARGETS.map(
-      (t) => `<rtept lat="${t.lat}" lon="${t.lon}"><name>${t.id}-${t.type}</name></rtept>`
-    ).join('\n    ')}
-    <rtept lat="${CHENNAI_BASE.lat}" lon="${CHENNAI_BASE.lon}"><name>BASE-CHENNAI-RETURN</name></rtept>
-  </rte>
-</gpx>`;
-    const blob = new Blob([gpxData], { type: 'application/gpx+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'SONARX_TSP_ROUTE_CHENNAI.gpx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('Exported GPX / KML navigation route package');
+    downloadGpxFile(tspSolution, vessel.name, `SONARX-${basePort.id.toUpperCase()}`);
+    showToast(`Exported navigation GPX package for ${vessel.name}`);
   };
 
-  // Deploy Route handler
-  const handleDeployRoute = () => {
-    sonarAudio.playLockBeep?.();
-    showToast('Deployed optimal route to Autonomous Eco-ROV Skimmer fleet!');
+  // Map Controls
+  const handleZoomIn = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomIn();
+      sonarAudio.playTargetBeep?.();
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomOut();
+      sonarAudio.playTargetBeep?.();
+    }
+  };
+
+  const handleRecenter = () => {
+    if (mapRef.current) {
+      if (routePolyline.length > 1) {
+        const bounds = L.latLngBounds(routePolyline);
+        mapRef.current.fitBounds(bounds, { padding: [40, 40] });
+      } else {
+        mapRef.current.setView([basePort.lat, basePort.lon], 9);
+      }
+      sonarAudio.playLockBeep?.();
+      showToast(`Re-centered on ${basePort.name}`);
+    }
+  };
+
+  // Waypoint Focus from Table or Map
+  const handleFocusWaypoint = (pointId: string, lat: number, lon: number) => {
+    setSelectedPointId(pointId);
+    sonarAudio.playTargetBeep?.();
+    if (mapRef.current) {
+      mapRef.current.flyTo([lat, lon], 11, { duration: 1.2 });
+    }
   };
 
   // Route Simulation Playback
@@ -341,10 +481,10 @@ export const RoutePlannerPage: React.FC = () => {
   }, [isSimulating, routePolyline.length]);
 
   return (
-    <div className="space-y-4 font-sans select-none text-slate-100 pb-12 relative">
+    <div className="space-y-4 font-sans select-none text-slate-100 pb-16 relative">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[600] px-4 py-2 bg-[#091524] border border-[#FFB703] rounded-lg text-xs font-mono font-bold text-[#FFB703] shadow-2xl flex items-center gap-2 animate-in fade-in">
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[600] px-4 py-2 bg-[#091524]/95 border border-[#FFB703] rounded-xl text-xs font-mono font-bold text-[#FFB703] shadow-2xl flex items-center gap-2 backdrop-blur-md animate-in fade-in">
           <Activity className="w-4 h-4 text-[#FFB703]" />
           <span>{toastMessage}</span>
         </div>
@@ -354,13 +494,13 @@ export const RoutePlannerPage: React.FC = () => {
       <div className="p-4 sm:p-5 bg-[#070D18] rounded-xl border border-white/[0.08] flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xl">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="w-8 h-8 rounded-lg bg-[#00F5D4]/15 border border-[#00F5D4]/30 flex items-center justify-center text-[#00F5D4]">
+            <div className="w-8 h-8 rounded-lg bg-[#FFB703]/15 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703]">
               <Navigation className="w-4 h-4" />
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Smart Multi-Vessel TSP Route Optimizer
             </h1>
-            <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#0284c7]/20 text-[#38bdf8] border border-[#0284c7]/40">
+            <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#FFB703]/15 text-[#FFB703] border border-[#FFB703]/30">
               ALGORITHM: 2-OPT TSP SOLVER
             </span>
           </div>
@@ -372,11 +512,11 @@ export const RoutePlannerPage: React.FC = () => {
         {/* Right Actions */}
         <div className="flex items-center gap-3 shrink-0 flex-wrap">
           <span className="text-[11px] font-mono text-slate-400 hidden sm:inline">
-            Last Optimized: 23 Sep 2026 23:41
+            Active Sector: <span className="text-white font-bold">{basePort.name.split(' ')[0]}</span>
           </span>
           <button
             onClick={handleReoptimize}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.12] hover:border-[#FFB703]/50 text-slate-200 text-xs font-mono font-semibold transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white/[0.04] hover:bg-[#FFB703]/10 border border-white/[0.12] hover:border-[#FFB703]/50 text-slate-200 hover:text-white text-xs font-mono font-semibold transition-all cursor-pointer active:scale-95"
           >
             <RotateCcw className={`w-3.5 h-3.5 text-[#FFB703] ${isOptimizing ? 'animate-spin' : ''}`} />
             <span>Re-optimize</span>
@@ -384,7 +524,7 @@ export const RoutePlannerPage: React.FC = () => {
 
           <button
             onClick={handleExportGpxKml}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-mono font-bold transition-all cursor-pointer shadow-md active:scale-95"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#FFB703] hover:bg-[#FCD34D] text-[#05070B] text-xs font-mono font-bold transition-all cursor-pointer shadow-lg shadow-[#FFB703]/20 active:scale-95"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export GPX / KML</span>
@@ -399,10 +539,19 @@ export const RoutePlannerPage: React.FC = () => {
           <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
             TOTAL DISTANCE (NM)
           </span>
-          <div className="text-2xl font-mono font-black text-[#38bdf8]">
-            72.3 <span className="text-xs font-normal text-slate-400">NM</span>
+          <div className="text-2xl font-mono font-black text-[#00F5D4]">
+            {tspSolution.totalDistanceNM}{' '}
+            <span className="text-xs font-normal text-slate-400">NM</span>
           </div>
-          <span className="text-[10px] text-slate-400 block">Optimal multi-leg route</span>
+          <span className="text-[10px] text-slate-400 block">
+            {tspSolution.percentSaved > 0 ? (
+              <span className="text-emerald-400 font-semibold">
+                -{tspSolution.percentSaved}% vs unoptimized
+              </span>
+            ) : (
+              'Optimal multi-leg route'
+            )}
+          </span>
         </div>
 
         {/* Card 2: Est. Mission Hours */}
@@ -411,9 +560,12 @@ export const RoutePlannerPage: React.FC = () => {
             EST. MISSION HOURS
           </span>
           <div className="text-2xl font-mono font-black text-white">
-            14 <span className="text-xs font-normal text-slate-400">hrs</span>
+            {tspSolution.totalMissionHours}{' '}
+            <span className="text-xs font-normal text-slate-400">hrs</span>
           </div>
-          <span className="text-[10px] text-slate-400 block">11.1h transit + 2.9h ops</span>
+          <span className="text-[10px] text-slate-400 block">
+            {tspSolution.estTransitHours}h transit + {tspSolution.estOpsHours}h ops
+          </span>
         </div>
 
         {/* Card 3: Energy Consumed */}
@@ -422,9 +574,14 @@ export const RoutePlannerPage: React.FC = () => {
             ENERGY CONSUMED
           </span>
           <div className="text-2xl font-mono font-black text-emerald-400">
-            101.2 <span className="text-xs font-normal text-slate-400">kWh</span>
+            {tspSolution.energyConsumedKWh}{' '}
+            <span className="text-xs font-normal text-slate-400">
+              {vessel.consumptionUnit === 'kWh' ? 'kWh' : 'L equiv'}
+            </span>
           </div>
-          <span className="text-[10px] text-slate-400 block">1.4 kWh/NM (fleet avg)</span>
+          <span className="text-[10px] text-slate-400 block">
+            {vessel.consumptionPerNM} {vessel.consumptionUnit}/NM (fleet rate)
+          </span>
         </div>
 
         {/* Card 4: CO2 Emissions Saved */}
@@ -432,10 +589,11 @@ export const RoutePlannerPage: React.FC = () => {
           <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
             CO₂ EMISSIONS SAVED
           </span>
-          <div className="text-2xl font-mono font-black text-[#F59E0B]">
-            813.8 <span className="text-xs font-normal text-slate-400">kg</span>
+          <div className="text-2xl font-mono font-black text-[#FFB703]">
+            {tspSolution.co2SavedKg}{' '}
+            <span className="text-xs font-normal text-slate-400">kg</span>
           </div>
-          <span className="text-[10px] text-slate-400 block">vs. conventional single-vessel ops</span>
+          <span className="text-[10px] text-slate-400 block">vs. conventional diesel tender</span>
         </div>
 
         {/* Card 5: Targets Scheduled */}
@@ -444,74 +602,154 @@ export const RoutePlannerPage: React.FC = () => {
             TARGETS SCHEDULED
           </span>
           <div className="text-2xl font-mono font-black text-white">
-            {activeTargets.length} / 5
+            {activeTargets.length} / {sectorTargets.length}
           </div>
-          <span className="text-[10px] text-slate-400 block">Ghost nets & large debris</span>
+          <span className="text-[10px] text-slate-400 block">
+            {tspSolution.totalMassRecoveredKg} kg estimated mass
+          </span>
         </div>
       </div>
 
       {/* ── 3. MAIN 3-COLUMN WORKSTATION ── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
-        {/* ── COLUMN 1: LEFT CONTROL COLUMN (w-[290px]) ── */}
+        {/* ── COLUMN 1: LEFT CONTROL COLUMN ── */}
         <div className="lg:col-span-3 space-y-3.5">
-          {/* Panel 1: Departure Base Port */}
-          <div className="p-3.5 bg-[#070D18] rounded-xl border border-white/[0.08] space-y-2.5">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#38bdf8] uppercase">
+          {/* Panel 1: Departure Base Port (Interactive Dropdown) */}
+          <div className="p-3.5 bg-[#070D18] rounded-xl border border-white/[0.08] space-y-2.5 relative">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#00F5D4] uppercase">
               <Anchor className="w-3.5 h-3.5" />
               <span>DEPARTURE BASE PORT</span>
             </div>
-            <div className="w-full bg-[#050B14] border border-white/[0.12] rounded-lg px-3 py-2 text-xs font-mono text-white flex items-center justify-between">
-              <span>{CHENNAI_BASE.name}</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </div>
+
+            <button
+              onClick={() => setIsBaseDropdownOpen(!isBaseDropdownOpen)}
+              className="w-full bg-[#050B14] hover:bg-[#081220] border border-white/[0.12] hover:border-[#FFB703]/50 rounded-lg px-3 py-2 text-xs font-mono text-white flex items-center justify-between transition-colors cursor-pointer"
+            >
+              <span className="truncate pr-2">{basePort.name}</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-slate-400 transition-transform ${
+                  isBaseDropdownOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isBaseDropdownOpen && (
+              <div className="absolute top-[82px] left-3.5 right-3.5 bg-[#050B14] border border-white/[0.15] rounded-xl shadow-2xl z-[500] py-1 max-h-56 overflow-y-auto divide-y divide-white/[0.04]">
+                {BASE_PORTS.map((b) => (
+                  <div
+                    key={b.id}
+                    onClick={() => {
+                      setSelectedBasePortId(b.id);
+                      setIsBaseDropdownOpen(false);
+                      sonarAudio.playTargetBeep?.();
+                      showToast(`Switched Base Port to ${b.name}`);
+                    }}
+                    className={`px-3 py-2.5 text-xs font-mono hover:bg-[#FFB703]/10 cursor-pointer transition-colors ${
+                      b.id === selectedBasePortId
+                        ? 'bg-[#FFB703]/15 text-[#FFB703] font-bold'
+                        : 'text-slate-300'
+                    }`}
+                  >
+                    <div className="font-bold truncate">{b.name}</div>
+                    <div className="text-[10px] text-slate-500">
+                      {b.lat.toFixed(4)}° N, {b.lon.toFixed(4)}° E
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="text-[10px] font-mono text-slate-400 bg-white/[0.02] p-2.5 rounded-lg border border-white/[0.06] space-y-0.5">
-              <span className="text-slate-200 font-bold block">{CHENNAI_BASE.name}</span>
-              <div>13.0850° N, 80.2980° E</div>
-              <div className="text-slate-500">{CHENNAI_BASE.description}</div>
+              <span className="text-white font-bold block">{basePort.name}</span>
+              <div className="text-[#00F5D4]">
+                {basePort.lat.toFixed(4)}° N, {basePort.lon.toFixed(4)}° E
+              </div>
+              <div className="text-slate-500">{basePort.notes}</div>
             </div>
           </div>
 
-          {/* Panel 2: Assigned Cleanup Fleet */}
-          <div className="p-3.5 bg-[#070D18] rounded-xl border border-white/[0.08] space-y-2.5">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#38bdf8] uppercase">
+          {/* Panel 2: Assigned Cleanup Fleet (Interactive Dropdown) */}
+          <div className="p-3.5 bg-[#070D18] rounded-xl border border-white/[0.08] space-y-2.5 relative">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#FFB703] uppercase">
               <Ship className="w-3.5 h-3.5" />
               <span>ASSIGNED CLEANUP FLEET</span>
             </div>
-            <div className="w-full bg-[#050B14] border border-white/[0.12] rounded-lg px-3 py-2 text-xs font-mono text-white flex items-center justify-between">
-              <span>Autonomous Eco-ROV Skimmer (Electric)</span>
-              <ChevronDown className="w-3 h-3 text-slate-400" />
-            </div>
+
+            <button
+              onClick={() => setIsVesselDropdownOpen(!isVesselDropdownOpen)}
+              className="w-full bg-[#050B14] hover:bg-[#081220] border border-white/[0.12] hover:border-[#FFB703]/50 rounded-lg px-3 py-2 text-xs font-mono text-white flex items-center justify-between transition-colors cursor-pointer"
+            >
+              <span className="truncate pr-2">{vessel.name}</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 text-slate-400 transition-transform ${
+                  isVesselDropdownOpen ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {/* Vessel Dropdown Menu */}
+            {isVesselDropdownOpen && (
+              <div className="absolute top-[82px] left-3.5 right-3.5 bg-[#050B14] border border-white/[0.15] rounded-xl shadow-2xl z-[500] py-1 max-h-56 overflow-y-auto divide-y divide-white/[0.04]">
+                {CLEANUP_FLEET.map((v) => (
+                  <div
+                    key={v.id}
+                    onClick={() => {
+                      setSelectedVesselId(v.id);
+                      setIsVesselDropdownOpen(false);
+                      sonarAudio.playTargetBeep?.();
+                      showToast(`Assigned Fleet Vessel: ${v.name}`);
+                    }}
+                    className={`px-3 py-2.5 text-xs font-mono hover:bg-[#FFB703]/10 cursor-pointer transition-colors ${
+                      v.id === selectedVesselId
+                        ? 'bg-[#FFB703]/15 text-[#FFB703] font-bold'
+                        : 'text-slate-300'
+                    }`}
+                  >
+                    <div className="font-bold truncate">{v.name}</div>
+                    <div className="text-[10px] text-slate-500">
+                      Cruise: {v.speedKnots} kts · {v.consumptionPerNM} {v.consumptionUnit}/NM · Max {v.maxPayloadKg} kg
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-2 text-xs font-mono">
               <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
                 <span className="text-slate-500 block text-[9.5px]">Cruising Speed</span>
-                <strong className="text-white text-xs">6.5 knots</strong>
+                <strong className="text-white text-xs">{vessel.speedKnots} knots</strong>
               </div>
               <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
                 <span className="text-slate-500 block text-[9.5px]">Consumption</span>
-                <strong className="text-emerald-400 text-xs">1.4 kWh/NM</strong>
+                <strong className="text-emerald-400 text-xs">
+                  {vessel.consumptionPerNM} {vessel.consumptionUnit}/NM
+                </strong>
               </div>
               <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
                 <span className="text-slate-500 block text-[9.5px]">Max Payload</span>
-                <strong className="text-white text-xs">1200 kg</strong>
+                <strong className="text-white text-xs">{vessel.maxPayloadKg} kg</strong>
               </div>
               <div className="p-2 rounded bg-white/[0.02] border border-white/[0.06]">
                 <span className="text-slate-500 block text-[9.5px]">Salvage Rate</span>
-                <strong className="text-white text-xs">35 m / target</strong>
+                <strong className="text-white text-xs">{vessel.salvageTimePerTargetMin} m / target</strong>
               </div>
             </div>
           </div>
 
-          {/* Panel 3: Retrieval Targets (5/5) */}
+          {/* Panel 3: Retrieval Targets (Dynamic Selection) */}
           <div className="p-3.5 bg-[#070D18] rounded-xl border border-white/[0.08] space-y-2.5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#FFB703] uppercase">
                 <MapPin className="w-3.5 h-3.5" />
-                <span>RETRIEVAL TARGETS ({activeTargets.length}/5)</span>
+                <span>
+                  RETRIEVAL TARGETS ({activeTargets.length}/{sectorTargets.length})
+                </span>
               </div>
               <div className="flex items-center gap-2 text-[10.5px] font-mono">
                 <button
                   onClick={handleSelectAll}
-                  className="text-[#38bdf8] hover:underline cursor-pointer"
+                  className="text-[#00F5D4] hover:underline cursor-pointer font-bold"
                 >
                   Select All
                 </button>
@@ -525,24 +763,28 @@ export const RoutePlannerPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-              {CHENNAI_TARGETS.map((t) => {
+            <div className="space-y-2 max-h-[320px] overflow-y-auto pr-1">
+              {sectorTargets.map((t) => {
                 const isChecked = selectedTargetIds.includes(t.id);
+                const isSelectedOnMap = selectedPointId === t.id;
                 return (
                   <div
                     key={t.id}
                     onClick={() => toggleTarget(t.id)}
                     className={`p-2.5 rounded-lg border text-xs font-mono cursor-pointer transition-all flex items-start gap-2.5 ${
-                      isChecked
-                        ? 'bg-[#131B2A] border-[#38bdf8]/40 text-white'
+                      isSelectedOnMap
+                        ? 'bg-[#FFB703]/15 border-[#FFB703] text-white shadow-md'
+                        : isChecked
+                        ? 'bg-[#0D1524] border-white/[0.12] text-white hover:border-[#FFB703]/40'
                         : 'bg-white/[0.02] border-white/[0.06] text-slate-500 hover:bg-white/[0.04]'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={isChecked}
-                      onChange={() => {}}
-                      className="mt-0.5 accent-[#0284c7] cursor-pointer shrink-0"
+                      onChange={() => toggleTarget(t.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="mt-0.5 accent-[#FFB703] cursor-pointer shrink-0"
                     />
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-center justify-between gap-1">
@@ -551,16 +793,16 @@ export const RoutePlannerPage: React.FC = () => {
                           className={`text-[8.5px] px-1.5 py-0.2 rounded font-bold uppercase shrink-0 ${
                             t.type === 'ghost_net'
                               ? 'bg-[#FFB703]/20 text-[#FFB703] border border-[#FFB703]/40'
-                              : t.type === 'debris'
+                              : t.type === 'pipeline'
                               ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
                               : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40'
                           }`}
                         >
-                          {t.typeLabel}
+                          {t.type.replace('_', ' ')}
                         </span>
                       </div>
                       <div className="text-[10px] text-slate-400">
-                        Depth: {t.depthM}m | Est. Mass: {t.estimatedMassKg} kg
+                        Depth: -{t.depthM || 20}m | Est. Mass: {t.estimatedMassKg || 250} kg
                       </div>
                       <div className="text-[9px] text-slate-500">
                         {t.lat.toFixed(4)}° N, {t.lon.toFixed(4)}° E
@@ -585,26 +827,32 @@ export const RoutePlannerPage: React.FC = () => {
                   TACTICAL MARITIME NAVIGATION MAP
                 </span>
                 <span className="text-slate-600">|</span>
-                <span className="text-slate-400 text-[11px]">Chennai Sector</span>
+                <span className="text-slate-400 text-[11px]">{basePort.name.split(' ')[0]} Sector</span>
               </div>
 
               {/* Map View Mode Switcher */}
               <div className="flex items-center gap-1 bg-white/[0.04] p-0.5 rounded-lg border border-white/[0.08]">
                 <button
-                  onClick={() => setMapMode('dark_marine')}
+                  onClick={() => {
+                    setMapMode('dark_marine');
+                    sonarAudio.playTargetBeep?.();
+                  }}
                   className={`px-2.5 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
                     mapMode === 'dark_marine'
-                      ? 'bg-[#0284c7] text-white shadow-xs'
+                      ? 'bg-[#FFB703] text-[#05070B] shadow-xs'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   Dark Marine
                 </button>
                 <button
-                  onClick={() => setMapMode('satellite')}
+                  onClick={() => {
+                    setMapMode('satellite');
+                    sonarAudio.playTargetBeep?.();
+                  }}
                   className={`px-2.5 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
                     mapMode === 'satellite'
-                      ? 'bg-[#0284c7] text-white shadow-xs'
+                      ? 'bg-[#FFB703] text-[#05070B] shadow-xs'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -616,12 +864,18 @@ export const RoutePlannerPage: React.FC = () => {
             {/* Map Viewport */}
             <div className="h-[360px] w-full relative bg-[#040810]">
               <MapContainer
-                center={[13.25, 80.42]}
+                center={[basePort.lat + 0.15, basePort.lon + 0.1]}
                 zoom={9}
                 style={{ height: '100%', width: '100%', background: '#040810' }}
                 zoomControl={false}
               >
-                <MapAutoCenter coords={[13.25, 80.42]} zoom={9} />
+                <MapController
+                  center={[basePort.lat + 0.15, basePort.lon + 0.1]}
+                  zoom={9}
+                  onMapReady={(m) => {
+                    mapRef.current = m;
+                  }}
+                />
 
                 {mapMode === 'dark_marine' ? (
                   <TileLayer
@@ -637,96 +891,121 @@ export const RoutePlannerPage: React.FC = () => {
                   />
                 )}
 
-                {/* Indian Territorial Waters Line */}
-                <Polyline
-                  positions={territorialWatersLine}
-                  pathOptions={{ color: '#00F5D4', weight: 1.5, dashArray: '6, 6' }}
-                >
-                  <Tooltip sticky>
-                    <span className="font-mono text-[9px] text-cyan-400">
-                      Indian Territorial Waters (12 NM)
-                    </span>
-                  </Tooltip>
-                </Polyline>
+                {/* Indian Territorial Waters Line (12 NM) */}
+                {layerSettings.territorialLine && (
+                  <Polyline
+                    positions={territorialWatersLine}
+                    pathOptions={{ color: '#00F5D4', weight: 1.5, dashArray: '6, 6' }}
+                  >
+                    <Tooltip direction="top">
+                      <span className="font-mono text-[10px] text-cyan-300">
+                        Indian Territorial Waters (12 NM)
+                      </span>
+                    </Tooltip>
+                  </Polyline>
+                )}
 
                 {/* Restricted Area (No Entry) */}
-                <Polygon
-                  positions={restrictedAreaPolygon}
-                  pathOptions={{
-                    color: '#EF4444',
-                    fillColor: '#EF4444',
-                    fillOpacity: 0.15,
-                    weight: 1.5,
-                    dashArray: '4, 4',
-                  }}
-                >
-                  <Tooltip sticky>
-                    <span className="font-mono text-[9px] text-red-400 font-bold">
-                      Restricted Area (No Entry)
-                    </span>
-                  </Tooltip>
-                </Polygon>
+                {layerSettings.restrictedArea && (
+                  <Polygon
+                    positions={restrictedAreaPolygon}
+                    pathOptions={{
+                      color: '#EF4444',
+                      fillColor: '#EF4444',
+                      fillOpacity: 0.15,
+                      weight: 1.5,
+                      dashArray: '4, 4',
+                    }}
+                  >
+                    <Tooltip direction="top">
+                      <span className="font-mono text-[10px] text-red-400 font-bold">
+                        Restricted Area (Naval Proving Zone)
+                      </span>
+                    </Tooltip>
+                  </Polygon>
+                )}
 
                 {/* Offshore Platform (No Entry) */}
-                <Polygon
-                  positions={offshorePlatformPolygon}
-                  pathOptions={{
-                    color: '#EF4444',
-                    fillColor: '#EF4444',
-                    fillOpacity: 0.12,
-                    weight: 1.5,
-                    dashArray: '3, 3',
+                {layerSettings.offshorePlatform && (
+                  <Polygon
+                    positions={offshorePlatformPolygon}
+                    pathOptions={{
+                      color: '#F59E0B',
+                      fillColor: '#F59E0B',
+                      fillOpacity: 0.12,
+                      weight: 1.5,
+                      dashArray: '3, 3',
+                    }}
+                  >
+                    <Tooltip direction="top">
+                      <span className="font-mono text-[10px] text-amber-400 font-bold">
+                        Offshore Gas Extraction Fairway (Safety Zone)
+                      </span>
+                    </Tooltip>
+                  </Polygon>
+                )}
+
+                {/* Planned Route Polyline (Full Round Trip) */}
+                {routePolyline.length > 1 && (
+                  <Polyline
+                    positions={routePolyline}
+                    pathOptions={{ color: '#FFB703', weight: 2.5, opacity: 0.85 }}
+                  />
+                )}
+
+                {/* Transit First Leg Highlight (Glowing Cyan) */}
+                {routePolyline.length > 1 && (
+                  <Polyline
+                    positions={[routePolyline[0], routePolyline[1]]}
+                    pathOptions={{ color: '#00F5D4', weight: 3, dashArray: '4, 4' }}
+                  />
+                )}
+
+                {/* Base Port Marker 0 (Clean Dark Tooltip, NOT permanent white box) */}
+                <Marker
+                  position={[basePort.lat, basePort.lon]}
+                  icon={createNumberedPin(0, true, selectedPointId === basePort.id)}
+                  eventHandlers={{
+                    click: () => handleFocusWaypoint(basePort.id, basePort.lat, basePort.lon),
                   }}
                 >
-                  <Tooltip sticky>
-                    <span className="font-mono text-[9px] text-red-400 font-bold">
-                      Offshore Platform (No Entry)
-                    </span>
-                  </Tooltip>
-                </Polygon>
-
-                {/* Planned Route Polyline (White Solid Line) */}
-                <Polyline
-                  positions={routePolyline}
-                  pathOptions={{ color: '#ffffff', weight: 2.5 }}
-                />
-
-                {/* Transit Leg Dashed Cyan Line */}
-                <Polyline
-                  positions={[routePolyline[0], routePolyline[1]]}
-                  pathOptions={{ color: '#00F5D4', weight: 2, dashArray: '4, 4' }}
-                />
-
-                {/* Base Port Marker 0 */}
-                <Marker
-                  position={[CHENNAI_BASE.lat, CHENNAI_BASE.lon]}
-                  icon={createNumberedPin(0, true)}
-                >
-                  <Tooltip permanent direction="top" offset={[0, -10]}>
-                    <span className="font-mono text-[9px] text-white font-bold">
-                      0: Chennai (Base Port)
-                    </span>
+                  <Tooltip direction="top" offset={[0, -12]}>
+                    <div className="font-mono text-[10px] text-slate-100 p-1">
+                      <strong className="text-[#00F5D4] block">WP 0: {basePort.name}</strong>
+                      <div className="text-slate-400">Home Berth & ROV Tender Slipway</div>
+                    </div>
                   </Tooltip>
                 </Marker>
 
-                {/* Target Waypoint Markers 1 to 5 */}
-                {CHENNAI_TARGETS.map((t) => (
-                  <Marker
-                    key={t.id}
-                    position={[t.lat, t.lon]}
-                    icon={createNumberedPin(t.wpNum)}
-                  >
-                    <Tooltip direction="top" offset={[0, -10]}>
-                      <div className="font-mono text-[9.5px] p-1 space-y-0.5">
-                        <strong className="text-white block">{t.name}</strong>
-                        <div>Depth: -{t.depthM}m | Mass: {t.estimatedMassKg}kg</div>
-                      </div>
-                    </Tooltip>
-                  </Marker>
-                ))}
+                {/* Target Waypoint Markers */}
+                {activeTargets.map((t, idx) => {
+                  const isSelected = selectedPointId === t.id;
+                  return (
+                    <Marker
+                      key={t.id}
+                      position={[t.lat, t.lon]}
+                      icon={createNumberedPin(idx + 1, false, isSelected)}
+                      eventHandlers={{
+                        click: () => handleFocusWaypoint(t.id, t.lat, t.lon),
+                      }}
+                    >
+                      <Tooltip direction="top" offset={[0, -12]}>
+                        <div className="font-mono text-[10px] p-1 space-y-0.5">
+                          <strong className="text-white block">
+                            WP {idx + 1}: {t.name}
+                          </strong>
+                          <div className="text-[#FFB703]">
+                            Depth: -{t.depthM || 20}m | Mass: {t.estimatedMassKg || 250}kg
+                          </div>
+                          <div className="text-slate-400 text-[9px]">{t.notes}</div>
+                        </div>
+                      </Tooltip>
+                    </Marker>
+                  );
+                })}
 
                 {/* Simulated Moving Vessel Icon during Playback */}
-                {isSimulating && (
+                {isSimulating && routePolyline[simStep] && (
                   <Marker
                     position={routePolyline[simStep]}
                     icon={L.divIcon({
@@ -742,43 +1021,89 @@ export const RoutePlannerPage: React.FC = () => {
                 )}
               </MapContainer>
 
-              {/* Map Left Toolbar */}
-              <div className="absolute top-3 left-3 z-[400] flex flex-col gap-1 bg-[#050A12]/90 border border-white/[0.1] rounded-lg p-1 text-slate-300">
+              {/* Map Left Functional Toolbar */}
+              <div className="absolute top-3 left-3 z-[400] flex flex-col gap-1 bg-[#050A12]/90 border border-white/[0.1] rounded-lg p-1 text-slate-300 backdrop-blur-md">
                 <button
-                  onClick={() => showToast('Map Zoom In')}
-                  className="p-1.5 hover:text-white hover:bg-white/[0.08] rounded"
+                  onClick={handleZoomIn}
+                  className="p-1.5 hover:text-white hover:bg-white/[0.08] rounded cursor-pointer transition-colors"
                   title="Zoom In"
                 >
                   +
                 </button>
                 <button
-                  onClick={() => showToast('Map Zoom Out')}
-                  className="p-1.5 hover:text-white hover:bg-white/[0.08] rounded"
+                  onClick={handleZoomOut}
+                  className="p-1.5 hover:text-white hover:bg-white/[0.08] rounded cursor-pointer transition-colors"
                   title="Zoom Out"
                 >
                   -
                 </button>
                 <div className="h-px bg-white/[0.08] my-0.5" />
                 <button
-                  onClick={() => showToast('Re-centered on Chennai Sector')}
-                  className="p-1.5 hover:text-[#FFB703] hover:bg-white/[0.08] rounded"
-                  title="Re-center"
+                  onClick={handleRecenter}
+                  className="p-1.5 hover:text-[#FFB703] hover:bg-white/[0.08] rounded cursor-pointer transition-colors"
+                  title="Re-center on Route"
                 >
                   <Target className="w-3.5 h-3.5" />
                 </button>
                 <button
-                  onClick={() => showToast('Map Layers Configuration')}
-                  className="p-1.5 hover:text-cyan-400 hover:bg-white/[0.08] rounded"
-                  title="Layers"
+                  onClick={() => setIsLayersMenuOpen(!isLayersMenuOpen)}
+                  className={`p-1.5 rounded cursor-pointer transition-colors ${
+                    isLayersMenuOpen
+                      ? 'text-[#FFB703] bg-[#FFB703]/10'
+                      : 'hover:text-cyan-400 hover:bg-white/[0.08]'
+                  }`}
+                  title="Toggle Layers"
                 >
                   <Sliders className="w-3.5 h-3.5" />
                 </button>
               </div>
 
+              {/* Layers Toggle Popover */}
+              {isLayersMenuOpen && (
+                <div className="absolute top-24 left-3 z-[450] bg-[#050A12]/95 border border-white/[0.15] rounded-xl p-3 shadow-2xl text-[10px] font-mono space-y-2 backdrop-blur-md w-48">
+                  <div className="font-bold text-white uppercase text-[9.5px] border-b border-white/[0.08] pb-1">
+                    Map Layers
+                  </div>
+                  <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={layerSettings.restrictedArea}
+                      onChange={(e) =>
+                        setLayerSettings({ ...layerSettings, restrictedArea: e.target.checked })
+                      }
+                      className="accent-[#FFB703]"
+                    />
+                    <span>Restricted Proving Area</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={layerSettings.offshorePlatform}
+                      onChange={(e) =>
+                        setLayerSettings({ ...layerSettings, offshorePlatform: e.target.checked })
+                      }
+                      className="accent-[#FFB703]"
+                    />
+                    <span>Offshore Safety Fairway</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-slate-300 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={layerSettings.territorialLine}
+                      onChange={(e) =>
+                        setLayerSettings({ ...layerSettings, territorialLine: e.target.checked })
+                      }
+                      className="accent-[#FFB703]"
+                    />
+                    <span>12 NM Territorial Line</span>
+                  </label>
+                </div>
+              )}
+
               {/* Map Right Legend Box */}
-              <div className="absolute top-3 right-3 z-[400] bg-[#050A12]/95 border border-white/[0.1] rounded-lg p-2.5 text-[8.5px] font-mono space-y-1 max-w-[130px]">
+              <div className="absolute top-3 right-3 z-[400] bg-[#050A12]/95 border border-white/[0.1] rounded-lg p-2.5 text-[8.5px] font-mono space-y-1 max-w-[130px] backdrop-blur-md">
                 <div className="flex items-center gap-1.5 text-slate-200">
-                  <span className="w-3.5 h-0.5 bg-white" />
+                  <span className="w-3.5 h-0.5 bg-[#FFB703]" />
                   <span>Planned Route</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-300">
@@ -790,31 +1115,38 @@ export const RoutePlannerPage: React.FC = () => {
                   <span>Target Waypoint</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-300">
-                  <span className="w-2 h-2 rounded-full bg-[#0284c7]" />
+                  <span className="w-2 h-2 rounded-full bg-[#00F5D4]" />
                   <span>Base Port</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-red-400">
                   <span className="w-2.5 h-2 bg-red-500/20 border border-red-500" />
                   <span>Restricted Area</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-slate-400">
+                <div className="flex items-center gap-1.5 text-cyan-400">
                   <span className="w-3 h-px bg-cyan-400/50" />
-                  <span>Depth Contour (m)</span>
+                  <span>12 NM Boundary</span>
                 </div>
               </div>
 
               {/* Bottom HUD: Coordinates & Depth */}
-              <div className="absolute bottom-2 right-2 z-[400] px-2 py-0.5 bg-[#050A12]/90 rounded border border-white/[0.08] text-[8.5px] font-mono text-slate-400">
-                Lat: 13.2867° N · Lon: 80.4873° E · Depth: 62 m
+              <div className="absolute bottom-2 right-2 z-[400] px-2 py-0.5 bg-[#050A12]/90 rounded border border-white/[0.08] text-[8.5px] font-mono text-slate-400 backdrop-blur-md">
+                Sector: {basePort.lat.toFixed(4)}° N · {basePort.lon.toFixed(4)}° E · Sounding: ~35 m
               </div>
             </div>
           </div>
 
-          {/* Turn-by-Turn Waypoint Navigation Sequence (6 Legs) Table */}
+          {/* Turn-by-Turn Waypoint Navigation Sequence Table */}
           <div className="p-3.5 bg-[#070D18] rounded-xl border border-white/[0.08] space-y-2.5">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-white uppercase">
-              <Compass className="w-4 h-4 text-[#FFB703]" />
-              <span>TURN-BY-TURN WAYPOINT NAVIGATION SEQUENCE (6 LEGS)</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-white uppercase">
+                <Compass className="w-4 h-4 text-[#FFB703]" />
+                <span>
+                  TURN-BY-TURN WAYPOINT NAVIGATION SEQUENCE ({tspSolution.legs.length} LEGS)
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">
+                Click any leg to focus map
+              </span>
             </div>
 
             <div className="overflow-x-auto">
@@ -831,21 +1163,55 @@ export const RoutePlannerPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.04]">
-                  {navigationLegs.map((leg, idx) => (
-                    <tr key={idx} className="hover:bg-white/[0.02] text-slate-200">
-                      <td className="py-2 px-2 font-bold text-white">
-                        <span className="px-1.5 py-0.2 rounded bg-white/[0.05] border border-white/[0.08]">
-                          {leg.leg}
-                        </span>
-                      </td>
-                      <td className="py-2 px-2 font-semibold text-slate-200">{leg.fromTo}</td>
-                      <td className="py-2 px-2 text-slate-400 text-[10px]">{leg.coords}</td>
-                      <td className="py-2 px-2 text-[#FFB703] font-bold">{leg.heading}</td>
-                      <td className="py-2 px-2 text-right font-bold text-[#38bdf8]">{leg.distNM}</td>
-                      <td className="py-2 px-2 text-right text-slate-300">{leg.estTime}</td>
-                      <td className="py-2 px-2 text-slate-300">{leg.action}</td>
-                    </tr>
-                  ))}
+                  {tspSolution.legs.map((leg, idx) => {
+                    const isSelected = selectedPointId === leg.to.id;
+                    const isSimActive = isSimulating && simStep === idx;
+                    return (
+                      <tr
+                        key={idx}
+                        onClick={() => handleFocusWaypoint(leg.to.id, leg.to.lat, leg.to.lon)}
+                        className={`hover:bg-[#FFB703]/[0.08] text-slate-200 cursor-pointer transition-colors ${
+                          isSimActive
+                            ? 'bg-[#00F5D4]/15 border-l-2 border-[#00F5D4]'
+                            : isSelected
+                            ? 'bg-[#FFB703]/15 border-l-2 border-[#FFB703]'
+                            : ''
+                        }`}
+                      >
+                        <td className="py-2 px-2 font-bold text-white">
+                          <span
+                            className={`px-1.5 py-0.2 rounded border ${
+                              isSimActive
+                                ? 'bg-[#00F5D4]/20 border-[#00F5D4] text-[#00F5D4]'
+                                : isSelected
+                                ? 'bg-[#FFB703]/20 border-[#FFB703] text-[#FFB703]'
+                                : 'bg-white/[0.05] border-white/[0.08]'
+                            }`}
+                          >
+                            WP-{idx}
+                          </span>
+                        </td>
+                        <td className="py-2 px-2 font-semibold text-slate-200">
+                          {leg.from.name.split(' ')[0]} → {leg.to.name.split(' ')[0]}
+                        </td>
+                        <td className="py-2 px-2 text-slate-400 text-[10px]">
+                          {leg.to.lat.toFixed(4)}° N, {leg.to.lon.toFixed(4)}° E
+                        </td>
+                        <td className="py-2 px-2 text-[#FFB703] font-bold">
+                          {String(leg.bearingDeg).padStart(3, '0')}°
+                        </td>
+                        <td className="py-2 px-2 text-right font-bold text-[#00F5D4]">
+                          {leg.distanceNM}
+                        </td>
+                        <td className="py-2 px-2 text-right text-slate-300">
+                          {Math.floor(leg.estMinutes / 60)}h {leg.estMinutes % 60}m
+                        </td>
+                        <td className="py-2 px-2 text-slate-300 truncate max-w-[150px]">
+                          {leg.actionNote}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -868,23 +1234,25 @@ export const RoutePlannerPage: React.FC = () => {
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-slate-400">Total Waypoints</span>
-                <strong className="text-white">5</strong>
+                <strong className="text-white">{tspSolution.orderedPoints.length}</strong>
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-slate-400">Total Distance</span>
-                <strong className="text-white">72.3 NM</strong>
+                <strong className="text-white">{tspSolution.totalDistanceNM} NM</strong>
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-slate-400">Estimated Time</span>
-                <strong className="text-white">14 hrs</strong>
+                <strong className="text-white">{tspSolution.totalMissionHours} hrs</strong>
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-slate-400">Fuel / Energy</span>
-                <strong className="text-white">101.2 kWh</strong>
+                <strong className="text-emerald-400">
+                  {tspSolution.energyConsumedKWh} {vessel.consumptionUnit}
+                </strong>
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-slate-400">CO₂ Reduction</span>
-                <strong className="text-white">813.8 kg</strong>
+                <strong className="text-[#FFB703]">{tspSolution.co2SavedKg} kg</strong>
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-slate-400">Safety Check</span>
@@ -914,7 +1282,7 @@ export const RoutePlannerPage: React.FC = () => {
           <div className="p-3.5 bg-[#070D18] rounded-xl border border-white/[0.08] space-y-2">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="font-bold text-white uppercase flex items-center gap-1.5">
-                <Waves className="w-3.5 h-3.5 text-[#38bdf8]" />
+                <Waves className="w-3.5 h-3.5 text-[#00F5D4]" />
                 BATHYMETRIC PROFILE
               </span>
             </div>
@@ -927,19 +1295,37 @@ export const RoutePlannerPage: React.FC = () => {
                 <line x1="28" y1="36" x2="270" y2="36" stroke="#162136" strokeDasharray="2,2" />
                 <line x1="28" y1="60" x2="270" y2="60" stroke="#162136" strokeDasharray="2,2" />
 
-                <text x="22" y="15" fill="#64748B" fontSize="6.5" textAnchor="end">0</text>
-                <text x="22" y="39" fill="#64748B" fontSize="6.5" textAnchor="end">-50</text>
-                <text x="22" y="63" fill="#64748B" fontSize="6.5" textAnchor="end">-100</text>
+                <text x="22" y="15" fill="#64748B" fontSize="6.5" textAnchor="end">
+                  0
+                </text>
+                <text x="22" y="39" fill="#64748B" fontSize="6.5" textAnchor="end">
+                  -50
+                </text>
+                <text x="22" y="63" fill="#64748B" fontSize="6.5" textAnchor="end">
+                  -100
+                </text>
 
                 {/* X-axis labels */}
-                <text x="32" y="78" fill="#64748B" fontSize="6.5">0</text>
-                <text x="88" y="78" fill="#64748B" fontSize="6.5">20</text>
-                <text x="144" y="78" fill="#64748B" fontSize="6.5">40</text>
-                <text x="200" y="78" fill="#64748B" fontSize="6.5">60</text>
-                <text x="256" y="78" fill="#64748B" fontSize="6.5">80</text>
-                <text x="274" y="78" fill="#64748B" fontSize="6.5">NM</text>
+                <text x="32" y="78" fill="#64748B" fontSize="6.5">
+                  0
+                </text>
+                <text x="88" y="78" fill="#64748B" fontSize="6.5">
+                  20
+                </text>
+                <text x="144" y="78" fill="#64748B" fontSize="6.5">
+                  40
+                </text>
+                <text x="200" y="78" fill="#64748B" fontSize="6.5">
+                  60
+                </text>
+                <text x="256" y="78" fill="#64748B" fontSize="6.5">
+                  80
+                </text>
+                <text x="274" y="78" fill="#64748B" fontSize="6.5">
+                  NM
+                </text>
 
-                {/* Seafloor line (Teal dashed) */}
+                {/* Seafloor line */}
                 <path
                   d="M 32,20 Q 80,45 130,35 T 220,55 T 265,22"
                   fill="none"
@@ -947,7 +1333,7 @@ export const RoutePlannerPage: React.FC = () => {
                   strokeWidth="2.5"
                 />
 
-                {/* Route Depth line (Yellow dashed) */}
+                {/* Route Depth line */}
                 <path
                   d="M 32,18 L 85,25 L 132,32 L 178,22 L 222,40 L 265,18"
                   fill="none"
@@ -956,22 +1342,38 @@ export const RoutePlannerPage: React.FC = () => {
                   strokeDasharray="3,3"
                 />
 
-                {/* Yellow Waypoint Nodes 0 to 5 */}
-                {[
-                  { cx: 32, cy: 18, label: '0' },
-                  { cx: 85, cy: 25, label: '1' },
-                  { cx: 132, cy: 32, label: '2' },
-                  { cx: 178, cy: 22, label: '3' },
-                  { cx: 222, cy: 40, label: '4' },
-                  { cx: 265, cy: 18, label: '5' },
-                ].map((node) => (
-                  <g key={node.label}>
-                    <circle cx={node.cx} cy={node.cy} r="4" fill="#FFB703" stroke="#05070B" strokeWidth="1" />
-                    <text x={node.cx} y={node.cy + 2.5} fill="#05070B" fontSize="5.5" fontWeight="bold" textAnchor="middle">
-                      {node.label}
-                    </text>
-                  </g>
-                ))}
+                {/* Waypoint Nodes on Profile */}
+                {tspSolution.orderedPoints.slice(0, 6).map((node, i) => {
+                  const cx = 32 + i * 46;
+                  const cy = 20 + ((node.depthM || 20) / 100) * 40;
+                  const isSelected = selectedPointId === node.id;
+                  return (
+                    <g
+                      key={node.id + i}
+                      className="cursor-pointer"
+                      onClick={() => handleFocusWaypoint(node.id, node.lat, node.lon)}
+                    >
+                      <circle
+                        cx={cx}
+                        cy={cy}
+                        r={isSelected ? 5 : 3.5}
+                        fill={isSelected ? '#ffffff' : '#FFB703'}
+                        stroke="#05070B"
+                        strokeWidth="1"
+                      />
+                      <text
+                        x={cx}
+                        y={cy + 2.5}
+                        fill="#05070B"
+                        fontSize="5"
+                        fontWeight="bold"
+                        textAnchor="middle"
+                      >
+                        {i}
+                      </text>
+                    </g>
+                  );
+                })}
               </svg>
             </div>
 
@@ -990,7 +1392,7 @@ export const RoutePlannerPage: React.FC = () => {
           {/* Panel 3: Weather & Sea State (Forecast) */}
           <div className="p-3.5 bg-[#070D18] rounded-xl border border-white/[0.08] space-y-2">
             <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-white uppercase">
-              <Wind className="w-3.5 h-3.5 text-cyan-400" />
+              <Wind className="w-3.5 h-3.5 text-[#00F5D4]" />
               <span>WEATHER & SEA STATE (FORECAST)</span>
             </div>
 
@@ -1011,14 +1413,17 @@ export const RoutePlannerPage: React.FC = () => {
 
             <div className="p-2 rounded bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-[10px] font-mono flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-              <span>Favorable for AUV/ROV operations</span>
+              <span>Favorable for autonomous ROV operations</span>
             </div>
           </div>
 
           {/* Action CTAs */}
           <div className="space-y-2 pt-1">
             <button
-              onClick={handleDeployRoute}
+              onClick={() => {
+                sonarAudio.playSonarPing?.();
+                setIsDeployModalOpen(true);
+              }}
               className="w-full py-2.5 rounded-xl bg-[#FFB703] hover:bg-[#FCD34D] text-[#05070B] font-mono font-black text-xs transition-all cursor-pointer shadow-lg shadow-[#FFB703]/25 flex items-center justify-center gap-2 active:scale-98"
             >
               <Play className="w-4 h-4 fill-current" />
@@ -1029,16 +1434,138 @@ export const RoutePlannerPage: React.FC = () => {
               onClick={() => {
                 setIsSimulating(!isSimulating);
                 sonarAudio.playTargetBeep?.();
-                showToast(isSimulating ? 'Paused route playback simulation' : 'Started autonomous route traversal playback');
+                showToast(
+                  isSimulating
+                    ? 'Paused route playback simulation'
+                    : 'Started autonomous route traversal playback'
+                );
               }}
-              className="w-full py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-white/[0.2] text-slate-300 hover:text-white font-mono text-xs transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+              className={`w-full py-2 rounded-xl border text-xs font-mono transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98 ${
+                isSimulating
+                  ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
+                  : 'bg-white/[0.04] hover:bg-white/[0.08] border-white/[0.1] text-slate-300 hover:text-white'
+              }`}
             >
-              <Activity className="w-3.5 h-3.5 text-[#38bdf8]" />
-              <span>{isSimulating ? 'Stop Simulation' : 'Simulate Route (Playback)'}</span>
+              {isSimulating ? (
+                <>
+                  <Pause className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Pause Simulation</span>
+                </>
+              ) : (
+                <>
+                  <Activity className="w-3.5 h-3.5 text-[#00F5D4]" />
+                  <span>Simulate Route (Playback)</span>
+                </>
+              )}
             </button>
           </div>
         </div>
       </div>
+
+      {/* ── 4. DEPLOY MISSION MODAL ── */}
+      {isDeployModalOpen && (
+        <div className="fixed inset-0 z-[700] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#070D18] border border-white/[0.15] rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-5 animate-in zoom-in-95">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-[#FFB703]/15 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703]">
+                  <Radio className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white font-mono">
+                    DISPATCH AUTONOMOUS MISSION
+                  </h3>
+                  <p className="text-[11px] text-slate-400 font-mono">
+                    VHF-AIS Telemetry Link (161.975 MHz)
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsDeployModalOpen(false)}
+                className="text-slate-400 hover:text-white cursor-pointer p-1 rounded-lg hover:bg-white/[0.06]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 font-mono text-xs">
+              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Assigned Fleet</span>
+                  <span className="text-white font-bold">{vessel.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Base Port</span>
+                  <span className="text-[#00F5D4] font-bold">{basePort.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Optimized Distance</span>
+                  <span className="text-white font-bold">{tspSolution.totalDistanceNM} NM</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Total Waypoints</span>
+                  <span className="text-[#FFB703] font-bold">
+                    {tspSolution.orderedPoints.length} Waypoints
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Est. Mission Duration</span>
+                  <span className="text-white font-bold">{tspSolution.totalMissionHours} Hours</span>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] space-y-1">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>AUTONOMOUS SAFETY AUDIT: PASSED</span>
+                </div>
+                <p className="text-slate-300 text-[10px]">
+                  Zero restricted-zone infringements detected. Under-keel bathymetry clearance
+                  verified across all legs.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => setIsDeployModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 hover:text-white text-xs font-mono font-semibold transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setIsDeploying(true);
+                  sonarAudio.playLockBeep?.();
+                  setTimeout(() => {
+                    setIsDeploying(false);
+                    setIsDeployModalOpen(false);
+                    showToast(
+                      `Uplink established! Navigation plan successfully dispatched to ${vessel.name}.`
+                    );
+                  }, 1000);
+                }}
+                disabled={isDeploying}
+                className="px-5 py-2 rounded-xl bg-[#FFB703] hover:bg-[#FCD34D] text-[#05070B] text-xs font-mono font-black transition-all cursor-pointer shadow-lg shadow-[#FFB703]/25 flex items-center gap-2"
+              >
+                {isDeploying ? (
+                  <>
+                    <RotateCcw className="w-4 h-4 animate-spin" />
+                    <span>Uplinking Plan...</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4 fill-current" />
+                    <span>Confirm & Dispatch</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+export default RoutePlannerPage;

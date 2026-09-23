@@ -162,8 +162,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div className="space-y-1 text-[11px] font-mono text-slate-400 bg-white/[0.02] p-2 rounded-xl border border-white/[0.04]">
                 {[
                   { name: 'Perception Engine', status: 'ACTIVE' },
-                  { name: 'AI Model (YOLOv8s)', status: 'ACTIVE' },
-                  { name: 'ONNX Runtime', status: '14.2ms' },
+                  { name: 'AI Model', status: 'YOLOv8s' },
+                  { name: 'ONNX Runtime', status: '14.2 ms' },
                   { name: 'Geo-Localization', status: 'WGS-84' },
                   { name: 'Acoustic Filter', status: 'PHYSICS' },
                   { name: 'Tracking Module', status: 'READY' },
@@ -173,7 +173,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       {s.name}
                     </span>
-                    <span className="text-[9px] text-slate-500 font-bold">{s.status}</span>
+                    <span className="text-[10px] text-slate-400 font-bold">{s.status}</span>
                   </div>
                 ))}
               </div>

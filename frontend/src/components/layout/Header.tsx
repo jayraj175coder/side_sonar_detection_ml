@@ -15,6 +15,7 @@ import {
   Activity,
   ShieldCheck,
   Bell,
+  Clock,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { sonarAudio } from '../../utils/sonarAudio';
@@ -37,7 +38,18 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
 
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(sonarAudio.isMuted);
   const [isOverflowOpen, setIsOverflowOpen] = useState<boolean>(false);
+  const [timeStr, setTimeStr] = useState<string>('04:18:22 UTC');
   const overflowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setTimeStr(now.toTimeString().split(' ')[0] + ' UTC');
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleToggleAudio = () => {
     const muted = sonarAudio.toggleMute();
@@ -103,31 +115,46 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
             <span className="w-2 h-2 rounded-full bg-[#FFB703] animate-ping" />
             <span>SIH26057 // MoES</span>
           </div>
+
+          {/* Mission ID & Live Status */}
+          <div className="hidden 2xl:flex items-center gap-2 font-mono text-[11px] text-slate-400 pl-1 border-l border-white/[0.08]">
+            <span className="text-slate-500">ID:</span>
+            <span className="text-white font-semibold">MX-026</span>
+            <span className="text-slate-600">•</span>
+            <span className="text-[#38bdf8] font-bold">SCAN: ACTIVE SWATH</span>
+          </div>
         </div>
       </div>
 
-      {/* 2. Center: Linear-style Live Telemetry Ticker (Clear & Legible) */}
-      <div className="hidden xl:flex items-center gap-4 text-xs font-sans text-slate-300 bg-white/[0.04] border border-white/[0.08] px-4 py-1.5 rounded-full shadow-inner">
+      {/* 2. Center: Linear-style Live Telemetry Ticker */}
+      <div className="hidden xl:flex items-center gap-3.5 text-xs font-sans text-slate-300 bg-white/[0.04] border border-white/[0.08] px-3.5 py-1.5 rounded-full shadow-inner">
         <div className="flex items-center gap-2">
           <Activity className="w-3.5 h-3.5 text-[#FFB703] animate-pulse" />
-          <span className="text-slate-400 font-semibold">ACOUSTIC CHIRP:</span>
-          <span className="text-[#FFB703] font-mono font-bold">900 kHz</span>
+          <span className="text-slate-400 font-semibold text-[11px]">ACOUSTIC CHIRP:</span>
+          <span className="text-[#FFB703] font-mono font-bold text-[11px]">900 kHz</span>
         </div>
 
         <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
 
         <div className="flex items-center gap-2">
           <Compass className="w-3.5 h-3.5 text-[#38bdf8]" />
-          <span className="text-slate-400 font-semibold">POSITION:</span>
-          <span className="text-slate-100 font-mono">18.9217° N, 72.8214° E</span>
+          <span className="text-slate-400 font-semibold text-[11px]">POSITION:</span>
+          <span className="text-slate-100 font-mono text-[11px]">18.9217° N, 72.8214° E</span>
         </div>
 
         <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
 
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="text-slate-400 font-semibold">STANDARDS:</span>
-          <span className="text-emerald-400 font-bold">IHO S-44 ORDER 1A</span>
+          <span className="text-slate-400 font-semibold text-[11px]">STANDARDS:</span>
+          <span className="text-emerald-400 font-bold text-[11px]">IHO S-44 ORDER 1A</span>
+        </div>
+
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+
+        <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400">
+          <Clock className="w-3.5 h-3.5 text-slate-500" />
+          <span className="text-slate-200">{timeStr}</span>
         </div>
       </div>
 

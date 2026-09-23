@@ -156,7 +156,7 @@ export interface DatasetCatalogResponse {
   datasets: Record<string, DatasetItem>;
 }
 
-export type TabType = 'overview' | 'scan' | 'history' | 'map' | 'reports' | 'model' | 'mission' | 'sonar' | 'analytics' | 'tracking';
+export type TabType = 'overview' | 'scan' | 'history' | 'map' | 'reports' | 'model' | 'mission' | 'sonar' | 'analytics' | 'tracking' | 'route-planner';
 
 /* ─── Mission Intelligence & Hydrographic Types ─────────────────────────── */
 

@@ -42,7 +42,6 @@ export const MissionPage: React.FC = () => {
 
   // Center Viewport Switcher ('sonar' | 'map' | '3d')
   const [centerViewMode, setCenterViewMode] = useState<'sonar' | 'map' | '3d'>('sonar');
-  const [isQueueOpen, setIsQueueOpen] = useState<boolean>(false);
 
   // Full-Screen Cinematic Story Demo Mode for Judges
   const [showCinematicDemo, setShowCinematicDemo] = useState<boolean>(false);
@@ -323,83 +322,67 @@ export const MissionPage: React.FC = () => {
         />
       ) : (
         <div className="flex-1 flex overflow-hidden relative">
-          {/* 1. LEFT — Collapsible Survey & Detection Queue */}
-          {isQueueOpen ? (
-            <div className="relative shrink-0 flex z-20">
-              <SurveyTargetQueue
+          {/* 1. LEFT (18%) — Operational Survey & Detection Queue */}
+          <div className="w-[18%] min-w-[220px] max-w-[270px] xl:max-w-[290px] h-full flex flex-col shrink-0 z-20">
+            <SurveyTargetQueue
+              targets={processedTargets}
+              selectedTargetId={selectedTargetId}
+              onSelectTarget={handleSelectTarget}
+              hoveredTargetId={hoveredTargetId}
+              onHoverTarget={setHoveredTargetId}
+              onFocusHeroTarget={runHeroSequence}
+              currentStageIndex={currentStageIndex}
+              confidenceThreshold={confidenceThreshold}
+              onChangeConfidenceThreshold={setConfidenceThreshold}
+            />
+          </div>
+
+          {/* 2. CENTER (62%) — 3-Way Hero Viewport (Sonar Waterfall | Subsea Mission Map | 3D Seafloor) */}
+          <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden relative">
+            {centerViewMode === 'sonar' ? (
+              <LargeSonarViewer
                 targets={processedTargets}
                 selectedTargetId={selectedTargetId}
                 onSelectTarget={handleSelectTarget}
                 hoveredTargetId={hoveredTargetId}
                 onHoverTarget={setHoveredTargetId}
-                onFocusHeroTarget={runHeroSequence}
-                currentStageIndex={currentStageIndex}
-                confidenceThreshold={confidenceThreshold}
-                onChangeConfidenceThreshold={setConfidenceThreshold}
+                isDemoRunning={isDemoRunning}
+                demoPhaseStep={demoPhaseStep}
+                heroConfidence={heroConfidence}
+                onViewMissionMap={() => setCenterViewMode('map')}
+                onView3D={() => setCenterViewMode('3d')}
               />
-              <button
-                onClick={() => setIsQueueOpen(false)}
-                className="absolute top-2 right-2 p-1 rounded bg-[#0A1220] border border-white/[0.1] text-slate-400 hover:text-white z-30 cursor-pointer text-xs"
-                title="Collapse Target Queue"
-              >
-                ✕
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setIsQueueOpen(true)}
-              className="hidden lg:flex flex-col items-center justify-center gap-1.5 py-4 px-1.5 bg-[#070D18] hover:bg-[#0A1220] border-r border-y border-white/[0.08] text-[9.5px] font-mono text-slate-400 hover:text-[#FFB703] transition-colors cursor-pointer rounded-r-lg my-auto z-20"
-              title="Expand Target Queue (17 Contacts)"
-            >
-              <Target className="w-3.5 h-3.5 text-[#FFB703]" />
-              <span className="[writing-mode:vertical-rl] rotate-180 font-bold tracking-widest uppercase">
-                TARGETS ({processedTargets.length})
-              </span>
-            </button>
-          )}
+            ) : centerViewMode === 'map' ? (
+              <MissionSubseaMapViewer
+                targets={processedTargets}
+                selectedTargetId={selectedTargetId}
+                onSelectTarget={handleSelectTarget}
+                onBackToSonar={() => setCenterViewMode('sonar')}
+                onExportReport={handleExportReport}
+                onView3D={() => setCenterViewMode('3d')}
+              />
+            ) : (
+              <Mission3DSeafloorViewer
+                targets={processedTargets}
+                selectedTargetId={selectedTargetId}
+                onSelectTarget={handleSelectTarget}
+                onBackToSonar={() => setCenterViewMode('sonar')}
+                onViewMissionMap={() => setCenterViewMode('map')}
+              />
+            )}
+          </div>
 
-        {/* 2. CENTER — 3-Way Hero Viewport (Sonar Waterfall | Subsea Mission Map | 3D Seafloor) */}
-        {centerViewMode === 'sonar' ? (
-          <LargeSonarViewer
-            targets={processedTargets}
-            selectedTargetId={selectedTargetId}
-            onSelectTarget={handleSelectTarget}
-            hoveredTargetId={hoveredTargetId}
-            onHoverTarget={setHoveredTargetId}
-            isDemoRunning={isDemoRunning}
-            demoPhaseStep={demoPhaseStep}
-            heroConfidence={heroConfidence}
-            onViewMissionMap={() => setCenterViewMode('map')}
-            onView3D={() => setCenterViewMode('3d')}
-          />
-        ) : centerViewMode === 'map' ? (
-          <MissionSubseaMapViewer
-            targets={processedTargets}
-            selectedTargetId={selectedTargetId}
-            onSelectTarget={handleSelectTarget}
-            onBackToSonar={() => setCenterViewMode('sonar')}
-            onExportReport={handleExportReport}
-            onView3D={() => setCenterViewMode('3d')}
-          />
-        ) : (
-          <Mission3DSeafloorViewer
-            targets={processedTargets}
-            selectedTargetId={selectedTargetId}
-            onSelectTarget={handleSelectTarget}
-            onBackToSonar={() => setCenterViewMode('sonar')}
-            onViewMissionMap={() => setCenterViewMode('map')}
-          />
-        )}
-
-        {/* 3. RIGHT — Selected Target Intelligence (Information Hero) */}
-        <TargetIntelligencePanel
-          target={selectedTarget}
-          isVerified={isVerified}
-          isDemoRunning={isDemoRunning}
-          heroConfidence={heroConfidence}
-          explainabilityStep={explainabilityStep}
-          onOpenDispatch={(t) => setDispatchTarget(t)}
-        />
+          {/* 3. RIGHT (20%) — Selected Target Intelligence (Information Hero) */}
+          <div className="w-[20%] min-w-[270px] max-w-[330px] xl:max-w-[360px] h-full flex flex-col shrink-0 z-20">
+            <TargetIntelligencePanel
+              target={selectedTarget}
+              isVerified={isVerified}
+              isDemoRunning={isDemoRunning}
+              heroConfidence={heroConfidence}
+              explainabilityStep={explainabilityStep}
+              onOpenDispatch={(t) => setDispatchTarget(t)}
+            />
+          </div>
         </div>
       )}
 

@@ -431,7 +431,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
   }, [activeTab, activeGeoTab, yaw, pitch, autoRotate, isDragging3D, target]);
 
   return (
-    <aside className="w-72 xl:w-80 2xl:w-88 bg-[#080D17] border-l border-[#162136] flex flex-col font-sans select-none overflow-y-auto shrink-0 z-20">
+    <aside className="w-full h-full bg-[#080D17] border-l border-[#162136] flex flex-col font-sans select-none overflow-y-auto shrink-0 z-20">
       {/* ── 1. HEADER & HERO CONFIDENCE DISPLAY ── */}
       <div className="p-3 border-b border-[#162136] bg-[#05070B] space-y-2">
         <div className="flex items-center justify-between">
@@ -701,7 +701,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
               </div>
 
               <div className="p-1.5 bg-[#131B2A] border border-[#FFB703]/30 rounded text-[8px] text-[#94A3B8] leading-tight">
-                Verdict: Specular intensity and high shadow hardness rule out natural basalt rock and sand dunes with 94.7% confidence.
+                Verdict: Detection is supported by acoustic shadow geometry, target shape, and backscatter characteristics (94.7% Non-Geological). Specular intensity and shadow relief rule out natural rock or sediment.
               </div>
             </div>
 

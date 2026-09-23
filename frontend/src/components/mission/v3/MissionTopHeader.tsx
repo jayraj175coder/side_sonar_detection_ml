@@ -88,19 +88,22 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
     <header className="shrink-0 bg-[#05070B] border-b border-[#162136] font-sans select-none z-30 sticky top-0">
       {/* ── CONSOLIDATED PRIMARY CONTEXT BAR (48px) ── */}
       <div className="h-12 px-4 flex items-center justify-between gap-4">
-        {/* Left: Logo + Survey ID + Live Dot */}
+        {/* Left: Logo + Survey ID + SIH / MoES + Live Dot */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded bg-[#131B2A] border border-[#FFB703]/60 flex items-center justify-center text-[#FFB703] font-black text-xs">
               SX
             </div>
-            <span className="text-sm font-black tracking-wider text-[#F8FAFC] uppercase">
+            <span className="text-sm font-black tracking-wider text-[#F8FAFC] uppercase font-mono">
               SONAR<span className="text-[#FFB703]">X</span>
             </span>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#131B2A] border border-[#FFB703]/40 text-[#FFB703] rounded">
               MX-026
             </span>
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 bg-[#080D17] border border-[#162136] rounded text-[9px] font-bold font-mono">
+            <span className="text-[10px] font-mono text-[#94A3B8] border-l border-[#162136] pl-2 hidden md:inline">
+              SIH 26057 / MoES
+            </span>
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 bg-[#080D17] border border-[#162136] rounded text-[9px] font-bold font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
               <span className="text-white">DRONE USV-04</span>
               <span className="text-slate-500">·</span>
@@ -314,9 +317,9 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
       <div className="h-8 px-4 bg-[#080D17] border-t border-[#162136] flex items-center justify-between text-xs text-[#94A3B8]">
         {/* Left: Interactive Filtration Controls */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-[#FFB703] font-bold">
-            <span className="w-2 h-2 rounded-full bg-[#FFB703] animate-ping" />
-            <span className="text-xs">
+          <div className="flex items-center gap-2 font-mono">
+            <span className={`w-2 h-2 rounded-full animate-ping ${isDemoRunning ? 'bg-[#FFB703]' : 'bg-emerald-400'}`} />
+            <span className={`text-xs font-bold ${isDemoRunning ? 'text-[#FFB703]' : 'text-emerald-400'}`}>
               {isDemoRunning ? `LIVE SCAN: ${activePhaseName || 'RUNNING'}` : 'SYSTEM ONLINE'}
             </span>
           </div>

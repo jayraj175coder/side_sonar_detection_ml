@@ -25,77 +25,57 @@ export const ImpactTranslationBanner: React.FC<ImpactTranslationBannerProps> = (
   }, [isDemoRunning]);
 
   return (
-    <div className="bg-[#05070B] border-b border-[#162136] px-3 sm:px-4 py-1 select-none font-sans">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-        {/* Card 1: Debris Sites & Tonnage */}
+    <div className="bg-[#05080E] border-b border-[#162136] px-3 sm:px-4 py-1 select-none font-mono text-xs">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {/* Metric 1: Debris Sites */}
         <div className="px-2.5 py-1 bg-[#080D17] border border-[#162136] rounded flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-[#EF4444]/15 border border-[#EF4444]/30 flex items-center justify-center text-[#EF4444] shrink-0">
-              <Target className="w-3 h-3" />
-            </div>
-            <div>
-              <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
-                <span className="text-[#EF4444]">{debrisCount}</span> SITES FLAGGED
-              </div>
-              <div className="text-[8px] text-[#94A3B8] mt-0.5">incl. 4 high-priority hazards</div>
-            </div>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444]" />
+            <span className="text-[11px] font-black text-[#F8FAFC]">
+              <strong className="text-[#EF4444] font-mono">{debrisCount}</strong> SITES FLAGGED
+            </span>
           </div>
-          <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-[#EF4444]/20 text-[#EF4444] rounded">
-            HIGH THREAT
+          <span className="text-[8px] font-bold text-[#94A3B8] uppercase">
+            4 HIGH HAZARDS
           </span>
         </div>
 
-        {/* Card 2: Human Time Saved (Speed Triage) */}
+        {/* Metric 2: Detection Recency */}
         <div className="px-2.5 py-1 bg-[#080D17] border border-[#162136] rounded flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-[#FFB703]/15 border border-[#FFB703]/30 flex items-center justify-center text-[#FFB703] shrink-0">
-              <Clock className="w-3 h-3" />
-            </div>
-            <div>
-              <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
-                <span className="text-[#FFB703]">4 MIN</span> <span className="text-[#94A3B8] text-[9px] font-normal">since last detection</span>
-              </div>
-              <div className="text-[8px] text-[#94A3B8] mt-0.5">Automated side-scan triage</div>
-            </div>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703]" />
+            <span className="text-[11px] font-black text-[#F8FAFC]">
+              <strong className="text-[#FFB703] font-mono">4 MIN</strong> <span className="text-[#94A3B8] font-normal text-[9.5px]">SINCE LAST DETECTION</span>
+            </span>
           </div>
-          <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded">
-            90× FASTER
+          <span className="text-[8px] font-bold px-1 py-0.2 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/30 rounded">
+            LIVE TRIAGE
           </span>
         </div>
 
-        {/* Card 3: Seafloor Coverage */}
+        {/* Metric 3: Seafloor Coverage */}
         <div className="px-2.5 py-1 bg-[#080D17] border border-[#162136] rounded flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-[#38BDF8]/15 border border-[#38BDF8]/30 flex items-center justify-center text-[#38BDF8] shrink-0">
-              <ShieldCheck className="w-3 h-3" />
-            </div>
-            <div>
-              <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
-                <span className="text-[#38BDF8]">{coveragePct}%</span> COVERAGE
-              </div>
-              <div className="text-[8px] text-[#94A3B8] mt-0.5">12.84 km² surveyed</div>
-            </div>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
+            <span className="text-[11px] font-black text-[#F8FAFC]">
+              <strong className="text-[#38BDF8] font-mono">{coveragePct}%</strong> COVERAGE
+            </span>
           </div>
-          <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-[#38BDF8]/20 text-[#38BDF8] rounded">
-            SURVEY PASS
+          <span className="text-[8px] font-bold text-[#94A3B8]">
+            12.84 km²
           </span>
         </div>
 
-        {/* Card 4: Shadow Gate Active */}
+        {/* Metric 4: Shadow Gate Nominal */}
         <div className="px-2.5 py-1 bg-[#080D17] border border-[#162136] rounded flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-              <Sparkles className="w-3 h-3" />
-            </div>
-            <div>
-              <div className="text-[11px] font-black text-[#F8FAFC] leading-none">
-                <span className="text-emerald-400">SHADOW GATE</span>
-              </div>
-              <div className="text-[8px] text-[#94A3B8] mt-0.5">Active (v2.1 Physics Filter)</div>
-            </div>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] font-black text-[#F8FAFC]">
+              SHADOW GATE: <strong className="text-emerald-400 font-mono">NOMINAL</strong>
+            </span>
           </div>
-          <span className="text-[7.5px] font-bold px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded">
-            NOMINAL
+          <span className="text-[8px] font-bold px-1.5 py-0.2 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 rounded">
+            v2.1 PHYSICS
           </span>
         </div>
       </div>

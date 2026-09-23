@@ -240,11 +240,16 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
           }
 
           // ── B. DRAW HIGH SPECULAR BACKSCATTER OBJECT ──
-          let col = '#FFB703';
-          if (target.priority === 'HIGH') col = '#FFB703';
-          else if (target.priority === 'MEDIUM') col = '#38BDF8';
-          else if (target.priority === 'LOW') col = '#F59E0B';
-          else if (isFiltered) col = '#64748B';
+          let col = '#FFB800';
+          if (target.id === 'SX-T07' || target.category === 'GHOST NET') {
+            col = '#FFB800'; // Amber
+          } else if (target.category === 'DEBRIS' || target.category === 'FISHING GEAR') {
+            col = '#F59E0B'; // Amber / Orange
+          } else if (isFiltered) {
+            col = '#64748B';
+          } else {
+            col = '#16B9D4'; // Cyan for anomaly
+          }
 
           ctx.fillStyle = isFiltered ? 'rgba(100, 116, 139, 0.6)' : col;
           ctx.shadowColor = col;
@@ -287,36 +292,36 @@ export const LargeSonarViewer: React.FC<LargeSonarViewerProps> = ({
               ctx.textAlign = 'left';
             }
           } else if (isSelected) {
-            ctx.strokeStyle = '#FFB703';
+            ctx.strokeStyle = '#FFB800';
             ctx.lineWidth = 2;
             ctx.strokeRect(cx - objW / 2 - 6, ty - objH / 2 - 6, objW + 12, objH + 12);
-            ctx.fillStyle = 'rgba(255, 183, 3, )';
+            ctx.fillStyle = 'rgba(255, 184, 0, 0.12)';
             ctx.fillRect(cx - objW / 2 - 6, ty - objH / 2 - 6, objW + 12, objH + 12);
 
-            const labelW = 160;
-            const labelH = 46;
+            const labelW = 196;
+            const labelH = 50;
             const labelX = cx - labelW / 2;
             const labelY = ty - objH / 2 - labelH - 10;
 
             ctx.fillStyle = '#05070B';
             ctx.fillRect(labelX, labelY, labelW, labelH);
-            ctx.strokeStyle = '#FFB703';
+            ctx.strokeStyle = '#FFB800';
             ctx.lineWidth = 1.5;
             ctx.strokeRect(labelX, labelY, labelW, labelH);
 
             ctx.fillStyle = '#F8FAFC';
-            ctx.font = 'bold 10px monospace';
+            ctx.font = 'bold 9.5px monospace';
             ctx.textAlign = 'center';
-            ctx.fillText(target.label.toUpperCase(), cx, labelY + 13);
-
-            ctx.fillStyle = '#94A3B8';
-            ctx.font = 'bold 8.5px monospace';
-            ctx.fillText(target.id, cx, labelY + 25);
+            ctx.fillText(`${target.label.toUpperCase()} // ${target.id}`, cx, labelY + 14);
 
             const displayConf = isDemoRunning ? heroConfidence.toFixed(1) : (target.confidence * 100).toFixed(1);
-            ctx.fillStyle = '#FFB703';
+            ctx.fillStyle = '#FFB800';
             ctx.font = '900 10.5px monospace';
-            ctx.fillText(`${displayConf}% CONFIDENCE`, cx, labelY + 39);
+            ctx.fillText(`${displayConf}% CONFIDENCE`, cx, labelY + 28);
+
+            ctx.fillStyle = '#94A3B8';
+            ctx.font = 'bold 8px monospace';
+            ctx.fillText(`ACOUSTIC SHADOW: ${target.shadowLength.toFixed(2)} m RELIEF`, cx, labelY + 42);
             ctx.textAlign = 'left';
           } else if (isHighPriority) {
             // Persistently label confirmed/high-priority targets

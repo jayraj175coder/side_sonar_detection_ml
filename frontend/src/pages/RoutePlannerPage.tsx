@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Polyline, Tooltip, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -18,13 +18,10 @@ import {
   ChevronDown,
   ChevronUp,
   MapPin,
-  Sliders,
-  Sparkles,
-  Shield,
-  Fuel,
   TrendingDown,
-  Info,
   Check,
+  Globe,
+  Waves,
 } from 'lucide-react';
 import {
   BASE_PORTS,
@@ -114,7 +111,7 @@ const REGIONAL_TARGETS: Record<string, NavPoint[]> = {
     },
     {
       id: 'MUM-T03',
-      name: '#03 Jawaharlal Nehru Port Fairway Steel Debris',
+      name: '#03 JNPT Approach Channel Heavy Steel Scrap',
       lat: 18.9480,
       lon: 72.8950,
       type: 'debris',
@@ -239,7 +236,7 @@ const MapAutoFitter: React.FC<{ points: NavPoint[] }> = ({ points }) => {
   useEffect(() => {
     if (points.length === 0) return;
     const bounds = L.latLngBounds(points.map((p) => [p.lat, p.lon]));
-    map.fitBounds(bounds, { padding: [45, 45], maxZoom: 12 });
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
   }, [points, map]);
   return null;
 };
@@ -255,21 +252,21 @@ const createBasePortPin = (name: string) => {
         gap: 6px;
         background: #0284c7;
         color: #ffffff;
-        padding: 4px 8px;
+        padding: 5px 10px;
         border-radius: 9999px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px;
-        font-weight: 800;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
         border: 2px solid #ffffff;
-        box-shadow: 0 0 16px rgba(2, 132, 199, 0.8);
+        box-shadow: 0 0 16px rgba(2, 132, 199, 0.9);
         white-space: nowrap;
       ">
         <span>⚓</span>
         <span>${name}</span>
       </div>
     `,
-    iconSize: [120, 28],
-    iconAnchor: [60, 14],
+    iconSize: [130, 30],
+    iconAnchor: [65, 15],
   });
 };
 
@@ -293,41 +290,44 @@ const createWaypointPin = (wpNumber: number, label: string, type: string) => {
       <div style="
         display: flex;
         align-items: center;
-        gap: 5px;
-        background: rgba(5, 7, 11, 0.95);
+        gap: 6px;
+        background: rgba(5, 7, 11, 0.96);
         color: #ffffff;
-        padding: 3px 8px;
+        padding: 4px 10px;
         border-radius: 9999px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px;
-        font-weight: 800;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
         border: 1.5px solid ${borderColor};
-        box-shadow: 0 0 12px ${borderColor}55;
+        box-shadow: 0 0 14px ${borderColor}66;
         white-space: nowrap;
       ">
         <span style="
           background: ${badgeColor};
           color: #05070B;
-          width: 16px;
-          height: 16px;
+          width: 18px;
+          height: 18px;
           border-radius: 9999px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          font-size: 9px;
+          font-size: 10px;
           font-weight: 900;
         ">#${wpNumber}</span>
         <span style="color: ${badgeColor};">${label}</span>
       </div>
     `,
-    iconSize: [110, 24],
-    iconAnchor: [55, 12],
+    iconSize: [120, 26],
+    iconAnchor: [60, 13],
   });
 };
 
 /* ─── Main Route Planner Page Component ─────────────────────────────────── */
 export const RoutePlannerPage: React.FC = () => {
   const { currentScan } = useApp();
+
+  // Map Basemap Mode (100% Free Esri layers - zero API key required, zero watermarks)
+  const [mapMode, setMapMode] = useState<'dark_hud' | 'bathymetry' | 'satellite'>('dark_hud');
 
   // 1. Base Port Selection
   const [selectedBaseId, setSelectedBaseId] = useState<string>('base-chennai');
@@ -347,7 +347,7 @@ export const RoutePlannerPage: React.FC = () => {
   const availableTargets = useMemo(() => {
     const list = [...(REGIONAL_TARGETS[selectedBaseId] || REGIONAL_TARGETS['base-chennai'])];
 
-    // If current scan has real GPS detections, inject them as dynamic targets!
+    // If current scan has real GPS detections, inject them as dynamic targets
     if (
       currentScan &&
       currentScan.location?.latitude &&
@@ -409,7 +409,7 @@ export const RoutePlannerPage: React.FC = () => {
       const solution = solveTspRoute(selectedBase, activeTargets, selectedVessel);
       setTspSolution(solution);
       setIsSolving(false);
-    }, 120);
+    }, 100);
     return () => clearTimeout(timer);
   }, [selectedBase, activeTargets, selectedVessel]);
 
@@ -434,44 +434,44 @@ export const RoutePlannerPage: React.FC = () => {
       {/* ═══════════════════════════════════════════════════════════════════
           HEADER: TITLE + EXPORT GPX NAVIGATION FILE BUTTON
           ═══════════════════════════════════════════════════════════════════ */}
-      <div className="p-5 subpixel-card rounded-2xl border border-white/[0.08] flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xl">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="w-8 h-8 rounded-lg bg-[#0284c7]/20 border border-[#0284c7]/40 flex items-center justify-center text-[#38bdf8]">
-              <Navigation className="w-4 h-4" />
+      <div className="p-5 sm:p-6 subpixel-card rounded-2xl border border-white/[0.08] flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-xl">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="w-9 h-9 rounded-xl bg-[#0284c7]/20 border border-[#0284c7]/40 flex items-center justify-center text-[#38bdf8] shadow-md">
+              <Navigation className="w-5 h-5" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight">
               Smart Multi-Vessel TSP Route Optimizer
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-[#0284c7]/15 text-[#38bdf8] border border-[#0284c7]/30">
+            <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#0284c7]/20 text-[#38bdf8] border border-[#0284c7]/40 shadow-xs">
               ALGORITHM: 2-OPT TSP SOLVER
             </span>
           </div>
-          <p className="text-xs font-mono text-slate-400">
+          <p className="text-sm font-sans text-slate-300">
             Solve Traveling Salesperson algorithm for cleanup fleet, fuel optimization, and bathymetric profile charts.
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
           <button
             onClick={() => {
               setIsSolving(true);
               setTimeout(() => {
                 setTspSolution(solveTspRoute(selectedBase, activeTargets, selectedVessel));
                 setIsSolving(false);
-              }, 200);
+              }, 150);
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.12] hover:border-[#FFB703]/50 text-slate-300 hover:text-white text-xs font-mono font-bold transition-all cursor-pointer shadow-sm"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/[0.12] hover:border-[#FFB703]/50 text-slate-200 hover:text-white text-sm font-semibold transition-all cursor-pointer shadow-sm"
             title="Recalculate 2-Opt local search refinement"
           >
-            <RotateCcw className={`w-3.5 h-3.5 text-[#FFB703] ${isSolving ? 'animate-spin' : ''}`} />
+            <RotateCcw className={`w-4 h-4 text-[#FFB703] ${isSolving ? 'animate-spin' : ''}`} />
             <span>Re-optimize</span>
           </button>
 
           <button
             onClick={handleExportGpx}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-mono font-bold transition-all cursor-pointer shadow-[0_0_20px_rgba(2,132,199,0.35)] active:scale-95"
+            className="flex items-center gap-2.5 px-5 py-2.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-sm font-bold transition-all cursor-pointer shadow-[0_0_24px_rgba(2,132,199,0.4)] active:scale-95"
             title="Export standard TopoGrafix GPX 1.1 file for marine ECDIS, Garmin & Raymarine chartplotters"
           >
             {downloadSuccess ? <Check className="w-4 h-4 text-white" /> : <Download className="w-4 h-4" />}
@@ -481,65 +481,65 @@ export const RoutePlannerPage: React.FC = () => {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          TOP TELEMETRY KPI CARDS STRIP (Matching MarineGuard Reference + Real Values)
+          TOP TELEMETRY KPI CARDS STRIP
           ═══════════════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Distance (NM) */}
-        <div className="subpixel-card p-4 rounded-2xl border border-white/[0.08] shadow-lg text-center space-y-1">
-          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block font-bold">
+        <div className="subpixel-card p-5 rounded-2xl border border-white/[0.08] shadow-lg text-center space-y-1.5">
+          <span className="text-xs font-sans text-slate-300 uppercase tracking-wider block font-semibold">
             Total Distance (NM)
           </span>
-          <div className="text-2xl sm:text-3xl font-mono font-black text-[#38bdf8]">
-            {tspSolution.totalDistanceNM} <span className="text-xs font-normal text-slate-400">NM</span>
+          <div className="text-3xl sm:text-4xl font-mono font-black text-[#38bdf8]">
+            {tspSolution.totalDistanceNM} <span className="text-sm font-medium text-slate-400">NM</span>
           </div>
           {tspSolution.percentSaved > 0 ? (
-            <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full border border-emerald-400/25">
-              <TrendingDown className="w-3 h-3" />
+            <span className="inline-flex items-center gap-1.5 text-xs font-sans font-bold text-emerald-400 bg-emerald-400/10 px-2.5 py-0.5 rounded-full border border-emerald-400/25">
+              <TrendingDown className="w-3.5 h-3.5" />
               {tspSolution.percentSaved}% shorter vs naive order
             </span>
           ) : (
-            <span className="text-[9px] font-mono text-slate-500">Optimal single leg</span>
+            <span className="text-xs font-sans text-slate-400">Optimal single leg</span>
           )}
         </div>
 
         {/* Est. Mission Hours */}
-        <div className="subpixel-card p-4 rounded-2xl border border-white/[0.08] shadow-lg text-center space-y-1">
-          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block font-bold">
+        <div className="subpixel-card p-5 rounded-2xl border border-white/[0.08] shadow-lg text-center space-y-1.5">
+          <span className="text-xs font-sans text-slate-300 uppercase tracking-wider block font-semibold">
             Est. Mission Hours
           </span>
-          <div className="text-2xl sm:text-3xl font-mono font-black text-white">
-            {tspSolution.totalMissionHours} <span className="text-xs font-normal text-slate-400">hrs</span>
+          <div className="text-3xl sm:text-4xl font-mono font-black text-white">
+            {tspSolution.totalMissionHours} <span className="text-sm font-medium text-slate-400">hrs</span>
           </div>
-          <span className="text-[9px] font-mono text-slate-400">
+          <span className="text-xs font-sans text-slate-400">
             {tspSolution.estTransitHours}h transit + {tspSolution.estOpsHours}h salvage ops
           </span>
         </div>
 
         {/* Energy Consumed */}
-        <div className="subpixel-card p-4 rounded-2xl border border-white/[0.08] shadow-lg text-center space-y-1">
-          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block font-bold">
+        <div className="subpixel-card p-5 rounded-2xl border border-white/[0.08] shadow-lg text-center space-y-1.5">
+          <span className="text-xs font-sans text-slate-300 uppercase tracking-wider block font-semibold">
             Energy Consumed
           </span>
-          <div className="text-2xl sm:text-3xl font-mono font-black text-emerald-400">
+          <div className="text-3xl sm:text-4xl font-mono font-black text-emerald-400">
             {tspSolution.energyConsumedKWh}{' '}
-            <span className="text-xs font-normal text-slate-400">
+            <span className="text-sm font-medium text-slate-400">
               {selectedVessel.consumptionUnit === 'kWh' ? 'kWh' : 'L'}
             </span>
           </div>
-          <span className="text-[9px] font-mono text-slate-400">
+          <span className="text-xs font-sans text-slate-400">
             {selectedVessel.consumptionPerNM} {selectedVessel.consumptionUnit}/NM fleet rate
           </span>
         </div>
 
         {/* CO2 Emissions Saved */}
-        <div className="subpixel-card p-4 rounded-2xl border border-white/[0.08] shadow-lg text-center space-y-1">
-          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block font-bold">
+        <div className="subpixel-card p-5 rounded-2xl border border-white/[0.08] shadow-lg text-center space-y-1.5">
+          <span className="text-xs font-sans text-slate-300 uppercase tracking-wider block font-semibold">
             CO₂ Emissions Saved
           </span>
-          <div className="text-2xl sm:text-3xl font-mono font-black text-amber-400">
-            {tspSolution.co2SavedKg} <span className="text-xs font-normal text-slate-400">kg</span>
+          <div className="text-3xl sm:text-4xl font-mono font-black text-amber-400">
+            {tspSolution.co2SavedKg} <span className="text-sm font-medium text-slate-400">kg</span>
           </div>
-          <span className="text-[9px] font-mono text-slate-400">
+          <span className="text-xs font-sans text-slate-400">
             Target yield: ~{tspSolution.totalMassRecoveredKg} kg debris
           </span>
         </div>
@@ -552,15 +552,15 @@ export const RoutePlannerPage: React.FC = () => {
         {/* LEFT COLUMN: Mission Parameters & Target Checklist */}
         <div className="lg:col-span-4 space-y-5">
           {/* 1. Departure Base Port Card */}
-          <div className="subpixel-card p-4 rounded-2xl border border-white/[0.08] shadow-lg space-y-3">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#38bdf8] uppercase tracking-wider">
-              <Anchor className="w-3.5 h-3.5" />
+          <div className="subpixel-card p-5 rounded-2xl border border-white/[0.08] shadow-lg space-y-3.5">
+            <div className="flex items-center gap-2 text-sm font-bold text-[#38bdf8] uppercase tracking-wider">
+              <Anchor className="w-4 h-4" />
               <span>DEPARTURE BASE PORT</span>
             </div>
             <select
               value={selectedBaseId}
               onChange={(e) => setSelectedBaseId(e.target.value)}
-              className="w-full bg-[#080d16] border border-white/[0.12] rounded-xl px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-[#38bdf8] transition-colors cursor-pointer"
+              className="w-full bg-[#0A0F18] border border-white/[0.15] rounded-xl px-4 py-3 text-sm font-semibold text-white focus:outline-none focus:border-[#38bdf8] transition-colors cursor-pointer"
             >
               {BASE_PORTS.map((b) => (
                 <option key={b.id} value={b.id}>
@@ -568,23 +568,23 @@ export const RoutePlannerPage: React.FC = () => {
                 </option>
               ))}
             </select>
-            <div className="text-[10px] font-mono text-slate-400 bg-white/[0.02] p-2.5 rounded-xl border border-white/[0.05] leading-relaxed">
-              <span className="text-slate-300 font-bold block mb-0.5">{selectedBase.name}</span>
-              <span>Coordinates: {selectedBase.lat.toFixed(4)}° N, {selectedBase.lon.toFixed(4)}° E</span>
-              <p className="text-slate-500 mt-1">{selectedBase.notes}</p>
+            <div className="text-xs font-sans text-slate-300 bg-white/[0.02] p-3 rounded-xl border border-white/[0.06] leading-relaxed">
+              <span className="text-white font-bold block mb-1">{selectedBase.name}</span>
+              <span className="font-mono text-slate-400">Coordinates: {selectedBase.lat.toFixed(4)}° N, {selectedBase.lon.toFixed(4)}° E</span>
+              <p className="text-slate-400 mt-1">{selectedBase.notes}</p>
             </div>
           </div>
 
           {/* 2. Assigned Cleanup Fleet Card */}
-          <div className="subpixel-card p-4 rounded-2xl border border-white/[0.08] shadow-lg space-y-3">
-            <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#38bdf8] uppercase tracking-wider">
-              <Ship className="w-3.5 h-3.5" />
+          <div className="subpixel-card p-5 rounded-2xl border border-white/[0.08] shadow-lg space-y-3.5">
+            <div className="flex items-center gap-2 text-sm font-bold text-[#38bdf8] uppercase tracking-wider">
+              <Ship className="w-4 h-4" />
               <span>ASSIGNED CLEANUP FLEET</span>
             </div>
             <select
               value={selectedVesselId}
               onChange={(e) => setSelectedVesselId(e.target.value)}
-              className="w-full bg-[#080d16] border border-white/[0.12] rounded-xl px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-[#38bdf8] transition-colors cursor-pointer"
+              className="w-full bg-[#0A0F18] border border-white/[0.15] rounded-xl px-4 py-3 text-sm font-semibold text-white focus:outline-none focus:border-[#38bdf8] transition-colors cursor-pointer"
             >
               {CLEANUP_FLEET.map((v) => (
                 <option key={v.id} value={v.id}>
@@ -592,41 +592,41 @@ export const RoutePlannerPage: React.FC = () => {
                 </option>
               ))}
             </select>
-            <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
-              <div className="p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-slate-500 block">Cruising Speed</span>
-                <strong className="text-white">{selectedVessel.speedKnots} knots</strong>
+            <div className="grid grid-cols-2 gap-2.5 text-xs font-sans">
+              <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <span className="text-slate-400 block text-[11px]">Cruising Speed</span>
+                <strong className="text-white font-mono text-sm">{selectedVessel.speedKnots} knots</strong>
               </div>
-              <div className="p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-slate-500 block">Consumption</span>
-                <strong className="text-emerald-400">
+              <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <span className="text-slate-400 block text-[11px]">Consumption</span>
+                <strong className="text-emerald-400 font-mono text-sm">
                   {selectedVessel.consumptionPerNM} {selectedVessel.consumptionUnit}/NM
                 </strong>
               </div>
-              <div className="p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-slate-500 block">Max Crane Payload</span>
-                <strong className="text-white">{selectedVessel.maxPayloadKg} kg</strong>
+              <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <span className="text-slate-400 block text-[11px]">Max Payload</span>
+                <strong className="text-white font-mono text-sm">{selectedVessel.maxPayloadKg} kg</strong>
               </div>
-              <div className="p-2 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-                <span className="text-slate-500 block">Salvage Rate</span>
-                <strong className="text-white">{selectedVessel.salvageTimePerTargetMin}m / target</strong>
+              <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                <span className="text-slate-400 block text-[11px]">Salvage Rate</span>
+                <strong className="text-white font-mono text-sm">{selectedVessel.salvageTimePerTargetMin}m / target</strong>
               </div>
             </div>
           </div>
 
           {/* 3. Subsea Target Selector Checklist */}
-          <div className="subpixel-card p-4 rounded-2xl border border-white/[0.08] shadow-lg space-y-3">
+          <div className="subpixel-card p-5 rounded-2xl border border-white/[0.08] shadow-lg space-y-3.5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-mono font-bold text-white uppercase tracking-wider">
-                <MapPin className="w-3.5 h-3.5 text-[#FFB703]" />
-                <span>SELECT RETRIEVAL TARGETS ({activeTargets.length}/{availableTargets.length})</span>
+              <div className="flex items-center gap-2 text-sm font-bold text-white uppercase tracking-wider">
+                <MapPin className="w-4 h-4 text-[#FFB703]" />
+                <span>RETRIEVAL TARGETS ({activeTargets.length}/{availableTargets.length})</span>
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-mono">
+              <div className="flex items-center gap-2.5 text-xs font-sans">
                 <button
                   onClick={handleSelectAll}
-                  className="text-[#38bdf8] hover:underline cursor-pointer"
+                  className="text-[#38bdf8] font-semibold hover:underline cursor-pointer"
                 >
-                  All
+                  Select All
                 </button>
                 <span className="text-slate-600">·</span>
                 <button
@@ -638,44 +638,44 @@ export const RoutePlannerPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-2 max-h-[310px] overflow-y-auto pr-1">
+            <div className="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
               {availableTargets.map((t) => {
                 const isSelected = selectedTargetIds.includes(t.id);
                 return (
                   <div
                     key={t.id}
                     onClick={() => toggleTarget(t.id)}
-                    className={`p-2.5 rounded-xl border text-xs font-mono cursor-pointer transition-all flex items-start gap-2.5 ${
+                    className={`p-3 rounded-xl border text-sm font-sans cursor-pointer transition-all flex items-start gap-3 ${
                       isSelected
-                        ? 'bg-white/[0.06] border-[#38bdf8]/40 text-white'
-                        : 'bg-white/[0.01] border-white/[0.05] text-slate-400 hover:bg-white/[0.03]'
+                        ? 'bg-white/[0.07] border-[#38bdf8]/50 text-white shadow-sm'
+                        : 'bg-white/[0.02] border-white/[0.05] text-slate-400 hover:bg-white/[0.04]'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => {}}
-                      className="mt-0.5 accent-[#0284c7] cursor-pointer"
+                      className="mt-1 w-4 h-4 accent-[#0284c7] cursor-pointer shrink-0"
                     />
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      <div className="flex items-center justify-between gap-1">
-                        <span className="font-bold text-white truncate">{t.name}</span>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center justify-between gap-1.5">
+                        <span className="font-bold text-white truncate text-xs sm:text-sm">{t.name}</span>
                         <span
-                          className={`text-[8px] font-mono uppercase px-1.5 py-0.2 rounded font-bold ${
+                          className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold shrink-0 ${
                             t.type === 'ghost_net'
-                              ? 'bg-[#FFB703]/15 text-[#FFB703]'
+                              ? 'bg-[#FFB703]/20 text-[#FFB703] border border-[#FFB703]/30'
                               : t.type === 'debris'
-                              ? 'bg-amber-500/15 text-amber-400'
-                              : 'bg-sky-500/15 text-sky-400'
+                              ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                              : 'bg-sky-500/20 text-sky-400 border border-sky-500/30'
                           }`}
                         >
                           {t.type.replace('_', ' ')}
                         </span>
                       </div>
-                      <div className="text-[10px] text-slate-400 leading-tight">
-                        Depth: {t.depthM}m · Est. Mass: {t.estimatedMassKg} kg
+                      <div className="text-xs text-slate-300">
+                        Depth: <strong className="text-white">{t.depthM}m</strong> · Est. Mass: <strong className="text-white">{t.estimatedMassKg} kg</strong>
                       </div>
-                      <div className="text-[9px] text-slate-500">
+                      <div className="text-[11px] font-mono text-slate-400">
                         {t.lat.toFixed(4)}° N, {t.lon.toFixed(4)}° E
                       </div>
                     </div>
@@ -690,42 +690,118 @@ export const RoutePlannerPage: React.FC = () => {
         <div className="lg:col-span-8 space-y-5">
           {/* Tactical Maritime Map Canvas */}
           <div className="subpixel-card rounded-2xl border border-white/[0.08] shadow-2xl overflow-hidden relative">
-            {/* Map Top Status Bar */}
-            <div className="px-4 py-2.5 bg-[#080d16]/90 border-b border-white/[0.08] flex items-center justify-between text-xs font-mono">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#00F5D4] animate-pulse" />
-                <span className="font-bold text-white uppercase tracking-wider text-[11px]">
-                  BATHYMETRIC TACTICAL ROUTE MAP
+            {/* Map Top Status Bar with Basemap Switcher */}
+            <div className="px-4 sm:px-5 py-3 bg-[#080d16]/95 border-b border-white/[0.08] flex items-center justify-between text-xs font-sans flex-wrap gap-2">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#00F5D4] animate-pulse" />
+                <span className="font-bold text-white uppercase tracking-wider text-xs sm:text-sm">
+                  TACTICAL MARITIME NAVIGATION MAP
                 </span>
                 <span className="text-slate-600 hidden sm:inline">|</span>
-                <span className="text-slate-400 text-[10px] hidden sm:inline">
+                <span className="text-slate-300 text-xs hidden sm:inline font-mono">
                   {selectedBase.name.split(' ')[0]} Sector
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-[10px] text-slate-300">
-                <span className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.08]">
-                  {tspSolution.legs.length} LEGS
-                </span>
-                <span className="px-2 py-0.5 rounded bg-[#0284c7]/20 text-[#38bdf8] border border-[#0284c7]/40 font-bold">
-                  {tspSolution.totalDistanceNM} NM TOTAL
-                </span>
+
+              {/* Free Esri Basemap Layer Switcher (Zero API Key, Zero Watermarks) */}
+              <div className="flex items-center gap-1.5 bg-white/[0.04] p-1 rounded-xl border border-white/[0.08]">
+                <button
+                  onClick={() => setMapMode('dark_hud')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                    mapMode === 'dark_hud'
+                      ? 'bg-[#0284c7] text-white shadow-xs font-bold'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                  title="Dark Marine Canvas"
+                >
+                  Dark Marine
+                </button>
+                <button
+                  onClick={() => setMapMode('bathymetry')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                    mapMode === 'bathymetry'
+                      ? 'bg-[#0284c7] text-white shadow-xs font-bold'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                  title="Esri Ocean Bathymetry"
+                >
+                  Ocean Depth
+                </button>
+                <button
+                  onClick={() => setMapMode('satellite')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                    mapMode === 'satellite'
+                      ? 'bg-[#0284c7] text-white shadow-xs font-bold'
+                      : 'text-slate-300 hover:text-white'
+                  }`}
+                  title="Esri World Satellite"
+                >
+                  Satellite
+                </button>
               </div>
             </div>
 
-            {/* Leaflet Map */}
-            <div className="h-[460px] w-full relative bg-[#05070B]">
+            {/* Leaflet Map with 100% Free Public Esri Layers (NO API KEY REQUIRED) */}
+            <div className="h-[480px] w-full relative bg-[#05070B]">
               <MapContainer
                 center={[selectedBase.lat, selectedBase.lon]}
                 zoom={9}
                 style={{ height: '100%', width: '100%', background: '#05070B' }}
                 zoomControl={true}
               >
-                {/* Clean Dark Tiles - Zero API Key Required */}
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                  url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                  maxZoom={18}
-                />
+                {/* 1. Dark Marine Canvas Mode */}
+                {mapMode === 'dark_hud' && (
+                  <>
+                    <TileLayer
+                      key="esri-dark-canvas"
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+                      attribution="Esri Dark Marine Canvas, OpenStreetMap"
+                      maxZoom={16}
+                    />
+                    <TileLayer
+                      key="esri-dark-ref"
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+                      attribution="Esri Reference"
+                      opacity={0.8}
+                    />
+                  </>
+                )}
+
+                {/* 2. Ocean Bathymetry Mode */}
+                {mapMode === 'bathymetry' && (
+                  <>
+                    <TileLayer
+                      key="esri-ocean-base"
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}"
+                      attribution="Esri Ocean Basemap, GEBCO, NOAA"
+                      maxZoom={13}
+                    />
+                    <TileLayer
+                      key="esri-ocean-ref"
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}"
+                      attribution="GEBCO Oceanic Contours"
+                      opacity={0.7}
+                    />
+                  </>
+                )}
+
+                {/* 3. Satellite Mode */}
+                {mapMode === 'satellite' && (
+                  <>
+                    <TileLayer
+                      key="esri-sat-base"
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                      attribution="Esri World Imagery, Maxar"
+                      maxZoom={18}
+                    />
+                    <TileLayer
+                      key="esri-sat-ref"
+                      url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+                      attribution="Esri Boundaries"
+                      opacity={0.8}
+                    />
+                  </>
+                )}
 
                 <MapAutoFitter points={tspSolution.orderedPoints} />
 
@@ -735,8 +811,8 @@ export const RoutePlannerPage: React.FC = () => {
                   icon={createBasePortPin(selectedBase.name.split(' ')[0])}
                 >
                   <Tooltip direction="top" offset={[0, -10]}>
-                    <div className="font-mono text-xs text-slate-900">
-                      <strong>{selectedBase.name}</strong>
+                    <div className="font-sans text-xs text-slate-900 p-1">
+                      <strong className="block text-sm">{selectedBase.name}</strong>
                       <div>Base Operations Departure Berth</div>
                     </div>
                   </Tooltip>
@@ -753,9 +829,9 @@ export const RoutePlannerPage: React.FC = () => {
                       icon={createWaypointPin(displayNum, t.name.split(' ')[1] || t.id, t.type)}
                     >
                       <Tooltip direction="top" offset={[0, -10]}>
-                        <div className="font-mono text-xs text-slate-900">
-                          <strong>Waypoint #{displayNum}: {t.name}</strong>
-                          <div>Depth: {t.depthM} m · Mass: {t.estimatedMassKg} kg</div>
+                        <div className="font-sans text-xs text-slate-900 p-1">
+                          <strong className="block text-sm">Waypoint #{displayNum}: {t.name}</strong>
+                          <div>Depth: <strong>{t.depthM} m</strong> · Mass: <strong>{t.estimatedMassKg} kg</strong></div>
                           <div>{t.notes}</div>
                         </div>
                       </Tooltip>
@@ -771,15 +847,15 @@ export const RoutePlannerPage: React.FC = () => {
                       positions={polylineCoords}
                       color="#0284c7"
                       weight={8}
-                      opacity={0.3}
+                      opacity={0.35}
                     />
                     {/* Foreground dashed line */}
                     <Polyline
                       positions={polylineCoords}
                       color="#38bdf8"
-                      weight={2.5}
+                      weight={3}
                       dashArray="6, 6"
-                      opacity={0.9}
+                      opacity={0.95}
                     />
                   </>
                 )}
@@ -790,17 +866,17 @@ export const RoutePlannerPage: React.FC = () => {
           {/* Turn-by-Turn Navigational Legs & Waypoint Table */}
           <div className="subpixel-card rounded-2xl border border-white/[0.08] shadow-lg overflow-hidden">
             <div
-              className="px-4 py-3 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between cursor-pointer"
+              className="px-5 py-4 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between cursor-pointer"
               onClick={() => setIsLegsExpanded((v) => !v)}
             >
-              <div className="flex items-center gap-2">
-                <Compass className="w-4 h-4 text-[#FFB703]" />
-                <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+              <div className="flex items-center gap-2.5">
+                <Compass className="w-5 h-5 text-[#FFB703]" />
+                <h3 className="text-sm font-sans font-bold text-white uppercase tracking-wider">
                   TURN-BY-TURN WAYPOINT NAVIGATION SEQUENCE ({tspSolution.legs.length} LEGS)
                 </h3>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono text-slate-400">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-mono text-[#38bdf8] font-bold">
                   Total Tour: {tspSolution.totalDistanceNM} NM
                 </span>
                 {isLegsExpanded ? (
@@ -813,46 +889,46 @@ export const RoutePlannerPage: React.FC = () => {
 
             {isLegsExpanded && (
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-mono">
-                  <thead className="bg-white/[0.03] text-slate-400 border-b border-white/[0.08]">
+                <table className="w-full text-left text-sm font-sans">
+                  <thead className="bg-white/[0.03] text-slate-300 border-b border-white/[0.08] text-xs font-semibold uppercase tracking-wider">
                     <tr>
-                      <th className="py-2.5 px-3">LEG #</th>
-                      <th className="py-2.5 px-3">WAYPOINT</th>
-                      <th className="py-2.5 px-3">COORDINATES</th>
-                      <th className="py-2.5 px-3 text-right">HEADING</th>
-                      <th className="py-2.5 px-3 text-right">LEG (NM)</th>
-                      <th className="py-2.5 px-3 text-right">TOTAL (NM)</th>
-                      <th className="py-2.5 px-3 text-right">TRANSIT</th>
-                      <th className="py-2.5 px-3">OPERATIONAL ACTION</th>
+                      <th className="py-3 px-4">LEG #</th>
+                      <th className="py-3 px-4">WAYPOINT</th>
+                      <th className="py-3 px-4">COORDINATES</th>
+                      <th className="py-3 px-4 text-right">HEADING</th>
+                      <th className="py-3 px-4 text-right">LEG (NM)</th>
+                      <th className="py-3 px-4 text-right">TOTAL (NM)</th>
+                      <th className="py-3 px-4 text-right">TRANSIT</th>
+                      <th className="py-3 px-4">OPERATIONAL ACTION</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/[0.05]">
                     {tspSolution.legs.map((leg, idx) => (
-                      <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="py-2.5 px-3 font-bold text-white">
-                          <span className="px-1.5 py-0.5 rounded bg-white/[0.05] border border-white/[0.1]">
+                      <tr key={idx} className="hover:bg-white/[0.03] transition-colors">
+                        <td className="py-3 px-4 font-bold text-white">
+                          <span className="px-2 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.1] font-mono text-xs">
                             WP-{String(idx + 1).padStart(2, '0')}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 font-medium text-slate-200">
+                        <td className="py-3 px-4 font-semibold text-white">
                           {leg.to.name}
                         </td>
-                        <td className="py-2.5 px-3 text-slate-400 text-[11px]">
+                        <td className="py-3 px-4 text-slate-400 font-mono text-xs">
                           {leg.to.lat.toFixed(4)}°N, {leg.to.lon.toFixed(4)}°E
                         </td>
-                        <td className="py-2.5 px-3 text-right text-[#FFB703] font-bold">
+                        <td className="py-3 px-4 text-right text-[#FFB703] font-mono font-bold">
                           {leg.bearingDeg}°
                         </td>
-                        <td className="py-2.5 px-3 text-right text-slate-200">
+                        <td className="py-3 px-4 text-right text-slate-200 font-mono">
                           {leg.distanceNM} NM
                         </td>
-                        <td className="py-2.5 px-3 text-right text-[#38bdf8] font-bold">
+                        <td className="py-3 px-4 text-right text-[#38bdf8] font-mono font-bold">
                           {leg.cumulativeNM} NM
                         </td>
-                        <td className="py-2.5 px-3 text-right text-slate-400">
+                        <td className="py-3 px-4 text-right text-slate-300 font-mono">
                           ~{leg.estMinutes}m
                         </td>
-                        <td className="py-2.5 px-3 text-slate-300 text-[11px]">
+                        <td className="py-3 px-4 text-slate-300 text-xs">
                           {leg.actionNote}
                         </td>
                       </tr>

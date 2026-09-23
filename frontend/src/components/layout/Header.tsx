@@ -63,12 +63,12 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   }, []);
 
   return (
-    <header className="h-13 bg-[#05070B]/85 backdrop-blur-xl border-b border-white/[0.08] px-4 flex items-center justify-between sticky top-0 z-30 font-sans select-none transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+    <header className="h-15 sm:h-16 bg-[#05070B]/90 backdrop-blur-xl border-b border-white/[0.08] px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 font-sans select-none transition-all shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
       {/* 1. Left: Sidebar Toggle + Logo + Survey ID Badge */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3.5">
         <button
           onClick={toggleSidebar}
-          className="hidden md:flex p-1.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-slate-400 hover:text-white rounded-md transition-all cursor-pointer"
+          className="hidden md:flex p-2 bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-slate-300 hover:text-white rounded-xl transition-all cursor-pointer"
           title={isSidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
         >
           {isSidebarCollapsed ? (
@@ -81,7 +81,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
         {onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}
-            className="md:hidden p-1.5 bg-white/[0.04] border border-white/[0.08] text-slate-300 hover:text-white rounded-md cursor-pointer"
+            className="md:hidden p-2 bg-white/[0.04] border border-white/[0.08] text-slate-300 hover:text-white rounded-xl cursor-pointer"
             title="Open Menu"
           >
             <Menu className="w-4 h-4" />
@@ -98,35 +98,35 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           />
 
           {/* Mission Telemetry Pill */}
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/25 text-[10px] font-mono font-semibold text-[#FFB703]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703] animate-ping" />
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFB703]/10 border border-[#FFB703]/30 text-xs font-mono font-bold text-[#FFB703]">
+            <span className="w-2 h-2 rounded-full bg-[#FFB703] animate-ping" />
             <span>SIH26057 // MoES</span>
           </div>
         </div>
       </div>
 
-      {/* 2. Center: Linear-style Live Telemetry Ticker (Quiet Chrome) */}
-      <div className="hidden xl:flex items-center gap-4 text-[11px] font-mono text-slate-400 bg-white/[0.02] border border-white/[0.06] px-3 py-1 rounded-full shadow-inner">
-        <div className="flex items-center gap-1.5">
-          <Activity className="w-3 h-3 text-[#FFB703] animate-pulse" />
-          <span className="text-slate-300 font-semibold">ACOUSTIC CHIRP:</span>
-          <span className="text-[#FFB703]">900 kHz</span>
+      {/* 2. Center: Linear-style Live Telemetry Ticker (Clear & Legible) */}
+      <div className="hidden xl:flex items-center gap-4 text-xs font-sans text-slate-300 bg-white/[0.04] border border-white/[0.08] px-4 py-1.5 rounded-full shadow-inner">
+        <div className="flex items-center gap-2">
+          <Activity className="w-3.5 h-3.5 text-[#FFB703] animate-pulse" />
+          <span className="text-slate-400 font-semibold">ACOUSTIC CHIRP:</span>
+          <span className="text-[#FFB703] font-mono font-bold">900 kHz</span>
         </div>
 
-        <span className="w-1 h-1 rounded-full bg-slate-700" />
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
 
-        <div className="flex items-center gap-1.5">
-          <Compass className="w-3 h-3 text-[#FFB703]" />
-          <span className="text-slate-300">POSITION:</span>
-          <span className="text-slate-200">18.9217° N, 72.8214° E</span>
+        <div className="flex items-center gap-2">
+          <Compass className="w-3.5 h-3.5 text-[#38bdf8]" />
+          <span className="text-slate-400 font-semibold">POSITION:</span>
+          <span className="text-slate-100 font-mono">18.9217° N, 72.8214° E</span>
         </div>
 
-        <span className="w-1 h-1 rounded-full bg-slate-700" />
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-600" />
 
-        <div className="flex items-center gap-1.5">
-          <ShieldCheck className="w-3 h-3 text-slate-400" />
-          <span className="text-slate-300">STANDARDS:</span>
-          <span className="text-slate-200">IHO S-44 ORDER 1A</span>
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="text-slate-400 font-semibold">STANDARDS:</span>
+          <span className="text-emerald-400 font-bold">IHO S-44 ORDER 1A</span>
         </div>
       </div>
 

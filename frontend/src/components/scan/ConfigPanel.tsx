@@ -5,11 +5,10 @@ import {
   Cpu,
   Play,
   CheckCircle2,
-  Filter,
   ShieldCheck,
   FileSpreadsheet,
+  Check,
 } from 'lucide-react';
-import { useApp } from '../../context/AppContext';
 
 interface ConfigPanelProps {
   confidence: number;
@@ -44,8 +43,6 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   isAnalyzing,
   hasFile,
 }) => {
-  const { modelInfo } = useApp();
-
   const handleApplyPresetCoords = (lat: number, lon: number) => {
     setLatitude(lat.toString());
     setLongitude(lon.toString());
@@ -54,120 +51,118 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   const isV2 = selectedModelVersion === 'v2';
 
   return (
-    <div className="space-y-5 p-6 rounded-3xl subpixel-card border border-white/[0.08] font-mono select-none shadow-2xl">
-      {/* Title & Architecture Tag */}
-      <div className="flex items-center justify-between border-b border-white/[0.08] pb-4">
-        <div className="flex items-center gap-2.5 text-xs font-black text-white uppercase tracking-wider">
-          <Sliders className="w-4 h-4 text-[#FFB703]" />
-          <span>Inference Parameters</span>
+    <div className="space-y-4 p-5 rounded-2xl bg-[#0B111A] border border-white/[0.08] font-sans select-none shadow-xl">
+      
+      {/* ── HEADER: INFERENCE PARAMETERS ── */}
+      <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+        <div className="flex items-center gap-2">
+          <Sliders className="w-4 h-4 text-[#FFB800]" />
+          <h2 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+            INFERENCE PARAMETERS
+          </h2>
         </div>
-        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/30">
-          ONNX Runtime
+        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-[#FFB800]/10 text-[#FFB800] border border-[#FFB800]/30">
+          ONNX RUNTIME
         </span>
       </div>
 
-      {/* Model Selection Track Cards */}
+      {/* ── 1. MODEL TRACK ── */}
       <div className="space-y-2">
-        <label className="text-xs font-mono font-bold text-slate-400 flex items-center justify-between">
-          <span>AI Model Track</span>
-          <span className="text-[10px] text-[#FFB703]">MoES / SIH 2026</span>
-        </label>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => setSelectedModelVersion && setSelectedModelVersion('v2')}
-            className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-              isV2
-                ? 'bg-[#FFB703]/10 border-[#FFB703]/60 text-[#FFB703] shadow-md ring-1 ring-[#FFB703]/30'
-                : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:border-white/[0.15]'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-black text-[#FFB703]">SIH Marine Debris V2</span>
-              {isV2 && <CheckCircle2 className="w-3.5 h-3.5 text-[#FFB703]" />}
-            </div>
-            <p className="text-[9px] text-slate-400 font-mono leading-tight">
-              Ghost Nets, ALDFG, Debris, Pipelines
-            </p>
-          </button>
+        <div className="flex items-center justify-between text-[11px] font-mono">
+          <span className="text-slate-400 font-bold uppercase tracking-wider">MODEL TRACK</span>
+          <span className="text-[#00B8D9] font-bold">Selected: SIH MARINE DEBRIS V2</span>
+        </div>
 
-          <button
-            type="button"
-            onClick={() => setSelectedModelVersion && setSelectedModelVersion('baseline')}
-            className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-              !isV2
-                ? 'bg-red-950/40 border-red-500/60 text-red-400 shadow-md ring-1 ring-red-500/30'
-                : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:border-white/[0.15]'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] font-black text-red-400">Legacy Baseline</span>
-              {!isV2 && <CheckCircle2 className="w-3.5 h-3.5 text-red-400" />}
+        {/* Model Spec Box */}
+        <div className="p-3 rounded-xl bg-[#070D16] border border-white/[0.06] space-y-2 text-xs font-mono">
+          <div className="flex items-center justify-between">
+            <span className="text-slate-400 flex items-center gap-1.5">
+              <Cpu className="w-3.5 h-3.5 text-[#FFB800]" />
+              Model:
+            </span>
+            <span className="text-[#FFB800] font-bold text-[11px]">
+              YOLOv8s-SIH-Marine-Debris-V2
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-slate-400">
+            <span>Runtime:</span>
+            <span className="text-white font-semibold">ONNX (FP32/INT8 Edge Tensor)</span>
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-slate-400">
+            <span>Latency:</span>
+            <span className="text-emerald-400 font-bold">14.2 ms</span>
+          </div>
+
+          <div className="pt-1.5 border-t border-white/[0.06]">
+            <span className="text-[9.5px] text-slate-500 uppercase block mb-1 font-bold">Target Classes:</span>
+            <div className="grid grid-cols-2 gap-1 text-[10px] text-slate-300">
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FFB800]" />
+                <span>Ghost Net / ALDFG</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+                <span>Anthropogenic Debris</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
+                <span>Pipeline Hazard</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                <span>Seafloor Anomaly</span>
+              </div>
             </div>
-            <p className="text-[9px] text-slate-400 font-mono leading-tight">
-              Reference MILCO / NOMBO Track
-            </p>
-          </button>
+          </div>
         </div>
       </div>
 
-      {/* Model Spec Box */}
-      <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-2 text-xs font-mono">
-        <div className="flex items-center justify-between">
-          <span className="text-slate-400 flex items-center gap-1.5">
-            <Cpu className="w-3.5 h-3.5 text-[#FFB703]" />
-            Active Architecture
-          </span>
-          <span className="text-[#FFB703] font-bold text-[11px]">
-            {isV2 ? 'YOLOv8n-SIH-Marine-Debris-V2' : 'YOLOv8n-Sonar-MILCO-NOMBO (Legacy)'}
-          </span>
-        </div>
-        <div className="flex items-center justify-between text-slate-400 text-[10px]">
-          <span>Target Classes</span>
-          <span className="text-slate-200 font-semibold truncate max-w-[200px]">
-            {isV2 ? 'ghost_net, debris, pipeline, anomaly' : 'MILCO, NOMBO'}
-          </span>
-        </div>
-      </div>
-
-      {/* Noise Filtering & False-Positive Suppression Toggle */}
-      <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-2">
+      {/* ── 2. ACOUSTIC VERIFICATION ── */}
+      <div className="p-3.5 rounded-xl bg-[#070D16] border border-white/[0.06] space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <div>
-              <p className="text-xs font-mono font-bold text-slate-100">
-                Acoustic Noise Filter
+              <p className="text-xs font-mono font-bold text-white uppercase tracking-wide">
+                ACOUSTIC NOISE FILTER
               </p>
-              <p className="text-[10px] text-slate-400 font-mono">
-                Post-NMS shadow & aspect ratio verification
+              <p className="text-[9.5px] text-slate-400 font-mono">
+                Post-NMS shadow &amp; aspect-ratio verification
               </p>
             </div>
           </div>
+          
           <button
             type="button"
             onClick={() => setNoiseFilteringEnabled && setNoiseFilteringEnabled(!noiseFilteringEnabled)}
-            className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors duration-200 cursor-pointer ${
-              noiseFilteringEnabled ? 'bg-[#FFB703]' : 'bg-white/[0.1]'
+            className={`px-2.5 py-1 rounded text-[10px] font-mono font-black transition cursor-pointer flex items-center gap-1.5 ${
+              noiseFilteringEnabled
+                ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 shadow-sm'
+                : 'bg-white/[0.04] border border-white/[0.1] text-slate-500'
             }`}
           >
-            <div
-              className={`bg-[#05070B] w-4 h-4 rounded-full shadow-md transform transition-transform duration-200 ${
-                noiseFilteringEnabled ? 'translate-x-5' : 'translate-x-0'
-              }`}
-            />
+            <span className={`w-1.5 h-1.5 rounded-full ${noiseFilteringEnabled ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`} />
+            <span>{noiseFilteringEnabled ? 'ACTIVE' : 'BYPASS'}</span>
           </button>
         </div>
+
+        <p className="text-[10px] font-sans text-slate-400 leading-relaxed pt-1 border-t border-white/[0.04]">
+          Reject detections inconsistent with expected acoustic-shadow geometry.
+        </p>
       </div>
 
-      {/* Confidence Threshold Slider & Presets */}
-      <div className="space-y-2.5">
+      {/* ── 3. CONFIDENCE CONTROL ── */}
+      <div className="space-y-2 pt-1">
         <div className="flex items-center justify-between text-xs font-mono">
-          <span className="text-slate-400 font-medium">Model Confidence Cutoff</span>
-          <span className="text-[#FFB703] font-black bg-[#FFB703]/10 px-2.5 py-0.5 rounded-md border border-[#FFB703]/30">
+          <span className="text-slate-400 font-bold uppercase text-[10.5px]">MODEL CONFIDENCE CUTOFF</span>
+          <span className="text-[#FFB800] font-black bg-[#FFB800]/10 px-2 py-0.5 rounded border border-[#FFB800]/30">
             {(confidence * 100).toFixed(0)}% ({confidence.toFixed(2)})
           </span>
         </div>
+
+        {/* Range Slider */}
         <input
           type="range"
           min="0.01"
@@ -175,64 +170,63 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
           step="0.01"
           value={confidence}
           onChange={(e) => setConfidence(parseFloat(e.target.value))}
-          className="w-full h-1.5 bg-white/[0.1] rounded-lg appearance-none cursor-pointer accent-[#FFB703]"
+          className="w-full h-1.5 bg-white/[0.1] rounded-lg appearance-none cursor-pointer accent-[#FFB800]"
         />
-        <div className="flex justify-between text-[9px] font-mono text-slate-400">
+
+        <div className="flex justify-between text-[9px] font-mono text-slate-500">
           <span>0.01 (High Recall)</span>
           <span>0.25 (Default)</span>
           <span>0.95 (High Precision)</span>
         </div>
 
-        {/* Quick Sensitivity Mode Chips */}
-        <div className="flex items-center gap-1.5 pt-1 text-[9px] font-mono flex-wrap">
-          <span className="text-slate-400">Presets:</span>
+        {/* Calibration Presets */}
+        <div className="flex items-center gap-1.5 pt-1 text-[10px] font-mono flex-wrap">
+          <span className="text-slate-500 uppercase text-[9px]">Presets:</span>
           <button
             type="button"
             onClick={() => setConfidence(0.25)}
-            className={`px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
+            className={`px-2.5 py-1 rounded text-[10px] font-bold border transition cursor-pointer ${
               confidence === 0.25
-                ? 'bg-[#FFB703]/20 text-[#FFB703] border-[#FFB703]/40 font-bold'
-                : 'bg-white/[0.02] text-slate-400 border-white/[0.08] hover:text-white'
+                ? 'bg-[#FFB800]/15 text-[#FFB800] border-[#FFB800]/40'
+                : 'bg-white/[0.03] text-slate-400 border-white/[0.06] hover:text-white'
             }`}
           >
-            Standard (25%)
+            Standard (0.25)
           </button>
           <button
             type="button"
-            onClick={() => setConfidence(0.08)}
-            className={`px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
-              confidence === 0.08
-                ? 'bg-amber-500/20 text-amber-400 border-amber-500/40 font-bold'
-                : 'bg-white/[0.02] text-slate-400 border-white/[0.08] hover:text-white'
+            onClick={() => setConfidence(0.45)}
+            className={`px-2.5 py-1 rounded text-[10px] font-bold border transition cursor-pointer ${
+              confidence === 0.45
+                ? 'bg-[#FFB800]/15 text-[#FFB800] border-[#FFB800]/40'
+                : 'bg-white/[0.03] text-slate-400 border-white/[0.06] hover:text-white'
             }`}
-            title="Inspect diffuse acoustic candidates"
           >
-            Ghost Net (8%)
+            Ghost Net (0.45)
           </button>
           <button
             type="button"
-            onClick={() => setConfidence(0.01)}
-            className={`px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
-              confidence === 0.01
-                ? 'bg-red-500/20 text-red-400 border-red-500/40 font-bold'
-                : 'bg-white/[0.02] text-slate-400 border-white/[0.08] hover:text-white'
+            onClick={() => setConfidence(0.15)}
+            className={`px-2.5 py-1 rounded text-[10px] font-bold border transition cursor-pointer ${
+              confidence === 0.15
+                ? 'bg-[#FFB800]/15 text-[#FFB800] border-[#FFB800]/40'
+                : 'bg-white/[0.03] text-slate-400 border-white/[0.06] hover:text-white'
             }`}
-            title="Deep Swath Scan"
           >
-            Deep Scan (1%)
+            Deep Scan (0.15)
           </button>
         </div>
       </div>
 
-      {/* Geolocation Coordinates */}
-      <div className="space-y-3 pt-3 border-t border-white/[0.08]">
+      {/* ── 4. GEOTAGGING ── */}
+      <div className="space-y-2 pt-2 border-t border-white/[0.08]">
         <div className="flex items-center justify-between text-xs font-mono">
-          <span className="text-slate-400 font-medium flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-[#FFB703]" />
-            <span>Geotag Coordinates</span>
+          <span className="text-slate-400 font-bold uppercase text-[10.5px] flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-[#FFB800]" />
+            <span>WGS84 GEOTAG</span>
           </span>
           {hasPingLog ? (
-            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
+            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
               <FileSpreadsheet className="w-3 h-3" />
               Auto (Ping Log)
             </span>
@@ -242,18 +236,18 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             </span>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-3">
+
+        <div className="grid grid-cols-2 gap-2.5">
           <div>
             <label className="block text-[9px] font-mono text-slate-400 uppercase mb-1">
               Latitude (°N)
             </label>
             <input
-              type="number"
-              step="any"
-              placeholder="17.6868"
+              type="text"
+              placeholder="18.9217"
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
-              className="w-full px-3 py-2 text-xs font-mono rounded-xl bg-white/[0.02] border border-white/[0.08] text-white placeholder-slate-500 focus:outline-none focus:border-[#FFB703]"
+              className="w-full px-2.5 py-1.5 text-xs font-mono rounded-lg bg-[#070D16] border border-white/[0.08] text-white placeholder-slate-600 focus:outline-none focus:border-[#FFB800]"
             />
           </div>
           <div>
@@ -261,75 +255,76 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               Longitude (°E)
             </label>
             <input
-              type="number"
-              step="any"
-              placeholder="83.2185"
+              type="text"
+              placeholder="72.8214"
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
-              className="w-full px-3 py-2 text-xs font-mono rounded-xl bg-white/[0.02] border border-white/[0.08] text-white placeholder-slate-500 focus:outline-none focus:border-[#FFB703]"
+              className="w-full px-2.5 py-1.5 text-xs font-mono rounded-lg bg-[#070D16] border border-white/[0.08] text-white placeholder-slate-600 focus:outline-none focus:border-[#FFB800]"
             />
           </div>
         </div>
 
-        {/* Preset Chips */}
-        <div className="flex items-center gap-1.5 text-[9px] font-mono flex-wrap">
-          <span className="text-slate-400">Coastal Presets:</span>
+        {/* Coastal Presets */}
+        <div className="flex items-center gap-1.5 text-[9px] font-mono flex-wrap pt-0.5">
+          <span className="text-slate-500 uppercase">Presets:</span>
           <button
             type="button"
-            onClick={() => handleApplyPresetCoords(17.6868, 83.2185)}
-            className="px-2 py-0.5 rounded-md bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] text-slate-400 hover:text-[#FFB703] transition-colors cursor-pointer"
+            onClick={() => handleApplyPresetCoords(18.9217, 72.8214)}
+            className="px-2 py-0.5 rounded bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] text-slate-400 hover:text-[#FFB800] transition cursor-pointer"
           >
-            Visakhapatnam (ENC)
+            Mumbai
           </button>
           <button
             type="button"
             onClick={() => handleApplyPresetCoords(9.9312, 76.2673)}
-            className="px-2 py-0.5 rounded-md bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] text-slate-400 hover:text-[#FFB703] transition-colors cursor-pointer"
+            className="px-2 py-0.5 rounded bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] text-slate-400 hover:text-[#FFB800] transition cursor-pointer"
           >
-            Kochi (SNC)
+            Kochi
           </button>
           <button
             type="button"
-            onClick={() => handleApplyPresetCoords(18.9220, 72.8347)}
-            className="px-2 py-0.5 rounded-md bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] text-slate-400 hover:text-[#FFB703] transition-colors cursor-pointer"
+            onClick={() => handleApplyPresetCoords(17.6868, 83.2185)}
+            className="px-2 py-0.5 rounded bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.08] text-slate-400 hover:text-[#FFB800] transition cursor-pointer"
           >
-            Mumbai (WNC)
+            Visakhapatnam
           </button>
         </div>
       </div>
 
-      {/* Primary CTA Button */}
-      <div className="pt-3">
+      {/* ── 5. PRIMARY ACTION ── */}
+      <div className="pt-2">
         <button
           type="button"
           onClick={onAnalyze}
           disabled={!hasFile || isAnalyzing}
-          className={`w-full py-4 px-6 rounded-2xl font-mono text-xs font-black tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2.5 shadow-xl cursor-pointer ${
+          className={`w-full py-3.5 px-4 rounded-xl font-mono text-xs font-black tracking-wider uppercase transition-all duration-200 flex items-center justify-center gap-2 shadow-lg cursor-pointer ${
             !hasFile
-              ? 'bg-white/[0.02] text-slate-500 border border-white/[0.08] cursor-not-allowed'
+              ? 'bg-white/[0.03] text-slate-500 border border-white/[0.08] cursor-not-allowed opacity-60'
               : isAnalyzing
-              ? 'bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/50 cursor-wait animate-pulse'
-              : 'bg-[#FFB703] hover:bg-[#FCD34D] text-[#05070B] shadow-[#FFB703]/20 shadow-lg hover:scale-[1.02] active:scale-[0.98]'
+              ? 'bg-[#FFB800]/15 text-[#FFB800] border border-[#FFB800]/50 cursor-wait animate-pulse'
+              : 'bg-[#FFB800] hover:bg-[#FFB800]/90 text-black shadow-[0_0_20px_rgba(255,184,0,0.3)] active:scale-[0.98]'
           }`}
         >
           {isAnalyzing ? (
             <>
-              <div className="w-4 h-4 rounded-full border-2 border-[#FFB703] border-t-transparent animate-spin" />
+              <div className="w-3.5 h-3.5 rounded-full border-2 border-[#FFB800] border-t-transparent animate-spin" />
               <span>Analyzing Sonar Track...</span>
             </>
           ) : (
             <>
-              <Play className="w-4 h-4 fill-current" />
-              <span>Analyze Sonar Imagery</span>
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span>ANALYZE SONAR IMAGERY</span>
             </>
           )}
         </button>
+
         {!hasFile && (
-          <p className="text-[10px] text-center text-slate-400 mt-2 font-mono">
-            * Select or drag a sonar scan above to enable inference
+          <p className="text-[10px] text-center text-slate-500 mt-2 font-mono">
+            * Select or drag a sonar swath above to enable inference
           </p>
         )}
       </div>
+
     </div>
   );
 };

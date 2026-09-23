@@ -1,25 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
-  UploadCloud,
-  Image as ImageIcon,
-  Sparkles,
-  FileSearch,
-  CheckCircle2,
-  Download,
-  ExternalLink,
-  Trash2,
   FolderOpen,
-  Clipboard,
-  AlertTriangle,
-  Boxes,
-  Layers,
   FileSpreadsheet,
-  MapPin,
-  Check,
-  ListOrdered,
-  Plus,
+  Layers,
+  FileText,
+  X,
+  Crosshair,
+  Radio,
+  Sliders,
 } from 'lucide-react';
-import { generateSampleSonarPngBlob, getSampleSonarImagePath } from '../../services/demoData';
 
 interface DropZoneProps {
   onImageSelected: (file: File | null, previewUrl: string | null) => void;
@@ -44,7 +33,6 @@ export const DropZone: React.FC<DropZoneProps> = ({
   const batchInputRef = useRef<HTMLInputElement>(null);
   const pingLogInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isLoadingSample, setIsLoadingSample] = useState(false);
   const [imageMeta, setImageMeta] = useState<{ width: number; height: number; size: string } | null>(null);
 
   // Measure image dimensions whenever previewUrl changes
@@ -56,8 +44,8 @@ export const DropZone: React.FC<DropZoneProps> = ({
     const img = new Image();
     img.onload = () => {
       const sizeStr = selectedFile
-        ? `${(selectedFile.size / 1024).toFixed(1)} KB`
-        : 'Sample Blob';
+        ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB`
+        : 'Sample Swath';
       setImageMeta({
         width: img.naturalWidth,
         height: img.naturalHeight,
@@ -67,7 +55,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
     img.src = previewUrl;
   }, [previewUrl, selectedFile]);
 
-  // Support Global & Local Clipboard Paste (Ctrl+V / Cmd+V)
+  // Support Global & Local Clipboard Paste
   useEffect(() => {
     const handlePaste = (e: ClipboardEvent) => {
       if (e.clipboardData && e.clipboardData.items) {
@@ -90,7 +78,8 @@ export const DropZone: React.FC<DropZoneProps> = ({
     return () => window.removeEventListener('paste', handlePaste);
   }, [onImageSelected]);
 
-  const handleOpenFilePicker = () => {
+  const handleOpenFilePicker = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
       fileInputRef.current.click();
@@ -115,16 +104,9 @@ export const DropZone: React.FC<DropZoneProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      if (e.target.files.length === 1) {
-        const file = e.target.files[0];
-        const url = URL.createObjectURL(file);
-        onImageSelected(file, url);
-      } else {
-        const filesArray = Array.from(e.target.files);
-        if (onBatchFilesSelected) onBatchFilesSelected(filesArray);
-        const url = URL.createObjectURL(filesArray[0]);
-        onImageSelected(filesArray[0], url);
-      }
+      const file = e.target.files[0];
+      const url = URL.createObjectURL(file);
+      onImageSelected(file, url);
     }
   };
 
@@ -160,24 +142,12 @@ export const DropZone: React.FC<DropZoneProps> = ({
     e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      if (e.dataTransfer.files.length === 1) {
-        const dropped = e.dataTransfer.files[0];
-        if (dropped.type.includes('image') || dropped.name.match(/\.(png|jpe?g|webp|bmp|tiff?)$/i)) {
-          const url = URL.createObjectURL(dropped);
-          onImageSelected(dropped, url);
-        } else if (dropped.name.match(/\.(csv|json|txt|log)$/i) && onPingLogSelected) {
-          onPingLogSelected(dropped);
-        }
-      } else {
-        // Multi-file dropped
-        const filesArray = Array.from(e.dataTransfer.files).filter(
-          (f) => f.type.includes('image') || f.name.match(/\.(png|jpe?g|webp|bmp|tiff?)$/i)
-        );
-        if (filesArray.length > 0) {
-          if (onBatchFilesSelected) onBatchFilesSelected(filesArray);
-          const url = URL.createObjectURL(filesArray[0]);
-          onImageSelected(filesArray[0], url);
-        }
+      const file = e.dataTransfer.files[0];
+      if (file.type.includes('image') || file.name.match(/\.(png|jpe?g|webp|bmp|tiff?|xtf|jsf)$/i)) {
+        const url = URL.createObjectURL(file);
+        onImageSelected(file, url);
+      } else if (file.name.match(/\.(csv|json|txt|log)$/i) && onPingLogSelected) {
+        onPingLogSelected(file);
       }
     }
   };
@@ -190,12 +160,12 @@ export const DropZone: React.FC<DropZoneProps> = ({
   };
 
   return (
-    <div className="space-y-4 font-mono select-none">
-      {/* Hidden Native File Inputs (Single, Multiple Batch, and Ping Log) */}
+    <div className="p-5 rounded-2xl bg-[#0B111A] border border-white/[0.08] font-sans select-none shadow-xl space-y-4">
+      {/* Hidden File Inputs */}
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*,.png,.jpg,.jpeg,.webp,.bmp,.tiff,.tif"
+        accept="image/*,.png,.jpg,.jpeg,.webp,.bmp,.tiff,.tif,.xtf,.jsf"
         onChange={handleFileChange}
         className="hidden"
       />
@@ -203,7 +173,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
         ref={batchInputRef}
         type="file"
         multiple
-        accept="image/*,.png,.jpg,.jpeg,.webp,.bmp,.tiff,.tif"
+        accept="image/*,.png,.jpg,.jpeg,.webp,.bmp,.tiff,.tif,.xtf,.jsf"
         onChange={handleBatchFileChange}
         className="hidden"
       />
@@ -215,212 +185,165 @@ export const DropZone: React.FC<DropZoneProps> = ({
         className="hidden"
       />
 
-      {/* Main Drag & Drop Zone */}
+      {/* ── LEFT PANEL HEADER: SONAR SWATH INGESTION ── */}
+      <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+        <div className="flex items-center gap-2">
+          <Layers className="w-4 h-4 text-[#00B8D9]" />
+          <h2 className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+            SONAR SWATH INGESTION
+          </h2>
+        </div>
+        <div className="flex items-center gap-2 font-mono text-[10px] text-slate-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>CHANNELS: PORT &amp; STBD DUAL</span>
+        </div>
+      </div>
+
+      {/* ── DRAG & DROP WORKSPACE ── */}
       <div
         onDragOver={handleDragOver}
         onDragEnter={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        onClick={handleOpenFilePicker}
-        className={`relative min-h-[340px] rounded-3xl subpixel-card border-2 border-dashed transition-all duration-300 cursor-pointer flex flex-col items-center justify-center p-6 overflow-hidden group ${
+        onClick={() => handleOpenFilePicker()}
+        className={`relative min-h-[220px] rounded-xl border-2 border-dashed transition-all duration-200 cursor-pointer flex flex-col items-center justify-center p-6 text-center group ${
           isDragging
-            ? 'border-[#FFB703] bg-[#FFB703]/10 scale-[1.01] shadow-[0_0_30px_rgba(255,183,3,0.3)]'
+            ? 'border-[#FFB800] bg-[#FFB800]/10 scale-[1.005]'
             : previewUrl
-            ? 'border-white/[0.15] bg-[#070B12]'
-            : 'border-white/[0.08] hover:border-[#FFB703]/50 bg-[#070B12]/80 hover:shadow-2xl'
+            ? 'border-white/[0.12] bg-[#070D16]'
+            : 'border-white/[0.1] hover:border-[#FFB800]/60 bg-[#070D16]/90'
         }`}
       >
         {previewUrl ? (
-          <div className="relative w-full h-full flex flex-col items-center justify-center space-y-3">
-            <div className="relative group/img overflow-hidden rounded-2xl">
+          /* When a File/Sample is Loaded: Show Interactive Swath Preview */
+          <div className="relative w-full flex flex-col items-center space-y-3">
+            <div className="relative max-h-[170px] w-full rounded-lg overflow-hidden border border-white/[0.1] bg-black/60 flex items-center justify-center group/img">
               <img
                 src={previewUrl}
-                alt="Sonar scan preview"
-                className="max-h-[220px] w-auto object-contain rounded-2xl border border-white/[0.08] shadow-[0_12px_40px_rgba(0,0,0,0.8)]"
+                alt="Sonar swath input"
+                className="max-h-[170px] w-auto object-contain sepia contrast-125 brightness-95"
               />
-              {/* Tactical Vertical Acoustic Laser Scanline */}
-              <div className="absolute inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-[#FFB703] to-transparent shadow-[0_0_10px_#FFB703] animate-laser-scan pointer-events-none z-10" />
+              {/* Scanline sweep */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.35)_50%)] bg-[length:100%_4px] pointer-events-none" />
 
-              <div className="absolute inset-0 bg-[#03070E]/60 opacity-0 group-hover/img:opacity-100 transition-opacity rounded-2xl flex items-center justify-center gap-2 backdrop-blur-[2px] z-20">
-                <button
-                  type="button"
-                  onClick={handleOpenFilePicker}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#FFB703] text-[#05070B] font-mono text-xs font-bold shadow-lg hover:scale-105 transition-transform cursor-pointer"
-                >
-                  Change Image
-                </button>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
-              <span className="font-mono font-bold text-[#FFB703] bg-[#FFB703]/10 px-3 py-1 rounded-lg border border-[#FFB703]/30 shadow-md">
-                {selectedFile ? selectedFile.name : 'Selected Sonar Image'}
-              </span>
-
-              {imageMeta && (
-                <span className="font-mono text-slate-400 bg-white/[0.02] px-3 py-1 rounded-lg border border-white/[0.08]">
-                  {imageMeta.width} × {imageMeta.height} px • {imageMeta.size}
-                </span>
-              )}
-
+              {/* Clear button */}
               <button
                 type="button"
                 onClick={handleClear}
-                className="p-1.5 rounded-lg bg-white/[0.03] border border-white/[0.08] text-slate-400 hover:text-red-400 transition-colors cursor-pointer"
-                title="Clear selected image"
+                className="absolute top-2 right-2 p-1.5 rounded-md bg-black/70 hover:bg-rose-950 text-slate-300 hover:text-rose-400 border border-white/20 transition cursor-pointer"
+                title="Remove Swath"
               >
-                <Trash2 className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
+            </div>
+
+            {/* Ingestion Readout Bar */}
+            <div className="flex items-center gap-2 flex-wrap text-xs font-mono">
+              <span className="font-bold text-[#FFB800] px-2.5 py-1 rounded bg-[#FFB800]/10 border border-[#FFB800]/30 truncate max-w-[260px]">
+                {selectedFile ? selectedFile.name : 'Selected Sonar Swath'}
+              </span>
+              {imageMeta && (
+                <span className="text-slate-400 px-2 py-1 rounded bg-white/[0.04] border border-white/[0.08] text-[11px]">
+                  {imageMeta.width} × {imageMeta.height} px • {imageMeta.size}
+                </span>
+              )}
+              {selectedPingLogFile && (
+                <span className="text-emerald-400 px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-[11px]">
+                  + GPS Log Attached
+                </span>
+              )}
             </div>
           </div>
         ) : (
-          <div className="relative w-full flex flex-col items-center justify-center space-y-4 text-center max-w-md py-4">
-            {/* Background Subsea AUV / Bathymetric Illustration in Dropzone */}
-            <div className="absolute right-0 -bottom-6 w-56 h-28 pointer-events-none opacity-30 overflow-hidden">
-              <svg viewBox="0 0 200 100" className="w-full h-full">
-                {/* Sonar Beam */}
-                <polygon points="120,40 180,95 70,95" fill="url(#dropzoneBeamGrad)" opacity="0.6" />
-                <defs>
-                  <linearGradient id="dropzoneBeamGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#38BDF8" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                {/* AUV Hull */}
-                <ellipse cx="120" cy="40" rx="35" ry="12" fill="#0E2238" stroke="#38BDF8" strokeWidth="1.5" />
-                <ellipse cx="150" cy="40" rx="6" ry="10" fill="#0A1828" stroke="#38BDF8" strokeWidth="1" />
-                <circle cx="95" cy="40" r="3.5" fill="#FFB703" />
-              </svg>
-            </div>
-
-            {/* Pulsing Sonar Ping Emitter Halo */}
-            <div className="relative flex items-center justify-center">
-              <div className="absolute w-20 h-20 rounded-full border border-[#38BDF8]/30 animate-ping pointer-events-none" />
-              <div className="w-14 h-14 rounded-2xl bg-[#0A101D] border border-white/[0.1] flex items-center justify-center text-[#38BDF8] shadow-[0_0_25px_rgba(56,189,248,0.25)] group-hover:scale-105 group-hover:border-[#38BDF8]/80 transition-all duration-300 z-10">
-                <UploadCloud className="w-7 h-7 animate-pulse text-[#38BDF8]" />
+          /* When No File: Restrained Text + Sonar Swath Strip Preview */
+          <div className="space-y-3 w-full flex flex-col items-center">
+            <div className="space-y-1">
+              <div className="text-sm font-mono font-bold text-white tracking-wide uppercase">
+                DROP SIDE-SCAN SONAR SWATH
               </div>
-            </div>
-
-            <div className="space-y-1 z-10">
-              <h3 className="text-base font-black text-white uppercase tracking-wider">
-                Drag &amp; Drop Raw Sonar Swath
-              </h3>
-              <p className="text-xs text-slate-400">
-                Drop a single image swath, multi-frame log, or click to browse.
+              <p className="text-xs text-slate-400 font-sans">
+                Upload a single sonar image, multi-frame swath, or sonar log.
+              </p>
+              <p className="text-[10px] font-mono text-[#00B8D9] pt-0.5">
+                Supported: PNG / JPG / TIFF / XTF / JSF
               </p>
             </div>
 
-            {/* Format Pills */}
-            <div className="flex items-center gap-1.5 text-[9.5px] font-mono text-slate-400 flex-wrap justify-center z-10">
-              {['PNG', 'JPG', 'TIFF', 'XTF', 'JSF'].map((fmt) => (
-                <span key={fmt} className="px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] font-semibold">
-                  {fmt}
-                </span>
-              ))}
-              <span className="text-slate-500 ml-1">Max size: 500 MB</span>
-            </div>
-
-            {/* Primary Action Button: Choose Files */}
-            <div className="pt-1 z-10">
-              <button
-                type="button"
-                onClick={handleOpenFilePicker}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white font-mono text-xs font-bold transition-all shadow-[0_4px_20px_rgba(2,132,199,0.4)] cursor-pointer hover:scale-105"
-              >
-                <FolderOpen className="w-4 h-4" />
-                <span>Choose Files</span>
-              </button>
-            </div>
-
-            {/* Sub Ingestion Buttons */}
-            <div className="flex items-center gap-2 pt-1 z-10">
-              <button
-                type="button"
-                onClick={handleOpenBatchPicker}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-[#38BDF8]/60 text-slate-300 hover:text-white text-[9.5px] font-mono font-medium transition-all shadow-md cursor-pointer"
-              >
-                <ListOrdered className="w-3.5 h-3.5 text-[#38BDF8]" />
-                <span>Upload Sonar Image Log (Batch)</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleOpenPingLogPicker}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-[#FFB703]/60 text-slate-300 hover:text-white text-[9.5px] font-mono font-medium transition-all cursor-pointer"
-              >
-                <FileSpreadsheet className="w-3.5 h-3.5 text-[#FFB703]" />
-                <span>Attach Ping Log CSV</span>
-              </button>
-            </div>
-
-            {/* Bottom Subsea Telemetry Bar */}
-            <div className="w-full pt-4 mt-2 border-t border-white/[0.06] flex items-center justify-between text-[9px] font-mono text-slate-400 z-10">
-              <div className="flex items-center gap-1 text-slate-400 tracking-wider">
-                <span>DEEPER INSIGHTS</span>
-                <span className="text-slate-600">·</span>
-                <span>CLEANER OCEANS</span>
-                <span className="text-slate-600">·</span>
-                <span>SAFER TOMORROW</span>
+            {/* Operational Sonar Swath Strip Graphic (Authentic Waterline & Nadir) */}
+            <div className="w-full max-w-md h-16 rounded-lg overflow-hidden border border-white/[0.08] bg-[#040810] relative flex items-center justify-between px-3">
+              {/* Left Port Channel Texture */}
+              <div className="flex-1 h-full opacity-60 flex items-center justify-center bg-[repeating-linear-gradient(90deg,#060D1A,#060D1A_2px,#0B1B30_2px,#0B1B30_4px)]">
+                <span className="text-[8px] font-mono text-slate-500">PORT SWATH [0–60m]</span>
               </div>
-              <div className="flex items-center gap-3">
-                <span><strong className="text-white">900 kHz</strong> Side-Scan</span>
-                <span className="text-slate-600">·</span>
-                <span><strong className="text-white">120 m</strong> Swath</span>
-                <span className="text-slate-600">·</span>
-                <span><strong className="text-white">&lt; 15 m</strong> Resolution</span>
+              
+              {/* Nadir Center Divider */}
+              <div className="w-4 h-full bg-[#02050B] border-x border-white/[0.1] flex items-center justify-center">
+                <div className="w-0.5 h-full bg-[#FFB800]/50" />
+              </div>
+
+              {/* Right Starboard Channel Texture */}
+              <div className="flex-1 h-full opacity-60 flex items-center justify-center bg-[repeating-linear-gradient(90deg,#060D1A,#060D1A_2px,#0B1B30_2px,#0B1B30_4px)]">
+                <span className="text-[8px] font-mono text-slate-500">STARBOARD SWATH [0–60m]</span>
+              </div>
+
+              {/* Scale bar at bottom */}
+              <div className="absolute bottom-1 right-2 text-[8px] font-mono text-slate-500">
+                0 25 50 m
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* SIH GAP 4 — Batch File Queue List if Multiple Files Loaded */}
-      {batchFiles.length > 1 && (
-        <div className="p-3 rounded-2xl bg-[#060D17] border border-[#152438] space-y-2">
-          <div className="flex items-center justify-between text-[10px] text-[#7C8AA0]">
-            <span className="font-bold text-[#4CD9E8] flex items-center gap-1">
-              <ListOrdered className="w-3.5 h-3.5 text-[#4CD9E8]" />
-              BATCH SONAR LOG QUEUE ({batchFiles.length} SWATHS)
-            </span>
-            <span className="text-[#3FD98A]">Batch Ready</span>
-          </div>
+      {/* ── 3 EXPLICIT BUTTONS ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-xs">
+        <button
+          type="button"
+          onClick={(e) => handleOpenFilePicker(e)}
+          className="px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-[#FFB800]/50 text-slate-200 hover:text-[#FFB800] font-semibold transition cursor-pointer flex items-center justify-center gap-1.5"
+        >
+          <FolderOpen className="w-3.5 h-3.5" />
+          <span>Choose Files</span>
+        </button>
 
-          <div className="space-y-1 max-h-32 overflow-y-auto">
-            {batchFiles.map((file, idx) => (
-              <div
-                key={file.name + idx}
-                onClick={() => {
-                  const url = URL.createObjectURL(file);
-                  onImageSelected(file, url);
-                }}
-                className={`p-1.5 rounded-lg border text-[9px] flex items-center justify-between cursor-pointer transition-colors ${
-                  selectedFile?.name === file.name
-                    ? 'bg-[#0A1A2E] border-[#4CD9E8]/50 text-[#4CD9E8]'
-                    : 'bg-[#0A1322] border-[#152438] text-[#7C8AA0] hover:text-[#EAEFF5]'
-                }`}
-              >
-                <span className="truncate max-w-[220px]">
-                  {idx + 1}. {file.name}
-                </span>
-                <span className="text-[8px] font-bold text-[#3FD98A]">
-                  {(file.size / 1024).toFixed(0)} KB · READY
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        <button
+          type="button"
+          onClick={handleOpenBatchPicker}
+          className="px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-[#FFB800]/50 text-slate-200 hover:text-[#FFB800] font-semibold transition cursor-pointer flex items-center justify-center gap-1.5"
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>Upload Sonar Image Log</span>
+        </button>
 
-      {/* Attached Ping Log Badge */}
-      {selectedPingLogFile && (
-        <div className="p-2.5 rounded-xl bg-[#091D17] border border-[#3FD98A]/30 text-[10px] flex items-center justify-between">
-          <div className="flex items-center gap-2 text-[#3FD98A]">
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>Companion Ping Log: <strong>{selectedPingLogFile.name}</strong></span>
-          </div>
-          <span className="text-[8px] text-[#3FD98A] font-bold">GEO-CORRELATED</span>
+        <button
+          type="button"
+          onClick={handleOpenPingLogPicker}
+          className="px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-[#FFB800]/50 text-slate-200 hover:text-[#FFB800] font-semibold transition cursor-pointer flex items-center justify-center gap-1.5"
+        >
+          <FileSpreadsheet className="w-3.5 h-3.5" />
+          <span>Attach Ping Log CSV</span>
+        </button>
+      </div>
+
+      {/* ── TECHNICAL INFORMATION ROW ── */}
+      <div className="pt-3 border-t border-white/[0.08] grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs text-center">
+        <div className="p-2 rounded-lg bg-[#070D16] border border-white/[0.04]">
+          <span className="text-[9px] uppercase tracking-wider text-slate-500 block">FREQUENCY</span>
+          <span className="text-white font-bold text-[11px]">900 kHz</span>
         </div>
-      )}
+        <div className="p-2 rounded-lg bg-[#070D16] border border-white/[0.04]">
+          <span className="text-[9px] uppercase tracking-wider text-slate-500 block">SWATH</span>
+          <span className="text-[#FFB800] font-bold text-[11px]">120 m</span>
+        </div>
+        <div className="p-2 rounded-lg bg-[#070D16] border border-white/[0.04]">
+          <span className="text-[9px] uppercase tracking-wider text-slate-500 block">RESOLUTION</span>
+          <span className="text-white font-bold text-[11px]">&lt; 15 cm</span>
+        </div>
+        <div className="p-2 rounded-lg bg-[#070D16] border border-white/[0.04]">
+          <span className="text-[9px] uppercase tracking-wider text-slate-500 block">PING RATE</span>
+          <span className="text-emerald-400 font-bold text-[11px]">LIVE</span>
+        </div>
+      </div>
     </div>
   );
 };

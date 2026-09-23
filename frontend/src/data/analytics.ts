@@ -37,14 +37,12 @@ export const MISSION_ANALYTICS: AnalyticsData = {
     { range: '90–100%', count: 3 },
   ],
 
-  /** Target class breakdown */
+  /** Target class breakdown — uses actual SONARX YOLOv8s trained class names */
   classDistribution: [
-    { name: 'Mine-like Object', count: 5,  color: '#FF5D5D' },
-    { name: 'Wreck',            count: 2,  color: '#FFB547' },
-    { name: 'Rock / Boulder',   count: 3,  color: '#65D391' },
-    { name: 'Debris Field',     count: 3,  color: '#29B6F6' },
-    { name: 'Pipeline',         count: 2,  color: '#32E6D1' },
-    { name: 'Unknown',          count: 2,  color: '#9B8EA8' },
+    { name: 'Ghost Net (ALDFG)',    count: 7,  color: '#FFB703' },
+    { name: 'Anthropogenic Debris', count: 4,  color: '#F59E0B' },
+    { name: 'Pipeline Hazard',      count: 3,  color: '#38BDF8' },
+    { name: 'Seafloor Anomaly',     count: 3,  color: '#94A3B8' },
   ],
 
   /** Depth distribution */

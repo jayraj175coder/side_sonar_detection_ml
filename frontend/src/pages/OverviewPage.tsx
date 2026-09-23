@@ -41,7 +41,7 @@ const GithubIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' })
 );
 
 export const OverviewPage: React.FC = () => {
-  const { setActiveTab } = useApp();
+  const { setActiveTab, stats, scans, isBackendConnected } = useApp();
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   // IntersectionObserver for smooth scroll-reveal (.reveal -> .reveal.in)
@@ -71,6 +71,74 @@ export const OverviewPage: React.FC = () => {
           SURVEY VESSEL + TOW CABLE + TOWFISH + ACOUSTIC BEAM + MARINE WILDLIFE
           ═══════════════════════════════════════════════════════════════════ */}
       <MarineSurveyHero />
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          KPI STRIP 1 — VERIFIED ML TECHNICAL METRICS
+          ═══════════════════════════════════════════════════════════════════ */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/[0.06] border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl reveal">
+        {[
+          { value: '5,205',  label: 'SSS Tiles',    sub: 'Training Dataset',     color: '#FFB703' },
+          { value: '74.09%', label: 'mAP@50',       sub: 'Held-Out Test Set',    color: '#FFB703' },
+          { value: '77.73%', label: 'Precision',    sub: 'F1 Optimal Point',     color: '#FFFFFF' },
+          { value: '14.2 ms',label: 'ONNX Edge',    sub: 'CPU Inference Latency',color: '#FFB703' },
+        ].map(({ value, label, sub, color }) => (
+          <div key={label} className="bg-[#090E17]/95 p-4 text-center">
+            <div className="font-mono text-2xl font-bold" style={{ color }}>{value}</div>
+            <div className="text-[11px] font-mono font-bold text-white mt-0.5">{label}</div>
+            <div className="text-[9px] text-slate-500 font-mono">{sub}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          KPI STRIP 2 — OPERATIONAL TELEMETRY (live state from context)
+          ═══════════════════════════════════════════════════════════════════ */}
+      <div className="subpixel-card rounded-2xl border border-white/[0.08] overflow-hidden reveal">
+        <div className="px-4 py-2 border-b border-white/[0.06] flex items-center gap-2 bg-white/[0.02]">
+          <span className={`w-2 h-2 rounded-full ${isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+          <span className="text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest">
+            {isBackendConnected ? 'LIVE OPERATIONAL TELEMETRY' : 'DEMO TELEMETRY — Backend Offline'}
+          </span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/[0.06]">
+          {[
+            {
+              label: 'SCANS',
+              value: stats?.total_scans ?? scans?.length ?? 0,
+              sub: 'Ingested swaths',
+              color: '#FFB703',
+            },
+            {
+              label: 'DETECTIONS',
+              value: stats?.objects_detected ?? scans?.reduce((a, s) => a + (s.total_detections || 0), 0) ?? 0,
+              sub: 'AI-verified contacts',
+              color: '#FFB703',
+            },
+            {
+              label: 'GHOST NETS',
+              value: stats?.ghost_net_detections ?? scans?.reduce((a, s) => a + (s.ghost_net_count || 0), 0) ?? 0,
+              sub: 'Priority ALDFG',
+              color: '#FFB703',
+            },
+            {
+              label: 'AVG CONFIDENCE',
+              value: stats?.avg_confidence
+                ? `${(stats.avg_confidence * 100).toFixed(1)}%`
+                : scans?.length
+                  ? `${(scans.reduce((a, s) => a + s.highest_confidence, 0) / scans.length * 100).toFixed(1)}%`
+                  : '—',
+              sub: 'Neural probability',
+              color: '#FFFFFF',
+            },
+          ].map(({ label, value, sub, color }) => (
+            <div key={label} className="p-4 text-center">
+              <div className="font-mono text-2xl font-bold" style={{ color }}>{value}</div>
+              <div className="text-[11px] font-mono font-bold text-slate-300 mt-0.5">{label}</div>
+              <div className="text-[9px] text-slate-500 font-mono">{sub}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
           LIVE AUTONOMOUS MARINE DEBRIS HOLOGRAPHIC RADAR SHOWCASE

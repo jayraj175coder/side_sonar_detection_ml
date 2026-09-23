@@ -85,10 +85,10 @@ export const AnalyticsPage: React.FC = () => {
     const avgConfidence = totalDetectionsCount > 0 ? (totalConfidenceSum / totalDetectionsCount) * 100 : 88.4;
 
     const classDist = [
-      { name: 'Ghost Net (ALDFG)', count: ghostNetCount, color: '#FFB703' },
-      { name: 'Anthropogenic Debris', count: debrisCount, color: '#F59E0B' },
-      { name: 'Subsea Pipeline Hazard', count: pipelineCount, color: '#38BDF8' },
-      { name: 'Seafloor Anomaly', count: anomalyCount, color: '#FFFFFF' },
+      { name: 'Ghost Net (ALDFG)',    count: ghostNetCount,  color: '#FFB703' },
+      { name: 'Anthropogenic Debris', count: debrisCount,    color: '#F59E0B' },
+      { name: 'Pipeline Hazard',      count: pipelineCount,  color: '#38BDF8' },
+      { name: 'Seafloor Anomaly',     count: anomalyCount,   color: '#94A3B8' },
     ];
 
     const confDist = [

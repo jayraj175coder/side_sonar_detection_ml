@@ -10,6 +10,7 @@ import { ModelInfoPage } from './pages/ModelInfoPage';
 import { MissionPage } from './pages/MissionPage';
 import { SonarViewerPage } from './pages/SonarViewerPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
+import { TrackingPage } from './pages/TrackingPage';
 import { MissionProvider } from './context/MissionContext';
 import { GeospatialConfigProvider } from './context/GeospatialConfigContext';
 import { GeospatialConfigModal } from './components/common/GeospatialConfigModal';
@@ -33,8 +34,9 @@ export const App: React.FC = () => {
       case 'mission':   return { title: 'Mission Control',                subtitle: 'Mumbai Shelf Corridor · Interactive Side-Scan Analysis Workstation' };
       case 'map':       return { title: 'Subsea Map',                     subtitle: 'Geospatial coordinate mapping & acoustic anomaly positions' };
       case 'analytics': return { title: 'Mission Analytics',              subtitle: 'Anomaly distributions, noise suppression ratios & survey efficiency metrics' };
+      case 'tracking':  return { title: 'Temporal Target Tracking',       subtitle: 'Acoustic Fingerprint (AFP) lifecycle: NEW → STILL THERE → MOVED → GONE across multi-epoch surveys' };
       case 'reports':   return { title: 'Marine Debris Anomaly Dossier',  subtitle: 'MoES compliance reports, WGS84 target registers & retrieval recommendations' };
-      case 'model':     return { title: 'Model Intel',                    subtitle: 'YOLOv8n ONNX perception architecture, acoustic noise filter & validation metrics' };
+      case 'model':     return { title: 'Model Intel',                    subtitle: 'YOLOv8s ONNX perception architecture, acoustic noise filter & validation metrics' };
       default:          return { title: 'SONARX',                         subtitle: 'Automated Side-Scan Sonar Intelligence for Marine Survey Teams' };
     }
   };
@@ -91,6 +93,7 @@ export const App: React.FC = () => {
                 {activeTab === 'model'     && <ModelInfoPage />}
                 {activeTab === 'sonar'     && <SonarViewerPage />}
                 {activeTab === 'analytics' && <AnalyticsPage />}
+                {activeTab === 'tracking'  && <TrackingPage />}
               </div>
             </main>
           )}

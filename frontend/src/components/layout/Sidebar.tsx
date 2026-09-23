@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Radio,
   ShieldAlert,
+  Activity,
 } from 'lucide-react';
 import { SonarxLogo, SonarxLogoIcon } from '../common/SonarxLogo';
 import { useApp } from '../../context/AppContext';
@@ -23,11 +24,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isMobileOpen = false,
   onCloseMobile,
 }) => {
-  const {
-    activeTab,
-    setActiveTab,
-    isSidebarCollapsed,
-  } = useApp();
+  const { activeTab, setActiveTab, isSidebarCollapsed, isBackendConnected } = useApp();
 
   const primaryNavItems: {
     id: TabType;
@@ -41,6 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'mission',   label: 'Mission Control',  icon: Crosshair, badge: 'HERO', tooltip: 'Guided Subsea Survey & Hero Target Identification' },
     { id: 'map',       label: 'Subsea Map',       icon: MapPin },
     { id: 'analytics', label: 'Analytics',        icon: BarChart2 },
+    { id: 'tracking',  label: 'Target Tracking',  icon: Activity, badge: 'DEMO', tooltip: 'Temporal AFP lifecycle tracking across multi-epoch surveys' },
     { id: 'reports',   label: 'Reports Dossier',  icon: FileText },
     { id: 'model',     label: 'Model Intel',      icon: Cpu, badge: 'YOLOv8s', tooltip: 'YOLOv8s Vision Backbone & Physical Validation Benchmarks' },
   ];
@@ -155,16 +153,48 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-3 border-t border-white/[0.08] bg-[#070B12]/80 shrink-0 space-y-2">
           {!isSidebarCollapsed ? (
             <>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02] border border-white/[0.06]">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
-                  <span className="text-slate-300 text-xs font-medium">Perception Engine</span>
+              {/* Subsystem Status Indicators */}
+              <div className="space-y-1.5">
+                <div className="text-[8px] font-mono text-slate-500 uppercase tracking-widest px-1">SUBSYSTEMS</div>
+
+                {/* Perception Engine — live state */}
+                <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05]">
+                  <span className="text-slate-300 text-[10px] font-medium">Perception Engine</span>
+                  <span className={`flex items-center gap-1 text-[9px] font-mono font-bold ${isBackendConnected ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${isBackendConnected ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                    {isBackendConnected ? 'ONLINE' : 'DEMO'}
+                  </span>
                 </div>
-                <span className="text-[9px] font-mono font-bold text-[#FFB703] bg-[#FFB703]/10 px-1.5 py-0.5 rounded border border-[#FFB703]/20">
-                  ONNX 14.2ms
-                </span>
+
+                {/* Model */}
+                <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05]">
+                  <span className="text-slate-300 text-[10px] font-medium">AI Model</span>
+                  <span className="text-[9px] font-mono font-bold text-[#FFB703]">YOLOv8s</span>
+                </div>
+
+                {/* ONNX Runtime */}
+                <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05]">
+                  <span className="text-slate-300 text-[10px] font-medium">Runtime</span>
+                  <span className="text-[9px] font-mono font-bold text-[#FFB703]">ONNX 14.2ms</span>
+                </div>
+
+                {/* Noise / Physics Filter */}
+                <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05]">
+                  <span className="text-slate-300 text-[10px] font-medium">Acoustic Filter</span>
+                  <span className="flex items-center gap-1 text-[9px] font-mono font-bold text-emerald-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    ACTIVE
+                  </span>
+                </div>
+
+                {/* Tracking Module */}
+                <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.05]">
+                  <span className="text-slate-300 text-[10px] font-medium">AFP Tracking</span>
+                  <span className="text-[9px] font-mono font-bold text-amber-400">DEMO</span>
+                </div>
               </div>
 
+              {/* MoES Protocol Banner */}
               <div className="p-2 rounded-lg bg-white/[0.02] border border-white/[0.06] text-xs space-y-0.5">
                 <div className="flex items-center justify-between text-slate-300 font-semibold">
                   <span className="flex items-center gap-1 text-slate-300">
@@ -180,7 +210,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </>
           ) : (
             <div className="flex justify-center py-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+              <span className={`w-2.5 h-2.5 rounded-full ${isBackendConnected ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]' : 'bg-amber-400'}`} />
             </div>
           )}
         </div>
@@ -188,4 +218,3 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </>
   );
 };
-

@@ -22,7 +22,7 @@ export const ModelInfoPage: React.FC = () => {
   const precision = modelInfo?.metrics?.precision ? (modelInfo.metrics.precision * 100).toFixed(1) + '%' : '77.7%';
   const recall = modelInfo?.metrics?.recall ? (modelInfo.metrics.recall * 100).toFixed(1) + '%' : '74.6%';
   const modelName = modelInfo?.name || 'YOLOv8s-SIH-Marine-Debris-V2';
-  const latency = modelInfo?.metrics?.benchmark_latency_ms ? `${modelInfo.metrics.benchmark_latency_ms} ms` : '14.5 ms';
+  const latency = modelInfo?.metrics?.benchmark_latency_ms ? `${modelInfo.metrics.benchmark_latency_ms} ms` : '14.2 ms';
 
   return (
     <div className="space-y-6 font-sans select-none text-xs text-slate-200">
@@ -45,11 +45,17 @@ export const ModelInfoPage: React.FC = () => {
       </div>
 
       {/* 2. Key Metric Tiles */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div className="p-3.5 subpixel-card rounded-xl border border-white/[0.08] space-y-1 text-center">
           <span className="text-[9px] text-slate-400 uppercase block font-mono font-bold">mAP@0.5 SCORE</span>
           <strong className="text-2xl font-black text-[#FFB703] font-mono">{map50}</strong>
           <span className="text-[8px] text-slate-500 block font-mono">HELD-OUT TEST SET (700 SSS TILES)</span>
+        </div>
+
+        <div className="p-3.5 subpixel-card rounded-xl border border-white/[0.08] space-y-1 text-center">
+          <span className="text-[9px] text-slate-400 uppercase block font-mono font-bold">mAP@0.5:0.95</span>
+          <strong className="text-2xl font-black text-[#38BDF8] font-mono">57.97%</strong>
+          <span className="text-[8px] text-slate-500 block font-mono">COCO STRICT IoU METRIC</span>
         </div>
 
         <div className="p-3.5 subpixel-card rounded-xl border border-white/[0.08] space-y-1 text-center">
@@ -61,7 +67,7 @@ export const ModelInfoPage: React.FC = () => {
         <div className="p-3.5 subpixel-card rounded-xl border border-white/[0.08] space-y-1 text-center">
           <span className="text-[9px] text-slate-400 uppercase block font-mono font-bold">INFERENCE LATENCY</span>
           <strong className="text-2xl font-black text-[#FFB703] font-mono">{latency}</strong>
-          <span className="text-[8px] text-slate-500 block font-mono">ONNX RUNTIME (CPU/GPU)</span>
+          <span className="text-[8px] text-slate-500 block font-mono">ONNX RUNTIME (CPU EDGE)</span>
         </div>
 
         <div className="p-3.5 subpixel-card rounded-xl border border-white/[0.08] space-y-1 text-center">
@@ -104,10 +110,10 @@ export const ModelInfoPage: React.FC = () => {
         {activeTab === 'architecture' && (
           <div className="space-y-4">
             <h3 className="text-xs font-black text-[#FFB703] uppercase tracking-wider">
-              YOLOv8n-Marine-Debris Architecture & ONNX Pipeline
+              YOLOv8s-Marine-Debris Architecture &amp; ONNX Pipeline
             </h3>
             <p className="text-slate-300 leading-relaxed text-[11px]">
-              The model utilizes a lightweight YOLOv8 Nano architecture fine-tuned specifically for single-channel side-scan sonar acoustic reflectivity arrays. The inference pipeline operates at a native resolution of 640×640 with an anchor-free split decoupled head.
+              The model utilizes a YOLOv8s (Small) architecture fine-tuned specifically for single-channel side-scan sonar acoustic reflectivity arrays. With 11.2M parameters, the inference pipeline operates at a native resolution of 640×640 with an anchor-free split decoupled head, delivering a strong accuracy-to-latency ratio on CPU edge hardware.
             </p>
 
             {/* Animated Neural Flow Diagram */}
@@ -117,7 +123,7 @@ export const ModelInfoPage: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-[10px] font-mono">
               <div className="p-3 bg-white/[0.02] border border-white/[0.08] rounded-xl">
                 <span className="text-slate-400 text-[8px] uppercase block">MODEL ARCHITECTURE</span>
-                <strong className="text-white font-bold">YOLOv8n (Ultralytics)</strong>
+                <strong className="text-white font-bold">YOLOv8s (Ultralytics)</strong>
               </div>
               <div className="p-3 bg-white/[0.02] border border-white/[0.08] rounded-xl">
                 <span className="text-slate-400 text-[8px] uppercase block">INFERENCE RUNTIME</span>

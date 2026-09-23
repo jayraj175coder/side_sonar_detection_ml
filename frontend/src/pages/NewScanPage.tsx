@@ -77,7 +77,7 @@ const PS_DELIVERABLES = [
   {
     num: '01',
     label: 'AI DETECTION',
-    sub: 'YOLOv8n bounding boxes & masks',
+    sub: 'YOLOv8s bounding boxes & masks',
     icon: Cpu,
     stageMin: 2,
   },
@@ -109,7 +109,7 @@ type PipelineMode = 'auto' | 'manual';
 // Stage definitions for manual mode
 const PIPELINE_STAGES = [
   { id: 1, label: '01 INGEST',    desc: 'Acoustic frame calibration & geotag ingestion' },
-  { id: 2, label: '02 DETECT',    desc: 'YOLOv8n ONNX tensor inference' },
+  { id: 2, label: '02 DETECT',    desc: 'YOLOv8s ONNX tensor inference' },
   { id: 3, label: '03 FILTER',    desc: 'Noise gate & false-positive suppression' },
   { id: 4, label: '04 REPORT',    desc: 'Geotag + structured anomaly dossier' },
 ];

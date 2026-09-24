@@ -78,49 +78,6 @@ export const CommandCenterDashboard: React.FC = () => {
                     <stop offset="100%" stopColor="#030811" stopOpacity="1" />
                   </linearGradient>
 
-                  {/* Operational Subsea Telemetry Animations */}
-                  <style>{`
-                    @keyframes subseaVesselBob {
-                      0%, 100% { transform: translate(370px, 24px) rotate(0deg); }
-                      50% { transform: translate(370px, 21.8px) rotate(0.35deg); }
-                    }
-                    @keyframes subseaRadarSweep {
-                      0% { transform: rotate(0deg); }
-                      100% { transform: rotate(360deg); }
-                    }
-                    @keyframes subseaNadirPulse {
-                      0% { stroke-dashoffset: 0; }
-                      100% { stroke-dashoffset: -32; }
-                    }
-                    @keyframes subseaBeamShimmer {
-                      0%, 100% { opacity: 0.40; }
-                      50% { opacity: 0.58; }
-                    }
-                    @keyframes acousticWavePulse {
-                      0% { opacity: 0; transform: translateY(0px) scaleX(0.35); }
-                      15% { opacity: 0.75; }
-                      80% { opacity: 0.35; }
-                      100% { opacity: 0; transform: translateY(280px) scaleX(1.0); }
-                    }
-                    @keyframes targetMarchDash {
-                      0% { stroke-dashoffset: 0; }
-                      100% { stroke-dashoffset: 24; }
-                    }
-                    @keyframes targetReticlePulse {
-                      0%, 100% { transform: scale(1); }
-                      50% { transform: scale(1.03); }
-                    }
-                    @keyframes benthicDrift {
-                      0% { transform: translate(0, 0); opacity: 0; }
-                      25% { opacity: 0.65; }
-                      75% { opacity: 0.65; }
-                      100% { transform: translate(45px, -18px); opacity: 0; }
-                    }
-                    @keyframes radarPingDot {
-                      0%, 100% { opacity: 0.3; transform: scale(0.9); }
-                      50% { opacity: 1; transform: scale(1.3); }
-                    }
-                  `}</style>
                 </defs>
 
                 {/* Depth Strata Reference Lines & Labels (Right Side) */}
@@ -138,86 +95,136 @@ export const CommandCenterDashboard: React.FC = () => {
                 <text x="635" y="280" fill="#64748B" fontSize="8" fontFamily="monospace" textAnchor="end">45 m</text>
                 <text x="635" y="289" fill="#64748B" fontSize="7" fontFamily="monospace" textAnchor="end">SEABED</text>
 
-                {/* Surface Survey Vessel: RV-SAGAR with Oceanic Bobbing Animation */}
-                <g style={{ animation: 'subseaVesselBob 4.8s ease-in-out infinite' }}>
-                  {/* Vessel Hull */}
-                  <path d="M 0,22 L 8,12 L 24,12 L 28,6 L 46,6 L 50,12 L 95,12 L 112,22 L 126,22 L 118,29 L 12,29 Z" fill="#E2E8F0" opacity="0.9" />
-                  <rect x="32" y="2" width="10" height="5" fill="#00F5D4" opacity="0.9" />
-                  <line x1="37" y1="-2" x2="37" y2="2" stroke="#FFFFFF" strokeWidth="1.5" />
-                  
-                  {/* Rotating Radar Scanner Antenna */}
-                  <g transform="translate(37, -2)">
-                    <circle cx="0" cy="0" r="2.5" fill="#FFB703" />
-                    <line
-                      x1="0"
-                      y1="0"
-                      x2="11"
-                      y2="-3"
-                      stroke="#FFB703"
-                      strokeWidth="1.4"
-                      strokeLinecap="round"
-                      style={{ transformOrigin: '0px 0px', animation: 'subseaRadarSweep 3s linear infinite' }}
+                {/* Surface Survey Vessel: RV-SAGAR with Oceanic Swell Animation */}
+                <g transform="translate(370, 24)">
+                  <g>
+                    <animateTransform
+                      attributeName="transform"
+                      type="translate"
+                      values="0,0; 0,-2.5; 0,0"
+                      dur="4.5s"
+                      repeatCount="indefinite"
                     />
-                    <circle cx="11" cy="-3" r="1.3" fill="#FFFFFF" opacity="0.9" />
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      values="0 56 18; 0.5 56 18; -0.35 56 18; 0 56 18"
+                      dur="6s"
+                      additive="sum"
+                      repeatCount="indefinite"
+                    />
+
+                    {/* Vessel Hull */}
+                    <path d="M 0,22 L 8,12 L 24,12 L 28,6 L 46,6 L 50,12 L 95,12 L 112,22 L 126,22 L 118,29 L 12,29 Z" fill="#E2E8F0" opacity="0.9" />
+                    <rect x="32" y="2" width="10" height="5" fill="#00F5D4" opacity="0.9" />
+                    <line x1="37" y1="-2" x2="37" y2="2" stroke="#FFFFFF" strokeWidth="1.5" />
+                    
+                    {/* Rotating Radar Scanner Antenna */}
+                    <g transform="translate(37, -2)">
+                      <circle cx="0" cy="0" r="2.5" fill="#FFB703" />
+                      <line x1="0" y1="0" x2="11" y2="-2" stroke="#FFB703" strokeWidth="1.4" strokeLinecap="round">
+                        <animateTransform
+                          attributeName="transform"
+                          type="rotate"
+                          from="0 0 0"
+                          to="360 0 0"
+                          dur="2.4s"
+                          repeatCount="indefinite"
+                        />
+                      </line>
+                      <circle cx="0" cy="0" r="7" fill="none" stroke="#FFB703" strokeWidth="0.5" opacity="0.35" />
+                    </g>
+
+                    {/* Vessel Name Callout */}
+                    <rect x="58" y="16" width="46" height="12" rx="2" fill="#050B14" stroke="#00F5D4" strokeWidth="0.6" opacity="0.8" />
+                    <text x="62" y="25" fill="#00F5D4" fontSize="7.5" fontWeight="bold" fontFamily="monospace">RV-SAGAR</text>
                   </g>
-
-                  {/* Vessel Name Callout */}
-                  <rect x="58" y="16" width="46" height="12" rx="2" fill="#050B14" stroke="#00F5D4" strokeWidth="0.6" opacity="0.8" />
-                  <text x="62" y="25" fill="#00F5D4" fontSize="7.5" fontWeight="bold" fontFamily="monospace">RV-SAGAR</text>
                 </g>
 
-                {/* Acoustic Conical Radiating Sonar Beams projecting from Vessel */}
-                <polygon
-                  points="420,53 230,340 420,340"
-                  fill="url(#beamPortHero)"
-                  style={{ animation: 'subseaBeamShimmer 3.2s ease-in-out infinite' }}
-                />
-                <polygon
-                  points="420,53 420,340 610,340"
-                  fill="url(#beamStbdHero)"
-                  style={{ animation: 'subseaBeamShimmer 3.2s ease-in-out infinite', animationDelay: '0.4s' }}
-                />
+                {/* Acoustic Conical Radiating Sonar Beams projecting from Vessel Keel */}
+                <polygon points="420,53 230,340 420,340" fill="url(#beamPortHero)">
+                  <animate attributeName="opacity" values="0.75; 0.95; 0.75" dur="3.2s" repeatCount="indefinite" />
+                </polygon>
+                <polygon points="420,53 420,340 610,340" fill="url(#beamStbdHero)">
+                  <animate attributeName="opacity" values="0.75; 0.95; 0.75" dur="3.2s" begin="0.4s" repeatCount="indefinite" />
+                </polygon>
 
-                {/* Downward Propagating Acoustic Wavefront Pulses */}
-                <g style={{ transformOrigin: '420px 53px' }}>
-                  <path
-                    d="M 380,53 Q 420,68 460,53"
-                    fill="none"
-                    stroke="#00F5D4"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    style={{
-                      animation: 'acousticWavePulse 3.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite',
-                      transformOrigin: '420px 53px',
-                    }}
-                  />
-                  <path
-                    d="M 380,53 Q 420,68 460,53"
-                    fill="none"
-                    stroke="#38BDF8"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    style={{
-                      animation: 'acousticWavePulse 3.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite',
-                      animationDelay: '1.2s',
-                      transformOrigin: '420px 53px',
-                    }}
-                  />
-                  <path
-                    d="M 380,53 Q 420,68 460,53"
-                    fill="none"
-                    stroke="#00F5D4"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    style={{
-                      animation: 'acousticWavePulse 3.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite',
-                      animationDelay: '2.4s',
-                      transformOrigin: '420px 53px',
-                    }}
-                  />
+                {/* Downward Propagating Acoustic Ping Wavefronts (Conical Radiating Arcs) */}
+                <g>
+                  {/* Ping Arc 1 */}
+                  <path fill="none" stroke="#00F5D4" strokeLinecap="round">
+                    <animate
+                      attributeName="d"
+                      values="M 405,68 Q 420,80 435,68; M 368,135 Q 420,165 472,135; M 315,220 Q 420,265 525,220; M 250,310 Q 420,370 590,310"
+                      dur="2.5s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.9; 0.7; 0.4; 0"
+                      dur="2.5s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="stroke-width"
+                      values="2.2; 1.6; 1.1; 0.5"
+                      dur="2.5s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
+
+                  {/* Ping Arc 2 (offset) */}
+                  <path fill="none" stroke="#38BDF8" strokeLinecap="round">
+                    <animate
+                      attributeName="d"
+                      values="M 405,68 Q 420,80 435,68; M 368,135 Q 420,165 472,135; M 315,220 Q 420,265 525,220; M 250,310 Q 420,370 590,310"
+                      dur="2.5s"
+                      begin="0.83s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.9; 0.7; 0.4; 0"
+                      dur="2.5s"
+                      begin="0.83s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="stroke-width"
+                      values="2.2; 1.6; 1.1; 0.5"
+                      dur="2.5s"
+                      begin="0.83s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
+
+                  {/* Ping Arc 3 (offset) */}
+                  <path fill="none" stroke="#00F5D4" strokeLinecap="round">
+                    <animate
+                      attributeName="d"
+                      values="M 405,68 Q 420,80 435,68; M 368,135 Q 420,165 472,135; M 315,220 Q 420,265 525,220; M 250,310 Q 420,370 590,310"
+                      dur="2.5s"
+                      begin="1.66s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.9; 0.7; 0.4; 0"
+                      dur="2.5s"
+                      begin="1.66s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="stroke-width"
+                      values="2.2; 1.6; 1.1; 0.5"
+                      dur="2.5s"
+                      begin="1.66s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
                 </g>
 
-                {/* Center Nadir Acoustic Line with Continuous Downward Flow */}
+                {/* Center Nadir Acoustic Line with Continuous Downward Sounding */}
                 <line
                   x1="420"
                   y1="53"
@@ -227,8 +234,9 @@ export const CommandCenterDashboard: React.FC = () => {
                   strokeWidth="1.2"
                   strokeDasharray="4,4"
                   opacity="0.85"
-                  style={{ animation: 'subseaNadirPulse 1.2s linear infinite' }}
-                />
+                >
+                  <animate attributeName="stroke-dashoffset" values="0; -16" dur="0.8s" repeatCount="indefinite" />
+                </line>
 
                 {/* Seabed Bathymetric Strata Layer */}
                 <path d="M 180,335 Q 320,325 450,335 T 650,330 L 650,380 L 180,380 Z" fill="url(#seabedGradHero)" />
@@ -249,23 +257,37 @@ export const CommandCenterDashboard: React.FC = () => {
                 ))}
 
                 {/* Benthic Current Micro-Drift Particles */}
-                <circle cx="280" cy="330" r="1.2" fill="#00F5D4" style={{ animation: 'benthicDrift 6.5s linear infinite' }} />
-                <circle cx="390" cy="315" r="1.4" fill="#38BDF8" style={{ animation: 'benthicDrift 7.8s linear infinite', animationDelay: '2.2s' }} />
-                <circle cx="510" cy="325" r="1.1" fill="#FFB703" style={{ animation: 'benthicDrift 7.0s linear infinite', animationDelay: '3.8s' }} />
+                <circle cx="280" cy="330" r="1.2" fill="#00F5D4">
+                  <animate attributeName="cx" values="280; 335; 280" dur="8s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.3; 0.85; 0.3" dur="8s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="390" cy="315" r="1.4" fill="#38BDF8">
+                  <animate attributeName="cx" values="390; 450; 390" dur="9.5s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.3; 0.8; 0.3" dur="9.5s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="510" cy="325" r="1.1" fill="#FFB703">
+                  <animate attributeName="cx" values="510; 565; 510" dur="7.5s" repeatCount="indefinite" />
+                  <animate attributeName="opacity" values="0.3; 0.85; 0.3" dur="7.5s" repeatCount="indefinite" />
+                </circle>
 
-                {/* ── Annotated Bounding Boxes on Seabed with Subtle Pulsing Reticles ── */}
-                {/* 1. Target: Pipeline (Red Box) */}
-                <g transform="translate(480, 260)" style={{ animation: 'targetReticlePulse 3.8s ease-in-out infinite', transformOrigin: '480px 260px' }}>
-                  <rect x="-18" y="-12" width="36" height="24" rx="2" fill="rgba(239, 68, 68, 0.15)" stroke="#EF4444" strokeWidth="1.5" />
+                {/* ── Annotated Bounding Boxes on Seabed ── */}
+                {/* 1. Target: Pipeline (Red Box) with Corner Targeting Reticles */}
+                <g transform="translate(480, 260)">
+                  <rect x="-18" y="-12" width="36" height="24" rx="2" fill="rgba(239, 68, 68, 0.15)" stroke="#EF4444" strokeWidth="1.5">
+                    <animate attributeName="stroke-opacity" values="0.65; 1; 0.65" dur="1.8s" repeatCount="indefinite" />
+                  </rect>
+                  {/* Corner Targeting Brackets */}
+                  <path d="M -21,-8 L -21,-14 L -15,-14 M 15,-14 L 21,-14 L 21,-8 M 21,8 L 21,14 L 15,14 M -15,14 L -21,14 L -21,8" fill="none" stroke="#EF4444" strokeWidth="1.2">
+                    <animate attributeName="opacity" values="0.4; 1; 0.4" dur="1.8s" repeatCount="indefinite" />
+                  </path>
                   <rect x="-18" y="-23" width="36" height="11" rx="1" fill="#EF4444" />
                   <text x="0" y="-15" fill="#FFFFFF" fontSize="6.5" fontWeight="bold" fontFamily="monospace" textAnchor="middle">Pipeline</text>
                   <text x="0" y="-7" fill="#EF4444" fontSize="6.5" fontWeight="bold" fontFamily="monospace" textAnchor="middle">87.6%</text>
-                  {/* Subtle 3D wireframe cylinder representing pipeline segment */}
                   <line x1="-12" y1="2" x2="12" y2="2" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" />
                 </g>
 
-                {/* 2. Target: Ghost Net (Teal/Green Box) with Animated Marching Dashes */}
-                <g transform="translate(370, 310)" style={{ animation: 'targetReticlePulse 4.2s ease-in-out infinite', animationDelay: '0.6s', transformOrigin: '370px 310px' }}>
+                {/* 2. Target: Ghost Net (Teal/Green Box) with Marching Dashes */}
+                <g transform="translate(370, 310)">
                   <rect
                     x="-20"
                     y="-16"
@@ -276,8 +298,9 @@ export const CommandCenterDashboard: React.FC = () => {
                     stroke="#00F5D4"
                     strokeWidth="1.5"
                     strokeDasharray="4,2"
-                    style={{ animation: 'targetMarchDash 2.5s linear infinite' }}
-                  />
+                  >
+                    <animate attributeName="stroke-dashoffset" values="0; 12" dur="1.4s" repeatCount="indefinite" />
+                  </rect>
                   <rect x="-20" y="-28" width="40" height="12" rx="1" fill="#00F5D4" />
                   <text x="0" y="-20" fill="#05070B" fontSize="7" fontWeight="900" fontFamily="monospace" textAnchor="middle">Ghost Net</text>
                   <text x="0" y="-12" fill="#00F5D4" fontSize="7" fontWeight="bold" fontFamily="monospace" textAnchor="middle">94.2%</text>
@@ -285,18 +308,21 @@ export const CommandCenterDashboard: React.FC = () => {
                   <path d="M -12,-8 L 12,8 M -12,8 L 12,-8" stroke="#00F5D4" strokeWidth="0.8" opacity="0.6" />
                 </g>
 
-                {/* 3. Target: Marine Debris (Amber/Yellow Box) with Radar Halo Ping */}
-                <g transform="translate(450, 335)" style={{ animation: 'targetReticlePulse 3.5s ease-in-out infinite', animationDelay: '1.2s', transformOrigin: '450px 335px' }}>
+                {/* 3. Target: Marine Debris (Amber/Yellow Box) with Expanding Sonar Ping Echo */}
+                <g transform="translate(450, 335)">
                   <rect x="-18" y="-14" width="36" height="28" rx="2" fill="rgba(255, 183, 3, 0.15)" stroke="#FFB703" strokeWidth="1.5" />
                   <rect x="-18" y="-25" width="44" height="11" rx="1" fill="#FFB703" />
                   <text x="4" y="-17" fill="#05070B" fontSize="6.5" fontWeight="900" fontFamily="monospace" textAnchor="middle">Marine Debris</text>
                   <text x="0" y="-7" fill="#FFB703" fontSize="6.5" fontWeight="bold" fontFamily="monospace" textAnchor="middle">76.3%</text>
-                  <circle cx="0" cy="2" r="4" fill="none" stroke="#FFB703" strokeWidth="1.2" />
-                  <circle cx="0" cy="2" r="8" fill="none" stroke="#FFB703" strokeWidth="0.6" opacity="0.5" style={{ animation: 'radarPingDot 2s ease-in-out infinite' }} />
+                  <circle cx="0" cy="2" r="3.5" fill="#FFB703" />
+                  <circle cx="0" cy="2" r="4" fill="none" stroke="#FFB703" strokeWidth="1">
+                    <animate attributeName="r" values="3; 14" dur="2s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.9; 0" dur="2s" repeatCount="indefinite" />
+                  </circle>
                 </g>
 
-                {/* 4. Target: Seafloor Anomaly (Cyan Dashed Box) with Shimmer */}
-                <g transform="translate(535, 305)" style={{ animation: 'targetReticlePulse 4s ease-in-out infinite', animationDelay: '1.8s', transformOrigin: '535px 305px' }}>
+                {/* 4. Target: Seafloor Anomaly (Cyan Dashed Box) with Acoustic Shimmer */}
+                <g transform="translate(535, 305)">
                   <rect
                     x="-18"
                     y="-14"
@@ -307,19 +333,25 @@ export const CommandCenterDashboard: React.FC = () => {
                     stroke="#38BDF8"
                     strokeWidth="1.2"
                     strokeDasharray="3,3"
-                    style={{ animation: 'targetMarchDash 3s linear infinite' }}
-                  />
+                  >
+                    <animate attributeName="stroke-dashoffset" values="0; 12" dur="2.2s" repeatCount="indefinite" />
+                  </rect>
                   <rect x="-22" y="-25" width="48" height="11" rx="1" fill="#0284C7" />
                   <text x="2" y="-17" fill="#FFFFFF" fontSize="6" fontWeight="bold" fontFamily="monospace" textAnchor="middle">Seafloor Anomaly</text>
                   <text x="0" y="-7" fill="#38BDF8" fontSize="6.5" fontWeight="bold" fontFamily="monospace" textAnchor="middle">68.1%</text>
-                  <ellipse cx="0" cy="2" rx="7" ry="4" fill="#38BDF8" opacity="0.5" />
+                  <ellipse cx="0" cy="2" rx="7" ry="4" fill="#38BDF8">
+                    <animate attributeName="opacity" values="0.3; 0.7; 0.3" dur="2.5s" repeatCount="indefinite" />
+                  </ellipse>
                 </g>
 
                 {/* Top-Right Mission Telemetry Box with Active Pulse Dot */}
                 <g transform="translate(470, 30)">
                   <rect x="0" y="0" width="160" height="52" rx="4" fill="#050B14" stroke="rgba(255, 255, 255, 0.12)" strokeWidth="0.8" opacity="0.9" />
                   <circle cx="148" cy="14" r="2.5" fill="#00F5D4" />
-                  <circle cx="148" cy="14" r="5" fill="none" stroke="#00F5D4" strokeWidth="0.8" opacity="0.6" style={{ animation: 'radarPingDot 1.5s ease-in-out infinite' }} />
+                  <circle cx="148" cy="14" r="5" fill="none" stroke="#00F5D4" strokeWidth="0.8">
+                    <animate attributeName="r" values="3; 7; 3" dur="1.8s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.9; 0.1; 0.9" dur="1.8s" repeatCount="indefinite" />
+                  </circle>
                   <text x="10" y="14" fill="#94A3B8" fontSize="7.5" fontFamily="monospace">MISSION: <tspan fill="#FFFFFF" fontWeight="bold">MX-026</tspan></text>
                   <text x="10" y="25" fill="#94A3B8" fontSize="7.5" fontFamily="monospace">SECTOR:  <tspan fill="#FFFFFF" fontWeight="bold">ARABIAN SEA</tspan></text>
                   <text x="10" y="36" fill="#94A3B8" fontSize="7.5" fontFamily="monospace">AUV:     <tspan fill="#00F5D4" fontWeight="bold">AUV-04</tspan></text>

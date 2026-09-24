@@ -172,16 +172,16 @@ def get_printable_html_report(scan_id: str):
         .badge.high {{ background: rgba(45,212,191,0.2); color: #2dd4bf; border: 1px solid #2dd4bf; }}
         .badge.medium {{ background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid #fb923c; }}
         .footer {{ font-size: 10px; color: #64748b; margin-top: 30px; text-align: center; border-top: 1px solid #334155; padding-top: 16px; }}
-        .no-print { display: flex; }
-        @media print {
-            body { background: white; color: black; padding: 0; }
-            .card { background: white; border: 1px solid #ccc; color: black; box-shadow: none; }
-            .metric-box { background: #f8fafc; border: 1px solid #ccc; color: black; }
-            .metric-val { color: #0f766e; }
-            th { background: #f1f5f9; color: black; }
-            td { border-bottom: 1px solid #ddd; }
-            .no-print { display: none !important; }
-        }
+        .no-print {{ display: flex; }}
+        @media print {{
+            body {{ background: white; color: black; padding: 0; }}
+            .card {{ background: white; border: 1px solid #ccc; color: black; box-shadow: none; }}
+            .metric-box {{ background: #f8fafc; border: 1px solid #ccc; color: black; }}
+            .metric-val {{ color: #0f766e; }}
+            th {{ background: #f1f5f9; color: black; }}
+            td {{ border-bottom: 1px solid #ddd; }}
+            .no-print {{ display: none !important; }}
+        }}
     </style>
 </head>
 <body>
@@ -249,11 +249,11 @@ def get_printable_html_report(scan_id: str):
         </div>
     </div>
     <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
+        window.addEventListener('load', function() {{
+            setTimeout(function() {{
                 window.print();
-            }, 300);
-        });
+            }}, 300);
+        }});
     </script>
 </body>
 </html>"""

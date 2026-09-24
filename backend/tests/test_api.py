@@ -209,7 +209,7 @@ def test_scan_repository_and_moes_report_workflow():
     assert fetched.filename == "test_acoustic_swath.png"
     assert fetched.location.heading == 120.0
 
-    # Report
+    # Report JSON
     report_res = client.get("/api/scans/SCAN-TEST-MOES-01/report")
     assert report_res.status_code == 200
     report_data = report_res.json()
@@ -217,7 +217,32 @@ def test_scan_repository_and_moes_report_workflow():
     assert "Ministry of Earth Sciences" in report_data["analyst_summary"] or "Ghost Net" in report_data["analyst_summary"]
     assert "disclaimer" in report_data
 
+    # Printable HTML / PDF Dossier
+    html_res = client.get("/api/scans/SCAN-TEST-MOES-01/report/html")
+    assert html_res.status_code == 200
+    assert "text/html" in html_res.headers.get("content-type", "")
+    assert "SONARX // SUBSEA INTELLIGENCE DOSSIER" in html_res.text
+    assert "SCAN-TEST-MOES-01" in html_res.text
+    assert "ghost_net_aldfg" in html_res.text
+
     # Delete
     del_res = client.delete("/api/scans/SCAN-TEST-MOES-01")
     assert del_res.status_code == 200
     assert scan_repository.get("SCAN-TEST-MOES-01") is None
+
+
+def test_stats_and_scan_listing():
+    """Verifies stats aggregation and scan listing pagination."""
+    # List scans
+    list_res = client.get("/api/scans?limit=5&offset=0")
+    assert list_res.status_code == 200
+    assert isinstance(list_res.json(), list)
+
+    # Get stats
+    stats_res = client.get("/api/stats")
+    assert stats_res.status_code == 200
+    stats_data = stats_res.json()
+    assert "total_scans" in stats_data
+    assert "objects_detected" in stats_data
+    assert "class_distribution" in stats_data
+

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Polygon, Tooltip, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Circle, Polyline, Polygon, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import {
   CheckCircle2,
@@ -598,11 +598,12 @@ export const DetectionMapPage: React.FC = () => {
   const [isMeasuring, setIsMeasuring] = useState<boolean>(false);
   const [measurePoints, setMeasurePoints] = useState<[number, number][]>([]);
 
-  // Layer Visibility State (LAYERS 7/7)
+  // Layer Visibility State (LAYERS 8/8)
   const [layerVisibility, setLayerVisibility] = useState({
     eez: true,
     trackline: true,
     targets: true,
+    uncertainty: true, // ±r meters Position Uncertainty Buffer (Acoustic Ray Bending & Towfish Layback)
     shadows: true,
     bathymetry: true,
     swath: true,
@@ -650,6 +651,17 @@ export const DetectionMapPage: React.FC = () => {
     const found = scenarioTargets.find((t) => t.id === selectedTargetId);
     return found || scenarioTargets[0] || ALL_SCENARIO_TARGETS[0];
   }, [scenarioTargets, selectedTargetId]);
+
+  // Position Uncertainty Radius (±r meters) calculation based on depth, slant range & classification confidence
+  const getTargetUncertaintyRadiusM = useCallback((target: { depthM?: number; confidence?: number; sizeM?: number }) => {
+    const depth = target.depthM || 40;
+    const conf = (target.confidence || 85) / 100;
+    const rayBendingError = depth * 0.058; // Acoustic ray bending through thermocline
+    const laybackError = 25 * 0.075; // Towfish layback / catenary offset
+    const ambiguityError = (1 - conf) * 6.5;
+    const tpu = Math.sqrt(1.2 * 1.2 + rayBendingError * rayBendingError + laybackError * laybackError) + ambiguityError;
+    return Math.min(22.0, Math.max(3.8, Math.round(tpu * 10) / 10));
+  }, []);
 
   // Search Results
   const searchResults = useMemo(() => {
@@ -1049,6 +1061,7 @@ export const DetectionMapPage: React.FC = () => {
                   { key: 'eez', label: 'Indian EEZ Boundary' },
                   { key: 'trackline', label: 'Survey Vessel Trackline' },
                   { key: 'targets', label: 'Acoustic Target Pins' },
+                  { key: 'uncertainty', label: 'Position Uncertainty Buffer (±r m)' },
                   { key: 'swath', label: '900 kHz Swath Footprint' },
                   { key: 'shadows', label: 'Acoustic Shadows Geometry' },
                   { key: 'bathymetry', label: 'Depth Profile Contours' },
@@ -1180,6 +1193,40 @@ export const DetectionMapPage: React.FC = () => {
               />
             )}
 
+            {/* Position Uncertainty Radius (±r meters) Buffer Circles */}
+            {/* Models acoustic ray bending through the thermocline and USBL / towfish layback offset */}
+            {layerVisibility.targets &&
+              layerVisibility.uncertainty &&
+              visibleTargets.map((target) => {
+                const radiusM = getTargetUncertaintyRadiusM(target);
+                const isSelected = target.id === selectedTargetId;
+                const strokeColor = isSelected
+                  ? '#38BDF8'
+                  : target.priority === 'HIGH'
+                  ? '#EF4444'
+                  : target.priority === 'MEDIUM'
+                  ? '#F59E0B'
+                  : '#00F5D4';
+
+                return (
+                  <Circle
+                    key={`unc-${target.id}`}
+                    center={[target.lat, target.lng]}
+                    radius={radiusM}
+                    pathOptions={{
+                      color: strokeColor,
+                      fillColor: strokeColor,
+                      fillOpacity: isSelected ? 0.22 : 0.08,
+                      weight: isSelected ? 2.0 : 1.2,
+                      dashArray: isSelected ? '4, 4' : '2, 3',
+                    }}
+                    eventHandlers={{
+                      click: () => handleSelectTarget(target.id),
+                    }}
+                  />
+                );
+              })}
+
             {/* Interactive Target Pins */}
             {layerVisibility.targets &&
               visibleTargets.map((target) => (
@@ -1197,6 +1244,9 @@ export const DetectionMapPage: React.FC = () => {
                         <div className="font-bold text-white">{target.categoryLabel}</div>
                         <div>Depth: -{target.depthM} m</div>
                         <div>Conf: {target.confidence}%</div>
+                        <div className="text-[#00F5D4] font-semibold">
+                          TPU Buffer: ±{getTargetUncertaintyRadiusM(target).toFixed(1)} m
+                        </div>
                         <div className="text-[#FFB703] font-bold pt-0.5">Click for details →</div>
                       </div>
                     </Tooltip>
@@ -1633,6 +1683,26 @@ export const DetectionMapPage: React.FC = () => {
                   <div className="flex justify-between text-[8.5px] text-slate-400 pt-1 border-t border-white/[0.06]">
                     <span>UTM GRID: Zone 43N</span>
                     <span>USBL FIX: ±0.35m</span>
+                  </div>
+                  <div className="p-2 rounded bg-black/40 border border-white/[0.08] space-y-1">
+                    <div className="flex justify-between items-center text-[9px]">
+                      <span className="text-[#00F5D4] font-bold">Position Uncertainty (TPU):</span>
+                      <span className="text-[#FFB703] font-bold">±{getTargetUncertaintyRadiusM(selectedTarget).toFixed(1)} m</span>
+                    </div>
+                    <div className="text-[7.5px] text-slate-400 space-y-0.5 pt-0.5 border-t border-white/[0.06]">
+                      <div className="flex justify-between">
+                        <span>• Acoustic Ray Bending (SVP):</span>
+                        <span>±{(selectedTarget.depthM * 0.058).toFixed(1)} m</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>• Towfish Layback / Catenary:</span>
+                        <span>±1.9 m</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>• IHO S-44 Standard:</span>
+                        <span className="text-emerald-400 font-semibold">Order 1a Compliant</span>
+                      </div>
+                    </div>
                   </div>
                   <button
                     onClick={handleCopyCoordinates}

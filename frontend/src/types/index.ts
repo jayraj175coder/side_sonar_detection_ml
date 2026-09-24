@@ -218,6 +218,7 @@ export interface MissionTarget {
   color: string;
   evidence: TargetEvidence;
   detectionEvidence: string[];
+  uncertaintyRadiusM?: number; // Total Propagated Uncertainty (TPU) ±r meters (Acoustic Ray Bending & Towfish Layback Offset - IHO S-44 Order 1a)
   reviewStatus?: 'UNREVIEWED' | 'CONFIRMED' | 'REJECTED';
 }
 

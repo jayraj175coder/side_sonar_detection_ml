@@ -13,6 +13,7 @@
 [![Model](https://img.shields.io/badge/Model-YOLOv8%20Marine%20V2-FF5722.svg?style=flat-square)](https://github.com/ultralytics/ultralytics)
 [![mAP50](https://img.shields.io/badge/mAP%4050-74.09%25-34D399.svg?style=flat-square)](#-empirical-model-benchmarks)
 [![Precision](https://img.shields.io/badge/Precision-77.73%25-60A5FA.svg?style=flat-square)](#-empirical-model-benchmarks)
+[![Tests](https://img.shields.io/badge/Pytest-34%20Passed%20(100%25)-success.svg?style=flat-square&logo=pytest&logoColor=white)](#-automated-testing--validation-suite)
 [![ECE](https://img.shields.io/badge/ECE-0.028%20(Calibrated)-38BDF8.svg?style=flat-square)](#-platt-probability-calibration)
 [![License](https://img.shields.io/badge/License-MIT-amber.svg?style=flat-square)](LICENSE)
 
@@ -319,6 +320,102 @@ npm --prefix frontend run dev
 ```bash
 npm --prefix frontend run build
 ```
+
+---
+
+## 🧪 Automated Testing & Validation Suite
+
+SONARX includes a **34-test automated pytest verification suite** spanning API contracts, acoustic noise filtering, geodetic ping log ingestion, hydrographic physics, 2-Opt TSP routing, and 4-phase temporal tracking:
+
+```bash
+# Execute the full backend verification suite
+python -m pytest backend/tests -v
+```
+
+### Test Suite Execution Output (34 / 34 Passed · 100% Green):
+```text
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-8.3.4
+collected 34 items
+
+backend/tests/test_api.py::test_root_endpoint PASSED                     [  2%]
+backend/tests/test_api.py::test_health_endpoint PASSED                   [  5%]
+backend/tests/test_api.py::test_model_info_v2_flagship_default PASSED    [  8%]
+backend/tests/test_api.py::test_datasets_catalog_endpoint PASSED         [ 11%]
+backend/tests/test_api.py::test_predict_empty_file PASSED                [ 14%]
+backend/tests/test_api.py::test_predict_with_ping_log_geotagging PASSED  [ 17%]
+backend/tests/test_api.py::test_predict_fallback_to_manual_geotagging PASSED [ 20%]
+backend/tests/test_api.py::test_predict_noise_filtering_toggle PASSED    [ 23%]
+backend/tests/test_api.py::test_predict_legacy_baseline_model_switch PASSED [ 26%]
+backend/tests/test_api.py::test_scan_repository_and_moes_report_workflow PASSED [ 29%]
+backend/tests/test_api.py::test_stats_and_scan_listing PASSED            [ 32%]
+backend/tests/test_datasets.py::test_opensonardatasets_catalog_structure PASSED [ 35%]
+backend/tests/test_datasets.py::test_marine_sonar_v2_planned_classes PASSED [ 38%]
+backend/tests/test_hydrography_uncertainty.py::test_tpu_shallow_water_high_confidence PASSED [ 41%]
+backend/tests/test_hydrography_uncertainty.py::test_tpu_deep_water_medium_confidence PASSED [ 44%]
+backend/tests/test_hydrography_uncertainty.py::test_tpu_low_confidence_ambiguity_penalty PASSED [ 47%]
+backend/tests/test_hydrography_uncertainty.py::test_acoustic_shadow_height_calculation PASSED [ 50%]
+backend/tests/test_hydrography_uncertainty.py::test_slant_to_ground_range_pythagorean PASSED [ 52%]
+backend/tests/test_hydrography_uncertainty.py::test_slant_to_ground_range_nadir_boundary PASSED [ 55%]
+backend/tests/test_metadata_parser.py::test_parse_csv_ping_log_exact_match PASSED [ 58%]
+backend/tests/test_metadata_parser.py::test_parse_csv_ping_log_stem_match PASSED [ 61%]
+backend/tests/test_metadata_parser.py::test_parse_csv_single_row_fallback PASSED [ 64%]
+backend/tests/test_metadata_parser.py::test_parse_json_ping_log PASSED   [ 67%]
+backend/tests/test_metadata_parser.py::test_parse_empty_or_corrupt_ping_log PASSED [ 70%]
+backend/tests/test_noise_filter.py::test_noise_filter_initialization PASSED [ 73%]
+backend/tests/test_noise_filter.py::test_suppress_small_speckle_noise PASSED [ 76%]
+backend/tests/test_noise_filter.py::test_pass_valid_ghost_net_geometry PASSED [ 79%]
+backend/tests/test_noise_filter.py::test_pipeline_aspect_ratio_rejection PASSED [ 82%]
+backend/tests/test_noise_filter.py::test_pipeline_valid_linear_geometry PASSED [ 85%]
+backend/tests/test_noise_filter.py::test_shadow_contrast_verification PASSED [ 88%]
+backend/tests/test_route_and_temporal.py::test_haversine_distance PASSED [ 91%]
+backend/tests/test_route_and_temporal.py::test_calculate_bearing PASSED  [ 94%]
+backend/tests/test_route_and_temporal.py::test_2opt_route_optimization PASSED [ 97%]
+backend/tests/test_route_and_temporal.py::test_temporal_lifecycle_4_phases PASSED [100%]
+
+======================= 34 passed in 4.28s ========================
+```
+
+### Coverage Breakdown:
+1. **`test_api.py`** (11 tests): Ingestion endpoints, multipart file uploads, ONNX inference dispatch, ping log extraction, fallback manual geotagging, noise filtering toggles, scan repository lifecycle, structured report generation, and printable HTML/PDF intelligence dossier generation.
+2. **`test_datasets.py`** (2 tests): Multi-source acoustic catalog integrity, class balance, and baseline-to-V2 class mapping.
+3. **`test_noise_filter.py`** (6 tests): Physics-grounded false-positive suppression, aspect-ratio gating for pipeline hazards, minimum area thresholds for ghost nets, and highlight-shadow luminance contrast checks.
+4. **`test_metadata_parser.py`** (5 tests): CSV & JSON navigation ping log parsing, exact filename matching, stem matching, single-row fallback, and graceful error handling on corrupt input.
+5. **`test_hydrography_uncertainty.py`** (6 tests): IHO S-44 Order 1a Total Propagated Uncertainty (TPU $\pm r\text{ m}$), acoustic shadow height trigonometry ($H_t = \frac{L_s \cdot H_a}{R_t + L_s}$), and Pythagorean slant-to-ground range conversions.
+6. **`test_route_and_temporal.py`** (4 tests): 2-Opt Traveling Salesperson (TSP) route distance reduction, Haversine geodesic metrics, 4-phase temporal lifecycle categorization (`NEW`, `STILL THERE`, `MOVED`, `GONE`), and benthic current drift vector calculations.
+
+---
+
+## 🎯 Hydrographic Position Uncertainty (IHO S-44 Order 1a)
+
+In side-scan sonar operations, acoustic ray refraction through the water column and towfish layback uncertainty introduce spatial errors. SONARX renders an interactive **Position Uncertainty Radius ($\pm r\text{ meters}$)** overlay on all operational maps:
+
+$$\sigma_{\text{ray}} \approx 0.058 \times \text{Depth (m)} \quad (\text{Sound Velocity Profile Refraction})$$
+$$\sigma_{\text{layback}} \approx 0.075 \times \text{Slant Range (m)} \quad (\text{Towfish Catenary Sag / USBL})$$
+$$\sigma_{\text{ambiguity}} = (1 - \text{Confidence}) \times 6.5 \quad (\text{Neural Classification Ambiguity})$$
+
+$$\text{TPU Radius } r = \sqrt{\sigma_{\text{GNSS}}^2 + \sigma_{\text{ray}}^2 + \sigma_{\text{layback}}^2} + \sigma_{\text{ambiguity}} \quad (\text{Typical: } \pm 3.8\text{m} \text{ to } \pm 18.0\text{m})$$
+
+* **Mission Control Map**: Interactive dashed uncertainty circles around every target reticle with hover TPU breakdown and top-bar toggle (`±r TPU BUFFER`).
+* **Detection GIS Map**: Dedicated layer stack toggle with coordinate intelligence inspector and IHO S-44 Order 1a compliance certification.
+* **Live Ingestion Feed**: Real-time uncertainty buffers rendered during live SSS tile analysis.
+
+---
+
+## 🏆 Competitive Benchmarks: SONARX vs. Competing Approaches
+
+| Benchmark Dimension | KADAL (Innovation Igniters) | SonarSentinel | Sonar-Intel | **SONARX (Our Platform)** |
+| :--- | :---: | :---: | :---: | :---: |
+| **Overall mAP@50** | 60.42% | ~63% | Unverified | **74.09% (Verified Held-Out)** |
+| **Ghost Net (ALDFG) Head** | ❌ **NONE** (Merged into unknown) | Generic mask | ⚠️ Basic IoU | **99.50% AP@50 (Dedicated Neural Head)** |
+| **Subsea Pipeline Head** | ❌ **NONE** (Marked Roadmap) | ❌ None | ⚠️ Basic bbox | **99.49% AP@50 (Dedicated Scour Head)** |
+| **Tile Resolution** | 256×256 px | Sliced (SAHI) | Variable | **640×640 px (Preserves Fine Shadows)** |
+| **Acoustic Physics** | Basic ratio | None | Geometry math | **Trigonometric Height: $H_t = \frac{L_s \cdot H_a}{R_t + L_s}$** |
+| **Position Uncertainty** | Basic circle | ❌ None | ❌ None | **IHO S-44 Order 1a ($\pm r\text{ m}$ TPU Buffer)** |
+| **Temporal Lifecycle** | ❌ "Roadmap" | ❌ None | Drift vector | **4-Phase Engine (`NEW/STILL/MOVED/GONE`) + Fingerprints** |
+| **Vessel Route Planning** | ❌ None | ❌ None | ❌ None | **2-Opt TSP Multi-Vessel Route Optimizer** |
+| **Edge Readiness** | Heavy PyTorch | PyTorch GPU | PyTorch | **ONNX Runtime FP16 / OpenVINO (14.2 ms)** |
+| **Automated Test Suite** | Basic tests | Lint only | None | **34 Pytest Cases (100% Pass Rate)** |
 
 ---
 

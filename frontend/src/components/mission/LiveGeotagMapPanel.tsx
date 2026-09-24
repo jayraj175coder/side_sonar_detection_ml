@@ -121,15 +121,34 @@ export const LiveGeotagMapPanel: React.FC<LiveGeotagMapPanelProps> = ({
         iconAnchor: [10, 10],
       });
 
+      // Position Uncertainty Radius (±r meters) - Acoustic ray bending & towfish layback
+      const rayBending = (box.depthM || 40) * 0.058;
+      const layback = 25 * 0.075;
+      const ambiguity = (1 - (box.confidence || 0.85)) * 6.5;
+      const uncertaintyM = Math.min(22.0, Math.max(3.8, Math.round((Math.sqrt(1.2 * 1.2 + rayBending * rayBending + layback * layback) + ambiguity) * 10) / 10));
+
+      const circle = L.circle([box.lat, box.lon], {
+        radius: uncertaintyM,
+        color: markerColor,
+        fillColor: markerColor,
+        fillOpacity: isSelected ? 0.22 : 0.08,
+        weight: isSelected ? 2 : 1.2,
+        dashArray: isSelected ? '4, 4' : '2, 3',
+      }).addTo(map);
+      markersRef.current.push(circle);
+
       const marker = L.marker([box.lat, box.lon], { icon: customIcon })
         .addTo(map)
         .bindPopup(
           `
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #E4F2F5; background: #081118; padding: 6px; border-radius: 8px; border: 1px solid #16303B;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #E4F2F5; background: #081118; padding: 7px; border-radius: 8px; border: 1px solid #16303B; min-width: 170px;">
             <strong style="color: ${markerColor};">${box.id} // ${box.label}</strong><br/>
             <span>Confidence: ${(box.confidence * 100).toFixed(1)}%</span><br/>
             <span>Depth: ${box.depthM.toFixed(1)}m</span><br/>
-            <span>Coords: ${box.lat.toFixed(4)}°N, ${box.lon.toFixed(4)}°E</span>
+            <span>Coords: ${box.lat.toFixed(4)}°N, ${box.lon.toFixed(4)}°E</span><br/>
+            <div style="margin-top: 4px; padding-top: 4px; border-top: 1px solid #16303B; color: #00F5D4; font-size: 10px; font-weight: bold;">
+              TPU Buffer: ±${uncertaintyM.toFixed(1)} m (IHO S-44)
+            </div>
           </div>
         `,
           { className: 'sonar-dark-popup' }
@@ -188,6 +207,10 @@ export const LiveGeotagMapPanel: React.FC<LiveGeotagMapPanelProps> = ({
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-[#FF5D5D]" />
             <span>Filtered Noise</span>
+          </span>
+          <span className="flex items-center gap-1 border-l border-[#16303B] pl-2 text-[#00F5D4]">
+            <span className="w-2.5 h-2.5 rounded-full border border-dashed border-[#00F5D4] bg-[#00F5D4]/20" />
+            <span>±r TPU Buffer</span>
           </span>
         </div>
       </div>

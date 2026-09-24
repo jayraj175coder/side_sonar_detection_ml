@@ -6,6 +6,7 @@ import {
   Polygon,
   Marker,
   Circle,
+  Tooltip,
   useMap,
 } from 'react-leaflet';
 import type { LatLngExpression } from 'leaflet';
@@ -29,7 +30,7 @@ import {
 } from 'lucide-react';
 import { useMission } from '../../context/MissionContext';
 import { MISSION_DATA, interpolateVesselPosition } from '../../data/mission';
-import { MISSION_TARGETS } from '../../data/targets';
+import { MISSION_TARGETS, computeUncertaintyRadiusM } from '../../data/targets';
 import type { MissionTarget } from '../../types';
 
 // Fix Leaflet default icon path
@@ -145,6 +146,7 @@ export const MissionMapPanel: React.FC = () => {
   } = useMission();
 
   const [mapMode, setMapMode] = useState<'satellite' | 'bathymetry' | 'dark_hud'>('dark_hud');
+  const [showUncertainty, setShowUncertainty] = useState<boolean>(true);
   const [mapCenter, setMapCenter] = useState<[number, number]>([18.921, 72.821]);
   const vessel = interpolateVesselPosition(playbackTime);
   const track = MISSION_DATA.track.map((p) => [p.lat, p.lon] as [number, number]);
@@ -173,6 +175,21 @@ export const MissionMapPanel: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-1.5">
+          {/* Position Uncertainty Radius (±r meters) Toggle */}
+          <button
+            onClick={() => setShowUncertainty(!showUncertainty)}
+            className={`flex items-center gap-1 px-2 py-0.5 rounded text-[8px] font-bold transition-all border cursor-pointer ${
+              showUncertainty
+                ? 'bg-[#00D4AA]/15 text-[#00D4AA] border-[#00D4AA]/50 shadow-[0_0_10px_rgba(0,212,170,0.25)]'
+                : 'bg-[#080B11] text-[#7C8AA0] border-[#1B2330] hover:text-[#EAEFF5]'
+            }`}
+            title="Toggle Position Uncertainty Radius Overlay (±r meters: Acoustic Ray Bending & Towfish Layback Error per IHO S-44 Order 1a)"
+          >
+            <span className="font-mono text-[#4CD9E8]">±r</span>
+            <span className="hidden sm:inline">TPU BUFFER</span>
+            <span className={`w-1.5 h-1.5 rounded-full ${showUncertainty ? 'bg-[#00D4AA] animate-pulse' : 'bg-[#7C8AA0]'}`} />
+          </button>
+
           {/* 3-Way Mode Switcher */}
           <div className="flex items-center bg-[#080B11] p-0.5 rounded-lg border border-[#1B2330]">
             <button
@@ -349,6 +366,58 @@ export const MissionMapPanel: React.FC = () => {
             }}
           />
 
+          {/* ── Position Uncertainty Radius Buffer (±r meters) ── */}
+          {/* Models acoustic ray bending through the thermocline and USBL / towfish layback offset */}
+          {showTargets &&
+            showUncertainty &&
+            activeTargets
+              .filter((t) => visibleTargetIds.includes(t.id))
+              .map((target) => {
+                const radiusM = computeUncertaintyRadiusM(target);
+                const isSelected = selectedTargetId === target.id;
+                const isCritical = target.risk === 'CRITICAL' || target.classCode === 'MLO';
+                const color = isSelected ? '#4CD9E8' : isCritical ? '#F04438' : target.color || '#4CD9E8';
+
+                return (
+                  <Circle
+                    key={`unc-${target.id}`}
+                    center={[target.lat, target.lon]}
+                    radius={radiusM}
+                    pathOptions={{
+                      color: color,
+                      fillColor: color,
+                      fillOpacity: isSelected ? 0.22 : 0.08,
+                      weight: isSelected ? 2.0 : 1.2,
+                      dashArray: isSelected ? '4, 4' : '2, 3',
+                    }}
+                    eventHandlers={{
+                      click: () =>
+                        setSelectedTargetId(selectedTargetId === target.id ? null : target.id),
+                    }}
+                  >
+                    {isSelected && (
+                      <Tooltip permanent direction="top" offset={[0, -18]} opacity={0.95}>
+                        <div className="bg-[#050C16]/95 border border-[#4CD9E8] rounded px-2 py-1.5 text-[8.5px] font-mono text-[#EAEFF5] shadow-2xl space-y-0.5 pointer-events-none">
+                          <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-0.5">
+                            <span className="text-[#4CD9E8] font-bold">{target.id} TPU BUFFER</span>
+                            <span className="text-[#FFB703] font-bold">±{radiusM.toFixed(1)} m</span>
+                          </div>
+                          <div className="text-[7.5px] text-[#7C8AA0]">
+                            • Acoustic Ray Bending: ±{(target.depth * 0.058).toFixed(1)} m
+                          </div>
+                          <div className="text-[7.5px] text-[#7C8AA0]">
+                            • Towfish Layback Offset: ±{(target.slantRange * 0.075).toFixed(1)} m
+                          </div>
+                          <div className="text-[7px] text-[#00D4AA] font-semibold pt-0.5">
+                            IHO S-44 Order 1a Standard
+                          </div>
+                        </div>
+                      </Tooltip>
+                    )}
+                  </Circle>
+                );
+              })}
+
           {/* Classified Contact Markers */}
           {showTargets &&
             activeTargets.filter((t) => visibleTargetIds.includes(t.id)).map((target) => (
@@ -402,6 +471,12 @@ export const MissionMapPanel: React.FC = () => {
           <div>
             <span>SPEED: </span>
             <strong className="text-[#EAEFF5]">{vessel.speed.toFixed(1)} kts</strong>
+          </div>
+          <div className="hidden sm:flex items-center gap-1 border-l border-[#1B2330] pl-3">
+            <span className="text-[#7C8AA0]">TPU: </span>
+            <strong className={showUncertainty ? 'text-[#00D4AA]' : 'text-[#7C8AA0]'}>
+              {showUncertainty ? '±r ON (IHO S-44)' : 'OFF'}
+            </strong>
           </div>
         </div>
 

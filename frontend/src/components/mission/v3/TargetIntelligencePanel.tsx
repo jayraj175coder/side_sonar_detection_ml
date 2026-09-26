@@ -1,33 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  ShieldAlert,
-  CheckCircle2,
-  AlertTriangle,
-  MapPin,
-  Compass,
-  Boxes,
-  RotateCcw,
-  Maximize2,
-  ExternalLink,
+  ChevronLeft,
   ChevronRight,
-  Filter,
-  Key,
-  Shield,
-  Layers,
-  Sparkles,
-  Waves,
-  Ruler,
-  Maximize,
-  Award,
+  Eye,
+  Crosshair,
   Download,
+  FilePlus,
   Check,
   X,
   RefreshCw,
   Activity,
+  Award,
   Cpu,
+  Thermometer,
+  Droplets,
+  Navigation,
+  Zap,
+  Radio,
+  Ruler,
+  Maximize,
+  Compass,
+  Waves,
+  Shield,
+  Sparkles,
 } from 'lucide-react';
 import { MissionV3Target } from '../../../data/missionV3Data';
-import { useGeospatialConfig } from '../../../context/GeospatialConfigContext';
 import { MoESClearanceCertificateModal } from './MoESClearanceCertificateModal';
 
 interface TargetIntelligencePanelProps {
@@ -37,8 +34,289 @@ interface TargetIntelligencePanelProps {
   heroConfidence?: number;
   explainabilityStep?: number;
   onOpenDispatch?: (target: MissionV3Target) => void;
+  allTargets?: MissionV3Target[];
+  onSelectTarget?: (id: string) => void;
 }
 
+// ── Sonar thumbnail generator (Canvas-based) ──────────────────────────────────
+function drawSonarThumbnail(
+  canvas: HTMLCanvasElement | null,
+  mode: 'raw' | 'detection' | 'shadow' | '3d',
+  target: MissionV3Target,
+) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const W = canvas.width;
+  const H = canvas.height;
+
+  if (mode === 'raw') {
+    // Grayscale speckle sonar image
+    ctx.fillStyle = '#030810';
+    ctx.fillRect(0, 0, W, H);
+    const imgData = ctx.createImageData(W, H);
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      const px = Math.random();
+      const bright = px < 0.04 ? 220 + Math.random() * 35 : px < 0.15 ? 90 + Math.random() * 60 : Math.random() * 28;
+      imgData.data[i] = imgData.data[i + 1] = imgData.data[i + 2] = bright;
+      imgData.data[i + 3] = 255;
+    }
+    ctx.putImageData(imgData, 0, 0);
+    // Bright target region
+    const cx = W * 0.5;
+    const cy = H * 0.45;
+    const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 22);
+    grad.addColorStop(0, 'rgba(255,230,100,0.85)');
+    grad.addColorStop(1, 'rgba(255,230,100,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+    // Shadow stripe
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(cx + 10, cy - 8, 32, 16);
+  }
+
+  if (mode === 'detection') {
+    // Same raw but with bounding box overlay
+    ctx.fillStyle = '#030810';
+    ctx.fillRect(0, 0, W, H);
+    const imgData2 = ctx.createImageData(W, H);
+    for (let i = 0; i < imgData2.data.length; i += 4) {
+      const px = Math.random();
+      const bright = px < 0.04 ? 210 + Math.random() * 35 : px < 0.15 ? 80 + Math.random() * 60 : Math.random() * 25;
+      imgData2.data[i] = imgData2.data[i + 1] = imgData2.data[i + 2] = bright;
+      imgData2.data[i + 3] = 255;
+    }
+    ctx.putImageData(imgData2, 0, 0);
+    const cx = W * 0.5;
+    const cy = H * 0.45;
+    const grad2 = ctx.createRadialGradient(cx, cy, 2, cx, cy, 22);
+    grad2.addColorStop(0, 'rgba(255,230,100,0.85)');
+    grad2.addColorStop(1, 'rgba(255,230,100,0)');
+    ctx.fillStyle = grad2;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(cx + 10, cy - 8, 32, 16);
+    // Detection box
+    ctx.strokeStyle = '#00F5D4';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(cx - 18, cy - 14, 36, 28);
+    // Corner accents
+    const corners = [[cx - 18, cy - 14], [cx + 18, cy - 14], [cx - 18, cy + 14], [cx + 18, cy + 14]];
+    corners.forEach(([x, y]) => {
+      ctx.strokeStyle = '#FFB703';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x - 4, y); ctx.lineTo(x + 4, y);
+      ctx.moveTo(x, y - 4); ctx.lineTo(x, y + 4);
+      ctx.stroke();
+    });
+    // Label
+    ctx.fillStyle = '#00F5D4';
+    ctx.font = 'bold 7px monospace';
+    ctx.fillText(`${target.id}  ${(target.confidence * 100).toFixed(1)}%`, cx - 16, cy - 17);
+  }
+
+  if (mode === 'shadow') {
+    // High-contrast shadow mode
+    ctx.fillStyle = '#020608';
+    ctx.fillRect(0, 0, W, H);
+    // Bright return stripe
+    const cx = W * 0.42;
+    const cy = H * 0.48;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 14, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // Jet shadow wedge
+    ctx.fillStyle = '#000000';
+    ctx.beginPath();
+    ctx.moveTo(cx + 14, cy - 6);
+    ctx.lineTo(cx + 14, cy + 6);
+    ctx.lineTo(cx + 14 + 38, cy + 4);
+    ctx.lineTo(cx + 14 + 30, cy - 4);
+    ctx.closePath();
+    ctx.fill();
+    // Red shadow border
+    ctx.strokeStyle = '#EF4444';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 2]);
+    ctx.beginPath();
+    ctx.moveTo(cx + 14, cy);
+    ctx.lineTo(cx + 14 + 38, cy + 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#F59E0B';
+    ctx.font = 'bold 6.5px monospace';
+    ctx.fillText(`Ls=${target.shadowLength.toFixed(2)}m`, cx + 16, cy + 14);
+    // Label
+    ctx.fillStyle = '#FFB703';
+    ctx.font = 'bold 7px monospace';
+    ctx.fillText('SHADOW', 4, 12);
+  }
+
+  if (mode === '3d') {
+    // Simple isometric 3D sketch
+    ctx.fillStyle = '#030A15';
+    ctx.fillRect(0, 0, W, H);
+    // Grid
+    ctx.strokeStyle = 'rgba(13,46,74,0.6)';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= 6; i++) {
+      ctx.beginPath();
+      ctx.moveTo(W * 0.1 + i * 12, H * 0.7);
+      ctx.lineTo(W * 0.1 + i * 12 + 20, H * 0.3);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(W * 0.1, H * 0.7 - i * 7);
+      ctx.lineTo(W * 0.1 + 72, H * 0.3 - i * 7);
+      ctx.stroke();
+    }
+    // 3D box
+    const bx = W * 0.38;
+    const by = H * 0.52;
+    ctx.fillStyle = '#FFB70320';
+    ctx.strokeStyle = '#FFB703';
+    ctx.lineWidth = 1.5;
+    const pts = [[bx, by], [bx + 18, by - 8], [bx + 18, by - 22], [bx, by - 14]];
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    pts.forEach(p => ctx.lineTo(p[0], p[1]));
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    // Acoustic cone
+    ctx.fillStyle = 'rgba(56,189,248,0.08)';
+    ctx.strokeStyle = 'rgba(56,189,248,0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W * 0.5, H * 0.08);
+    ctx.lineTo(bx, by - 7);
+    ctx.lineTo(bx + 18, by - 15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#38BDF8';
+    ctx.font = 'bold 6px monospace';
+    ctx.fillText('3D VIEW', 4, 12);
+  }
+}
+
+// ── Acoustic Profile Waveform ─────────────────────────────────────────────────
+function drawAcousticProfile(canvas: HTMLCanvasElement | null, target: MissionV3Target) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const W = canvas.width;
+  const H = canvas.height;
+  ctx.fillStyle = '#030810';
+  ctx.fillRect(0, 0, W, H);
+
+  // Background grid
+  ctx.strokeStyle = 'rgba(13,46,74,0.5)';
+  ctx.lineWidth = 0.5;
+  ctx.setLineDash([2, 4]);
+  for (let x = 0; x <= W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 12) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.setLineDash([]);
+
+  // Waveform fill
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, 'rgba(255,183,3,0.35)');
+  grad.addColorStop(1, 'rgba(255,183,3,0)');
+  ctx.fillStyle = grad;
+  ctx.strokeStyle = '#FFB703';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  const segs = 80;
+  for (let i = 0; i <= segs; i++) {
+    const x = (i / segs) * W;
+    const normalized = i / segs;
+    let amp = 0.08 + Math.random() * 0.12;
+    // High return region at target position
+    if (normalized > 0.42 && normalized < 0.54) amp = 0.55 + Math.random() * 0.35;
+    // Shadow (near zero) region
+    else if (normalized > 0.54 && normalized < 0.72) amp = 0.01 + Math.random() * 0.04;
+    const y = H - amp * H;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.lineTo(W, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // Waveform stroke
+  ctx.beginPath();
+  for (let i = 0; i <= segs; i++) {
+    const x = (i / segs) * W;
+    const normalized = i / segs;
+    let amp = 0.08 + Math.random() * 0.12;
+    if (normalized > 0.42 && normalized < 0.54) amp = 0.55 + Math.random() * 0.35;
+    else if (normalized > 0.54 && normalized < 0.72) amp = 0.01 + Math.random() * 0.04;
+    const y = H - amp * H;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = '#FFB703';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Shadow annotation
+  const shadowStart = W * 0.54;
+  const shadowEnd   = W * 0.72;
+  ctx.strokeStyle = '#EF4444';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 2]);
+  ctx.beginPath();
+  ctx.moveTo(shadowStart, H * 0.1);
+  ctx.lineTo(shadowStart, H * 0.95);
+  ctx.moveTo(shadowEnd, H * 0.1);
+  ctx.lineTo(shadowEnd, H * 0.95);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#EF4444';
+  ctx.font = 'bold 7px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(`± ${target.shadowLength.toFixed(2)}m`, (shadowStart + shadowEnd) / 2, H * 0.18);
+  ctx.textAlign = 'left';
+
+  // Axis labels
+  ctx.fillStyle = '#475569';
+  ctx.font = '6.5px monospace';
+  ctx.fillText('RANGE →', 2, H - 2);
+  ctx.fillText('dB', 2, 8);
+}
+
+// ── Live AUV Telemetry hook ───────────────────────────────────────────────────
+function useAuvTelemetry() {
+  const [tel, setTel] = useState({
+    depth: 186.4,
+    temp: 14.7,
+    salinity: 35.2,
+    current: 0.38,
+    speed: 2.8,
+    heading: 242,
+    pingRate: 11,
+    battery: 84,
+  });
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTel(prev => ({
+        ...prev,
+        depth:    parseFloat((prev.depth    + (Math.random() - 0.5) * 0.4).toFixed(1)),
+        temp:     parseFloat((prev.temp     + (Math.random() - 0.5) * 0.06).toFixed(1)),
+        salinity: parseFloat((prev.salinity + (Math.random() - 0.5) * 0.02).toFixed(1)),
+        current:  parseFloat(Math.max(0.05, prev.current + (Math.random() - 0.5) * 0.02).toFixed(2)),
+        speed:    parseFloat(Math.max(0.5, prev.speed   + (Math.random() - 0.5) * 0.08).toFixed(1)),
+        pingRate: Math.max(8, Math.min(15, prev.pingRate + (Math.random() > 0.7 ? 1 : 0))),
+        battery:  Math.max(0, Math.min(100, prev.battery - (Math.random() > 0.95 ? 1 : 0))),
+      }));
+    }, 2000);
+    return () => clearInterval(id);
+  }, []);
+  return tel;
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
 export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = ({
   target,
   isVerified = true,
@@ -46,983 +324,385 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
   heroConfidence = 94.7,
   explainabilityStep = 4,
   onOpenDispatch,
+  allTargets = [],
+  onSelectTarget,
 }) => {
-  const { provider, status, openModal } = useGeospatialConfig();
-  const [activeTab, setActiveTab] = useState<'evidence' | 'specs' | 'geotag'>('evidence');
-  const [activeGeoTab, setActiveGeoTab] = useState<'map' | '3d'>('map');
+  const [sonarTab, setSonarTab] = useState<'raw' | 'detection' | 'shadow' | '3d'>('detection');
+  const [triageState, setTriageState] = useState<'CONFIRMED' | 'REJECTED' | 'RECLASSIFIED'>('CONFIRMED');
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
-  
-  // Human-in-the-loop Active Learning Triage state
-  const [triageMap, setTriageMap] = useState<Record<string, 'CONFIRMED' | 'REJECTED' | 'RECLASSIFIED'>>({
-    'SX-T07': 'CONFIRMED',
-  });
-  const currentTriage = triageMap[target.id] || (isVerified ? 'CONFIRMED' : 'CONFIRMED');
 
-  // 3D Recon Interactive Orbit Controls
-  const [yaw, setYaw] = useState<number>(0.75);
-  const [pitch, setPitch] = useState<number>(0.55);
-  const [isDragging3D, setIsDragging3D] = useState<boolean>(false);
-  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [autoRotate, setAutoRotate] = useState<boolean>(true);
+  const rawCanvasRef       = useRef<HTMLCanvasElement>(null);
+  const detectionCanvasRef = useRef<HTMLCanvasElement>(null);
+  const shadowCanvasRef    = useRef<HTMLCanvasElement>(null);
+  const view3DCanvasRef    = useRef<HTMLCanvasElement>(null);
+  const waveformCanvasRef  = useRef<HTMLCanvasElement>(null);
 
-  const mapCanvasRef = useRef<HTMLCanvasElement>(null);
-  const seabed3DCanvasRef = useRef<HTMLCanvasElement>(null);
+  const tel = useAuvTelemetry();
+  const displayConf = isDemoRunning ? heroConfidence : target.confidence * 100;
 
-  const displayConfidence = isDemoRunning ? heroConfidence : target.confidence * 100;
-
-  const handleExportActiveLearning = () => {
-    const manifest = {
-      dataset_name: 'SONARX_MoES_Active_Learning_FineTune_v1',
-      timestamp: new Date().toISOString(),
-      survey_id: 'MOES-DOM-2026',
-      annotator: 'Marine Hydrographer Triage Console',
-      triage_verdict: currentTriage,
-      target_id: target.id,
-      classes: ['ghost_net_aldfg', 'anthropogenic_debris', 'pipeline_hazard', 'natural_rock_suppressed'],
-      annotation: {
-        category: target.category,
-        yolo_bbox: [
-          parseFloat((target.rawX / 100).toFixed(4)),
-          parseFloat((target.rawY / 100).toFixed(4)),
-          parseFloat((target.width / 75).toFixed(4)),
-          parseFloat((target.length / 75).toFixed(4)),
-        ],
-        raw_softmax_confidence: target.confidence,
-        platt_calibrated_confidence: 0.947,
-        ece_calibration_error: 0.028,
-        acoustic_shadow_m: target.shadowLength,
-        ray_traced_height_m: parseFloat(((target.shadowLength * 8.4) / (25.0 + target.shadowLength)).toFixed(2)),
-      },
-      yolo_txt_format: `${currentTriage === 'REJECTED' ? 3 : 0} ${(target.rawX / 100).toFixed(4)} ${(target.rawY / 100).toFixed(4)} ${(target.width / 75).toFixed(4)} ${(target.length / 75).toFixed(4)}`,
-    };
-
-    const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `sonarx_active_learning_${target.id}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  // 4 Concrete Reasoning Chips
-  const REASONING_CHIPS = [
-    {
-      icon: Ruler,
-      title: `Acoustic Shadow Relief: ${target.shadowLength.toFixed(2)}m`,
-      desc: 'Matches netting drape profile above seabed (acoustic shadow void)',
-      metric: '96%',
-    },
-    {
-      icon: Maximize,
-      title: 'Shape Match: Irregular Mesh Boundary',
-      desc: '84% match to Ghost Net class; irregular perimeter inconsistent with natural rock',
-      metric: '92%',
-    },
-    {
-      icon: Compass,
-      title: `Depth / Context: ${target.depth.toFixed(1)}m Bathymetry`,
-      desc: 'Consistent with active commercial trawling corridor (Mumbai Shelf Sector B)',
-      metric: '89%',
-    },
-    {
-      icon: Waves,
-      title: 'Texture Signature: +18.4 dB Scatter',
-      desc: 'High acoustic backscatter return vs. natural sediment background baseline',
-      metric: '94%',
-    },
-  ];
-
-  // ── Render Geospatial Marine Map Canvas ──
+  // Draw all thumbnails when target changes
   useEffect(() => {
-    if (activeTab !== 'geotag' || activeGeoTab !== 'map') return;
-    const canvas = mapCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    drawSonarThumbnail(rawCanvasRef.current, 'raw', target);
+    drawSonarThumbnail(detectionCanvasRef.current, 'detection', target);
+    drawSonarThumbnail(shadowCanvasRef.current, 'shadow', target);
+    drawSonarThumbnail(view3DCanvasRef.current, '3d', target);
+    drawAcousticProfile(waveformCanvasRef.current, target);
+  }, [target]);
 
-    const W = canvas.width;
-    const H = canvas.height;
+  // Target navigation
+  const filtered = allTargets.filter(t => t.status !== 'FILTERED');
+  const currentIdx = filtered.findIndex(t => t.id === target.id);
+  const goPrev = () => { if (currentIdx > 0) onSelectTarget?.(filtered[currentIdx - 1].id); };
+  const goNext = () => { if (currentIdx < filtered.length - 1) onSelectTarget?.(filtered[currentIdx + 1].id); };
 
-    ctx.fillStyle = '#05070B';
-    ctx.fillRect(0, 0, W, H);
-
-    // Bathymetric depth contours
-    ctx.strokeStyle = '#162136';
-    ctx.lineWidth = 1;
-    for (let r = 25; r < W; r += 32) {
-      ctx.beginPath();
-      ctx.arc(W / 2, H / 2, r, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    // Latitude / Longitude graticules
-    ctx.strokeStyle = 'rgba(13, 46, 74, 0.5)';
-    ctx.setLineDash([3, 3]);
-    for (let x = 40; x < W; x += 60) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, H);
-      ctx.stroke();
-      ctx.fillStyle = '#94A3B8';
-      ctx.font = '7px monospace';
-      ctx.fillText(`${(target.longitude - 0.008 + (x / W) * 0.016).toFixed(3)}°E`, x + 2, H - 4);
-    }
-    for (let y = 30; y < H; y += 45) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(W, y);
-      ctx.stroke();
-      ctx.fillStyle = '#94A3B8';
-      ctx.font = '7px monospace';
-      ctx.fillText(`${(target.latitude - 0.006 + (y / H) * 0.012).toFixed(3)}°N`, 4, y - 2);
-    }
-    ctx.setLineDash([]);
-
-    // Survey Corridor Bounding Polygon
-    ctx.fillStyle = 'rgba(255, 183, 3, )';
-    ctx.strokeStyle = 'rgba(255, 183, 3, )';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(W * 0.15, H * 0.9);
-    ctx.lineTo(W * 0.75, H * 0.1);
-    ctx.lineTo(W * 0.88, H * 0.1);
-    ctx.lineTo(W * 0.28, H * 0.9);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Towfish Trackline
-    ctx.strokeStyle = 'rgba(255, 183, 3, )';
-    ctx.lineWidth = 1.8;
-    ctx.beginPath();
-    ctx.moveTo(W * 0.21, H * 0.9);
-    ctx.lineTo(W * 0.81, H * 0.1);
-    ctx.stroke();
-
-    // Towfish Position Pulse
-    const towfishX = W * 0.51;
-    const towfishY = H * 0.5;
-    ctx.fillStyle = '#38BDF8';
-    ctx.beginPath();
-    ctx.arc(towfishX, towfishY, 4, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Towfish Heading vector
-    ctx.strokeStyle = '#38BDF8';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(towfishX, towfishY);
-    ctx.lineTo(towfishX + 16, towfishY - 14);
-    ctx.stroke();
-
-    // Target Fix Indicator
-    const targetMapX = W * 0.44;
-    const targetMapY = H * 0.42;
-
-    ctx.strokeStyle = '#EF4444';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.arc(targetMapX, targetMapY, 8, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.fillStyle = '#EF4444';
-    ctx.beginPath();
-    ctx.arc(targetMapX, targetMapY, 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Acoustic Slant-range ray
-    ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([2, 2]);
-    ctx.beginPath();
-    ctx.moveTo(towfishX, towfishY);
-    ctx.lineTo(targetMapX, targetMapY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }, [activeTab, activeGeoTab, target]);
-
-  // ── Render Interactive 3D Seafloor & Acoustic Ray Recon Canvas ──
-  useEffect(() => {
-    if (activeTab !== 'geotag' || activeGeoTab !== '3d') return;
-    const canvas = seabed3DCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animId: number;
-
-    const render3D = () => {
-      if (autoRotate && !isDragging3D) {
-        setYaw((y) => y + 0.008);
-      }
-
-      const W = canvas.width;
-      const H = canvas.height;
-      ctx.fillStyle = '#020710';
-      ctx.fillRect(0, 0, W, H);
-
-      // 3D Projection Helper
-      const project = (X: number, Y: number, Z: number) => {
-        const x1 = X * Math.cos(yaw) - Z * Math.sin(yaw);
-        const z1 = X * Math.sin(yaw) + Z * Math.cos(yaw);
-        const y1 = Y * Math.cos(pitch) - z1 * Math.sin(pitch);
-        const z2 = Y * Math.sin(pitch) + z1 * Math.cos(pitch);
-        const scale = 180 / (180 + z2 * 0.4);
-        return {
-          x: W / 2 + x1 * scale,
-          y: H / 2 + y1 * scale + 15,
-          z: z2,
-        };
-      };
-
-      // 1. Draw Seafloor Bathymetric Grid
-      const gridSize = 7;
-      const spacing = 20;
-      ctx.lineWidth = 0.8;
-
-      for (let i = -gridSize; i <= gridSize; i++) {
-        // Grid lines along X
-        ctx.beginPath();
-        for (let j = -gridSize; j <= gridSize; j++) {
-          const X = j * spacing;
-          const Z = i * spacing;
-          const distToTarget = Math.hypot(X, Z);
-          let bedElev = Math.sin(j * 0.3) * 4 + Math.cos(i * 0.4) * 3;
-          if (distToTarget < 35) bedElev -= (35 - distToTarget) * 0.25;
-
-          const p = project(X, bedElev + 25, Z);
-          if (j === -gridSize) ctx.moveTo(p.x, p.y);
-          else ctx.lineTo(p.x, p.y);
-        }
-        ctx.strokeStyle = i === 0 ? 'rgba(255, 183, 3, )' : 'rgba(13, 46, 74, 0.55)';
-        ctx.stroke();
-
-        // Grid lines along Z
-        ctx.beginPath();
-        for (let j = -gridSize; j <= gridSize; j++) {
-          const X = i * spacing;
-          const Z = j * spacing;
-          const distToTarget = Math.hypot(X, Z);
-          let bedElev = Math.sin(i * 0.3) * 4 + Math.cos(j * 0.4) * 3;
-          if (distToTarget < 35) bedElev -= (35 - distToTarget) * 0.25;
-
-          const p = project(X, bedElev + 25, Z);
-          if (j === -gridSize) ctx.moveTo(p.x, p.y);
-          else ctx.lineTo(p.x, p.y);
-        }
-        ctx.strokeStyle = i === 0 ? 'rgba(255, 183, 3, )' : 'rgba(13, 46, 74, 0.55)';
-        ctx.stroke();
-      }
-
-      // 2. Projected Seafloor Acoustic Shadow Wedge
-      const s0 = project(-10, 25, 5);
-      const s1 = project(10, 25, 5);
-      const s2 = project(26, 25, 55);
-      const s3 = project(-6, 25, 55);
-
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.22)';
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.8)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(s0.x, s0.y);
-      ctx.lineTo(s1.x, s1.y);
-      ctx.lineTo(s2.x, s2.y);
-      ctx.lineTo(s3.x, s3.y);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // 3. 3D Target Obstacle Box (Height h = 1.42m proud)
-      const targetH = 22; // Height in 3D units
-      const b0 = project(-9, 25, -9);
-      const b1 = project(9, 25, -9);
-      const b2 = project(9, 25, 9);
-      const b3 = project(-9, 25, 9);
-
-      const t0 = project(-9, 25 - targetH, -9);
-      const t1 = project(9, 25 - targetH, -9);
-      const t2 = project(9, 25 - targetH, 9);
-      const t3 = project(-9, 25 - targetH, 9);
-
-      // Target faces
-      ctx.fillStyle = 'rgba(255, 183, 3, )';
-      ctx.strokeStyle = '#FFB703';
-      ctx.lineWidth = 1.5;
-
-      // Top face
-      ctx.beginPath();
-      ctx.moveTo(t0.x, t0.y);
-      ctx.lineTo(t1.x, t1.y);
-      ctx.lineTo(t2.x, t2.y);
-      ctx.lineTo(t3.x, t3.y);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // Side pillars
-      [[b0, t0], [b1, t1], [b2, t2], [b3, t3]].forEach(([b, t]) => {
-        ctx.beginPath();
-        ctx.moveTo(b.x, b.y);
-        ctx.lineTo(t.x, t.y);
-        ctx.stroke();
-      });
-
-      // 4. Towfish Transducer Body (Altitude H = 8.4m proud, offset)
-      const towfishY = -50;
-      const towfishZ = -60;
-      const tf0 = project(-14, towfishY, towfishZ);
-      const tf1 = project(14, towfishY, towfishZ);
-      const tfCenter = project(0, towfishY, towfishZ);
-
-      // Towfish hull line
-      ctx.strokeStyle = '#38BDF8';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(tf0.x, tf0.y);
-      ctx.lineTo(tf1.x, tf1.y);
-      ctx.stroke();
-
-      // Towfish nose cone
-      ctx.fillStyle = '#38BDF8';
-      ctx.beginPath();
-      ctx.arc(tfCenter.x, tfCenter.y, 4, 0, Math.PI * 2);
-      ctx.fill();
-
-      // 5. Acoustic Fan Beam Ray Cone (Towfish -> Seafloor & Target)
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([3, 2]);
-
-      ctx.beginPath();
-      ctx.moveTo(tfCenter.x, tfCenter.y);
-      ctx.lineTo(t0.x, t0.y);
-      ctx.lineTo(t1.x, t1.y);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(tfCenter.x, tfCenter.y);
-      ctx.lineTo(s2.x, s2.y);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // 6. 3D Overlay Labels & Coordinates
-      ctx.fillStyle = '#38BDF8';
-      ctx.font = 'bold 8px monospace';
-      ctx.fillText('TOWFISH (H=8.4m)', tfCenter.x - 36, tfCenter.y - 8);
-
-      ctx.fillStyle = '#FFB703';
-      ctx.fillText(`TARGET: ${target.id} (h=1.42m)`, t0.x - 20, t0.y - 8);
-
-      ctx.fillStyle = '#EF4444';
-      ctx.fillText(`ACOUSTIC SHADOW Ls=5.8m`, s2.x - 40, s2.y + 12);
-    };
-
-    render3D();
-    if (autoRotate && !isDragging3D) {
-      animId = requestAnimationFrame(render3D);
-    }
-    return () => cancelAnimationFrame(animId);
-  }, [activeTab, activeGeoTab, yaw, pitch, autoRotate, isDragging3D, target]);
+  const confColor = displayConf >= 90 ? '#00F5D4' : displayConf >= 70 ? '#FFB703' : '#EF4444';
+  const prioColor = target.priority === 'HIGH' ? '#EF4444' : target.priority === 'MEDIUM' ? '#F59E0B' : '#38BDF8';
+  const THUMBNAIL_TABS = [
+    { key: 'raw',       label: 'RAW SONAR',  ref: rawCanvasRef },
+    { key: 'detection', label: 'DETECTION',  ref: detectionCanvasRef },
+    { key: 'shadow',    label: 'SHADOW',     ref: shadowCanvasRef },
+    { key: '3d',        label: '3D VIEW',    ref: view3DCanvasRef },
+  ] as const;
 
   return (
-    <aside className="w-full h-full bg-[#080D17] border-l border-[#162136] flex flex-col font-sans select-none overflow-y-auto shrink-0 z-20">
-      {/* ── 1. HEADER & HERO CONFIDENCE DISPLAY ── */}
-      <div className="p-3 border-b border-[#162136] bg-[#05070B] space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest">
-            TARGET INTELLIGENCE
+    <aside className="w-full h-full bg-[#05080F] border-l border-[#0F1E2E] flex flex-col font-mono select-none overflow-y-auto text-[9px] shrink-0 z-20">
+
+      {/* ══════════════════════════════════════════════════
+          SECTION 1 — TARGET DETAILS
+      ══════════════════════════════════════════════════ */}
+      <div className="bg-[#05080F] border-b border-[#0F1E2E]">
+
+        {/* Header row: title + nav */}
+        <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#0F1E2E]">
+          <span className="text-[9px] font-black text-[#64748B] uppercase tracking-widest">
+            TARGET DETAILS
           </span>
-          <span
-            className={`text-[9px] font-bold px-2 py-0.5 border uppercase rounded transition-all duration-300 ${
-              isVerified
-                ? 'bg-[#FFB703] text-[#05070B] border-[#FFB703] shadow-[0_0_12px_rgba(255, 183, 3, )] font-black'
-                : 'bg-[#131B2A] text-[#94A3B8] border-[#162136]'
-            }`}
-          >
-            {isVerified ? '✓ VERIFIED' : 'PENDING'}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="text-sm font-black text-[#F8FAFC] tracking-tight">
-              {target.id} // {target.label.toUpperCase()}
-            </div>
-            <div className="text-[10px] text-[#94A3B8]">
-              CATEGORY: <strong className="text-[#FFB703]">{target.category}</strong>
-            </div>
-          </div>
-
-          <span
-            className={`text-[9px] font-bold px-2 py-0.5 border uppercase rounded ${
-              target.priority === 'HIGH'
-                ? 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/50 shadow-[0_0_8px_rgba(239,68,68,0.2)]'
-                : target.priority === 'MEDIUM'
-                ? 'bg-[#F59E0B]/20 text-[#F59E0B] border-[#F59E0B]/50'
-                : 'bg-[#94A3B8]/20 text-[#94A3B8] border-[#94A3B8]/50'
-            }`}
-          >
-            {target.priority}
-          </span>
-        </div>
-
-        {/* Hero Confidence Card */}
-        <div className="p-2.5 bg-[#131B2A] border border-[#FFB703]/60 rounded shadow-[0_0_15px_rgba(255, 183, 3, )] flex items-center justify-between">
-          <div>
-            <div className="text-[28px] leading-none font-black text-[#FFB703] tracking-tighter">
-              {displayConfidence.toFixed(1)}%
-            </div>
-            <div className="text-[9px] text-[#94A3B8] font-bold mt-1 uppercase">
-              AI CONFIDENCE · YOLOv8s ONNX
-            </div>
-          </div>
-
-          <div className="text-right text-[10px] text-[#F8FAFC] font-semibold space-y-0.5">
-            <div>STATUS: <span className="text-[#FFB703]">CONFIRMED</span></div>
-            <div>VERDICT: <span className="text-[#FFB703] font-bold">CERTAIN</span></div>
-          </div>
-        </div>
-
-        {/* Confidence Progress Bar */}
-        <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden">
-          <div
-            className="h-full bg-[#FFB703] transition-all duration-300 shadow-[0_0_8px_rgba(255, 183, 3, )]"
-            style={{ width: `${displayConfidence}%` }}
-          />
-        </div>
-
-        {/* Human-in-the-Loop Analyst Triage & Active Learning Strip */}
-        <div className="p-2 bg-[#080D17] border border-[#162136] rounded-lg space-y-1.5 font-mono text-[9px]">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-400 font-bold uppercase flex items-center gap-1 text-[8.5px]">
-              <Cpu className="w-3 h-3 text-[#FFB703]" />
-              HUMAN TRIAGE / ACTIVE LEARNING
+          <div className="flex items-center gap-1">
+            <button onClick={goPrev} disabled={currentIdx <= 0}
+              className="p-0.5 rounded bg-[#0A1520] border border-[#1E293B] hover:border-[#00F5D4] text-[#64748B] hover:text-[#00F5D4] disabled:opacity-30 cursor-pointer transition-colors">
+              <ChevronLeft className="w-3 h-3" />
+            </button>
+            <span className="text-[8px] text-[#475569] px-1 font-bold">
+              {currentIdx + 1} / {filtered.length}
             </span>
-            <span
-              className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
-                currentTriage === 'CONFIRMED'
-                  ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
-                  : currentTriage === 'REJECTED'
-                  ? 'bg-red-950 text-red-300 border border-red-500/40'
-                  : 'bg-amber-950 text-amber-300 border border-amber-500/40'
-              }`}
-            >
-              {currentTriage}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-1 pt-0.5">
-            <button
-              onClick={() => setTriageMap((m) => ({ ...m, [target.id]: 'CONFIRMED' }))}
-              className={`py-1 px-1 rounded border text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
-                currentTriage === 'CONFIRMED'
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 shadow-sm'
-                  : 'bg-[#0A1A2E] text-slate-400 border-[#102E4A] hover:text-white'
-              }`}
-            >
-              <Check className="w-2.5 h-2.5" />
-              <span>CONFIRM</span>
-            </button>
-            <button
-              onClick={() => setTriageMap((m) => ({ ...m, [target.id]: 'REJECTED' }))}
-              className={`py-1 px-1 rounded border text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
-                currentTriage === 'REJECTED'
-                  ? 'bg-red-500/20 text-red-300 border-red-500/60 shadow-sm'
-                  : 'bg-[#0A1A2E] text-slate-400 border-[#102E4A] hover:text-white'
-              }`}
-            >
-              <X className="w-2.5 h-2.5" />
-              <span>REJECT</span>
-            </button>
-            <button
-              onClick={() => setTriageMap((m) => ({ ...m, [target.id]: 'RECLASSIFIED' }))}
-              className={`py-1 px-1 rounded border text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
-                currentTriage === 'RECLASSIFIED'
-                  ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-sm'
-                  : 'bg-[#0A1A2E] text-slate-400 border-[#102E4A] hover:text-white'
-              }`}
-            >
-              <RefreshCw className="w-2.5 h-2.5" />
-              <span>RE-CLASS</span>
+            <button onClick={goNext} disabled={currentIdx >= filtered.length - 1}
+              className="p-0.5 rounded bg-[#0A1520] border border-[#1E293B] hover:border-[#00F5D4] text-[#64748B] hover:text-[#00F5D4] disabled:opacity-30 cursor-pointer transition-colors">
+              <ChevronRight className="w-3 h-3" />
             </button>
           </div>
+        </div>
 
-          <button
-            onClick={handleExportActiveLearning}
-            className="w-full py-1 bg-[#0A1A2E] hover:bg-[#FFB703]/15 border border-[#162136] hover:border-[#FFB703]/40 text-[#FFB703] rounded text-[8px] font-bold flex items-center justify-center gap-1 transition-all cursor-pointer"
-          >
-            <Download className="w-2.5 h-2.5" />
-            <span>EXPORT ACTIVE LEARNING (YOLO)</span>
+        {/* Target identity row */}
+        <div className="px-3 py-2 flex items-start gap-2.5">
+          {/* Sonar thumbnail preview (small) */}
+          <div className="relative w-16 h-12 shrink-0 rounded overflow-hidden border border-[#1E293B]">
+            <canvas ref={detectionCanvasRef} width={64} height={48} className="w-full h-full" />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-1 mb-0.5">
+              <span className="text-[11px] font-black text-[#E2E8F0] tracking-tight leading-none">
+                {target.id}
+              </span>
+              <span className={`text-[7.5px] font-black px-1.5 py-0.5 rounded uppercase border ${
+                isVerified
+                  ? 'bg-[#00F5D4]/15 text-[#00F5D4] border-[#00F5D4]/40'
+                  : 'bg-[#1E293B] text-[#64748B] border-[#1E293B]'
+              }`}>
+                {isVerified ? '✓ VERIFIED' : 'PENDING'}
+              </span>
+            </div>
+            <div className="text-[9px] text-[#94A3B8] font-bold truncate leading-tight">
+              {target.label.toUpperCase()}
+            </div>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="text-[7.5px] font-black px-1 py-0.5 rounded border uppercase"
+                style={{ color: prioColor, borderColor: `${prioColor}50`, background: `${prioColor}12` }}>
+                {target.priority}
+              </span>
+              <span className="text-[7.5px] text-[#475569]">{target.category}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* BIG Confidence display */}
+        <div className="mx-3 mb-2 p-2 bg-[#030810] border border-[#1E293B] rounded-lg">
+          <div className="flex items-end justify-between mb-1">
+            <div>
+              <span className="text-[30px] font-black leading-none tracking-tighter"
+                style={{ color: confColor }}>
+                {displayConf.toFixed(1)}%
+              </span>
+            </div>
+            <div className="text-right text-[7.5px] text-[#475569] leading-relaxed">
+              <div>AI CONFIDENCE</div>
+              <div className="text-[#94A3B8] font-bold">YOLOv8s + ONNX</div>
+            </div>
+          </div>
+          {/* Confidence bar */}
+          <div className="w-full h-1 bg-[#0A1520] rounded overflow-hidden">
+            <div className="h-full rounded transition-all duration-500"
+              style={{ width: `${displayConf}%`, background: confColor, boxShadow: `0 0 6px ${confColor}` }} />
+          </div>
+        </div>
+
+        {/* Metrics grid */}
+        <div className="grid grid-cols-3 gap-px px-3 mb-2">
+          {[
+            { label: 'DEPTH',        value: `${target.depth.toFixed(1)} m`,    color: '#38BDF8' },
+            { label: 'SIZE (L×W)',   value: `${target.length.toFixed(1)}×${target.width.toFixed(1)}m`, color: '#E2E8F0' },
+            { label: 'SHADOW RELIEF',value: `${target.shadowLength.toFixed(2)} m`, color: '#FFB703' },
+          ].map(m => (
+            <div key={m.label} className="p-1.5 bg-[#030810] border border-[#0F1E2E] rounded">
+              <div className="text-[6.5px] text-[#475569] uppercase mb-0.5">{m.label}</div>
+              <div className="font-black text-[9.5px] leading-none" style={{ color: m.color }}>
+                {m.value}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Position & Ping */}
+        <div className="grid grid-cols-2 gap-px px-3 mb-2">
+          <div className="p-1.5 bg-[#030810] border border-[#0F1E2E] rounded">
+            <div className="text-[6.5px] text-[#475569] mb-0.5">POSITION</div>
+            <div className="text-[8px] font-black text-[#94A3B8] font-mono leading-tight">
+              {target.latitude.toFixed(4)}°N<br/>{target.longitude.toFixed(4)}°E
+            </div>
+          </div>
+          <div className="p-1.5 bg-[#030810] border border-[#0F1E2E] rounded">
+            <div className="text-[6.5px] text-[#475569] mb-0.5">PING #</div>
+            <div className="text-[9.5px] font-black text-[#E2E8F0]">
+              {(60000 + Math.abs(target.rawX * 123 | 0)).toLocaleString()}
+            </div>
+            <div className="text-[6.5px] text-[#475569]">13:27:42 UTC</div>
+          </div>
+        </div>
+
+        {/* Status indicators */}
+        <div className="grid grid-cols-3 gap-px px-3 mb-2">
+          {[
+            { label: 'THREAT LEVEL', value: target.priority === 'HIGH' ? 'HIGH' : 'MEDIUM', color: prioColor },
+            { label: 'STATUS',       value: 'CONFIRMED',  color: '#00F5D4' },
+            { label: 'VERDICT',      value: 'CERTAIN',    color: '#00F5D4' },
+          ].map(s => (
+            <div key={s.label} className="p-1 bg-[#030810] border border-[#0F1E2E] rounded text-center">
+              <div className="text-[6px] text-[#475569] mb-0.5">{s.label}</div>
+              <div className="text-[7.5px] font-black uppercase" style={{ color: s.color }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Action buttons row 1 */}
+        <div className="grid grid-cols-2 gap-1.5 px-3 mb-1.5">
+          <button className="flex items-center justify-center gap-1 py-1.5 bg-[#0A1520] border border-[#1E293B] hover:border-[#00F5D4] text-[#E2E8F0] hover:text-[#00F5D4] rounded text-[8px] font-bold cursor-pointer transition-all">
+            <Eye className="w-2.5 h-2.5" />
+            VIEW EVIDENCE
+          </button>
+          <button className="flex items-center justify-center gap-1 py-1.5 bg-[#0A1520] border border-[#1E293B] hover:border-[#FFB703] text-[#E2E8F0] hover:text-[#FFB703] rounded text-[8px] font-bold cursor-pointer transition-all">
+            <Crosshair className="w-2.5 h-2.5" />
+            TRACK TARGET
           </button>
         </div>
-      </div>
 
-      {/* ── 2. MERGED 3-TAB PANEL SELECTOR ── */}
-      <div className="flex items-center border-b border-[#162136] bg-[#05070B] text-xs font-bold shrink-0">
-        <button
-          onClick={() => setActiveTab('evidence')}
-          className={`flex-1 py-1.5 px-1 text-center transition-all cursor-pointer border-b-2 text-[10px] font-mono font-bold truncate ${
-            activeTab === 'evidence'
-              ? 'border-[#FFB703] text-[#FFB703] bg-[#131B2A]/50'
-              : 'border-transparent text-[#94A3B8] hover:text-[#F8FAFC]'
-          }`}
-        >
-          EVIDENCE
-        </button>
-        <button
-          onClick={() => setActiveTab('specs')}
-          className={`flex-1 py-1.5 px-1 text-center transition-all cursor-pointer border-b-2 text-[10px] font-mono font-bold truncate ${
-            activeTab === 'specs'
-              ? 'border-[#FFB703] text-[#FFB703] bg-[#131B2A]/50'
-              : 'border-transparent text-[#94A3B8] hover:text-[#F8FAFC]'
-          }`}
-        >
-          SPECS
-        </button>
-        <button
-          onClick={() => setActiveTab('geotag')}
-          className={`flex-1 py-1.5 px-1 text-center transition-all cursor-pointer border-b-2 text-[10px] font-mono font-bold truncate ${
-            activeTab === 'geotag'
-              ? 'border-[#FFB703] text-[#FFB703] bg-[#131B2A]/50'
-              : 'border-transparent text-[#94A3B8] hover:text-[#F8FAFC]'
-          }`}
-        >
-          GEOTAG
-        </button>
-      </div>
+        {/* Action buttons row 2 */}
+        <div className="grid grid-cols-2 gap-1.5 px-3 mb-2">
+          <button className="flex items-center justify-center gap-1 py-1.5 bg-[#0A1520] border border-[#1E293B] hover:border-[#38BDF8] text-[#64748B] hover:text-[#38BDF8] rounded text-[8px] font-bold cursor-pointer transition-all">
+            <Download className="w-2.5 h-2.5" />
+            EXPORT CLIP
+          </button>
+          <button
+            onClick={() => {/* add to report */}}
+            className="flex items-center justify-center gap-1 py-1.5 bg-[#FFB703]/10 border border-[#FFB703]/40 hover:bg-[#FFB703]/20 text-[#FFB703] rounded text-[8px] font-bold cursor-pointer transition-all">
+            <FilePlus className="w-2.5 h-2.5" />
+            ADD TO REPORT
+          </button>
+        </div>
 
-      {/* ── 3. TAB CONTENT ── */}
-      <div className="flex-1 overflow-y-auto">
-        {/* TAB 1: AI EVIDENCE SCORES */}
-        {activeTab === 'evidence' && (
-          <div className="p-3.5 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-[#FFB703] uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#FFB703]" />
-                <span>AI EVIDENCE SCORES</span>
-              </span>
-              <span className="text-[8.5px] font-bold px-1.5 py-0.5 bg-[#131B2A] text-[#94A3B8] border border-[#FFB703]/40 rounded">
-                YOLOv8 + Heuristics
-              </span>
-            </div>
-
-            {/* 4 Reasoning Chips */}
-            <div className="space-y-1.5">
-              {REASONING_CHIPS.map((chip, idx) => {
-                const isVisible = !isDemoRunning || idx < explainabilityStep;
-                if (!isVisible) return null;
-                const IconComponent = chip.icon;
-
-                return (
-                  <div
-                    key={idx}
-                    className="p-2 bg-[#05070B] border border-[#162136] hover:border-[#FFB703]/40 rounded flex items-start justify-between gap-2 transition-all"
-                  >
-                    <div className="flex items-start gap-2">
-                      <div className="p-1 rounded bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/30 shrink-0 mt-0.5">
-                        <IconComponent className="w-3 h-3" />
-                      </div>
-                      <div>
-                        <div className="text-[10px] font-bold text-[#F8FAFC] leading-tight">
-                          {chip.title}
-                        </div>
-                        <div className="text-[9px] text-[#94A3B8] mt-0.5 leading-tight">
-                          {chip.desc}
-                        </div>
-                      </div>
-                    </div>
-
-                    <span className="text-[9px] font-black text-[#FFB703] shrink-0 font-mono">
-                      {chip.metric}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Explainable AI: Acoustic Evidence Decomposition (XAI) */}
-            <div className="p-3 bg-[#05070B] border border-[#162136] rounded-xl space-y-2 font-mono text-[9.5px]">
-              <div className="flex items-center justify-between text-[#FFB703] font-bold">
-                <span className="flex items-center gap-1.5 uppercase text-[9px]">
-                  <Shield className="w-3.5 h-3.5 text-[#FFB703]" />
-                  <span>XAI ACOUSTIC EVIDENCE DECOMPOSITION</span>
-                </span>
-                <span className="text-[8px] px-1.5 py-0.5 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded font-bold">
-                  94.7% NON-GEOLOGICAL
-                </span>
-              </div>
-
-              <div className="space-y-1.5 pt-1">
-                <div>
-                  <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
-                    <span>1. SPECULAR BACKSCATTER INTENSITY</span>
-                    <span className="text-[#FFB703] font-bold">+18.4 dB (+14.2 dB vs Rock)</span>
-                  </div>
-                  <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
-                    <div className="h-full bg-[#FFB703] w-[88%]" />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
-                    <span>2. ACOUSTIC SHADOW HARDNESS (RIGIDITY)</span>
-                    <span className="text-[#38BDF8] font-bold">94% STEP GRADIENT (PASS)</span>
-                  </div>
-                  <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
-                    <div className="h-full bg-[#38BDF8] w-[94%]" />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
-                    <span>3. NON-LINEAR SYNTHETIC CURVATURE</span>
-                    <span className="text-[#F59E0B] font-bold">88% (ALDFG WEAVE MESH)</span>
-                  </div>
-                  <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
-                    <div className="h-full bg-[#F59E0B] w-[88%]" />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-[8.5px] text-[#94A3B8]">
-                    <span>4. CAVITY / NATURAL PIT EXCLUSION</span>
-                    <span className="text-[#FFB703] font-bold">12% (DEPRESSION RULED OUT)</span>
-                  </div>
-                  <div className="w-full h-1 bg-[#0A1E30] rounded overflow-hidden mt-0.5">
-                    <div className="h-full bg-[#FFB703] w-[12%]" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-1.5 bg-[#131B2A] border border-[#FFB703]/30 rounded text-[8px] text-[#94A3B8] leading-tight">
-                Verdict: Detection is supported by acoustic shadow geometry, target shape, and backscatter characteristics (94.7% Non-Geological). Specular intensity and shadow relief rule out natural rock or sediment.
-              </div>
-            </div>
-
-            {/* Platt-Calibrated True Probability Gauge (ECE Benchmark vs Competitors) */}
-            <div className="p-3 bg-[#05070B] border border-[#FFB703]/40 rounded-xl space-y-2 font-mono text-[9px]">
-              <div className="flex items-center justify-between text-[#FFB703] font-bold">
-                <span className="flex items-center gap-1.5 uppercase text-[8.5px]">
-                  <Activity className="w-3.5 h-3.5 text-[#FFB703]" />
-                  <span>PLATT PROBABILITY CALIBRATION GAUGE</span>
-                </span>
-                <span className="text-[7.5px] px-1.5 py-0.5 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 rounded font-bold">
-                  ECE: 0.028 (CALIBRATED)
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-[9px]">
-                <div className="p-2 bg-[#080D17] border border-[#162136] rounded">
-                  <span className="text-slate-400 text-[7.5px] block uppercase">RAW SOFTMAX SCORE</span>
-                  <span className="text-base font-black text-slate-200">88.0%</span>
-                  <span className="text-[7px] text-slate-500 block">Uncalibrated Output</span>
-                </div>
-                <div className="p-2 bg-[#080D17] border border-[#FFB703]/50 rounded">
-                  <span className="text-[#FFB703] text-[7.5px] block uppercase font-bold">PLATT POSTERIOR</span>
-                  <span className="text-base font-black text-[#FFB703]">94.7%</span>
-                  <span className="text-[7px] text-emerald-400 block font-bold">True Probability P(Y=1|z)</span>
-                </div>
-              </div>
-
-              {/* Mathematical Equation & Temp Scaling Badge */}
-              <div className="p-2 bg-[#080D17] border border-[#162136] rounded text-[8px] text-slate-300 space-y-0.5">
-                <div className="flex justify-between text-slate-400">
-                  <span>LOGISTIC SIGMOID SCALING:</span>
-                  <span className="text-[#FFB703] font-bold">P = 1 / (1 + e^-(Az+B))</span>
-                </div>
-                <div className="text-[7.5px] text-slate-400">
-                  T = 0.84 · Brier Score 0.041 · Countering overconfidence in side-scan backscatter
-                </div>
-              </div>
-            </div>
-
-            {/* Environmental Impact Metrics */}
-            <div className="grid grid-cols-2 gap-2 pt-1 text-[10px]">
-              <div className="p-2 bg-[#05070B] border border-[#162136] rounded">
-                <span className="text-[#94A3B8] text-[8.5px] uppercase block">VOLUMETRIC FOOTPRINT</span>
-                <strong className="text-sm font-bold text-[#FFB703]">
-                  {(target.length * target.width * target.shadowLength * 0.5).toFixed(1)} m³
-                </strong>
-              </div>
-              <div className="p-2 bg-[#05070B] border border-[#162136] rounded">
-                <span className="text-[#94A3B8] text-[8.5px] uppercase block">PLASTIC MITIGATION</span>
-                <strong className="text-sm font-bold text-[#38BDF8]">
-                  {(target.length * target.width * 14.2).toFixed(0)} kg
-                </strong>
-              </div>
-            </div>
-
-            {/* Dispatch Action */}
-            {onOpenDispatch && (
-              <button
-                onClick={() => onOpenDispatch(target)}
-                className="w-full mt-2 py-2.5 bg-[#FFB703] text-[#05070B] font-black text-xs rounded cursor-pointer hover:bg-[#00c098] shadow-[0_0_12px_rgba(255, 183, 3, )] transition-all flex items-center justify-center gap-1.5 active:scale-95"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>DISPATCH REMEDIATION ROV UNIT</span>
+        {/* Human-in-the-loop triage */}
+        <div className="mx-3 mb-2 p-2 bg-[#030810] border border-[#0F1E2E] rounded-lg space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[7.5px] text-[#475569] font-bold flex items-center gap-1">
+              <Cpu className="w-2.5 h-2.5 text-[#FFB703]" />
+              ANALYST TRIAGE
+            </span>
+            <span className={`text-[7px] font-black px-1.5 py-0.5 rounded ${
+              triageState === 'CONFIRMED' ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/30'
+              : triageState === 'REJECTED' ? 'bg-red-950 text-red-300 border border-red-500/30'
+              : 'bg-amber-950 text-amber-300 border border-amber-500/30'
+            }`}>{triageState}</span>
+          </div>
+          <div className="grid grid-cols-3 gap-1">
+            {(['CONFIRMED', 'REJECTED', 'RECLASSIFIED'] as const).map(s => (
+              <button key={s}
+                onClick={() => setTriageState(s)}
+                className={`py-1 rounded text-[7.5px] font-bold border flex items-center justify-center gap-0.5 cursor-pointer transition-all ${
+                  triageState === s
+                    ? s === 'CONFIRMED' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
+                      : s === 'REJECTED' ? 'bg-red-500/20 text-red-300 border-red-500/50'
+                      : 'bg-amber-500/20 text-amber-300 border-amber-500/50'
+                    : 'bg-[#0A1520] text-[#475569] border-[#1E293B] hover:text-[#E2E8F0]'
+                }`}>
+                {s === 'CONFIRMED' ? <Check className="w-2 h-2" /> : s === 'REJECTED' ? <X className="w-2 h-2" /> : <RefreshCw className="w-2 h-2" />}
+                {s === 'CONFIRMED' ? 'CONFIRM' : s === 'REJECTED' ? 'REJECT' : 'RE-CLASS'}
               </button>
-            )}
+            ))}
           </div>
-        )}
-
-        {/* TAB 2: PHYSICAL & ACOUSTIC SPECIFICATIONS */}
-        {activeTab === 'specs' && (
-          <div className="p-3.5 space-y-3 text-[10.5px]">
-            <div className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider">
-              PHYSICAL & ACOUSTIC DIMENSIONS
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
-                <span className="text-[#94A3B8] text-[9px] uppercase block">SEABED DEPTH</span>
-                <strong className="text-sm font-bold text-[#F8FAFC]">{target.depth.toFixed(1)} m</strong>
-                <span className="text-[8.5px] text-[#94A3B8] block">Pressure 4.3 atm</span>
-              </div>
-
-              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
-                <span className="text-[#94A3B8] text-[9px] uppercase block">DIMENSIONS (L × W)</span>
-                <strong className="text-sm font-bold text-[#F8FAFC]">{target.dimensions}</strong>
-                <span className="text-[8.5px] text-[#94A3B8] block">Aspect ratio {(target.length / target.width).toFixed(1)}:1</span>
-              </div>
-
-              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
-                <span className="text-[#94A3B8] text-[9px] uppercase block">SHADOW RELIEF</span>
-                <strong className="text-sm font-bold text-[#FFB703]">{target.shadowLength.toFixed(2)} m</strong>
-                <span className="text-[8.5px] text-[#94A3B8] block">Trigonometric Void</span>
-              </div>
-
-              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
-                <span className="text-[#94A3B8] text-[9px] uppercase block">ESTIMATED HEIGHT</span>
-                <strong className="text-sm font-bold text-[#38BDF8]">
-                  {(target.shadowLength * 0.35).toFixed(2)} m PROUD
-                </strong>
-                <span className="text-[8.5px] text-[#94A3B8] block">Above Benthic Plane</span>
-              </div>
-
-              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
-                <span className="text-[#94A3B8] text-[9px] uppercase block">ACOUSTIC STRENGTH</span>
-                <strong className="text-sm font-bold text-[#F59E0B]">-14.2 dB</strong>
-                <span className="text-[8.5px] text-[#94A3B8] block">Specular Return</span>
-              </div>
-
-              <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-0.5">
-                <span className="text-[#94A3B8] text-[9px] uppercase block">CLASSIFICATION</span>
-                <strong className="text-sm font-bold text-[#F8FAFC]">{target.category}</strong>
-                <span className="text-[8.5px] text-[#94A3B8] block">Taxonomy #26057</span>
-              </div>
-            </div>
-
-            {/* Physics-Informed Acoustic Shadow Ray-Tracer Diagram & Live Equation */}
-            <div className="p-3 bg-[#05070B] border border-[#162136] rounded-xl space-y-2 font-mono">
-              <div className="flex items-center justify-between text-[9px]">
-                <span className="font-bold text-[#FFB703] uppercase flex items-center gap-1.5">
-                  <Ruler className="w-3.5 h-3.5 text-[#FFB703]" />
-                  <span>PHYSICS-INFORMED SHADOW RAY-TRACER</span>
-                </span>
-                <span className="text-[8px] px-1.5 py-0.5 bg-[#131B2A] text-[#38BDF8] border border-[#38BDF8]/40 rounded font-bold">
-                  PI-AI CALC
-                </span>
-              </div>
-
-              {/* SVG Ray-Tracing Cross-Section Diagram */}
-              <div className="p-2 bg-[#080D17] border border-[#162136] rounded-lg">
-                <svg viewBox="0 0 280 110" className="w-full h-24">
-                  {/* Water Surface Baseline */}
-                  <line x1="10" y1="15" x2="270" y2="15" stroke="#162136" strokeWidth="1" strokeDasharray="3,3" />
-                  <text x="12" y="12" fill="#94A3B8" fontSize="6.5">WATER SURFACE</text>
-
-                  {/* Sonar Transducer Towfish */}
-                  <circle cx="35" cy="28" r="4" fill="#FFB703" />
-                  <text x="44" y="30" fill="#FFB703" fontSize="7" fontWeight="bold">TOWFISH (H = 8.4m)</text>
-
-                  {/* Seafloor Bedline */}
-                  <line x1="10" y1="95" x2="270" y2="95" stroke="#1A4E6A" strokeWidth="2" />
-                  <text x="12" y="105" fill="#94A3B8" fontSize="6.5">SEAFLOOR BED</text>
-
-                  {/* Acoustic Incident Ray from Towfish to Target */}
-                  <line x1="35" y1="28" x2="140" y2="82" stroke="#38BDF8" strokeWidth="1.5" strokeDasharray="4,2" />
-                  <text x="70" y="50" fill="#38BDF8" fontSize="6.5" transform="rotate(25, 70, 50)">Slant Range Rs = 25.0m</text>
-
-                  {/* Target Object on Seafloor */}
-                  <rect x="135" y="82" width="12" height="13" fill="#FFB703" rx="1" />
-                  <text x="124" y="78" fill="#F8FAFC" fontSize="7" fontWeight="bold">TARGET</text>
-
-                  {/* Cast Acoustic Shadow Wedge on Seabed */}
-                  <polygon points="147,95 240,95 147,82" fill="#01050A" stroke="#EF4444" strokeWidth="1" strokeDasharray="2,2" />
-                  <line x1="147" y1="97" x2="240" y2="97" stroke="#F59E0B" strokeWidth="2" />
-                  <text x="160" y="105" fill="#F59E0B" fontSize="6.5" fontWeight="bold">Shadow Ls = {target.shadowLength.toFixed(2)}m</text>
-
-                  {/* Height Extrusion Arrow */}
-                  <line x1="130" y1="82" x2="130" y2="95" stroke="#FFB703" strokeWidth="1.5" />
-                  <text x="96" y="90" fill="#FFB703" fontSize="7" fontWeight="bold">h = {((target.shadowLength * 8.4) / (25.0 + target.shadowLength)).toFixed(2)}m</text>
-                </svg>
-              </div>
-
-              {/* Physics Formula Breakdown */}
-              <div className="p-2 bg-[#080D17] border border-[#162136] rounded text-[8.5px] space-y-1">
-                <div className="flex justify-between text-[#94A3B8]">
-                  <span>GOVERNING ACOUSTIC EQUATION:</span>
-                  <span className="text-[#FFB703] font-bold">h = (Ls × H) / (Rs + Ls)</span>
-                </div>
-                <div className="text-[#F8FAFC] font-mono text-[9px]">
-                  h = ({target.shadowLength.toFixed(2)}m × 8.40m) / (25.00m + {target.shadowLength.toFixed(2)}m) = <span className="text-[#FFB703] font-black text-xs">{((target.shadowLength * 8.4) / (25.0 + target.shadowLength)).toFixed(2)}m</span> proud of seabed
-                </div>
-                <div className="flex items-center justify-between pt-1 border-t border-[#162136] text-[8px]">
-                  <span className="text-[#94A3B8]">BENTHIC HAZARD RATING:</span>
-                  <span className="text-[#EF4444] font-bold">CRITICAL SUBSEA NAVIGATION RISK</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* TAB 3: SENSOR GEOTAGGING & BATHYMETRY */}
-        {activeTab === 'geotag' && (
-          <div className="p-3.5 space-y-3">
-            {/* Geotag Coordinates Header */}
-            <div className="p-2.5 bg-[#05070B] border border-[#162136] rounded space-y-1">
-              <div className="flex items-center justify-between text-[9px] text-[#94A3B8]">
-                <span className="uppercase font-bold">WGS84 COORDINATES</span>
-                <span className="text-[#FFB703] font-mono font-bold">USBL FIXED</span>
-              </div>
-              <div className="text-xs font-mono font-bold text-[#F8FAFC]">
-                {target.latitude.toFixed(4)}° N, {target.longitude.toFixed(4)}° E
-              </div>
-              <div className="text-[8.5px] text-[#94A3B8]">
-                Mumbai Offshore Continental Shelf · Depth {target.depth.toFixed(1)}m
-              </div>
-            </div>
-
-            {/* Map / 3D Canvas Switcher */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 bg-[#05070B] p-0.5 border border-[#162136] rounded">
-                <button
-                  onClick={() => setActiveGeoTab('map')}
-                  className={`px-2 py-0.5 rounded text-[9px] font-bold transition-all cursor-pointer ${
-                    activeGeoTab === 'map'
-                      ? 'bg-[#FFB703] text-[#05070B]'
-                      : 'text-[#94A3B8] hover:text-[#F8FAFC]'
-                  }`}
-                >
-                  MAP VIEW
-                </button>
-                <button
-                  onClick={() => setActiveGeoTab('3d')}
-                  className={`px-2 py-0.5 rounded text-[9px] font-bold transition-all cursor-pointer ${
-                    activeGeoTab === '3d'
-                      ? 'bg-[#FFB703] text-[#05070B]'
-                      : 'text-[#94A3B8] hover:text-[#F8FAFC]'
-                  }`}
-                >
-                  3D MESH
-                </button>
-              </div>
-
-              <span className="text-[8.5px] text-[#94A3B8] font-mono">
-                {activeGeoTab === 'map' ? 'USBL FIX 2026' : 'ISO BATHYMETRY'}
-              </span>
-            </div>
-
-            {/* Canvas Viewport */}
-            <div className="h-44 rounded border border-[#162136] overflow-hidden bg-[#05070B] relative">
-              {activeGeoTab === 'map' ? (
-                <canvas
-                  ref={mapCanvasRef}
-                  width={340}
-                  height={176}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="relative w-full h-full">
-                  <canvas
-                    ref={seabed3DCanvasRef}
-                    width={340}
-                    height={176}
-                    onMouseDown={(e) => {
-                      setIsDragging3D(true);
-                      setDragStart({ x: e.clientX, y: e.clientY });
-                    }}
-                    onMouseMove={(e) => {
-                      if (!isDragging3D) return;
-                      const dx = e.clientX - dragStart.x;
-                      const dy = e.clientY - dragStart.y;
-                      setYaw((y) => y + dx * 0.01);
-                      setPitch((p) => Math.max(0.1, Math.min(1.4, p + dy * 0.01)));
-                      setDragStart({ x: e.clientX, y: e.clientY });
-                    }}
-                    onMouseUp={() => setIsDragging3D(false)}
-                    onMouseLeave={() => setIsDragging3D(false)}
-                    className="w-full h-full object-cover cursor-grab active:cursor-grabbing"
-                  />
-                  <div className="absolute top-1.5 right-1.5 flex items-center gap-1 z-10">
-                    <button
-                      onClick={() => setAutoRotate((r) => !r)}
-                      className={`px-1.5 py-0.5 rounded text-[7.5px] font-mono font-bold border transition-all cursor-pointer ${
-                        autoRotate
-                          ? 'bg-[#FFB703]/20 text-[#FFB703] border-[#FFB703]/40'
-                          : 'bg-[#080D17] text-slate-400 border-[#162136]'
-                      }`}
-                    >
-                      {autoRotate ? 'ORBIT: ON' : 'ORBIT: OFF'}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setYaw(0.75);
-                        setPitch(0.55);
-                      }}
-                      className="px-1.5 py-0.5 rounded text-[7.5px] font-mono text-slate-400 bg-[#080D17] border border-[#162136] hover:text-white transition-all cursor-pointer"
-                      title="Reset 3D View"
-                    >
-                      RESET
-                    </button>
-                  </div>
-                  <div className="absolute bottom-1 left-2 text-[7.5px] font-mono text-slate-500 pointer-events-none">
-                    CLICK & DRAG TO ORBIT 3D RECON
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Geotagging Pipeline Sequence */}
-            <div className="flex items-center gap-1 text-[8px] text-[#94A3B8] overflow-x-auto py-1">
-              <span className="px-1.5 py-0.5 bg-[#131B2A] text-[#FFB703] border border-[#FFB703]/40 font-bold shrink-0 rounded">
-                SONAR
-              </span>
-              <span>→</span>
-              <span className="px-1 py-0.5 bg-[#0A1E30] text-[#F8FAFC] border border-[#162136] shrink-0 rounded">
-                PING #0184
-              </span>
-              <span>→</span>
-              <span className="px-1 py-0.5 bg-[#0A1E30] text-[#F8FAFC] border border-[#162136] shrink-0 rounded">
-                USBL
-              </span>
-              <span>→</span>
-              <span className="px-1 py-0.5 bg-[#0A1E30] text-[#FFB703] border border-[#162136] font-bold shrink-0 rounded">
-                WGS84
-              </span>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
 
-      {/* MoES Clearance Certificate Trigger Button */}
-      <div className="p-2.5 border-t border-[#162136] bg-[#05070B] shrink-0">
+      {/* ══════════════════════════════════════════════════
+          SECTION 2 — SONAR PREVIEW
+      ══════════════════════════════════════════════════ */}
+      <div className="border-b border-[#0F1E2E] bg-[#030810]">
+        {/* Header */}
+        <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#0F1E2E]">
+          <span className="text-[8.5px] font-black text-[#64748B] uppercase tracking-widest">
+            SONAR PREVIEW ({target.id})
+          </span>
+          <div className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-pulse" />
+            <span className="text-[7px] text-[#00F5D4] font-bold">LIVE</span>
+          </div>
+        </div>
+
+        {/* 4 Thumbnail tabs */}
+        <div className="grid grid-cols-4 gap-1 p-2">
+          {THUMBNAIL_TABS.map(({ key, label, ref }) => (
+            <button
+              key={key}
+              onClick={() => setSonarTab(key)}
+              className={`relative rounded overflow-hidden border cursor-pointer transition-all ${
+                sonarTab === key
+                  ? 'border-[#FFB703] shadow-[0_0_8px_rgba(255,183,3,0.3)]'
+                  : 'border-[#1E293B] hover:border-[#334155]'
+              }`}
+            >
+              <canvas
+                ref={ref}
+                width={64}
+                height={48}
+                className="w-full h-auto block pointer-events-none"
+              />
+              <div className={`absolute bottom-0 left-0 right-0 text-center text-[5.5px] font-black py-0.5 ${
+                sonarTab === key ? 'bg-[#FFB703] text-[#030810]' : 'bg-black/60 text-[#64748B]'
+              }`}>
+                {label}
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* Acoustic Profile cross-section */}
+        <div className="px-2 pb-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[7.5px] font-black text-[#64748B] uppercase">
+              ACOUSTIC PROFILE (CROSS-SECTION)
+            </span>
+            <span className="text-[7px] text-[#EF4444] font-bold">
+              ± {target.shadowLength.toFixed(2)} m
+            </span>
+          </div>
+          <div className="rounded border border-[#0F1E2E] overflow-hidden">
+            <canvas
+              ref={waveformCanvasRef}
+              width={260}
+              height={52}
+              className="w-full h-[52px]"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════
+          SECTION 3 — HYDROGRAPHIC TELEMETRY (AUV)
+      ══════════════════════════════════════════════════ */}
+      <div className="bg-[#03080E] flex-1">
+        {/* Header */}
+        <div className="flex items-center justify-between px-3 py-1.5 border-b border-[#0F1E2E]">
+          <span className="text-[8.5px] font-black text-[#64748B] uppercase tracking-widest">
+            HYDROGRAPHIC TELEMETRY (AUV-07)
+          </span>
+          <div className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-pulse" />
+            <span className="text-[7px] text-[#00F5D4] font-bold">LIVE</span>
+          </div>
+        </div>
+
+        {/* Big 4 telemetry blocks */}
+        <div className="grid grid-cols-4 gap-px p-2">
+          {[
+            { icon: Waves,       label: 'DEPTH',        value: `${tel.depth}`,    unit: 'm',   color: '#38BDF8' },
+            { icon: Thermometer, label: 'TEMPERATURE',  value: `${tel.temp}`,     unit: '°C',  color: '#F59E0B' },
+            { icon: Droplets,    label: 'SALINITY',     value: `${tel.salinity}`, unit: 'PSU', color: '#818CF8' },
+            { icon: Navigation,  label: 'CURRENT',      value: `${tel.current}`,  unit: 'm/s', color: '#00F5D4' },
+          ].map(({ icon: Icon, label, value, unit, color }) => (
+            <div key={label} className="p-1.5 bg-[#030810] border border-[#0F1E2E] rounded text-center">
+              <div className="flex justify-center mb-0.5">
+                <Icon className="w-2.5 h-2.5" style={{ color }} />
+              </div>
+              <div className="font-black text-[11px] leading-none" style={{ color }}>
+                {value}
+              </div>
+              <div className="text-[6.5px] text-[#475569]">{unit}</div>
+              <div className="text-[5.5px] text-[#334155] uppercase mt-0.5">{label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* AUV Status bar */}
+        <div className="mx-2 mb-1.5 px-2 py-1 bg-[#030810] border border-[#0F1E2E] rounded flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00F5D4] animate-pulse" />
+            <span className="text-[7.5px] font-black text-[#00F5D4] uppercase">AUV STATUS</span>
+          </div>
+          <span className="text-[7.5px] font-black text-[#E2E8F0] uppercase">SURVEYING</span>
+        </div>
+
+        {/* Secondary metrics */}
+        <div className="grid grid-cols-4 gap-px mx-2 mb-2">
+          {[
+            { label: 'SPEED',    value: `${tel.speed}`,    unit: 'kn',  color: '#E2E8F0' },
+            { label: 'HEADING',  value: `${tel.heading}°`, unit: 'SW',  color: '#E2E8F0' },
+            { label: 'PING RATE',value: `${tel.pingRate}`, unit: 'Hz',  color: '#FFB703' },
+            { label: 'BATTERY',  value: `${tel.battery}%`, unit: '',    color: tel.battery > 50 ? '#00F5D4' : tel.battery > 20 ? '#F59E0B' : '#EF4444' },
+          ].map(m => (
+            <div key={m.label} className="p-1.5 bg-[#030810] border border-[#0F1E2E] rounded text-center">
+              <div className="font-black text-[9.5px] leading-none" style={{ color: m.color }}>
+                {m.value}
+              </div>
+              <div className="text-[5.5px] text-[#475569] uppercase mt-0.5">{m.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Battery progress */}
+        <div className="mx-2 mb-2">
+          <div className="w-full h-1 bg-[#0A1520] rounded overflow-hidden">
+            <div
+              className="h-full rounded transition-all duration-1000"
+              style={{
+                width: `${tel.battery}%`,
+                background: tel.battery > 50 ? '#00F5D4' : tel.battery > 20 ? '#F59E0B' : '#EF4444',
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════
+          FOOTER — MoES Certificate
+      ══════════════════════════════════════════════════ */}
+      <div className="p-2 border-t border-[#0F1E2E] bg-[#030810] shrink-0">
         <button
           onClick={() => setIsCertModalOpen(true)}
-          className="w-full py-2 bg-[#0D2640] border border-[#FFB703]/60 hover:bg-[#FFB703]/15 text-[#FFB703] font-mono font-bold text-[10.5px] rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(255, 183, 3, )]"
+          className="w-full py-1.5 bg-[#0A1520] border border-[#FFB703]/40 hover:bg-[#FFB703]/10 text-[#FFB703] font-black text-[9px] rounded cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-[0_0_10px_rgba(255,183,3,0.15)]"
         >
-          <Award className="w-3.5 h-3.5 text-[#FFB703]" />
-          <span>MoES CERTIFICATE (SHA-256)</span>
+          <Award className="w-3 h-3" />
+          MoES CLEARANCE CERTIFICATE (SHA-256)
         </button>
       </div>
 
-      {/* MoES Clearance Certificate Modal */}
       <MoESClearanceCertificateModal
         isOpen={isCertModalOpen}
         onClose={() => setIsCertModalOpen(false)}

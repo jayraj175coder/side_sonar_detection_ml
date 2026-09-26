@@ -381,6 +381,8 @@ export const MissionPage: React.FC = () => {
               heroConfidence={heroConfidence}
               explainabilityStep={explainabilityStep}
               onOpenDispatch={(t) => setDispatchTarget(t)}
+              allTargets={processedTargets}
+              onSelectTarget={handleSelectTarget}
             />
           </div>
         </div>

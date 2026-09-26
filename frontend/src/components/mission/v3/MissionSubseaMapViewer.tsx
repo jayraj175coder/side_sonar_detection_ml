@@ -127,7 +127,7 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
   const [activeTool, setActiveTool] = useState<'select' | 'center' | 'box' | 'ruler' | 'pin'>('select');
   const [layers, setLayers] = useState<MapLayersConfig>(DEFAULT_MAP_LAYERS);
   const [showLayerPopover, setShowLayerPopover] = useState<boolean>(false);
-  const [cursorCoords, setCursorCoords] = useState<string>('27.788°N, 89.874°W');
+  const [cursorCoords, setCursorCoords] = useState<string>('18.922°N, 72.821°E');
 
   // Interactive GIS annotations state
   const [measurePts, setMeasurePts] = useState<{ x: number; y: number }[]>([]);
@@ -446,24 +446,42 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
     ctx.fill();
     ctx.restore();
 
-    // 8. Plot Secondary Confirmed Targets as Glowing Dots
+    // 8. Plot Secondary Confirmed Targets as Glowing Dots + Tag Pill when Selected
     if (layers.sonarDetections) {
       targets.forEach((t) => {
         if (FEATURED_CALLOUTS[t.id]) return; // Drawn as rich callout boxes below
-        if (t.status === 'FILTERED') return;
-        const pos = getTargetCanvasPos(t, W, H);
         const isSel = t.id === selectedTargetId;
+        if (t.status === 'FILTERED' && !isSel) return;
+        const pos = getTargetCanvasPos(t, W, H);
+        const dotColor =
+          t.status === 'FILTERED'
+            ? '#F87171'
+            : t.priority === 'HIGH'
+            ? '#EF4444'
+            : '#38BDF8';
         ctx.save();
-        ctx.fillStyle = t.priority === 'HIGH' ? '#EF4444' : '#38BDF8';
+        ctx.fillStyle = dotColor;
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, isSel ? 5 : 3, 0, Math.PI * 2);
+        ctx.arc(pos.x, pos.y, isSel ? 5 : 3.2, 0, Math.PI * 2);
         ctx.fill();
         if (isSel) {
-          ctx.strokeStyle = '#00F5D4';
-          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = dotColor;
+          ctx.lineWidth = 1.6;
+          ctx.setLineDash([3, 3]);
           ctx.beginPath();
-          ctx.arc(pos.x, pos.y, 10, 0, Math.PI * 2);
+          ctx.arc(pos.x, pos.y, 18, 0, Math.PI * 2);
           ctx.stroke();
+          ctx.setLineDash([]);
+
+          const code = formatDisplayId(t.id);
+          ctx.fillStyle = '#070E1B';
+          ctx.strokeStyle = dotColor;
+          ctx.lineWidth = 1.2;
+          ctx.fillRect(pos.x - 23, pos.y - 28, 46, 14);
+          ctx.strokeRect(pos.x - 23, pos.y - 28, 46, 14);
+          ctx.fillStyle = dotColor;
+          ctx.font = 'bold 9.5px monospace';
+          ctx.fillText(code, pos.x - 18, pos.y - 18);
         }
         ctx.restore();
       });
@@ -688,9 +706,9 @@ export const MissionSubseaMapViewer: React.FC<MissionSubseaMapViewerProps> = ({
     const rect = canvas.getBoundingClientRect();
     const nx = (e.clientX - rect.left) / rect.width;
     const ny = (e.clientY - rect.top) / rect.height;
-    const lat = (27.792 - ny * 0.008).toFixed(3);
-    const lon = (89.878 - nx * 0.008).toFixed(3);
-    setCursorCoords(`${lat}°N, ${lon}°W`);
+    const lat = (18.928 - ny * 0.012).toFixed(3);
+    const lon = (72.815 + nx * 0.014).toFixed(3);
+    setCursorCoords(`${lat}°N, ${lon}°E`);
 
     if (isDrawingBox && roiBox) {
       const x = nx * canvas.width;

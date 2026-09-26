@@ -1,11 +1,16 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Target } from 'lucide-react';
-import { MissionTopHeader } from '../components/mission/v3/MissionTopHeader';
+import { MissionTopHeader, KpiFilterCategory } from '../components/mission/v3/MissionTopHeader';
 import { LargeSonarViewer } from '../components/mission/v3/LargeSonarViewer';
 import { MissionSubseaMapViewer, CenterViewportMode } from '../components/mission/v3/MissionSubseaMapViewer';
 import { Mission3DSeafloorViewer } from '../components/mission/v3/Mission3DSeafloorViewer';
-import { SonarPreviewPanel } from '../components/mission/v3/SonarPreviewPanel';
-import { TargetIntelligencePanel } from '../components/mission/v3/TargetIntelligencePanel';
+import {
+  SonarPreviewPanel,
+  ExtendedMissionTarget,
+} from '../components/mission/v3/SonarPreviewPanel';
+import {
+  TargetIntelligencePanel,
+  getTargetPingAndTime,
+} from '../components/mission/v3/TargetIntelligencePanel';
 import { BottomPipelineTimeline } from '../components/mission/v3/BottomPipelineTimeline';
 import { UploadClassifyModal } from '../components/mission/UploadClassifyModal';
 import { HazardAlertDrawer } from '../components/mission/v3/HazardAlertDrawer';
@@ -27,8 +32,9 @@ import { exportToKML, exportToIHOS44CSV } from '../utils/gisExport';
 
 export const MissionPage: React.FC = () => {
   // ── State Management ──
-  const [targets] = useState<MissionV3Target[]>(MISSION_V3_TARGETS);
+  const [targets, setTargets] = useState<ExtendedMissionTarget[]>(MISSION_V3_TARGETS);
   const [selectedTargetId, setSelectedTargetId] = useState<string>('SX-T07');
+  const [activeKpiFilter, setActiveKpiFilter] = useState<KpiFilterCategory>('all');
   const [hoveredTargetId, setHoveredTargetId] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
   const [isAlertDrawerOpen, setIsAlertDrawerOpen] = useState<boolean>(false);
@@ -51,7 +57,7 @@ export const MissionPage: React.FC = () => {
 
   // AI Pipeline & Timeline State
   const [currentStageIndex, setCurrentStageIndex] = useState<number>(6); // Default 07 VERIFY
-  const [currentFrame, setCurrentFrame] = useState<number>(54);
+  const [currentFrame, setCurrentFrame] = useState<number>(81);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [timelineSpeed, setTimelineSpeed] = useState<number>(1);
 
@@ -95,10 +101,38 @@ export const MissionPage: React.FC = () => {
     frameIntervalRef.current = [];
   }, []);
 
-  // ── Target Selection Handler (Bidirectional Sync) ──
+  // ── Target Selection Handler (Bidirectional Sync with Timeline & Map) ──
   const handleSelectTarget = useCallback((id: string) => {
     setSelectedTargetId(id);
+    const meta = getTargetPingAndTime(id);
+    setCurrentFrame(meta.frame);
     sonarAudio.playTargetBeep?.();
+  }, []);
+
+  // ── Top KPI Strip Category Filter Handler ──
+  const handleSelectKpiFilter = useCallback(
+    (category: KpiFilterCategory) => {
+      setActiveKpiFilter(category);
+      const cycleIds: Record<KpiFilterCategory, string[]> = {
+        all: ['SX-T07', 'SX-T03', 'SX-T05', 'SX-T01'],
+        verified: ['SX-T07', 'SX-T03', 'SX-T05', 'SX-T01', 'SX-T11'],
+        high_risk: ['SX-T07', 'SX-T03', 'SX-T05', 'SX-T09'],
+        pipelines: ['SX-T01', 'SX-T08'],
+        anomalies: ['SX-T11', 'SX-T05', 'SX-T02'],
+      };
+      const pool = cycleIds[category];
+      const currentIdx = pool.indexOf(selectedTargetId);
+      const nextId = pool[(currentIdx + 1) % pool.length];
+      handleSelectTarget(nextId);
+    },
+    [selectedTargetId, handleSelectTarget]
+  );
+
+  // ── Handle Pinning Real Uploaded or Sample Sonar Target from UploadClassifyModal ──
+  const handlePinV3Target = useCallback((newTarget: ExtendedMissionTarget) => {
+    setTargets((prev) => [newTarget, ...prev]);
+    setSelectedTargetId(newTarget.id);
+    setCurrentFrame(81);
   }, []);
 
   // ── Hero Ghost Net Sequence (Manual or Scripted) ──
@@ -308,6 +342,8 @@ export const MissionPage: React.FC = () => {
         onToggleShadowGate={() => setIsShadowGateActive((v) => !v)}
         centerViewMode={centerViewMode}
         onSelectCenterViewMode={setCenterViewMode}
+        activeKpiFilter={activeKpiFilter}
+        onSelectKpiFilter={handleSelectKpiFilter}
       />
 
       {/* ── HAZARD ALERT DRAWER (REAL-TIME NOTIFICATION BELL) ── */}
@@ -369,7 +405,9 @@ export const MissionPage: React.FC = () => {
                       </button>
                     ))}
                   </div>
-                  <span className="text-[11px] font-mono text-[#CBD5E1]">27.788°N, 89.874°W</span>
+                  <span className="text-[11px] font-mono text-[#CBD5E1]">
+                    {selectedTarget.latitude.toFixed(3)}°N, {selectedTarget.longitude.toFixed(3)}°E
+                  </span>
                 </div>
                 <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
                   <LargeSonarViewer
@@ -440,7 +478,9 @@ export const MissionPage: React.FC = () => {
                       </button>
                     ))}
                   </div>
-                  <span className="text-[11px] font-mono text-[#CBD5E1]">27.788°N, 89.874°W</span>
+                  <span className="text-[11px] font-mono text-[#CBD5E1]">
+                    {selectedTarget.latitude.toFixed(3)}°N, {selectedTarget.longitude.toFixed(3)}°E
+                  </span>
                 </div>
                 <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
                   <Mission3DSeafloorViewer
@@ -475,6 +515,7 @@ export const MissionPage: React.FC = () => {
               onExportReport={handleExportReport}
               allTargets={processedTargets}
               onSelectTarget={handleSelectTarget}
+              isShadowGateActive={isShadowGateActive}
             />
           </div>
         </div>
@@ -503,6 +544,7 @@ export const MissionPage: React.FC = () => {
       <UploadClassifyModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
+        onPinV3Target={handlePinV3Target}
       />
 
       {/* ── ROV / DIVERS REMEDIATION DISPATCH MODAL ── */}

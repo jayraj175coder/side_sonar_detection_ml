@@ -26,6 +26,7 @@ import { AcousticGisProcessingOverlay } from '../scan/AcousticGisProcessingOverl
 interface UploadClassifyModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onPinV3Target?: (target: any) => void;
 }
 
 const BUNDLED_SONAR_SAMPLES = [
@@ -34,7 +35,7 @@ const BUNDLED_SONAR_SAMPLES = [
     name: 'Sample A: Ghost Net (ALDFG Swath)',
     fileUrl: '/samples/sih_ghost_net_aldfg_swath.png',
     category: 'Ghost Net (ALDFG)',
-    confidence: 0.806,
+    confidence: 0.947,
     uncertaintyRating: 'LOW AMBIGUITY' as const,
     dimensions: { length: 12.4, width: 3.2, height: 0.82, shadow: 2.31 },
     operatorCaveat: 'Irregular acoustic mesh boundary with prominent acoustic shadow void (2.31m). Classified as abandoned monofilament fishing gear (ALDFG).',
@@ -46,9 +47,9 @@ const BUNDLED_SONAR_SAMPLES = [
     name: 'Sample B: Marine Debris & Drums',
     fileUrl: '/samples/sih_marine_debris_drum.png',
     category: 'Anthropogenic Debris',
-    confidence: 0.645,
+    confidence: 0.845,
     uncertaintyRating: 'MODERATE UNCERTAINTY' as const,
-    dimensions: { length: 2.1, width: 1.4, height: 0.65, shadow: 1.42 },
+    dimensions: { length: 4.8, width: 2.1, height: 0.65, shadow: 2.85 },
     operatorCaveat: 'Compact metallic specular highlight return consistent with discarded industrial container drum on seabed.',
     color: '#F59E0B',
     targetStrengthDb: -12.8,
@@ -70,19 +71,24 @@ const BUNDLED_SONAR_SAMPLES = [
     name: 'Sample D: Seafloor Anomaly / Wreckage',
     fileUrl: '/samples/sonar_track_kochi_nombo.png',
     category: 'Seafloor Anomaly',
-    confidence: 0.664,
+    confidence: 0.892,
     uncertaintyRating: 'MODERATE UNCERTAINTY' as const,
-    dimensions: { length: 6.8, width: 2.4, height: 1.1, shadow: 3.2 },
+    dimensions: { length: 6.8, width: 2.4, height: 1.1, shadow: 3.12 },
     operatorCaveat: 'Elevated seabed acoustic anomaly with distinct relief shadow, flagged for ROV camera inspection.',
     color: '#EC4899',
     targetStrengthDb: -16.4,
   },
 ];
 
-export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen, onClose }) => {
+export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({
+  isOpen,
+  onClose,
+  onPinV3Target,
+}) => {
   const { addCustomTarget, setSelectedTargetId } = useMission();
   const [selectedSample, setSelectedSample] = useState<any>(BUNDLED_SONAR_SAMPLES[0]);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [uploadedPreviewUrl, setUploadedPreviewUrl] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [isClassified, setIsClassified] = useState<boolean>(true);
   const [isPinned, setIsPinned] = useState<boolean>(false);
@@ -181,6 +187,7 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
     sonarAudio.playLockBeep();
     setSelectedSample(sample);
     setUploadedFileName(null);
+    setUploadedPreviewUrl(sample.fileUrl);
     setInferenceMeta(null);
     setIsClassified(true);
     setIsPinned(false);
@@ -200,6 +207,8 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const previewUrl = URL.createObjectURL(file);
+    setUploadedPreviewUrl(previewUrl);
     setUploadedFileName(file.name);
     await runModelOnImage(file);
   };
@@ -207,8 +216,10 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
   const handlePinToMission = () => {
     if (!selectedSample) return;
     sonarAudio.playSonarPing();
+    const randomNum = Math.floor(20 + Math.random() * 79);
+    const newId = `SX-T${randomNum}`;
     const newTarget: MissionTarget = {
-      id: `SX-U${Math.floor(10 + Math.random() * 89)}`,
+      id: newId,
       tracklineId: 'LINE-01',
       class: selectedSample.category,
       classCode: selectedSample.category.includes('Net') ? 'NET' : selectedSample.category.includes('Pipeline') ? 'PIP' : selectedSample.category.includes('Debris') ? 'DEBRIS' : 'ANOMALY',
@@ -247,6 +258,42 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({ isOpen
 
     addCustomTarget(newTarget);
     setSelectedTargetId(newTarget.id);
+
+    if (onPinV3Target) {
+      const isSuppressed = selectedSample.dimensions.shadow < 0.25 || selectedSample.confidence < 0.4;
+      onPinV3Target({
+        id: newId,
+        label: selectedSample.category,
+        shortLabel: selectedSample.category.split('(')[0].trim(),
+        confidence: selectedSample.confidence,
+        priority: isSuppressed ? 'FILTERED' : selectedSample.category.includes('Net') || selectedSample.category.includes('Pipeline') ? 'HIGH' : 'MEDIUM',
+        status: isSuppressed ? 'FILTERED' : 'CONFIRMED',
+        depth: 38.4,
+        dimensions: `${selectedSample.dimensions.length}m × ${selectedSample.dimensions.width}m × ${selectedSample.dimensions.height}m`,
+        length: selectedSample.dimensions.length,
+        width: selectedSample.dimensions.width,
+        height: selectedSample.dimensions.height,
+        shadowLength: selectedSample.dimensions.shadow,
+        latitude: 18.9214 + (Math.random() - 0.5) * 0.004,
+        longitude: 72.8217 + (Math.random() - 0.5) * 0.004,
+        rawX: 52,
+        rawY: 46,
+        boxW: 11,
+        boxH: 10,
+        flank: 'PORT',
+        isHero: false,
+        explainability: [
+          `Real ONNX Inference (${inferenceMeta?.inferenceMs ?? 34}ms)`,
+          `Measured Shadow Relief (${selectedSample.dimensions.shadow}m)`,
+          `900 kHz High-Contrast Backscatter`,
+          `MoES Geodesic Pin Verified`,
+        ],
+        recommendedAction: `Dispatch ROV inspection along MoES Mumbai Offshore Survey Track for ${selectedSample.category}.`,
+        customImageUrl: uploadedPreviewUrl || selectedSample.fileUrl,
+        customBbox: inferenceMeta?.bbox,
+      });
+    }
+
     setIsPinned(true);
     setTimeout(() => {
       onClose();

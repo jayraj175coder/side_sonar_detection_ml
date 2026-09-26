@@ -7,95 +7,57 @@ import {
   FileText,
   Anchor,
   Check,
+  X,
 } from 'lucide-react';
-import { MissionV3Target } from '../../../data/missionV3Data';
 import { MoESClearanceCertificateModal } from './MoESClearanceCertificateModal';
-import { formatDisplayId } from './SonarPreviewPanel';
+import {
+  ExtendedMissionTarget,
+  formatDisplayId,
+  renderSonarCanvas,
+} from './SonarPreviewPanel';
 
 interface TargetIntelligencePanelProps {
-  target: MissionV3Target;
+  target: ExtendedMissionTarget;
   isVerified?: boolean;
   isDemoRunning?: boolean;
   heroConfidence?: number;
   explainabilityStep?: number;
-  onOpenDispatch?: (target: MissionV3Target) => void;
+  onOpenDispatch?: (target: ExtendedMissionTarget) => void;
   onExportReport?: () => void;
-  allTargets?: MissionV3Target[];
+  allTargets?: ExtendedMissionTarget[];
   onSelectTarget?: (id: string) => void;
+  isShadowGateActive?: boolean;
 }
 
-// Draw the golden sonar crop thumbnail for Target Details header
-function drawTargetCropThumb(canvas: HTMLCanvasElement | null, target: MissionV3Target) {
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  const W = canvas.width;
-  const H = canvas.height;
-
-  // Deep amber-brown sonar background
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#2B1504');
-  bg.addColorStop(0.5, '#4A2408');
-  bg.addColorStop(1, '#120802');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-
-  // Speckle grain
-  for (let i = 0; i < 420; i++) {
-    const x = (Math.sin(i * 78.233) * 0.5 + 0.5) * W;
-    const y = (Math.cos(i * 45.164) * 0.5 + 0.5) * H;
-    const alpha = (i % 7) * 0.04;
-    ctx.fillStyle = `rgba(245, 158, 11, ${alpha})`;
-    ctx.fillRect(x, y, 1.5, 1.5);
-  }
-
-  // Dark acoustic shadow band to the right
-  ctx.fillStyle = 'rgba(4, 6, 10, 0.85)';
-  ctx.beginPath();
-  ctx.moveTo(W * 0.52, H * 0.36);
-  ctx.lineTo(W, H * 0.24);
-  ctx.lineTo(W, H * 0.78);
-  ctx.lineTo(W * 0.52, H * 0.68);
-  ctx.closePath();
-  ctx.fill();
-
-  // Tangled circular ghost-net / target ring return in center
-  const cx = W * 0.46;
-  const cy = H * 0.52;
-  ctx.strokeStyle = '#F59E0B';
-  ctx.lineWidth = 2;
-  ctx.shadowColor = '#F59E0B';
-  ctx.shadowBlur = 6;
-  ctx.beginPath();
-  for (let a = 0; a <= Math.PI * 2; a += 0.2) {
-    const r = 10 + Math.sin(a * 4) * 2.2 + Math.cos(a * 3) * 1.5;
-    const px = cx + Math.cos(a) * r;
-    const py = cy + Math.sin(a) * r * 0.82;
-    if (a === 0) ctx.moveTo(px, py);
-    else ctx.lineTo(px, py);
-  }
-  ctx.closePath();
-  ctx.stroke();
-
-  // Bright specular highlight knots
-  ctx.fillStyle = '#FEF08A';
-  ctx.fillRect(cx - 8, cy - 5, 3, 3);
-  ctx.fillRect(cx + 5, cy + 3, 2.5, 2.5);
-  ctx.shadowBlur = 0;
+export function getTargetPingAndTime(id: string): { ping: number; time: string; frame: number } {
+  const map: Record<string, { ping: number; time: string; frame: number }> = {
+    'SX-T07': { ping: 60123, time: '14:27:42', frame: 54 },
+    'SX-T03': { ping: 60218, time: '14:32:15', frame: 95 },
+    'SX-T05': { ping: 60164, time: '14:29:48', frame: 72 },
+    'SX-T01': { ping: 59842, time: '14:21:12', frame: 12 },
+    'SX-T09': { ping: 60265, time: '14:35:04', frame: 112 },
+    'SX-T11': { ping: 59915, time: '14:23:18', frame: 24 },
+    'SX-T14': { ping: 60140, time: '14:28:30', frame: 61 },
+    'SX-T16': { ping: 60190, time: '14:31:02', frame: 84 },
+    'SX-T02': { ping: 59880, time: '14:22:15', frame: 18 },
+    'SX-T08': { ping: 60240, time: '14:33:50', frame: 104 },
+  };
+  return map[id] || { ping: 60050, time: '14:26:10', frame: 45 };
 }
 
 export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = ({
   target,
-  isVerified = true,
   isDemoRunning = false,
   heroConfidence = 94.7,
   onOpenDispatch,
   onExportReport,
   allTargets = [],
   onSelectTarget,
+  isShadowGateActive = true,
 }) => {
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
   const [clipExported, setClipExported] = useState(false);
+  const [addedToReport, setAddedToReport] = useState(false);
   const thumbCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Live gentle sensor drift for AUV-07 Hydrographic Telemetry
@@ -124,45 +86,62 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
   }, []);
 
   useEffect(() => {
-    drawTargetCropThumb(thumbCanvasRef.current, target);
+    renderSonarCanvas(thumbCanvasRef.current, target, 'detection', false, 1, true);
   }, [target]);
 
-  const activeList = allTargets.length > 0 ? allTargets : [target];
-  const currentIdx = Math.max(0, activeList.findIndex((t) => t.id === target.id));
-  const totalCount = activeList.length || 17;
-  const displayIndex = currentIdx === 0 && target.id === 'SX-T07' ? 3 : currentIdx + 1;
+  // When Shadow Gate is active, cycle through confirmed targets first so clicks always land on real targets
+  const confirmedTargets = allTargets.filter((t) => t.status === 'CONFIRMED');
+  const navList =
+    isShadowGateActive && confirmedTargets.length > 0
+      ? confirmedTargets
+      : allTargets.length > 0
+      ? allTargets
+      : [target];
+
+  const currentIdx = Math.max(0, navList.findIndex((t) => t.id === target.id));
+  const totalCount = navList.length;
 
   const handlePrev = () => {
-    if (activeList.length <= 1 || !onSelectTarget) return;
-    const prevIdx = (currentIdx - 1 + activeList.length) % activeList.length;
-    onSelectTarget(activeList[prevIdx].id);
+    if (navList.length <= 1 || !onSelectTarget) return;
+    const prevIdx = (currentIdx - 1 + navList.length) % navList.length;
+    onSelectTarget(navList[prevIdx].id);
   };
 
   const handleNext = () => {
-    if (activeList.length <= 1 || !onSelectTarget) return;
-    const nextIdx = (currentIdx + 1) % activeList.length;
-    onSelectTarget(activeList[nextIdx].id);
+    if (navList.length <= 1 || !onSelectTarget) return;
+    const nextIdx = (currentIdx + 1) % navList.length;
+    onSelectTarget(navList[nextIdx].id);
   };
+
+  const pingMeta = getTargetPingAndTime(target.id);
+  const isFiltered = target.status === 'FILTERED' || target.shadowLength < 0.25;
+  const hasValidShadow = target.shadowLength >= 0.25;
 
   const handleExportClip = () => {
     const payload = {
       clip_id: formatDisplayId(target.id),
       internal_id: target.id,
+      authority: 'Ministry of Earth Sciences (MoES) / NIOT',
+      sector: 'Indian EEZ — Mumbai Offshore Continental Shelf',
       category: target.label,
-      confidence: +(target.confidence * 100).toFixed(1),
+      confidence_pct: +(target.confidence * 100).toFixed(1),
       depth_m: target.depth,
       shadow_relief_m: target.shadowLength,
+      shadow_gate_passed: hasValidShadow,
       dimensions: target.dimensions,
-      coordinates: { lat: 27.7881, lon: -89.8742, survey_lat: target.latitude, survey_lon: target.longitude },
-      ping_number: 60123,
-      timestamp_utc: '14:27:42',
-      model: 'YOLOv8s + ONNX',
+      coordinates_wgs84: {
+        latitude: `${target.latitude.toFixed(4)}°N`,
+        longitude: `${target.longitude.toFixed(4)}°E`,
+      },
+      ping_number: pingMeta.ping,
+      timestamp_utc: pingMeta.time,
+      model: 'YOLOv8s + ONNX Runtime',
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${formatDisplayId(target.id)}_sonar_clip.json`;
+    a.download = `${formatDisplayId(target.id)}_MoES_sonar_clip.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -171,7 +150,8 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
     setTimeout(() => setClipExported(false), 2000);
   };
 
-  const displayConf = isDemoRunning ? heroConfidence : target.confidence * 100;
+  const displayConf =
+    isDemoRunning && target.id === 'SX-T07' ? heroConfidence : target.confidence * 100;
   const displayId = formatDisplayId(target.id);
   const sizeText =
     target.id === 'SX-T07'
@@ -189,7 +169,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
           <span className="text-[11px] font-bold tracking-wider text-[#CBD5E1] uppercase font-mono">
             TARGET DETAILS
           </span>
-          <div className="flex items-center bg-[#0B1424] border border-[#1E3250] rounded px-1 py-0.5 gap-1.5">
+          <div className="flex items-center bg-[#0B1424] border border-[#1E3250] rounded px-1.5 py-0.5 gap-1.5">
             <button
               onClick={handlePrev}
               className="text-[#94A3B8] hover:text-white cursor-pointer transition-colors"
@@ -198,7 +178,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
             <span className="text-[10px] font-mono font-bold text-[#E2E8F0]">
-              {displayIndex} / {totalCount}
+              {currentIdx + 1} / {totalCount}
             </span>
             <button
               onClick={handleNext}
@@ -212,7 +192,11 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
 
         {/* Target Identity Row (Thumbnail + ID/Category + Badges) */}
         <div className="flex items-stretch gap-2.5">
-          <div className="w-[88px] h-[58px] rounded-md overflow-hidden border border-[#F59E0B]/50 shrink-0 bg-[#120902]">
+          <div
+            className={`w-[88px] h-[58px] rounded-md overflow-hidden border shrink-0 bg-[#120902] ${
+              isFiltered ? 'border-[#EF4444]/50' : 'border-[#F59E0B]/60'
+            }`}
+          >
             <canvas ref={thumbCanvasRef} width={88} height={58} className="w-full h-full block" />
           </div>
 
@@ -221,29 +205,41 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
               <span className="text-[18px] font-black text-white tracking-tight leading-none font-mono">
                 {displayId}
               </span>
-              <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider bg-[#3B2607] text-[#FBBF24] border border-[#F59E0B]/60">
-                {isVerified ? 'VERIFIED' : 'PENDING'}
+              <span
+                className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider border ${
+                  isFiltered
+                    ? 'bg-[#3B1219] text-[#F87171] border-[#EF4444]/60'
+                    : 'bg-[#3B2607] text-[#FBBF24] border-[#F59E0B]/60'
+                }`}
+              >
+                {isFiltered ? 'SUPPRESSED' : 'VERIFIED'}
               </span>
             </div>
 
             <div className="flex items-end justify-between gap-1 mt-1">
-              <div>
+              <div className="min-w-0">
                 <div className="text-[8.5px] font-mono uppercase tracking-wider text-[#64748B]">
                   CATEGORY
                 </div>
-                <div className="text-[13px] font-bold text-[#F59E0B] leading-tight truncate">
+                <div
+                  className={`text-[13px] font-bold leading-tight truncate ${
+                    isFiltered ? 'text-[#94A3B8]' : 'text-[#F59E0B]'
+                  }`}
+                >
                   {target.label}
                 </div>
               </div>
 
               <span
-                className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider border ${
+                className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider border shrink-0 ${
                   target.priority === 'HIGH'
                     ? 'bg-[#3B1219] text-[#F87171] border-[#EF4444]/50'
+                    : isFiltered
+                    ? 'bg-[#1E293B] text-[#94A3B8] border-[#475569]/50'
                     : 'bg-[#3B2607] text-[#FBBF24] border-[#F59E0B]/50'
                 }`}
               >
-                {target.priority === 'FILTERED' ? 'LOW' : target.priority}
+                {isFiltered ? 'CLUTTER' : target.priority}
               </span>
             </div>
           </div>
@@ -251,7 +247,11 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
 
         {/* Hero Confidence Box */}
         <div className="px-3 py-2 rounded-lg bg-[#0A1220] border border-[#182942] flex items-center gap-3">
-          <span className="text-[28px] font-black text-[#F59E0B] leading-none tracking-tight font-mono">
+          <span
+            className={`text-[28px] font-black leading-none tracking-tight font-mono ${
+              isFiltered ? 'text-[#94A3B8]' : 'text-[#F59E0B]'
+            }`}
+          >
             {displayConf.toFixed(1)}%
           </span>
           <div className="border-l border-[#1E3250] pl-3">
@@ -284,25 +284,31 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
               <span className="text-[12.5px] font-mono font-bold text-[#F1F5F9]">
                 {target.shadowLength.toFixed(2)} m
               </span>
-              <span className="px-1 py-0.2 rounded bg-[#063324] border border-[#10B981]/50 text-[#34D399] text-[8.5px] font-mono font-bold flex items-center gap-0.5">
-                <Check className="w-2.5 h-2.5" /> Valid
-              </span>
+              {hasValidShadow ? (
+                <span className="px-1 py-0.2 rounded bg-[#063324] border border-[#10B981]/50 text-[#34D399] text-[8.5px] font-mono font-bold flex items-center gap-0.5">
+                  <Check className="w-2.5 h-2.5" /> Valid
+                </span>
+              ) : (
+                <span className="px-1 py-0.2 rounded bg-[#3B1219] border border-[#EF4444]/50 text-[#F87171] text-[8.5px] font-mono font-bold flex items-center gap-0.5">
+                  <X className="w-2.5 h-2.5" /> Flat
+                </span>
+              )}
             </div>
           </div>
         </div>
 
-        {/* 2-Col Specs: POSITION | PING # */}
+        {/* 2-Col Specs: POSITION (Real Indian EEZ Coordinates) | PING # */}
         <div className="grid grid-cols-2 gap-2 border-b border-[#132035] pb-2">
           <div>
-            <div className="text-[9px] font-mono uppercase text-[#64748B]">POSITION</div>
+            <div className="text-[9px] font-mono uppercase text-[#64748B]">POSITION (EEZ)</div>
             <div className="text-[11px] font-mono font-bold text-[#38BDF8] mt-0.5 truncate">
-              27.7881°N, 89.8742°W
+              {target.latitude.toFixed(4)}°N, {target.longitude.toFixed(4)}°E
             </div>
           </div>
           <div>
             <div className="text-[9px] font-mono uppercase text-[#64748B]">PING #</div>
             <div className="text-[11px] font-mono font-bold text-[#E2E8F0] mt-0.5">
-              60123 (14:27:42)
+              {pingMeta.ping} ({pingMeta.time})
             </div>
           </div>
         </div>
@@ -311,17 +317,41 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
         <div className="grid grid-cols-3 gap-2 pb-1">
           <div>
             <div className="text-[9px] font-mono uppercase text-[#64748B]">THREAT LEVEL</div>
-            <div className="text-[12px] font-bold text-[#F59E0B] mt-0.5">
-              {target.priority === 'HIGH' ? 'High' : 'Medium'}
+            <div
+              className={`text-[12px] font-bold mt-0.5 ${
+                isFiltered
+                  ? 'text-[#64748B]'
+                  : target.priority === 'HIGH'
+                  ? 'text-[#F59E0B]'
+                  : 'text-[#38BDF8]'
+              }`}
+            >
+              {isFiltered ? 'None' : target.priority === 'HIGH' ? 'High' : 'Medium'}
             </div>
           </div>
           <div>
             <div className="text-[9px] font-mono uppercase text-[#64748B]">STATUS</div>
-            <div className="text-[12px] font-bold text-[#2DD4BF] mt-0.5">Confirmed</div>
+            <div
+              className={`text-[12px] font-bold mt-0.5 ${
+                isFiltered ? 'text-[#F87171]' : 'text-[#2DD4BF]'
+              }`}
+            >
+              {isFiltered ? 'Filtered' : 'Confirmed'}
+            </div>
           </div>
           <div>
             <div className="text-[9px] font-mono uppercase text-[#64748B]">VERDICT</div>
-            <div className="text-[12px] font-bold text-[#10B981] mt-0.5">Certain</div>
+            <div
+              className={`text-[12px] font-bold mt-0.5 ${
+                isFiltered
+                  ? 'text-[#94A3B8]'
+                  : target.confidence >= 0.85
+                  ? 'text-[#10B981]'
+                  : 'text-[#FBBF24]'
+              }`}
+            >
+              {isFiltered ? 'Clutter' : target.confidence >= 0.85 ? 'Certain' : 'Probable'}
+            </div>
           </div>
         </div>
 
@@ -348,15 +378,19 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
             className="py-2 px-2.5 rounded-md bg-[#0A1322] hover:bg-[#112038] border border-[#1B2E4B] hover:border-[#38BDF8] text-[#CBD5E1] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-all"
           >
             <Download className="w-3.5 h-3.5 text-[#94A3B8]" />
-            <span>{clipExported ? 'CLIP SAVED' : 'EXPORT CLIP'}</span>
+            <span>{clipExported ? 'CLIP SAVED ✓' : 'EXPORT CLIP'}</span>
           </button>
 
           <button
-            onClick={() => onExportReport?.()}
+            onClick={() => {
+              setAddedToReport(true);
+              setTimeout(() => setAddedToReport(false), 2000);
+              onExportReport?.();
+            }}
             className="py-2 px-2.5 rounded-md bg-[#0A1322] hover:bg-[#112038] border border-[#1B2E4B] hover:border-[#38BDF8] text-[#CBD5E1] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-all"
           >
             <FilePlus className="w-3.5 h-3.5 text-[#94A3B8]" />
-            <span>ADD TO REPORT</span>
+            <span>{addedToReport ? 'EXPORTED ✓' : 'ADD TO REPORT'}</span>
           </button>
         </div>
       </div>
@@ -483,15 +517,10 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
                     <stop offset="100%" stopColor="#1D4ED8" />
                   </linearGradient>
                 </defs>
-                {/* Tail fins */}
                 <polygon points="6,17 16,9 18,17 16,25" fill="#1E40AF" stroke="#60A5FA" strokeWidth="1" />
-                {/* Hull torpedo body */}
                 <rect x="14" y="10" width="52" height="14" rx="7" fill="url(#auvBodyGrad)" stroke="#93C5FD" strokeWidth="1" />
-                {/* Conning sensor dome */}
                 <path d="M36,10 Q42,5 48,10 Z" fill="#38BDF8" />
-                {/* Side acoustic array window */}
                 <rect x="28" y="15" width="22" height="4" rx="2" fill="#0F172A" stroke="#38BDF8" strokeWidth="0.8" />
-                {/* Nose cone glow */}
                 <circle cx="62" cy="17" r="2.5" fill="#E0F2FE" />
               </svg>
             </div>

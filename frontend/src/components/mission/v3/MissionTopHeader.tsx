@@ -22,6 +22,8 @@ import {
   Compass,
 } from 'lucide-react';
 
+export type KpiFilterCategory = 'all' | 'verified' | 'high_risk' | 'pipelines' | 'anomalies';
+
 interface MissionTopHeaderProps {
   isDemoRunning: boolean;
   onStartDemo: () => void;
@@ -48,6 +50,8 @@ interface MissionTopHeaderProps {
   onToggleShadowGate: () => void;
   centerViewMode: 'sonar' | 'map' | '3d' | 'split';
   onSelectCenterViewMode: (mode: 'sonar' | 'map' | '3d' | 'split') => void;
+  activeKpiFilter?: KpiFilterCategory;
+  onSelectKpiFilter?: (cat: KpiFilterCategory) => void;
 }
 
 export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
@@ -69,6 +73,8 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
   onToggleShadowGate,
   centerViewMode,
   onSelectCenterViewMode,
+  activeKpiFilter = 'all',
+  onSelectKpiFilter,
 }) => {
   const [isOverflowOpen, setIsOverflowOpen] = useState(false);
   const overflowRef = useRef<HTMLDivElement>(null);
@@ -104,7 +110,7 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
             12 Hz
           </span>
           <span className="text-[10px] font-mono text-[#94A3B8] uppercase tracking-wider pl-1 hidden lg:inline shrink-0">
-            SIDE-SCAN SONAR
+            SIDE-SCAN SONAR // MoES INDIAN EEZ
           </span>
         </div>
 
@@ -171,7 +177,7 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={onOpenUpload}
-            title="Upload Side-Scan Sonar Image"
+            title="Upload Side-Scan Sonar Image for Real YOLOv8 ONNX Detection"
             className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0B1526] border border-[#1E3250] hover:border-[#38BDF8] text-[#CBD5E1] hover:text-white text-[10px] font-mono font-bold cursor-pointer transition-colors"
           >
             <UploadCloud className="w-3.5 h-3.5 text-[#38BDF8]" />
@@ -333,55 +339,99 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
         </div>
       </div>
 
-      {/* ── ROW 2: EXACT REFERENCE KPI & COVERAGE STRIP (44px) ── */}
+      {/* ── ROW 2: INTERACTIVE KPI FILTER PILLS & COVERAGE STRIP (44px) ── */}
       <div className="h-11 px-3 bg-[#060B16] flex items-center justify-between gap-2 overflow-x-auto">
-        {/* Left 5 KPI Cards Group */}
+        {/* Left 5 Clickable KPI Cards Group */}
         <div className="flex items-center bg-[#091220] border border-[#182942] rounded-lg p-0.5 divide-x divide-[#16263D] shrink-0">
           {/* 17 TARGETS */}
-          <div className="px-3 py-1 flex items-center gap-1.5">
+          <button
+            onClick={() => onSelectKpiFilter?.('all')}
+            title="Show All Targets & Focus Hero Ghost Net SX-107"
+            className={`px-3 py-1 flex items-center gap-1.5 relative cursor-pointer hover:bg-[#112038] transition-colors ${
+              activeKpiFilter === 'all' ? 'bg-[#0F1E36]' : ''
+            }`}
+          >
             <ArrowUp className="w-3.5 h-3.5 text-[#22D3EE] stroke-[2.5]" />
             <span className="text-[14px] font-mono font-black text-white">17</span>
             <span className="text-[10px] font-mono font-bold text-[#CBD5E1] uppercase">
               TARGETS
             </span>
-          </div>
+            {activeKpiFilter === 'all' && (
+              <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#22D3EE] rounded-full" />
+            )}
+          </button>
 
           {/* 8 VERIFIED */}
-          <div className="px-3 py-1 flex items-center gap-1.5 bg-[#062E22]/70">
+          <button
+            onClick={() => onSelectKpiFilter?.('verified')}
+            title="Cycle Confirmed Verified Targets"
+            className={`px-3 py-1 flex items-center gap-1.5 relative cursor-pointer transition-colors ${
+              activeKpiFilter === 'verified' ? 'bg-[#063B2C]' : 'bg-[#062E22]/70 hover:bg-[#063B2C]'
+            }`}
+          >
             <span className="text-[14px] font-mono font-black text-[#10B981]">8</span>
             <span className="text-[10px] font-mono font-bold text-[#34D399] uppercase">
               VERIFIED
             </span>
-          </div>
+            {activeKpiFilter === 'verified' && (
+              <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#10B981] rounded-full" />
+            )}
+          </button>
 
           {/* 4 HIGH RISK */}
-          <div className="px-3 py-1 flex items-center gap-1.5">
+          <button
+            onClick={() => onSelectKpiFilter?.('high_risk')}
+            title="Cycle High-Risk Targets (SX-107 Ghost Net, SX-103 Gear, SX-101 Cable, SX-111 Wreck)"
+            className={`px-3 py-1 flex items-center gap-1.5 relative cursor-pointer hover:bg-[#2A1018] transition-colors ${
+              activeKpiFilter === 'high_risk' ? 'bg-[#2A1018]' : ''
+            }`}
+          >
             <span className="text-[14px] font-mono font-black text-[#EF4444]">
               {highPriorityCount || 4}
             </span>
             <span className="text-[10px] font-mono font-bold text-[#F87171] uppercase">
               HIGH RISK
             </span>
-          </div>
+            {activeKpiFilter === 'high_risk' && (
+              <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#EF4444] rounded-full" />
+            )}
+          </button>
 
           {/* 2 PIPELINES */}
-          <div className="px-3 py-1 flex items-center gap-1.5">
+          <button
+            onClick={() => onSelectKpiFilter?.('pipelines')}
+            title="Inspect Subsea Pipeline & Cable Infrastructure Contacts (SX-101)"
+            className={`px-3 py-1 flex items-center gap-1.5 relative cursor-pointer hover:bg-[#1F1235] transition-colors ${
+              activeKpiFilter === 'pipelines' ? 'bg-[#1F1235]' : ''
+            }`}
+          >
             <GitBranch className="w-3.5 h-3.5 text-[#A855F7]" />
             <span className="text-[14px] font-mono font-black text-[#C084FC]">2</span>
             <span className="text-[10px] font-mono font-bold text-[#C084FC] uppercase">
               PIPELINES
             </span>
-          </div>
+            {activeKpiFilter === 'pipelines' && (
+              <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#A855F7] rounded-full" />
+            )}
+          </button>
 
           {/* 3 ANOMALIES */}
-          <div className="px-3 py-1 flex items-center gap-1.5 relative">
+          <button
+            onClick={() => onSelectKpiFilter?.('anomalies')}
+            title="Inspect Seafloor Anomaly & Wreckage Contacts (SX-111, SX-105)"
+            className={`px-3 py-1 flex items-center gap-1.5 relative cursor-pointer hover:bg-[#2B1D08] transition-colors ${
+              activeKpiFilter === 'anomalies' ? 'bg-[#2B1D08]' : ''
+            }`}
+          >
             <AlertTriangle className="w-3.5 h-3.5 text-[#F59E0B]" />
             <span className="text-[14px] font-mono font-black text-[#F59E0B]">3</span>
             <span className="text-[10px] font-mono font-bold text-[#FBBF24] uppercase">
               ANOMALIES
             </span>
-            <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#F59E0B] rounded-full" />
-          </div>
+            {activeKpiFilter === 'anomalies' && (
+              <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#F59E0B] rounded-full" />
+            )}
+          </button>
         </div>
 
         {/* Middle-Left: COVERAGE 87% */}
@@ -412,10 +462,11 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
         <div className="flex items-center gap-2 shrink-0 ml-auto">
           <button
             onClick={onToggleShadowGate}
+            title="Toggle Physics Shadow Verification Gate (Suppresses 0.00m shadow clutter)"
             className={`px-3.5 py-1.5 rounded-lg text-[10.5px] font-mono font-bold uppercase tracking-wider border cursor-pointer transition-all ${
               isShadowGateActive
                 ? 'bg-[#052E22] border-[#10B981] text-[#34D399] shadow-[0_0_12px_rgba(16,185,129,0.25)]'
-                : 'bg-[#091220] border-[#1E3250] text-[#64748B]'
+                : 'bg-[#2B1218] border-[#EF4444] text-[#F87171]'
             }`}
           >
             {isShadowGateActive ? 'SHADOW GATE ACTIVE' : 'SHADOW GATE BYPASS'}

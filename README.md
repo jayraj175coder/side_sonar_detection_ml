@@ -101,7 +101,7 @@ flowchart TD
     subgraph Client ["5. Operational Workstation (React 19 + TypeScript + Vite 8)"]
         Dashboard["Command Center Dashboard (Telemetry & Fleet Readiness)"]
         ScanWorkstation["Upload & Analyze Acoustic Workstation (ONNX Telemetry)"]
-        MissionControl["Mission Control 18/62/20 Console (Dual Waterfall + Target Intel)"]
+        MissionControl["Mission Control 3-Column Operations HUD (Map/Sonar + Cross-Section + AUV-07 Intel)"]
         GISMap["Subsea GIS Map (Indian EEZ 6 Sectors + Heatmaps)"]
         RouteOptimizer["Smart Multi-Vessel TSP Route Optimizer (2-Opt + GPX Export)"]
         TargetTracking["Temporal AFP Lifecycle Tracking & Benthic Drift Vectors"]
@@ -126,11 +126,12 @@ SONARX delivers a full operational command-center suite built for marine survey 
 
 1. **`Dashboard` (Command Center)**: High-level overview of live survey missions, autonomous fleet readiness (AUV / USV), cumulative marine debris tally, and Indian EEZ sector summaries.
 2. **`Upload & Analyze` (Workstation)**: Dual-mode ingestion of raw sonar waterfalls with optional companion navigation ping logs (XTF / CSV / JSON), real-time ONNX tensor execution, and bounding box shadow inspection.
-3. **`Mission Control` (18% / 62% / 20% Flagship Console)**:
-   - **Left Queue (18%)**: Acoustic candidate triage, false-alarm rejection counter, live confidence threshold cutoff slider (40%), and shadow gate toggle.
-   - **Center Viewport (62%)**: Dual-flank acoustic waterfall canvas with center nadir line, Kongsberg copper amber / emerald / cobalt / B&W palettes, slant-to-ground range rectification ($R_g = \sqrt{R_s^2 - H^2}$), and live towfish/USV telemetry overlays.
-   - **Right Intel Panel (20%)**: Active contact inspection, Platt probability calibration gauge (ECE: 0.028), Human-in-the-Loop triage (`CONFIRM` / `REJECT` / `RE-CLASS`), Active Learning ground-truth export (YOLO format), shadow geometry ray-tracing ($h = \frac{L_s \cdot H}{R_s + L_s}$), and official MoES Certificate of Clearance (SHA-256).
-   - **Bottom Timeline**: 8-stage AI pipeline execution strip with synchronized frame scrubber and event log.
+3. **`Mission Control` (3-Column Hydrographic Operations HUD)**:
+   - **Top Tactical KPI & Filter Strip**: Interactive category filter pills (`17 TARGETS`, `8 VERIFIED`, `4 HIGH RISK`, `2 PIPELINES`, `3 ANOMALIES`), live survey coverage progress bar (`2.8 km²`, `62%`), Confidence Threshold slider (`40%`), Acoustic Shadow Gate toggle, and one-click `UPLOAD & ANALYZE` modal that runs real YOLOv8s ONNX inference and pins uploaded sonar targets directly into the live mission map.
+   - **Column 1 — Multi-Mode Tactical Viewport (`MISSION MAP` | `SONAR VIEW` | `SPLIT VIEW` | `3D TERRAIN`)**: Interactive bathymetric swath corridor in the Indian EEZ (Mumbai Offshore Continental Shelf, `18.922°N, 72.821°E`), AUV-07 live acoustic fan-beam projection (`82.0m`), pipeline hazard zone polygons, boxed target callouts (`[SX-107]`, `[SX-103]`, `[SX-105]`, `[SX-101]`), 7-tool floating GIS toolbar (Select, Center, ROI Box, Distance Ruler, Waypoint Pin, Hazard Polygon, Clear), and map layer toggles.
+   - **Column 2 — `SONAR PREVIEW` & `ACOUSTIC PROFILE` Cross-Section**: Target-specific acoustic backscatter & shadow morphology engine (rendering distinct monofilament mesh canopies for Ghost Nets, linked trap pots for Derelict Fishing Gear, linear high-backscatter trenches for Subsea Pipelines/Cables, rectangular metallic specular returns for Industrial Drums/Containers, structural hull ribs for Wreckage Anomalies, and flat sand-ripple returns for Suppressed Clutter), real-time YOLOv8 bounding box overlay, proportional acoustic cross-section elevation curve ($h = \frac{L_s \cdot H}{R_s + L_s}$), and 4 synchronized imaging mode switcher thumbnails (`Raw`, `Filtered`, `Shadow`, `Overlay`).
+   - **Column 3 — `TARGET DETAILS` & `HYDROGRAPHIC TELEMETRY (AUV-07)`**: Synchronized target crop inspection, verified/suppressed status badges, physical footprint & shadow geometry metrics (`✓ Valid` vs `✕ Flat`), AI evidence tags, recommended MoES remediation action with ROV dispatch, and live AUV-07 telemetry (`900 kHz`, `150 m` swath, `14.8 m` altitude, `3.2 kn`, `76%` battery, `1512 m/s` sound velocity, `5.05 GB` storage).
+   - **Bottom `SURVEY TRACK TIMELINE`**: Interactive ping-by-ping sonar filmstrip (`PING 1` to `PING 2500`) with clickable target markers (`[SX-101]`, `[SX-107]`, `[SX-103]`, `[SX-105]`) and synchronized playback speed controls (`0.5x`, `1x`, `2x`, `4x`).
 4. **`Subsea Map` (GIS Reconnaissance)**: Interactive multi-layer marine GIS covering 6 Indian maritime sectors with bathymetric depth contours, 200 NM EEZ lines, offshore platform hazard zones, and contact heatmaps.
 5. **`Route Planner` (Smart Multi-Vessel TSP Optimizer)**:
    - Automated 2-Opt Traveling Salesperson Problem (TSP) solver for subsea recovery fleets.

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Play, Pause, RotateCcw, List, ChevronUp, ChevronDown, Check, Circle } from 'lucide-react';
-import { PIPELINE_STAGES_V3 } from '../../../data/missionV3Data';
+import React, { useEffect, useRef } from 'react';
+import { Play, Pause, SkipForward, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface BottomPipelineTimelineProps {
-  currentStageIndex: number; // 0 to 7
+  currentStageIndex: number;
   onSelectStageIndex: (idx: number) => void;
   currentFrame: number;
+  onChangeFrame?: (frame: number) => void;
   totalFrames?: number;
   isPlaying: boolean;
   onTogglePlay: () => void;
@@ -13,166 +13,334 @@ interface BottomPipelineTimelineProps {
   speed: number;
   onSelectSpeed: (s: number) => void;
   isDemoRunning?: boolean;
+  onSelectTarget?: (targetId: string) => void;
+}
+
+interface TimelineMarker {
+  pct: number; // 0 to 100
+  type: 'detection' | 'verified' | 'anomaly' | 'pipeline';
+  targetId?: string;
+}
+
+const TIMELINE_MARKERS: TimelineMarker[] = [
+  { pct: 4.5, type: 'verified', targetId: 'SX-T01' },
+  { pct: 9.2, type: 'verified' },
+  { pct: 15.0, type: 'anomaly', targetId: 'SX-T11' },
+  { pct: 18.8, type: 'verified' },
+  { pct: 31.0, type: 'anomaly' },
+  { pct: 35.5, type: 'verified', targetId: 'SX-T07' },
+  { pct: 46.2, type: 'detection', targetId: 'SX-T14' },
+  { pct: 55.8, type: 'detection', targetId: 'SX-T05' },
+  { pct: 61.5, type: 'verified' },
+  { pct: 68.0, type: 'anomaly' },
+  { pct: 74.2, type: 'verified', targetId: 'SX-T03' },
+  { pct: 81.0, type: 'pipeline' },
+  { pct: 87.5, type: 'detection', targetId: 'SX-T09' },
+  { pct: 94.0, type: 'pipeline' },
+];
+
+const PING_LABELS = ['P01', 'P50', 'P100', 'P150', 'P200', 'P250', 'P300', 'P350', 'P400'];
+
+function drawFilmstripFrame(canvas: HTMLCanvasElement | null, index: number) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Deep dark sonar base
+  ctx.fillStyle = '#070401';
+  ctx.fillRect(0, 0, W, H);
+
+  // Nadir position varies slightly across frames
+  const nadirX = W * (0.32 + Math.sin(index * 0.9) * 0.14);
+
+  // Draw golden-amber side-scan swath texture
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
+  grad.addColorStop(0, '#140902');
+  grad.addColorStop(Math.max(0.05, (nadirX - 14) / W), '#6B3408');
+  grad.addColorStop(nadirX / W, '#F59E0B');
+  grad.addColorStop(Math.min(0.95, (nadirX + 18) / W), '#783909');
+  grad.addColorStop(1, '#0C0602');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Dark nadir gap line
+  ctx.fillStyle = '#050301';
+  ctx.fillRect(nadirX - 2.5, 0, 5, H);
+
+  // Speckle grain & bright target echoes on specific frames
+  for (let i = 0; i < 90; i++) {
+    const sx = ((Math.sin(i * 43.12 + index * 11) * 0.5 + 0.5)) * W;
+    const sy = ((Math.cos(i * 19.87 + index * 7) * 0.5 + 0.5)) * H;
+    ctx.fillStyle = i % 9 === 0 ? 'rgba(253, 224, 71, 0.55)' : 'rgba(180, 83, 9, 0.35)';
+    ctx.fillRect(sx, sy, 1.5, 1.5);
+  }
+
+  // Highlight feature on key frames
+  if (index % 2 === 0 || index === 6) {
+    const ex = nadirX + (index % 3 === 0 ? -12 : 14);
+    const ey = H * 0.5;
+    ctx.fillStyle = '#FBBF24';
+    ctx.beginPath();
+    ctx.arc(ex, ey, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.85)';
+    ctx.fillRect(ex + 4, ey - 2, 10, 4);
+  }
 }
 
 export const BottomPipelineTimeline: React.FC<BottomPipelineTimelineProps> = ({
-  currentStageIndex,
-  onSelectStageIndex,
   currentFrame,
+  onChangeFrame,
   totalFrames = 128,
   isPlaying,
   onTogglePlay,
-  onReset,
   speed,
   onSelectSpeed,
-  isDemoRunning = false,
+  onSelectTarget,
 }) => {
-  const [showEventLog, setShowEventLog] = useState(false);
+  const filmRefs = useRef<(HTMLCanvasElement | null)[]>([]);
+  const trackRef = useRef<HTMLDivElement>(null);
 
-  const RECENT_EVENTS = [
-    { time: '04:18:22', tag: 'ING', text: 'Dual-channel 900 kHz acoustic stream ingested (75m swath)', level: 'info' },
-    { time: '04:18:23', tag: 'DEN', text: 'Bilateral spatial filter + CLAHE contrast boost applied', level: 'success' },
-    { time: '04:18:24', tag: 'DET', text: 'YOLOv8n ONNX detected 37 acoustic candidate proposals', level: 'info' },
-    { time: '04:18:25', tag: 'FIL', text: 'Acoustic shadow gate suppressed 20 natural rocks and sand megaripples', level: 'reject' },
-    { time: '04:18:26', tag: 'CLS', text: '17 confirmed anomalies attributed to MoES marine debris taxonomy', level: 'success' },
-    { time: '04:18:27', tag: 'GEO', text: 'Hero target SX-T07 Ghost Net geotagged at 18.9217° N, 72.8214° E (43.1m depth)', level: 'info' },
-    { time: '04:18:28', tag: 'VER', text: 'Target verified (94.7% confidence) · Ready for salvage ROV dispatch', level: 'success' },
-  ];
+  const NUM_THUMBS = 12;
+  const progressPct = Math.max(0, Math.min(100, (currentFrame / totalFrames) * 100));
+  const activeThumbIdx = Math.min(
+    NUM_THUMBS - 1,
+    Math.floor((currentFrame / Math.max(1, totalFrames)) * NUM_THUMBS)
+  );
+
+  // Compute simulated survey timestamp & ping number matching 14:27:42 / PING #60123 at default frame
+  const totalSecondsOffset = Math.round((currentFrame / totalFrames) * 18 * 60);
+  const mins = 20 + Math.floor(totalSecondsOffset / 60);
+  const secs = totalSecondsOffset % 60;
+  const currentTimestamp = `14:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  const currentPing = 59800 + Math.round((currentFrame / totalFrames) * 512);
+
+  useEffect(() => {
+    for (let i = 0; i < NUM_THUMBS; i++) {
+      drawFilmstripFrame(filmRefs.current[i], i);
+    }
+  }, []);
+
+  const handleTrackClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!trackRef.current || !onChangeFrame) return;
+    const rect = trackRef.current.getBoundingClientRect();
+    const clickRatio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    onChangeFrame(Math.max(1, Math.round(clickRatio * totalFrames)));
+  };
+
+  const handleStepForward = () => {
+    if (!onChangeFrame) return;
+    onChangeFrame(currentFrame >= totalFrames ? 1 : currentFrame + 4);
+  };
+
+  const handleCycleSpeed = () => {
+    const nextSpeed = speed === 1 ? 2 : speed === 2 ? 4 : 1;
+    onSelectSpeed(nextSpeed);
+  };
 
   return (
-    <div className="shrink-0 bg-[#05070B] border-t border-[#162136] font-sans select-none z-30">
-      {/* ── EXPANDABLE EVENT LOG DRAWER ── */}
-      {showEventLog && (
-        <div className="bg-[#080D17] border-b border-[#162136] p-3 max-h-36 overflow-y-auto">
-          <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-[#162136] text-[9px] text-[#94A3B8] uppercase font-bold">
-            <span>AUTOMATED PIPELINE AUDIT LOG</span>
-            <button onClick={() => setShowEventLog(false)} className="hover:text-[#EF4444] cursor-pointer">
-              ✕ CLOSE
-            </button>
+    <div className="shrink-0 bg-[#060B14] border-t border-[#142238] font-sans select-none z-30">
+      {/* ── ROW 1: TIMELINE HEADER & LEGEND ── */}
+      <div className="h-7 px-3.5 border-b border-[#111E32] flex items-center justify-between text-[10px] font-mono">
+        <span className="font-bold tracking-wider text-[#CBD5E1] uppercase">
+          SURVEY TRACK TIMELINE
+        </span>
+
+        <div className="hidden md:flex items-center gap-3 text-[#94A3B8]">
+          <span>14:20:00 → 14:38:00 (18 min)</span>
+          <span className="text-[#334155]">|</span>
+          <span className="text-[#CBD5E1]">
+            CURRENT: <strong className="text-white">{currentTimestamp}</strong> / PING{' '}
+            <strong className="text-[#38BDF8]">#{currentPing}</strong>
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3.5 text-[10px]">
+          <span className="flex items-center gap-1.5 text-[#CBD5E1]">
+            <span className="w-2 h-2 rounded-full bg-[#F59E0B]" />
+            Detections
+          </span>
+          <span className="flex items-center gap-1.5 text-[#CBD5E1]">
+            <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+            Verified
+          </span>
+          <span className="flex items-center gap-1.5 text-[#CBD5E1]">
+            <span className="text-[#EF4444] text-[9px] leading-none">▲</span>
+            Anomaly
+          </span>
+          <span className="flex items-center gap-1.5 text-[#CBD5E1]">
+            <span className="w-2 h-2 rounded-full bg-[#A855F7]" />
+            Pipeline
+          </span>
+        </div>
+      </div>
+
+      {/* ── ROW 2: PLAYBACK CONTROLS + PING SCRUBBER TRACK ── */}
+      <div className="px-3.5 pt-2 pb-1 flex items-center gap-4">
+        {/* Left AUV-07 & Playback Controls */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          <div className="pr-1">
+            <div className="text-[11px] font-mono font-bold text-[#E2E8F0] leading-tight">
+              AUV-07
+            </div>
+            <div className="text-[9px] text-[#64748B] leading-tight">Ping-by-Ping</div>
           </div>
-          <div className="space-y-1 text-[9px]">
-            {RECENT_EVENTS.map((ev, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span className="text-[#94A3B8] font-mono">{ev.time}</span>
-                <span className={`px-1 py-0.2 text-[7.5px] font-bold border rounded-xs ${
-                  ev.level === 'success' ? 'bg-[#FFB703]/20 text-[#FFB703] border-[#FFB703]/40' :
-                  ev.level === 'reject' ? 'bg-[#EF4444]/20 text-[#EF4444] border-[#EF4444]/40' :
-                  'bg-[#38BDF8]/20 text-[#38BDF8] border-[#38BDF8]/40'
-                }`}>
-                  {ev.tag}
-                </span>
-                <span className="text-[#F8FAFC]">{ev.text}</span>
-              </div>
+
+          <button
+            onClick={onTogglePlay}
+            title={isPlaying ? 'Pause' : 'Play'}
+            className="w-8 h-8 rounded-full bg-[#0D1829] border border-[#233B5E] hover:border-[#38BDF8] text-white flex items-center justify-center cursor-pointer transition-all shadow"
+          >
+            {isPlaying ? (
+              <Pause className="w-3.5 h-3.5 fill-current" />
+            ) : (
+              <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+            )}
+          </button>
+
+          <button
+            onClick={handleStepForward}
+            title="Step Forward"
+            className="w-7 h-7 rounded bg-[#0B1424] border border-[#1B2E4B] hover:border-[#38BDF8] text-[#CBD5E1] hover:text-white flex items-center justify-center cursor-pointer transition-colors"
+          >
+            <SkipForward className="w-3.5 h-3.5" />
+          </button>
+
+          <button
+            onClick={handleCycleSpeed}
+            title="Cycle Playback Speed"
+            className="px-2.5 h-7 rounded bg-[#0B1424] border border-[#1B2E4B] hover:border-[#38BDF8] text-[#E2E8F0] text-[10px] font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors"
+          >
+            <span>{speed}x</span>
+            <span className="text-[8px] text-[#64748B]">▾</span>
+          </button>
+        </div>
+
+        {/* Right Interactive Scrubber Track */}
+        <div className="flex-1 flex flex-col gap-1 min-w-0">
+          {/* Event Dots & Progress Bar */}
+          <div
+            ref={trackRef}
+            onClick={handleTrackClick}
+            className="relative h-6 flex flex-col justify-end cursor-pointer group"
+          >
+            {/* Event Markers Row */}
+            <div className="relative w-full h-3.5 mb-0.5">
+              {TIMELINE_MARKERS.map((m, idx) => {
+                const color =
+                  m.type === 'verified'
+                    ? '#10B981'
+                    : m.type === 'anomaly'
+                    ? '#EF4444'
+                    : m.type === 'pipeline'
+                    ? '#A855F7'
+                    : '#F59E0B';
+                return (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onChangeFrame) {
+                        onChangeFrame(Math.max(1, Math.round((m.pct / 100) * totalFrames)));
+                      }
+                      if (m.targetId && onSelectTarget) {
+                        onSelectTarget(m.targetId);
+                      }
+                    }}
+                    style={{ left: `${m.pct}%` }}
+                    className="absolute top-0.5 -translate-x-1/2 hover:scale-125 transition-transform cursor-pointer"
+                    title={m.targetId ? `Jump to ${m.targetId}` : m.type}
+                  >
+                    {m.type === 'anomaly' ? (
+                      <span className="text-[#EF4444] text-[9px] leading-none block">▲</span>
+                    ) : (
+                      <span
+                        className="w-2 h-2 rounded-full block shadow-sm"
+                        style={{ backgroundColor: color }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Scrubber Track Line */}
+            <div className="w-full h-1.5 bg-[#111E32] rounded-full relative overflow-visible">
+              <div
+                className="h-full bg-gradient-to-r from-[#0284C7] via-[#00E5FF] to-[#38BDF8] rounded-full shadow-[0_0_8px_rgba(0,229,255,0.5)] transition-all duration-150"
+                style={{ width: `${progressPct}%` }}
+              />
+              {/* White Vertical Playhead Handle */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-white rounded-xs shadow-[0_0_8px_#fff] transition-all duration-150"
+                style={{ left: `${progressPct}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Ping Tick Labels (P01 .. P400) */}
+          <div className="flex items-center justify-between text-[9px] font-mono text-[#64748B] px-1">
+            {PING_LABELS.map((lbl) => (
+              <span key={lbl}>{lbl}</span>
             ))}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* ── 1. HORIZONTAL AI PIPELINE (8 CLEAN STAGES) ── */}
-      <div className="h-10 px-3 sm:px-4 border-b border-[#162136] flex items-center justify-between gap-1 overflow-x-auto">
-        <div className="text-[9px] font-black tracking-wider text-[#94A3B8] uppercase shrink-0 mr-1.5 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FFB703]" />
-          <span className="hidden sm:inline">AI PIPELINE:</span>
-        </div>
+      {/* ── ROW 3: SONAR WATERFALL FILMSTRIP THUMBNAILS ── */}
+      <div className="px-3.5 pb-2 pt-0.5 flex items-center gap-1.5">
+        <button
+          onClick={() => onChangeFrame?.(Math.max(1, currentFrame - Math.round(totalFrames / NUM_THUMBS)))}
+          className="w-6 h-9 rounded bg-[#0A1322] border border-[#192B44] hover:border-[#38BDF8] text-[#94A3B8] hover:text-white flex items-center justify-center cursor-pointer shrink-0 transition-colors"
+          title="Previous Ping Segment"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+        </button>
 
-        <div className="flex items-center gap-1 flex-1 min-w-0">
-          {PIPELINE_STAGES_V3.map((st, idx) => {
-            const isCurrent = currentStageIndex === idx;
-            const isCompleted = currentStageIndex > idx;
-
+        <div className="flex-1 grid grid-cols-12 gap-1">
+          {Array.from({ length: NUM_THUMBS }).map((_, idx) => {
+            const isSelected = idx === activeThumbIdx;
             return (
               <button
-                key={st.number}
-                onClick={() => onSelectStageIndex(idx)}
-                className={`flex-1 py-0.5 px-1 sm:px-1.5 border transition-all cursor-pointer rounded-xs flex items-center justify-between min-w-[68px] xl:min-w-[82px] ${
-                  isCurrent
-                    ? 'bg-[#131B2A] border-[#FFB703] text-[#FFB703] font-bold shadow-[0_0_10px_rgba(255, 183, 3, )]'
-                    : isCompleted
-                    ? 'bg-[#080D17] border-[#162136] text-[#F8FAFC] hover:border-[#FFB703]/40'
-                    : 'bg-[#02070D] border-[#0A1E30] text-[#64748B] hover:text-[#94A3B8]'
+                key={idx}
+                onClick={() => {
+                  const targetFrame = Math.max(
+                    1,
+                    Math.min(totalFrames, Math.round(((idx + 0.5) / NUM_THUMBS) * totalFrames))
+                  );
+                  onChangeFrame?.(targetFrame);
+                }}
+                className={`h-9 rounded overflow-hidden border transition-all cursor-pointer relative ${
+                  isSelected
+                    ? 'border-2 border-[#00E5FF] shadow-[0_0_10px_rgba(0,229,255,0.45)] scale-[1.03] z-10'
+                    : 'border-[#1B2C46] opacity-80 hover:opacity-100 hover:border-[#38BDF8]/60'
                 }`}
               >
-                <span className="text-[8px] sm:text-[8.5px] font-mono truncate mr-0.5">
-                  {st.number} {st.name}
-                </span>
-
-                {isCurrent ? (
-                  <span className="text-[7px] px-0.5 bg-[#FFB703] text-[#05070B] font-black rounded-xs animate-pulse">
-                    ●
-                  </span>
-                ) : isCompleted ? (
-                  <Check className="w-2.5 h-2.5 text-[#FFB703] shrink-0" />
-                ) : (
-                  <Circle className="w-2 h-2 text-[#64748B] shrink-0" />
-                )}
+                <canvas
+                  ref={(el) => {
+                    filmRefs.current[idx] = el;
+                  }}
+                  width={72}
+                  height={36}
+                  className="w-full h-full object-cover block pointer-events-none"
+                />
               </button>
             );
           })}
         </div>
-      </div>
 
-      {/* ── 2. MISSION TIMELINE SCRUBBER & CONTROLS ── */}
-      <div className="h-9 px-3 sm:px-4 flex items-center justify-between text-[10px] text-[#94A3B8] gap-2">
-        {/* Playback Controls */}
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={onTogglePlay}
-            className="p-1.5 bg-[#080D17] border border-[#162136] hover:border-[#FFB703]/60 text-[#F8FAFC] hover:text-[#FFB703] cursor-pointer rounded-xs transition-colors"
-            title={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-          </button>
-
-          <button
-            onClick={onReset}
-            className="p-1.5 bg-[#080D17] border border-[#162136] hover:border-[#EF4444]/60 text-[#94A3B8] hover:text-[#EF4444] cursor-pointer rounded-xs transition-colors"
-            title="Reset to Frame 001"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-          </button>
-
-          <div className="text-[9.5px] font-bold text-[#F8FAFC] ml-1">
-            FRAME <span className="text-[#FFB703]">{String(currentFrame).padStart(3, '0')}</span> / {totalFrames}
-          </div>
-        </div>
-
-        {/* Horizontal Scrubber */}
-        <div className="flex-1 flex items-center gap-2">
-          <div className="flex-1 h-1.5 bg-[#080D17] border border-[#162136] relative rounded-xs overflow-hidden cursor-pointer">
-            <div
-              className="h-full bg-[#FFB703] transition-all duration-150"
-              style={{ width: `${(currentFrame / totalFrames) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Speed Multipliers & Event Log Drawer Trigger */}
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center border border-[#162136] bg-[#080D17] rounded-xs overflow-hidden text-[8.5px]">
-            {[1, 2, 4].map((s) => (
-              <button
-                key={s}
-                onClick={() => onSelectSpeed(s)}
-                className={`px-2 py-1 font-bold cursor-pointer transition-colors ${
-                  speed === s
-                    ? 'bg-[#FFB703] text-[#05070B]'
-                    : 'text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#0A1E30]'
-                }`}
-              >
-                {s}×
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={() => setShowEventLog((v) => !v)}
-            className="flex items-center gap-1 px-2.5 py-1 bg-[#080D17] border border-[#162136] hover:border-[#FFB703]/50 text-[#94A3B8] hover:text-[#FFB703] text-[9px] font-bold cursor-pointer rounded-xs transition-all"
-          >
-            <List className="w-3 h-3" />
-            <span>EVENT LOG</span>
-            {showEventLog ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
-          </button>
-        </div>
+        <button
+          onClick={() =>
+            onChangeFrame?.(Math.min(totalFrames, currentFrame + Math.round(totalFrames / NUM_THUMBS)))
+          }
+          className="w-6 h-9 rounded bg-[#0A1322] border border-[#192B44] hover:border-[#38BDF8] text-[#94A3B8] hover:text-white flex items-center justify-center cursor-pointer shrink-0 transition-colors"
+          title="Next Ping Segment"
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
       </div>
     </div>
   );

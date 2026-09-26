@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Target } from 'lucide-react';
 import { MissionTopHeader } from '../components/mission/v3/MissionTopHeader';
-import { SurveyTargetQueue } from '../components/mission/v3/SurveyTargetQueue';
 import { LargeSonarViewer } from '../components/mission/v3/LargeSonarViewer';
-import { MissionSubseaMapViewer } from '../components/mission/v3/MissionSubseaMapViewer';
+import { MissionSubseaMapViewer, CenterViewportMode } from '../components/mission/v3/MissionSubseaMapViewer';
 import { Mission3DSeafloorViewer } from '../components/mission/v3/Mission3DSeafloorViewer';
+import { SonarPreviewPanel } from '../components/mission/v3/SonarPreviewPanel';
 import { TargetIntelligencePanel } from '../components/mission/v3/TargetIntelligencePanel';
 import { BottomPipelineTimeline } from '../components/mission/v3/BottomPipelineTimeline';
-import { ImpactTranslationBanner } from '../components/mission/v3/ImpactTranslationBanner';
 import { UploadClassifyModal } from '../components/mission/UploadClassifyModal';
 import { HazardAlertDrawer } from '../components/mission/v3/HazardAlertDrawer';
 import { RovDispatchModal } from '../components/mission/v3/RovDispatchModal';
@@ -40,8 +39,8 @@ export const MissionPage: React.FC = () => {
   // Judge Mode (20-Second Simplified Proof View)
   const [isJudgeMode, setIsJudgeMode] = useState<boolean>(false);
 
-  // Center Viewport Switcher ('sonar' | 'map' | '3d')
-  const [centerViewMode, setCenterViewMode] = useState<'sonar' | 'map' | '3d'>('sonar');
+  // Center Viewport Switcher ('map' | 'sonar' | 'split' | '3d')
+  const [centerViewMode, setCenterViewMode] = useState<CenterViewportMode>('map');
 
   // Full-Screen Cinematic Story Demo Mode for Judges
   const [showCinematicDemo, setShowCinematicDemo] = useState<boolean>(false);
@@ -52,8 +51,8 @@ export const MissionPage: React.FC = () => {
 
   // AI Pipeline & Timeline State
   const [currentStageIndex, setCurrentStageIndex] = useState<number>(6); // Default 07 VERIFY
-  const [currentFrame, setCurrentFrame] = useState<number>(81);
-  const [isPlaying, setIsPlaying] = useState<boolean>(true);
+  const [currentFrame, setCurrentFrame] = useState<number>(54);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [timelineSpeed, setTimelineSpeed] = useState<number>(1);
 
   // Live Demo Mode & Hero Sequence State
@@ -228,9 +227,20 @@ export const MissionPage: React.FC = () => {
   }, [clearDemoTimers]);
 
   // Clean up timers on unmount
+  // Clean up timers on unmount
   useEffect(() => {
     return () => clearDemoTimers();
   }, [clearDemoTimers]);
+
+  // Continuous Ping-by-Ping timeline playback when Play is active
+  useEffect(() => {
+    if (!isPlaying || isDemoRunning) return;
+    const intervalMs = Math.max(80, Math.round(320 / timelineSpeed));
+    const timer = setInterval(() => {
+      setCurrentFrame((prev) => (prev >= 128 ? 1 : prev + 1));
+    }, intervalMs);
+    return () => clearInterval(timer);
+  }, [isPlaying, isDemoRunning, timelineSpeed]);
 
   // Keyboard shortcut: Spacebar toggles Play/Pause or starts demo
   useEffect(() => {
@@ -270,8 +280,8 @@ export const MissionPage: React.FC = () => {
   }, [processedTargets, confidenceThreshold, isShadowGateActive]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#05070B] text-[#F8FAFC] font-sans overflow-hidden select-none pointer-events-auto">
-      {/* ── TOP HEADER (60–64px) + INTERACTIVE FILTRATION BAR ── */}
+    <div className="flex flex-col h-full w-full bg-[#050811] text-[#F8FAFC] font-sans overflow-hidden select-none pointer-events-auto">
+      {/* ── TOP HEADER + KPI & COVERAGE STRIP ── */}
       <MissionTopHeader
         isDemoRunning={isDemoRunning}
         onStartDemo={handleStartDemo}
@@ -309,10 +319,7 @@ export const MissionPage: React.FC = () => {
         onOpenDispatch={(t) => setDispatchTarget(t)}
       />
 
-      {/* ── IMPACT TRANSLATION BANNER (Translates ML stats to human impact) ── */}
-      <ImpactTranslationBanner isDemoRunning={isDemoRunning} />
-
-      {/* ── MAIN WORKSPACE: JUDGE MODE 3-PANEL PROOF OR FULL WORKSTATION ── */}
+      {/* ── MAIN WORKSPACE: 3-COLUMN OPS HUD MATCHING REFERENCE SCREENSHOT ── */}
       {isJudgeMode ? (
         <JudgeModeProofView
           heroTarget={selectedTarget}
@@ -321,38 +328,10 @@ export const MissionPage: React.FC = () => {
           confidenceThreshold={confidenceThreshold}
         />
       ) : (
-        <div className="flex-1 flex overflow-hidden relative">
-          {/* 1. LEFT (18%) — Operational Survey & Detection Queue */}
-          <div className="w-[18%] min-w-[220px] max-w-[270px] xl:max-w-[290px] h-full flex flex-col shrink-0 z-20">
-            <SurveyTargetQueue
-              targets={processedTargets}
-              selectedTargetId={selectedTargetId}
-              onSelectTarget={handleSelectTarget}
-              hoveredTargetId={hoveredTargetId}
-              onHoverTarget={setHoveredTargetId}
-              onFocusHeroTarget={runHeroSequence}
-              currentStageIndex={currentStageIndex}
-              confidenceThreshold={confidenceThreshold}
-              onChangeConfidenceThreshold={setConfidenceThreshold}
-            />
-          </div>
-
-          {/* 2. CENTER (62%) — 3-Way Hero Viewport (Sonar Waterfall | Subsea Mission Map | 3D Seafloor) */}
+        <div className="flex-1 flex overflow-hidden relative min-h-0">
+          {/* COLUMN 1 (~48%): MISSION MAP / SONAR VIEW / SPLIT VIEW / 3D TERRAIN */}
           <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden relative">
-            {centerViewMode === 'sonar' ? (
-              <LargeSonarViewer
-                targets={processedTargets}
-                selectedTargetId={selectedTargetId}
-                onSelectTarget={handleSelectTarget}
-                hoveredTargetId={hoveredTargetId}
-                onHoverTarget={setHoveredTargetId}
-                isDemoRunning={isDemoRunning}
-                demoPhaseStep={demoPhaseStep}
-                heroConfidence={heroConfidence}
-                onViewMissionMap={() => setCenterViewMode('map')}
-                onView3D={() => setCenterViewMode('3d')}
-              />
-            ) : centerViewMode === 'map' ? (
+            {centerViewMode === 'map' ? (
               <MissionSubseaMapViewer
                 targets={processedTargets}
                 selectedTargetId={selectedTargetId}
@@ -360,20 +339,132 @@ export const MissionPage: React.FC = () => {
                 onBackToSonar={() => setCenterViewMode('sonar')}
                 onExportReport={handleExportReport}
                 onView3D={() => setCenterViewMode('3d')}
+                activeViewMode={centerViewMode}
+                onChangeViewMode={setCenterViewMode}
+                currentFrame={currentFrame}
+                totalFrames={128}
               />
+            ) : centerViewMode === 'sonar' ? (
+              <div className="w-full h-full flex flex-col overflow-hidden">
+                <div className="h-9 px-2.5 bg-[#080E1A] border-b border-[#142238] flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-1">
+                    {(
+                      [
+                        { id: 'map', label: 'MISSION MAP' },
+                        { id: 'sonar', label: 'SONAR VIEW' },
+                        { id: 'split', label: 'SPLIT VIEW' },
+                        { id: '3d', label: '3D TERRAIN' },
+                      ] as { id: CenterViewportMode; label: string }[]
+                    ).map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setCenterViewMode(tab.id)}
+                        className={`px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          centerViewMode === tab.id
+                            ? 'bg-[#F59E0B] text-[#050810] font-black shadow-[0_0_10px_rgba(245,158,11,0.35)]'
+                            : 'bg-[#0D1726] text-[#94A3B8] border border-[#1B2D48] hover:text-white'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="text-[11px] font-mono text-[#CBD5E1]">27.788°N, 89.874°W</span>
+                </div>
+                <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+                  <LargeSonarViewer
+                    targets={processedTargets}
+                    selectedTargetId={selectedTargetId}
+                    onSelectTarget={handleSelectTarget}
+                    hoveredTargetId={hoveredTargetId}
+                    onHoverTarget={setHoveredTargetId}
+                    isDemoRunning={isDemoRunning}
+                    demoPhaseStep={demoPhaseStep}
+                    heroConfidence={heroConfidence}
+                    onViewMissionMap={() => setCenterViewMode('map')}
+                    onView3D={() => setCenterViewMode('3d')}
+                  />
+                </div>
+              </div>
+            ) : centerViewMode === 'split' ? (
+              <div className="w-full h-full flex flex-col overflow-hidden">
+                <div className="flex-1 min-h-0 grid grid-cols-2 divide-x divide-[#142238]">
+                  <MissionSubseaMapViewer
+                    targets={processedTargets}
+                    selectedTargetId={selectedTargetId}
+                    onSelectTarget={handleSelectTarget}
+                    onBackToSonar={() => setCenterViewMode('sonar')}
+                    onExportReport={handleExportReport}
+                    onView3D={() => setCenterViewMode('3d')}
+                    activeViewMode="split"
+                    onChangeViewMode={setCenterViewMode}
+                    currentFrame={currentFrame}
+                    totalFrames={128}
+                  />
+                  <LargeSonarViewer
+                    targets={processedTargets}
+                    selectedTargetId={selectedTargetId}
+                    onSelectTarget={handleSelectTarget}
+                    hoveredTargetId={hoveredTargetId}
+                    onHoverTarget={setHoveredTargetId}
+                    isDemoRunning={isDemoRunning}
+                    demoPhaseStep={demoPhaseStep}
+                    heroConfidence={heroConfidence}
+                    onViewMissionMap={() => setCenterViewMode('map')}
+                    onView3D={() => setCenterViewMode('3d')}
+                  />
+                </div>
+              </div>
             ) : (
-              <Mission3DSeafloorViewer
-                targets={processedTargets}
-                selectedTargetId={selectedTargetId}
-                onSelectTarget={handleSelectTarget}
-                onBackToSonar={() => setCenterViewMode('sonar')}
-                onViewMissionMap={() => setCenterViewMode('map')}
-              />
+              <div className="w-full h-full flex flex-col overflow-hidden">
+                <div className="h-9 px-2.5 bg-[#080E1A] border-b border-[#142238] flex items-center justify-between shrink-0">
+                  <div className="flex items-center gap-1">
+                    {(
+                      [
+                        { id: 'map', label: 'MISSION MAP' },
+                        { id: 'sonar', label: 'SONAR VIEW' },
+                        { id: 'split', label: 'SPLIT VIEW' },
+                        { id: '3d', label: '3D TERRAIN' },
+                      ] as { id: CenterViewportMode; label: string }[]
+                    ).map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setCenterViewMode(tab.id)}
+                        className={`px-3 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          centerViewMode === tab.id
+                            ? 'bg-[#F59E0B] text-[#050810] font-black shadow-[0_0_10px_rgba(245,158,11,0.35)]'
+                            : 'bg-[#0D1726] text-[#94A3B8] border border-[#1B2D48] hover:text-white'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="text-[11px] font-mono text-[#CBD5E1]">27.788°N, 89.874°W</span>
+                </div>
+                <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+                  <Mission3DSeafloorViewer
+                    targets={processedTargets}
+                    selectedTargetId={selectedTargetId}
+                    onSelectTarget={handleSelectTarget}
+                    onBackToSonar={() => setCenterViewMode('sonar')}
+                    onViewMissionMap={() => setCenterViewMode('map')}
+                  />
+                </div>
+              </div>
             )}
           </div>
 
-          {/* 3. RIGHT (20%) — Selected Target Intelligence (Information Hero) */}
-          <div className="w-[20%] min-w-[270px] max-w-[330px] xl:max-w-[360px] h-full flex flex-col shrink-0 z-20">
+          {/* COLUMN 2 (~26%): SONAR PREVIEW + ACOUSTIC PROFILE + 4 MODE THUMBNAILS */}
+          <div className="w-[26%] min-w-[275px] max-w-[360px] h-full flex flex-col shrink-0 z-20">
+            <SonarPreviewPanel
+              target={selectedTarget}
+              onExpandToFullSonar={() => setCenterViewMode('sonar')}
+            />
+          </div>
+
+          {/* COLUMN 3 (~26%): TARGET DETAILS + HYDROGRAPHIC TELEMETRY (AUV-07) */}
+          <div className="w-[26%] min-w-[285px] max-w-[370px] h-full flex flex-col shrink-0 z-20">
             <TargetIntelligencePanel
               target={selectedTarget}
               isVerified={isVerified}
@@ -381,6 +472,7 @@ export const MissionPage: React.FC = () => {
               heroConfidence={heroConfidence}
               explainabilityStep={explainabilityStep}
               onOpenDispatch={(t) => setDispatchTarget(t)}
+              onExportReport={handleExportReport}
               allTargets={processedTargets}
               onSelectTarget={handleSelectTarget}
             />
@@ -388,11 +480,12 @@ export const MissionPage: React.FC = () => {
         </div>
       )}
 
-      {/* ── 4. BOTTOM — AI Pipeline & Mission Timeline ── */}
+      {/* ── BOTTOM: SURVEY TRACK TIMELINE & SONAR FILMSTRIP ── */}
       <BottomPipelineTimeline
         currentStageIndex={currentStageIndex}
         onSelectStageIndex={setCurrentStageIndex}
         currentFrame={currentFrame}
+        onChangeFrame={setCurrentFrame}
         totalFrames={128}
         isPlaying={isPlaying}
         onTogglePlay={() => setIsPlaying((v) => !v)}
@@ -403,6 +496,7 @@ export const MissionPage: React.FC = () => {
         speed={timelineSpeed}
         onSelectSpeed={setTimelineSpeed}
         isDemoRunning={isDemoRunning}
+        onSelectTarget={handleSelectTarget}
       />
 
       {/* ── UPLOAD & ANALYZE MODAL (Real ML Upload Workflow) ── */}

@@ -32,6 +32,9 @@ import { useMission } from '../../context/MissionContext';
 import { MISSION_DATA, interpolateVesselPosition } from '../../data/mission';
 import { MISSION_TARGETS, computeUncertaintyRadiusM } from '../../data/targets';
 import type { MissionTarget } from '../../types';
+import { MapLayerTogglePanel, type MapLayers } from '../map/MapLayerTogglePanel';
+import { HydrographicTelemetryPanel } from '../map/HydrographicTelemetryPanel';
+import { SurveyAcquisitionTimeline } from '../map/SurveyAcquisitionTimeline';
 
 // Fix Leaflet default icon path
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -148,6 +151,27 @@ export const MissionMapPanel: React.FC = () => {
   const [mapMode, setMapMode] = useState<'satellite' | 'bathymetry' | 'dark_hud'>('dark_hud');
   const [showUncertainty, setShowUncertainty] = useState<boolean>(true);
   const [mapCenter, setMapCenter] = useState<[number, number]>([18.921, 72.821]);
+
+  // Layer toggle state (SLICKTRACE-style control panel)
+  const [layers, setLayers] = useState<MapLayers>({
+    ghostNets:          true,
+    pipelines:          true,
+    marineDebris:       true,
+    seafloorAnomalies:  true,
+    surveyTrack:        true,
+    swathEnvelope:      true,
+    uncertaintyRadius:  true,
+    sonarRange:         true,
+    graticule:          true,
+    highPriorityOnly:   false,
+  });
+
+  const toggleLayer = (key: keyof MapLayers) =>
+    setLayers(prev => ({ ...prev, [key]: !prev[key] }));
+
+  // Sync uncertainty with layer toggle
+  const effectiveShowUncertainty = showUncertainty && layers.uncertaintyRadius;
+
   const vessel = interpolateVesselPosition(playbackTime);
   const track = MISSION_DATA.track.map((p) => [p.lat, p.lon] as [number, number]);
 
@@ -308,19 +332,21 @@ export const MissionMapPanel: React.FC = () => {
           <MapFlyTo center={mapCenter} />
 
           {/* Survey Swath Polygon Box */}
-          <Polygon
-            positions={MISSION_DATA.polygon.map((p) => p as LatLngExpression)}
-            pathOptions={{
-              color: '#4CD9E8',
-              fillColor: '#4CD9E8',
-              fillOpacity: 0.05,
-              weight: 1.5,
-              dashArray: '4, 4',
-            }}
-          />
+          {layers.swathEnvelope && (
+            <Polygon
+              positions={MISSION_DATA.polygon.map((p) => p as LatLngExpression)}
+              pathOptions={{
+                color: '#4CD9E8',
+                fillColor: '#4CD9E8',
+                fillOpacity: 0.05,
+                weight: 1.5,
+                dashArray: '4, 4',
+              }}
+            />
+          )}
 
           {/* Full Planned Lawnmower Track */}
-          {showTrack && (
+          {showTrack && layers.surveyTrack && (
             <Polyline
               positions={track as LatLngExpression[]}
               pathOptions={{
@@ -333,7 +359,7 @@ export const MissionMapPanel: React.FC = () => {
           )}
 
           {/* Completed Swath Trackline with Glowing Cyan Line */}
-          {showTrack && trackSoFar.length >= 2 && (
+          {showTrack && layers.surveyTrack && trackSoFar.length >= 2 && (
             <Polyline
               positions={trackSoFar as LatLngExpression[]}
               pathOptions={{
@@ -345,33 +371,38 @@ export const MissionMapPanel: React.FC = () => {
           )}
 
           {/* Concentric Sonar Range Rings centered on vessel */}
-          <Circle
-            center={[vessel.lat, vessel.lon]}
-            radius={400}
-            pathOptions={{
-              color: 'rgba(76, 217, 232, 0.25)',
-              weight: 1,
-              dashArray: '2, 4',
-              fill: false,
-            }}
-          />
-          <Circle
-            center={[vessel.lat, vessel.lon]}
-            radius={800}
-            pathOptions={{
-              color: 'rgba(76, 217, 232, 0.15)',
-              weight: 1,
-              dashArray: '3, 6',
-              fill: false,
-            }}
-          />
+          {layers.sonarRange && (
+            <>
+              <Circle
+                center={[vessel.lat, vessel.lon]}
+                radius={400}
+                pathOptions={{
+                  color: 'rgba(76, 217, 232, 0.25)',
+                  weight: 1,
+                  dashArray: '2, 4',
+                  fill: false,
+                }}
+              />
+              <Circle
+                center={[vessel.lat, vessel.lon]}
+                radius={800}
+                pathOptions={{
+                  color: 'rgba(76, 217, 232, 0.15)',
+                  weight: 1,
+                  dashArray: '3, 6',
+                  fill: false,
+                }}
+              />
+            </>
+          )}
 
           {/* ── Position Uncertainty Radius Buffer (±r meters) ── */}
           {/* Models acoustic ray bending through the thermocline and USBL / towfish layback offset */}
           {showTargets &&
-            showUncertainty &&
+            effectiveShowUncertainty &&
             activeTargets
               .filter((t) => visibleTargetIds.includes(t.id))
+              .filter((t) => !layers.highPriorityOnly || t.risk === 'CRITICAL')
               .map((target) => {
                 const radiusM = computeUncertaintyRadiusM(target);
                 const isSelected = selectedTargetId === target.id;
@@ -418,19 +449,30 @@ export const MissionMapPanel: React.FC = () => {
                 );
               })}
 
-          {/* Classified Contact Markers */}
+          {/* Classified Contact Markers — filtered by layer toggles */}
           {showTargets &&
-            activeTargets.filter((t) => visibleTargetIds.includes(t.id)).map((target) => (
-              <Marker
-                key={target.id}
-                position={[target.lat, target.lon]}
-                icon={createTargetPin(target, selectedTargetId === target.id)}
-                eventHandlers={{
-                  click: () =>
-                    setSelectedTargetId(selectedTargetId === target.id ? null : target.id),
-                }}
-              />
-            ))}
+            activeTargets
+              .filter((t) => visibleTargetIds.includes(t.id))
+              .filter((t) => !layers.highPriorityOnly || t.risk === 'CRITICAL')
+              .filter((t) => {
+                const cls = t.classCode;
+                if (!layers.ghostNets && (cls === 'ALDFG' || cls === 'MLO')) return false;
+                if (!layers.pipelines && cls === 'PIP') return false;
+                if (!layers.marineDebris && cls === 'DEBRIS') return false;
+                if (!layers.seafloorAnomalies && cls === 'ANOM') return false;
+                return true;
+              })
+              .map((target) => (
+                <Marker
+                  key={target.id}
+                  position={[target.lat, target.lon]}
+                  icon={createTargetPin(target, selectedTargetId === target.id)}
+                  eventHandlers={{
+                    click: () =>
+                      setSelectedTargetId(selectedTargetId === target.id ? null : target.id),
+                  }}
+                />
+              ))}
 
           {/* Active Survey Vessel Marker with Radar Beam & Ripples */}
           <Marker
@@ -446,8 +488,14 @@ export const MissionMapPanel: React.FC = () => {
           </div>
         </MapContainer>
 
+        {/* ── SLICKTRACE-style Layer Toggle Panel (top-left overlay) ── */}
+        <MapLayerTogglePanel layers={layers} onToggle={toggleLayer} />
+
+        {/* ── Hydrographic Telemetry Widgets (top-right overlay) ── */}
+        <HydrographicTelemetryPanel />
+
         {/* Floating Re-center Button */}
-        <div className="absolute top-2 right-12 z-[500] flex flex-col items-end gap-2">
+        <div className="absolute top-2 right-2 z-[500] flex flex-col items-end gap-2" style={{ marginTop: '220px' }}>
           <button
             onClick={handleCenterOnVessel}
             className="px-2 py-1 rounded bg-[#10151D]/90 border border-[#1B2330] hover:border-[#4CD9E8] text-[#4CD9E8] text-[8px] font-bold shadow-lg backdrop-blur-md transition-all flex items-center gap-1 cursor-pointer"
@@ -458,7 +506,7 @@ export const MissionMapPanel: React.FC = () => {
           </button>
         </div>
 
-        {/* Floating Telemetry Badge (Bottom Left) */}
+        {/* Floating AUV Telemetry Badge (Bottom Left) */}
         <div className="absolute bottom-2 left-2 z-[500] px-2.5 py-1.5 rounded-lg bg-[#080B11]/90 border border-[#1B2330] text-[8px] text-[#7C8AA0] flex items-center gap-3 backdrop-blur-md shadow-xl">
           <div>
             <span>HDG: </span>
@@ -474,8 +522,8 @@ export const MissionMapPanel: React.FC = () => {
           </div>
           <div className="hidden sm:flex items-center gap-1 border-l border-[#1B2330] pl-3">
             <span className="text-[#7C8AA0]">TPU: </span>
-            <strong className={showUncertainty ? 'text-[#00D4AA]' : 'text-[#7C8AA0]'}>
-              {showUncertainty ? '±r ON (IHO S-44)' : 'OFF'}
+            <strong className={effectiveShowUncertainty ? 'text-[#00D4AA]' : 'text-[#7C8AA0]'}>
+              {effectiveShowUncertainty ? '±r ON (IHO S-44)' : 'OFF'}
             </strong>
           </div>
         </div>
@@ -489,6 +537,9 @@ export const MissionMapPanel: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* ── Survey Acoustic Ping Acquisition Timeline (SLICKTRACE-style bottom strip) ── */}
+      <SurveyAcquisitionTimeline />
     </div>
   );
 };

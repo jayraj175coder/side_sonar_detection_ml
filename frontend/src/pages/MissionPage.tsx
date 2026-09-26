@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Target } from 'lucide-react';
 import { MissionTopHeader } from '../components/mission/v3/MissionTopHeader';
 import { SurveyTargetQueue } from '../components/mission/v3/SurveyTargetQueue';
-import { MapLayersSidePanel } from '../components/mission/v3/MapLayersSidePanel';
 import { LargeSonarViewer } from '../components/mission/v3/LargeSonarViewer';
 import { MissionSubseaMapViewer } from '../components/mission/v3/MissionSubseaMapViewer';
 import { Mission3DSeafloorViewer } from '../components/mission/v3/Mission3DSeafloorViewer';
@@ -299,10 +298,6 @@ export const MissionPage: React.FC = () => {
         onToggleShadowGate={() => setIsShadowGateActive((v) => !v)}
         centerViewMode={centerViewMode}
         onSelectCenterViewMode={setCenterViewMode}
-        verifiedCount={processedTargets.filter(t => t.status === 'CONFIRMED').length}
-        pipelineCount={processedTargets.filter(t => t.category === 'FISHING GEAR').length}
-        coveragePercent={87}
-        surveyAreaKm2={12.84}
       />
 
       {/* ── HAZARD ALERT DRAWER (REAL-TIME NOTIFICATION BELL) ── */}
@@ -327,44 +322,23 @@ export const MissionPage: React.FC = () => {
         />
       ) : (
         <div className="flex-1 flex overflow-hidden relative">
-          {/* 1. LEFT — MAP LAYERS Side Panel (matches reference screenshot) */}
-          <div className="w-[17%] min-w-[185px] max-w-[230px] h-full shrink-0 z-20">
-            <MapLayersSidePanel />
+          {/* 1. LEFT (18%) — Operational Survey & Detection Queue */}
+          <div className="w-[18%] min-w-[220px] max-w-[270px] xl:max-w-[290px] h-full flex flex-col shrink-0 z-20">
+            <SurveyTargetQueue
+              targets={processedTargets}
+              selectedTargetId={selectedTargetId}
+              onSelectTarget={handleSelectTarget}
+              hoveredTargetId={hoveredTargetId}
+              onHoverTarget={setHoveredTargetId}
+              onFocusHeroTarget={runHeroSequence}
+              currentStageIndex={currentStageIndex}
+              confidenceThreshold={confidenceThreshold}
+              onChangeConfidenceThreshold={setConfidenceThreshold}
+            />
           </div>
 
-          {/* 2. CENTER — 3-Way Hero Viewport with reference-style tabs */}
+          {/* 2. CENTER (62%) — 3-Way Hero Viewport (Sonar Waterfall | Subsea Mission Map | 3D Seafloor) */}
           <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden relative">
-            {/* Reference-style tab bar: MISSION MAP | SONAR VIEW | SPLIT VIEW | 3D TERRAIN */}
-            <div className="flex items-center justify-between px-3 py-1.5 bg-[#030810] border-b border-[#0F1E2E] shrink-0">
-              <div className="flex items-center gap-0.5">
-                {[
-                  { mode: 'map',   label: 'MISSION MAP' },
-                  { mode: 'sonar', label: 'SONAR VIEW' },
-                  { mode: '3d',    label: '3D TERRAIN' },
-                ].map(({ mode, label }) => (
-                  <button
-                    key={mode}
-                    onClick={() => setCenterViewMode(mode as 'sonar' | 'map' | '3d')}
-                    className={`px-3 py-1 text-[8.5px] font-black rounded-sm transition-all cursor-pointer ${
-                      centerViewMode === mode
-                        ? 'bg-[#FFB703] text-[#030810]'
-                        : 'text-[#475569] hover:text-[#94A3B8] hover:bg-[#0A1520]'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              {/* Coordinate readout */}
-              <div className="flex items-center gap-2 text-[7.5px] text-[#475569] font-mono">
-                <span>18.921°N, 72.821°E</span>
-                <span className="px-1.5 py-0.5 bg-[#0A1520] border border-[#1E293B] rounded text-[#64748B]">
-                  ⊞ FULL
-                </span>
-              </div>
-            </div>
-
-            {/* Viewer content */}
             {centerViewMode === 'sonar' ? (
               <LargeSonarViewer
                 targets={processedTargets}

@@ -23,7 +23,7 @@ def noise_filter():
 
 
 def test_noise_filter_initialization(noise_filter):
-    """Verifies default area thresholds for MoES marine debris taxonomy."""
+    """Verifies default area thresholds for MHA marine debris taxonomy."""
     assert "ghost_net_aldfg" in noise_filter.min_area
     assert "pipeline_hazard" in noise_filter.min_area
     assert "anthropogenic_debris" in noise_filter.min_area

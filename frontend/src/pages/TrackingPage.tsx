@@ -76,7 +76,7 @@ const STATUS_CONFIG: Record<
     borderColor: 'border-sky-400/40',
     badgeBg: 'bg-sky-400 text-slate-950',
     dotColor: 'bg-sky-400',
-    description: 'Confirmed absent in follow-up sweep. Cleared by MoES recovery team.',
+    description: 'Confirmed absent in follow-up sweep. Cleared by MHA recovery team.',
   },
 };
 
@@ -154,7 +154,7 @@ export const TrackingPage: React.FC = () => {
               Subsea Target Drift & Acoustic Re-ID Laboratory
             </h1>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded font-bold bg-white/[0.04] border border-white/[0.08] text-slate-400">
-              MoES // TEMPORAL RECON
+              MHA // TEMPORAL RECON
             </span>
           </div>
           <p className="text-xs text-slate-400">
@@ -637,7 +637,7 @@ export const TrackingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="rounded-2xl bg-[#070D18] border border-white/[0.08] p-4 space-y-2.5 shadow-xl">
               <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
-                MoES Remediation Directive
+                MHA Remediation Directive
               </span>
               <p className="text-xs text-slate-300 leading-relaxed font-sans">
                 {activeRecord.actionRecommendation}
@@ -663,7 +663,7 @@ export const TrackingPage: React.FC = () => {
               </div>
               <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-400">
                 <span>Verified By:</span>
-                <span className="text-slate-200">{activeRecord.verifiedBy || 'MoES Taskforce'}</span>
+                <span className="text-slate-200">{activeRecord.verifiedBy || 'MHA Taskforce'}</span>
               </div>
             </div>
           </div>

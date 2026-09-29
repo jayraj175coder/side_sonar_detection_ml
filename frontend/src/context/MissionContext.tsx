@@ -49,7 +49,7 @@ export const GUIDED_DEMO_STEPS: GuidedDemoStep[] = [
     stepCode: 'REPORT',
     title: 'MISSION ANOMALY DOSSIER & EXPORT',
     badge: '4. DOSSIER (REPORTS)',
-    caption: 'Mission MX-026 verified · 12.84 km² surveyed · MoES Marine Debris Compliance Dossier ready for export',
+    caption: 'Mission MX-026 verified · 12.84 km² surveyed · MHA Marine Debris Compliance Dossier ready for export',
     durationMs: 6500,
   },
 ];
@@ -349,7 +349,7 @@ export const MissionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setDemoStage(7);
       setMissionStatus('complete');
       sonarAudio.playLockBeep();
-      addLog('REPORT', 'Mission MX-026 verified · MoES Marine Debris Dossier compiled & export ready', 'complete');
+      addLog('REPORT', 'Mission MX-026 verified · MHA Marine Debris Dossier compiled & export ready', 'complete');
     }
   }, [addLog, setActiveTab]);
 

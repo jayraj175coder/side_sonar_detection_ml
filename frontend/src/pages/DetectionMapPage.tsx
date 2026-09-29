@@ -806,7 +806,7 @@ export const DetectionMapPage: React.FC = () => {
     }));
 
     exportOfficialIncidentReport(site, candidateAdapter, confidenceCutoff / 100, true);
-    triggerToast(`Downloaded MoES Marine Debris Incident Report (PDF)`);
+    triggerToast(`Downloaded MHA Marine Debris Incident Report (PDF)`);
   };
 
   // Active layers counter
@@ -825,14 +825,14 @@ export const DetectionMapPage: React.FC = () => {
         </div>
       )}
 
-      {/* ── 1. TOP HEADER: MOES SUBSEA GIS INTELLIGENCE ── */}
+      {/* ── 1. TOP HEADER: MHA SUBSEA GIS INTELLIGENCE ── */}
       <div className="px-4 py-2 bg-[#070D18] border border-white/[0.08] rounded-xl flex items-center justify-between gap-3 shrink-0 shadow-lg">
         {/* Left: Survey Identification */}
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => {
               sonarAudio.playSonarPing?.();
-              triggerToast('MoES Hydrographic GIS Core Online · 900 kHz Slant Stream');
+              triggerToast('MHA Hydrographic GIS Core Online · 900 kHz Slant Stream');
             }}
             className="w-6 h-6 rounded bg-[#FFB703]/10 border border-[#FFB703]/40 flex items-center justify-center text-[#FFB703] font-bold text-xs font-mono hover:bg-[#FFB703]/20 transition-colors cursor-pointer"
             title="Sonar Ping Audio Check"
@@ -841,7 +841,7 @@ export const DetectionMapPage: React.FC = () => {
           </button>
           <div>
             <div className="font-mono font-bold text-xs text-white uppercase tracking-wider flex items-center gap-2">
-              <span>MOES SUBSEA GIS INTELLIGENCE</span>
+              <span>MHA SUBSEA GIS INTELLIGENCE</span>
               <span className="text-slate-600">|</span>
               <span className="text-[11px] text-slate-400 font-normal">
                 Survey: <strong className="text-slate-200">NIOT / INCOIS 48.2 NM — {activeScenario.name}</strong>
@@ -887,7 +887,7 @@ export const DetectionMapPage: React.FC = () => {
           <div
             onClick={() => triggerToast(`${visibleTargets.length} targets currently verified by YOLOv8s + Acoustic Shadow Gate`)}
             className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-bold cursor-help"
-            title="Verified against MoES Marine Taxonomy"
+            title="Verified against MHA Marine Taxonomy"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>{visibleTargets.length} VERIFIED</span>
@@ -1639,8 +1639,8 @@ export const DetectionMapPage: React.FC = () => {
                     <strong className="text-cyan-400">{(selectedTarget.depthM * 0.1 + 1).toFixed(1)} atm</strong>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">MoES Taxonomy:</span>
-                    <strong className="text-[#FFB703]">SIH-26057</strong>
+                    <span className="text-slate-400">MHA Taxonomy:</span>
+                    <strong className="text-[#FFB703]">OPR-740</strong>
                   </div>
                 </div>
               )}
@@ -1912,7 +1912,7 @@ export const DetectionMapPage: React.FC = () => {
                 <Target className="w-5 h-5 text-[#FFB703]" />
                 <div>
                   <h3 className="text-sm font-black text-white">{selectedTarget.name}</h3>
-                  <div className="text-[10px] text-slate-400">MoES Hydrographic Target Inspection Dossier</div>
+                  <div className="text-[10px] text-slate-400">MHA Hydrographic Target Inspection Dossier</div>
                 </div>
               </div>
               <button

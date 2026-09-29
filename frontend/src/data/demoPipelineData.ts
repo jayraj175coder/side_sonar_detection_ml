@@ -114,7 +114,7 @@ export const DEMO_PIPELINE_SCENARIOS: DemoScenario[] = [
       { stage: 'FILTER', delayMs: 2150, text: 'Filter REJECTED Candidate #3: "Sand Ripple Bedform" (Confidence 0.281, Zero vertical relief shadow)', level: 'reject' },
       { stage: 'FILTER', delayMs: 2450, text: 'Filter ACCEPTED Target SX-T07: "Ghost Net (ALDFG)" — Confidence 94.7% [HIGH PRIORITY HAZARD]', level: 'success' },
       { stage: 'REPORT', delayMs: 2800, text: 'Geotagging: Lat 18.9217° N, Lon 72.8214° E (Seabed Depth: 43.1m) synchronized to trackline LINE-02', level: 'info' },
-      { stage: 'REPORT', delayMs: 3100, text: 'Report generated: anomaly_record_SX-T07.json + MoES target register updated', level: 'success' },
+      { stage: 'REPORT', delayMs: 3100, text: 'Report generated: anomaly_record_SX-T07.json + MHA target register updated', level: 'success' },
     ],
   },
 
@@ -272,7 +272,7 @@ export const DEMO_PIPELINE_SCENARIOS: DemoScenario[] = [
       { stage: 'FILTER', delayMs: 1450, text: 'Filter ACCEPTED Target SX-T03: "Anthropogenic Debris" (Confidence: 88.9%)', level: 'success' },
       { stage: 'FILTER', delayMs: 1750, text: 'Filter ACCEPTED Target SX-T09: "Industrial Metal Barrel" (Confidence: 81.2%)', level: 'success' },
       { stage: 'REPORT', delayMs: 2150, text: 'Geotagging: Lat 18.9142° N, Lon 72.8189° E & Lat 18.9168° N, Lon 72.8125° E attached', level: 'info' },
-      { stage: 'REPORT', delayMs: 2450, text: 'Report generated: 2 anomaly records registered to MoES dossier', level: 'success' },
+      { stage: 'REPORT', delayMs: 2450, text: 'Report generated: 2 anomaly records registered to MHA dossier', level: 'success' },
     ],
   },
 ];

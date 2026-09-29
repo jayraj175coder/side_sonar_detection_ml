@@ -73,8 +73,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {!isSidebarCollapsed ? (
             <SonarxLogo
               size="sm"
-              subtitle="MoES Subsea Intelligence"
-              badge="SIH 26057"
+              subtitle="MHA Subsea Intelligence"
+              badge="OPR-740"
               animated={true}
               onClick={() => setActiveTab('overview')}
             />
@@ -183,7 +183,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 ))}
               </div>
               <div className="px-1 text-[9px] font-mono text-slate-500 text-center tracking-wider pt-1">
-                MoES // INDIAN EEZ RECONNAISSANCE
+                MHA // INDIAN EEZ RECONNAISSANCE
               </div>
             </div>
           ) : (

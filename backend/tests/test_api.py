@@ -32,7 +32,7 @@ def test_model_info_v2_flagship_default():
     assert response.status_code == 200
     data = response.json()
     assert "classes" in data
-    # Default model should be V2 (SIH Marine Debris Flagship)
+    # Default model should be V2 (AHS Marine Debris Flagship)
     assert "ghost_net_aldfg" in data["classes"]
     assert "anthropogenic_debris" in data["classes"]
     assert "pipeline_hazard" in data["classes"]
@@ -170,9 +170,9 @@ def test_predict_legacy_baseline_model_switch():
 
 def test_scan_repository_and_moes_report_workflow():
     sample_scan = PredictionResponse(
-        scan_id="SCAN-TEST-MOES-01",
+        scan_id="SCAN-TEST-MHA-01",
         filename="test_acoustic_swath.png",
-        model_name="YOLOv8n-SIH-Marine-Debris-V2",
+        model_name="YOLOv8n-Subsea-Perception-V2",
         model_version="v2",
         image_width=800,
         image_height=600,
@@ -204,31 +204,31 @@ def test_scan_repository_and_moes_report_workflow():
     scan_repository.save(sample_scan)
 
     # Get
-    fetched = scan_repository.get("SCAN-TEST-MOES-01")
+    fetched = scan_repository.get("SCAN-TEST-MHA-01")
     assert fetched is not None
     assert fetched.filename == "test_acoustic_swath.png"
     assert fetched.location.heading == 120.0
 
     # Report JSON
-    report_res = client.get("/api/scans/SCAN-TEST-MOES-01/report")
+    report_res = client.get("/api/scans/SCAN-TEST-MHA-01/report")
     assert report_res.status_code == 200
     report_data = report_res.json()
     assert "analyst_summary" in report_data
-    assert "Ministry of Earth Sciences" in report_data["analyst_summary"] or "Ghost Net" in report_data["analyst_summary"]
+    assert "Maritime Hydrographic Authority" in report_data["analyst_summary"] or "Ghost Net" in report_data["analyst_summary"]
     assert "disclaimer" in report_data
 
     # Printable HTML / PDF Dossier
-    html_res = client.get("/api/scans/SCAN-TEST-MOES-01/report/html")
+    html_res = client.get("/api/scans/SCAN-TEST-MHA-01/report/html")
     assert html_res.status_code == 200
     assert "text/html" in html_res.headers.get("content-type", "")
     assert "SONARX // SUBSEA INTELLIGENCE DOSSIER" in html_res.text
-    assert "SCAN-TEST-MOES-01" in html_res.text
+    assert "SCAN-TEST-MHA-01" in html_res.text
     assert "ghost_net_aldfg" in html_res.text
 
     # Delete
-    del_res = client.delete("/api/scans/SCAN-TEST-MOES-01")
+    del_res = client.delete("/api/scans/SCAN-TEST-MHA-01")
     assert del_res.status_code == 200
-    assert scan_repository.get("SCAN-TEST-MOES-01") is None
+    assert scan_repository.get("SCAN-TEST-MHA-01") is None
 
 
 def test_stats_and_scan_listing():

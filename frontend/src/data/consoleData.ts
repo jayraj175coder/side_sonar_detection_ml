@@ -536,7 +536,7 @@ export const STAGE_DETAILS: Record<StageId, StageDetail> = {
     metric2: { label: 'TRAWL GEAR', value: '4' },
     metric3: { label: 'PIPELINE SPANS', value: '3' },
     explanation:
-      'Confirmed detections are classified into MoES ALDFG (Abandoned, Lost or Discarded Fishing Gear) and subsea hazard taxonomy based on high-frequency textural resonance and shadow geometry.',
+      'Confirmed detections are classified into MHA ALDFG (Abandoned, Lost or Discarded Fishing Gear) and subsea hazard taxonomy based on high-frequency textural resonance and shadow geometry.',
     cautionCallout:
       'CLASSIFICATION CONFIDENCE IS NOT RECOVERY FEASIBILITY. Debris signatures classified as Ghost Net (ALDFG) require physical ROV verification prior to grappling operations.',
     eventState: 'TAXONOMY ATTRIBUTION COMPLETE · 17 TARGETS CLASSIFIED',
@@ -550,7 +550,7 @@ export const STAGE_DETAILS: Record<StageId, StageDetail> = {
     metric2: { label: 'SURVEY AREA', value: '12.84 km²' },
     metric3: { label: 'EXPORT FORMATS', value: 'JSON / CSV' },
     explanation:
-      'Every accepted anomaly is tagged with high-precision WGS84 coordinates (interpolated from tow-fish layback and USBL telemetry) and compiled into formal Ministry of Earth Sciences inspection records.',
+      'Every accepted anomaly is tagged with high-precision WGS84 coordinates (interpolated from tow-fish layback and USBL telemetry) and compiled into formal Maritime Hydrographic Authority inspection records.',
     eventState: 'ANOMALY DOSSIER COMPILED · READY FOR HUMAN VERIFICATION',
   },
 };

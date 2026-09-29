@@ -2,7 +2,7 @@ export interface IndiaMaritimeSector {
   id: string;
   name: string;
   subName: string;
-  fleetCommand: 'Western Naval Command' | 'Eastern Naval Command' | 'Southern Naval Command' | 'Andaman & Nicobar Command' | 'MoES / NIOT';
+  fleetCommand: 'Western Naval Command' | 'Eastern Naval Command' | 'Southern Naval Command' | 'Andaman & Nicobar Command' | 'MHA / NIOT';
   region: 'Arabian Sea' | 'Bay of Bengal' | 'Indian Ocean' | 'Andaman Sea' | 'Lakshadweep Sea';
   lat: number;
   lon: number;
@@ -21,7 +21,7 @@ export interface HydrographicVessel {
   name: string;
   pennant: string;
   type: 'Survey Vessel (Large)' | 'Oceanographic Research Vessel' | 'Fisheries Research Vessel';
-  operator: 'Indian Navy' | 'Ministry of Earth Sciences' | 'NIOT / CMLRE';
+  operator: 'Indian Navy' | 'Maritime Hydrographic Authority' | 'NIOT / CMLRE';
   lat: number;
   lon: number;
   headingDeg: number;
@@ -87,7 +87,7 @@ export const INDIA_MARITIME_SECTORS: IndiaMaritimeSector[] = [
     id: 'SEC-GOM',
     name: 'Gulf of Mannar Coral Biosphere',
     subName: 'Sector Delta · Indo-Sri Lanka Palk Strait',
-    fleetCommand: 'MoES / NIOT',
+    fleetCommand: 'MHA / NIOT',
     region: 'Indian Ocean',
     lat: 9.1367,
     lon: 79.2122,
@@ -98,7 +98,7 @@ export const INDIA_MARITIME_SECTORS: IndiaMaritimeSector[] = [
     primaryClass: 'Ghost Fishing Nets & Reef Entanglement',
     status: 'HIGH ALERT',
     description: 'Environmentally critical coral biosphere with high-density derelict monofilament gillnets trapping marine megafauna.',
-    assignedVessel: 'ORV Sagar Kanya (MoES)',
+    assignedVessel: 'ORV Sagar Kanya (MHA)',
   },
   {
     id: 'SEC-CHE',
@@ -155,7 +155,7 @@ export const INDIA_MARITIME_SECTORS: IndiaMaritimeSector[] = [
     id: 'SEC-LAK',
     name: 'Lakshadweep Kavaratti Lagoon',
     subName: 'Sector Hotel · Atoll Coral Basin',
-    fleetCommand: 'MoES / NIOT',
+    fleetCommand: 'MHA / NIOT',
     region: 'Lakshadweep Sea',
     lat: 10.5667,
     lon: 72.6417,
@@ -204,7 +204,7 @@ export const HYDROGRAPHIC_VESSELS: HydrographicVessel[] = [
     name: 'ORV Sagar Kanya',
     pennant: 'SK-01',
     type: 'Oceanographic Research Vessel',
-    operator: 'Ministry of Earth Sciences',
+    operator: 'Maritime Hydrographic Authority',
     lat: 9.1420,
     lon: 79.2180,
     headingDeg: 284,

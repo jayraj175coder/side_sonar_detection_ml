@@ -546,7 +546,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                 Acoustic Contact Register
               </h4>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/30">
-                Model: {scan.model_name || 'YOLOv8n-SIH-Marine-Debris-V2'}
+                Model: {scan.model_name || 'YOLOv8n-Subsea-Perception-V2'}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -650,7 +650,7 @@ export const DetectionViewer: React.FC<DetectionViewerProps> = ({
                   <th className="py-3 px-3">Confidence</th>
                   <th className="py-3 px-3">Bounding Box</th>
                   <th className="py-3 px-3">Noise Filter Diagnostic</th>
-                  <th className="py-3 px-3">MoES Priority</th>
+                  <th className="py-3 px-3">MHA Priority</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">

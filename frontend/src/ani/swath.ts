@@ -262,7 +262,7 @@ export function getSwath(onProgress: (p: number) => void = () => {}): Promise<Sw
   return cached;
 }
 
-async function generateSwath(onProgress: (p: number) => void, seed = 26057): Promise<Swath> {
+async function generateSwath(onProgress: (p: number) => void, seed = 740): Promise<Swath> {
   const rnd = mulberry32(seed);
   const R = new Float32Array(SW * SH);
   const CHUNK = 256;

@@ -19,7 +19,7 @@ export const Badge: React.FC<BadgeProps> = ({ type, label, size = 'md' }) => {
   const isSm = size === 'sm';
   const displayLabel = label || type;
 
-  // 1. Ghost Net / ALDFG (MoES Target 1)
+  // 1. Ghost Net / ALDFG (MHA Target 1)
   if (type === 'ghost_net_aldfg' || type.toLowerCase().includes('ghost_net') || type.toLowerCase().includes('net')) {
     return (
       <span
@@ -33,7 +33,7 @@ export const Badge: React.FC<BadgeProps> = ({ type, label, size = 'md' }) => {
     );
   }
 
-  // 2. Anthropogenic Debris (MoES Target 2)
+  // 2. Anthropogenic Debris (MHA Target 2)
   if (type === 'anthropogenic_debris' || type.toLowerCase().includes('debris')) {
     return (
       <span

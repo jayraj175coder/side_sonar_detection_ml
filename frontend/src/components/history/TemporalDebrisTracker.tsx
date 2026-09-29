@@ -115,7 +115,7 @@ export const TemporalDebrisTracker: React.FC = () => {
             <div className="flex items-center gap-2 mb-1.5">
               <span className="px-2 py-0.5 rounded bg-[#FFB703]/10 border border-[#FFB703]/30 text-[#FFB703] text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                 <Fingerprint className="w-3 h-3 text-[#FFB703]" />
-                MoES Swachh Sagar · Subsea Re-Survey Engine
+                MHA DeepWater Clearance · Subsea Re-Survey Engine
               </span>
               <span className="text-[10px] text-slate-400">
                 UNEP Marine Litter Temporal Tracking Standard
@@ -178,7 +178,7 @@ export const TemporalDebrisTracker: React.FC = () => {
               4. Gone / Salvaged
             </div>
             <p className="text-[10px] text-slate-400 mt-0.5">
-              Verified removed from ocean floor under MoES recovery ops.
+              Verified removed from ocean floor under MHA recovery ops.
             </p>
           </div>
         </div>
@@ -260,7 +260,7 @@ export const TemporalDebrisTracker: React.FC = () => {
             <CheckCircle2 className="w-3 h-3 text-purple-400" />
           </div>
           <div className="text-xl font-black text-purple-400 mt-1 font-sans">{counts.gone}</div>
-          <div className="text-[9px] text-slate-500 mt-0.5">Swachh Sagar Recoveries</div>
+          <div className="text-[9px] text-slate-500 mt-0.5">DeepWater Clearance Recoveries</div>
         </button>
       </div>
 
@@ -549,10 +549,10 @@ export const TemporalDebrisTracker: React.FC = () => {
               </div>
             </div>
 
-            {/* ── MoES SWACHH SAGAR REMEDIATION & SALVAGE ── */}
+            {/* ── MHA DEEPWATER CLEARANCE REMEDIATION & SALVAGE ── */}
             <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-2">
               <div className="flex items-center justify-between text-[10px]">
-                <span className="text-slate-400 uppercase font-bold">MoES Swachh Sagar Remediation</span>
+                <span className="text-slate-400 uppercase font-bold">MHA DeepWater Clearance Remediation</span>
                 {selectedRecord.salvageTicketId && (
                   <span className="text-[#FFB703] font-mono font-bold">{selectedRecord.salvageTicketId}</span>
                 )}

@@ -25,8 +25,8 @@ from app.services.metadata_parser import parse_ping_log
 
 def run_qualitative_validation():
     print("=" * 80)
-    print("SONARX - SIH Marine Debris & Anomaly Perception Model Validation")
-    print("Model: YOLOv8n-SIH-Marine-Debris-V2 (ONNX Runtime)")
+    print("SONARX - AHS Marine Debris & Anomaly Perception Model Validation")
+    print("Model: YOLOv8n-Subsea-Perception-V2 (ONNX Runtime)")
     print("=" * 80)
 
     samples_dir = Path("samples")

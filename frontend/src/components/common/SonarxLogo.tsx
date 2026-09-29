@@ -42,7 +42,7 @@ export const SonarxLogoIcon: React.FC<{ size?: number; animated?: boolean; class
 
 /**
  * Full official SONAR X brand logo:
- * Circular Sonar Crosshair Emblem + SONAR X™ wordmark + MoES Subsea Intelligence + SIH 26057 badge
+ * Circular Sonar Crosshair Emblem + SONAR X™ wordmark + MHA Subsea Intelligence + OPR-740 badge
  */
 export const SonarxLogo: React.FC<SonarxLogoProps> = ({
   size = 'md',
@@ -75,11 +75,11 @@ export const SonarxLogo: React.FC<SonarxLogoProps> = ({
       className={`inline-flex items-center select-none ${
         onClick ? 'cursor-pointer group' : ''
       } ${className}`}
-      title="SONAR X // MoES Subsea Intelligence (SIH 26057)"
+      title="SONAR X // MHA Subsea Intelligence (OPR-740)"
     >
       <img
         src="/sonarx-logo-transparent.png"
-        alt="SONAR X — MoES Subsea Intelligence (SIH 26057)"
+        alt="SONAR X — MHA Subsea Intelligence (OPR-740)"
         style={{ height: `${currentHeight}px`, width: 'auto' }}
         className="object-contain max-w-full drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)] transition-transform duration-200 group-hover:scale-[1.02]"
       />

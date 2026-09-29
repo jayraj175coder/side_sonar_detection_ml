@@ -64,7 +64,7 @@ export const ReportsPage: React.FC = () => {
 
   const scanId = activeScan?.scan_id || 'SCAN-BB9947D4';
   const filename = activeScan?.filename || 'sih_subsea_pipeline_trench.png';
-  const modelName = activeScan?.model_name || 'YOLOv8s-SIH-Marine-Debris-V2';
+  const modelName = activeScan?.model_name || 'YOLOv8s-Subsea-Perception-V2';
   const inferenceMs = activeScan?.inference_ms || 13597.9;
   const surveyArea = 'Arabian Sea — Mumbai Sector';
   const surveyDate = '23 September 2026';
@@ -212,7 +212,7 @@ export const ReportsPage: React.FC = () => {
       title: 'SONARX SUBSEA MARINE DEBRIS ANOMALY DOSSIER',
       scan_id: scanId,
       filename,
-      organization: 'Ministry of Earth Sciences (MoES)',
+      organization: 'Maritime Hydrographic Authority (MHA)',
       survey_date: surveyDate,
       sonar_frequency: '900 kHz CHIRP',
       model: modelName,
@@ -292,7 +292,7 @@ export const ReportsPage: React.FC = () => {
               Reports &amp; Anomaly Dossier
             </h1>
             <p className="text-xs font-mono text-slate-400">
-              Ministry of Earth Sciences (MoES) | Subsea Marine Debris Anomaly Report
+              Maritime Hydrographic Authority (MHA) | Subsea Marine Debris Anomaly Report
             </p>
           </div>
         </div>
@@ -357,7 +357,7 @@ export const ReportsPage: React.FC = () => {
               SONAR X
             </span>
             <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#FFB703]/10 text-[#FFB703] border border-[#FFB703]/30 font-bold">
-              MoES SIH 26057
+              MHA OPR-740
             </span>
           </div>
 
@@ -366,7 +366,7 @@ export const ReportsPage: React.FC = () => {
           </h2>
 
           <p className="text-[11px] font-mono text-slate-400">
-            Ministry of Earth Sciences • WGS84 Automated Perception Report
+            Maritime Hydrographic Authority • WGS84 Automated Perception Report
           </p>
 
           <div className="text-[10px] font-mono text-slate-500 pt-1">
@@ -591,7 +591,7 @@ export const ReportsPage: React.FC = () => {
             </div>
             <div className="font-mono text-left leading-tight truncate">
               <span className="text-[8px] text-slate-500 block">05 Report Generated</span>
-              <span className="text-[10px] font-semibold text-white block">3 Targets • MoES IHO S-44</span>
+              <span className="text-[10px] font-semibold text-white block">3 Targets • MHA IHO S-44</span>
               <span className="text-[9px] font-black text-emerald-400 block mt-0.5">PASS</span>
             </div>
           </div>

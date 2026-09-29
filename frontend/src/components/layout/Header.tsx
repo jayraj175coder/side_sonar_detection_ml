@@ -12,6 +12,7 @@ import {
   Bell,
   Clock,
   Cpu,
+  Play,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { sonarAudio } from '../../utils/sonarAudio';
@@ -112,6 +113,16 @@ export const Header: React.FC<HeaderProps> = ({ title, subtitle, onToggleMobileM
 
       {/* 3. Right: Fast Action Buttons, Audio Toggle & Overflow Menu */}
       <div className="flex items-center gap-2.5">
+        {/* DEMO VIDEO (/ani 6-Act Cinematic Story) */}
+        <a
+          href="/ani"
+          className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#FFB703]/15 hover:bg-[#FFB703]/25 border border-[#FFB703]/50 text-[#FFB703] text-[11px] font-mono font-bold transition-all cursor-pointer shadow-[0_0_12px_rgba(255,183,3,0.18)]"
+          title="Open 6-Act Interactive SONARX Demo Story (/ani)"
+        >
+          <Play className="w-3 h-3 fill-current" />
+          <span>DEMO VIDEO</span>
+        </a>
+
         {/* System Status Pill */}
         <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-mono font-bold text-emerald-400">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

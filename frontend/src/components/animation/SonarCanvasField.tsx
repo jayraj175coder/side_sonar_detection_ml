@@ -48,7 +48,7 @@ export const SonarCanvasField: React.FC<SonarCanvasFieldProps> = ({
   const [openingPhase, setOpeningPhase] = useState<number>(showOpeningSequence ? 0 : 4);
   const [isOpeningFinished, setIsOpeningFinished] = useState<boolean>(!showOpeningSequence);
 
-  // Targets definition aligned with MoES problem statement
+  // Targets definition aligned with MHA problem statement
   const targetsRef = useRef<TargetPoint[]>([
     {
       id: 'SX-T07',

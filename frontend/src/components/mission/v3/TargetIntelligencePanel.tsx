@@ -121,7 +121,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
     const payload = {
       clip_id: formatDisplayId(target.id),
       internal_id: target.id,
-      authority: 'Ministry of Earth Sciences (MoES) / NIOT',
+      authority: 'Maritime Hydrographic Authority (MHA) / NIOT',
       sector: 'Indian EEZ — Mumbai Offshore Continental Shelf',
       category: target.label,
       confidence_pct: +(target.confidence * 100).toFixed(1),
@@ -557,7 +557,7 @@ export const TargetIntelligencePanel: React.FC<TargetIntelligencePanelProps> = (
         </div>
       </div>
 
-      {/* MoES Clearance Certificate & Evidence Modal */}
+      {/* MHA Clearance Certificate & Evidence Modal */}
       <MoESClearanceCertificateModal
         isOpen={isCertModalOpen}
         onClose={() => setIsCertModalOpen(false)}

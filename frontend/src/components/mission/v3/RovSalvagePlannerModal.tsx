@@ -58,7 +58,7 @@ export const RovSalvagePlannerModal: React.FC<RovSalvagePlannerModalProps> = ({
       .join('\n');
 
     const gpxData = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="SONARX MoES Salvage Planner" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="SONARX MHA Salvage Planner" xmlns="http://www.topografix.com/GPX/1/1">
   <metadata>
     <name>MOES_ROV_SALVAGE_MISSION_PLAN</name>
     <desc>Autonomous ROV Recovery Flightplan for Marine Debris and ALDFG Ghost Nets</desc>
@@ -90,7 +90,7 @@ ${waypointsXml}
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-mono font-bold text-[#FFB703] tracking-wider uppercase">
-                  MoES Deep Ocean Mission
+                  MHA Deep Ocean Mission
                 </span>
                 <span className="px-2 py-0.5 rounded bg-emerald-950/70 border border-emerald-500/40 text-[9px] font-mono text-emerald-300 font-bold">
                   OPTIMAL WAYPOINTS READY

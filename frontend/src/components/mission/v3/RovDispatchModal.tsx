@@ -48,7 +48,7 @@ export const RovDispatchModal: React.FC<RovDispatchModalProps> = ({ target, isOp
                 DISPATCH ORDER TRANSMITTED
               </h3>
               <p className="text-xs text-[#FFB703] font-mono">
-                ORDER ID: MoES-DISPATCH-{Math.floor(100000 + Math.random() * 900000)}
+                ORDER ID: MHA-DISPATCH-{Math.floor(100000 + Math.random() * 900000)}
               </p>
               <p className="text-xs text-[#94A3B8]">
                 Remediation Unit <strong>{unitType}-04</strong> dispatched to target <strong>{target.id}</strong> ({target.latitude.toFixed(4)}°N, {target.longitude.toFixed(4)}°E). Estimated ETA: 42 minutes.

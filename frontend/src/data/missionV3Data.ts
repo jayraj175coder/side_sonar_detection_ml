@@ -38,7 +38,7 @@ export const PIPELINE_STAGES_V3: PipelineStageV3[] = [
   { number: '02', name: 'DENOISE',  description: 'Bilateral speckle filter & CLAHE contrast' },
   { number: '03', name: 'DETECT',   description: 'YOLOv8n ONNX perception forward pass' },
   { number: '04', name: 'FILTER',   description: 'Acoustic shadow relief & bedrock gating' },
-  { number: '05', name: 'CLASSIFY', description: 'MoES ALDFG marine debris taxonomy' },
+  { number: '05', name: 'CLASSIFY', description: 'MHA ALDFG marine debris taxonomy' },
   { number: '06', name: 'GEOTAG',   description: 'WGS84 USBL positioning & depth fix' },
   { number: '07', name: 'VERIFY',   description: 'Multi-attribute evidence confidence matrix' },
   { number: '08', name: 'REPORT',   description: 'Formal incident advisory & dossier export' },

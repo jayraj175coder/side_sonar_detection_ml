@@ -159,7 +159,7 @@ export const ConsoleLeftRail: React.FC<ConsoleLeftRailProps> = ({
           </div>
         </div>
 
-        {/* ── MODEL TRAINING METRICS (SIH 2026 PS 26057) ── */}
+        {/* ── MODEL TRAINING METRICS (AHS-2026 OPR-740) ── */}
         <div className="p-2 border border-[#162136] bg-[#05070B] space-y-1.5 font-mono text-[8px]">
           <div className="flex items-center justify-between border-b border-[#162136] pb-1">
             <span className="text-[8.5px] font-bold text-[#FFB703] tracking-wider">// MODEL TRAINING METRICS</span>

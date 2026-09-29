@@ -10,7 +10,7 @@ def create_physics_sonar_swath(
     height: int = 768,
     nadir_width: int = 64,
     target_type: str = "ghost_net",
-    scenario_title: str = "MoES SSS Survey Track",
+    scenario_title: str = "MHA SSS Survey Track",
 ) -> np.ndarray:
     """
     Generates high-resolution, physics-accurate side-scan sonar waterfall swath:
@@ -130,22 +130,22 @@ def main():
         (
             "sih_ghost_net_aldfg_swath.png",
             "ghost_net",
-            "MoES Track: Ghost Net / ALDFG Entanglement Contact",
+            "MHA Track: Ghost Net / ALDFG Entanglement Contact",
         ),
         (
             "sih_marine_debris_drum.png",
             "debris",
-            "MoES Track: Submerged Anthropogenic Container Debris",
+            "MHA Track: Submerged Anthropogenic Container Debris",
         ),
         (
             "sih_subsea_pipeline_trench.png",
             "pipeline",
-            "MoES Track: SubPipe Infrastructure & Pipeline Hazard",
+            "MHA Track: SubPipe Infrastructure & Pipeline Hazard",
         ),
         (
             "sih_vizag_harbor_multitarget.png",
             "complex_harbor",
-            "MoES Track: Visakhapatnam Harbor Multi-Debris Survey",
+            "MHA Track: Visakhapatnam Harbor Multi-Debris Survey",
         ),
     ]
 

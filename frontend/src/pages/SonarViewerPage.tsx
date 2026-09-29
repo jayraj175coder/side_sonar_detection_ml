@@ -559,7 +559,7 @@ export const SonarViewerPage: React.FC = () => {
                 <span className="text-[9px] text-[rgba(255, 183, 3, 0.35)]">{activeScenario.sensorFrequencyKhz} kHz</span>
               </div>
               <div className="space-y-3">
-                {/* SIH GAP 2 REQUIREMENT — Noise & Clutter Filtering Funnel */}
+                {/* AHS GAP 2 REQUIREMENT — Noise & Clutter Filtering Funnel */}
                 <div className="bg-[#0A0F18] p-2.5 rounded border border-[#FFB703]/30 space-y-1.5">
                   <div className="flex items-center justify-between text-[8px] uppercase tracking-wider text-[rgba(255, 183, 3, 0.35)] font-bold">
                     <span>Acoustic False-Positive Filtering</span>
@@ -832,7 +832,7 @@ export const SonarViewerPage: React.FC = () => {
                 <span className="font-black text-[#FFB703] tracking-wider uppercase">
                   06 SCIENTIFIC METHODOLOGY
                 </span>
-                <span className="text-[9px] text-[rgba(255, 183, 3, 0.35)]">ISO / MoES SPEC</span>
+                <span className="text-[9px] text-[rgba(255, 183, 3, 0.35)]">ISO / MHA SPEC</span>
               </div>
               <div className="space-y-2.5 text-[8px] text-[#E2E8F0]">
                 <div className="bg-[#0A0F18] p-2.5 rounded border border-[rgba(255, 255, 255, 0.08)]">

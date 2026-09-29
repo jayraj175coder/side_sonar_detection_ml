@@ -112,7 +112,7 @@ export const ProcessingState: React.FC<ProcessingStateProps> = ({
           SCANNING ACOUSTIC WATERFALL
         </h3>
         <p className="text-xs text-slate-400 font-mono">
-          YOLOv8n-SIH-Marine-Debris-V2 Neural Perception & Noise Filtering
+          YOLOv8n-Subsea-Perception-V2 Neural Perception & Noise Filtering
         </p>
       </div>
 

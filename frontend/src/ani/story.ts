@@ -82,7 +82,7 @@ export const BEATS: Record<ActId, Beat[]> = {
   ],
 };
 
-export const TEAM = { name: 'DEAD BRAINCELLS', id: '161987', ps: '26057', event: 'SMART INDIA HACKATHON 2026' };
+export const TEAM = { name: 'SUBSEA PERCEPTION LAB', id: 'SPL-09', ps: '740', event: 'AUTONOMOUS HYDROGRAPHIC SYSTEMS 2026' };
 export const MISSION = {
   id: 'SX-014',
   area: 'MUMBAI SHELF CORRIDOR',

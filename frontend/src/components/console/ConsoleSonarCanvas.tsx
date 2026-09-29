@@ -500,7 +500,7 @@ export const ConsoleSonarCanvas: React.FC<ConsoleSonarCanvasProps> = ({
     '2': 'STAGE 02 // DENOISE & CONTRAST — CLAHE Normalization & TVG Correction Active',
     '3': 'STAGE 03 // DETECT — YOLOv8n ONNX Candidate Proposals (37 Detected)',
     '4': 'STAGE 04 // FILTER — Dynamic Confidence & Acoustic Shadow Relief Gating',
-    '5': 'STAGE 05 // CLASSIFY — MoES ALDFG Marine Debris Taxonomy Attribution',
+    '5': 'STAGE 05 // CLASSIFY — MHA ALDFG Marine Debris Taxonomy Attribution',
     '6': 'STAGE 06 // REPORT — High-Precision WGS84 USBL Geotagged Register',
   };
 

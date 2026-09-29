@@ -110,7 +110,7 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
             12 Hz
           </span>
           <span className="text-[10px] font-mono text-[#94A3B8] uppercase tracking-wider pl-1 hidden lg:inline shrink-0">
-            SIDE-SCAN SONAR // MoES INDIAN EEZ
+            SIDE-SCAN SONAR // MHA INDIAN EEZ
           </span>
         </div>
 
@@ -173,8 +173,17 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
           </button>
         </div>
 
-        {/* Right: Upload + Alert Bell + Menu + START LIVE DEMO */}
+        {/* Right: Demo Video + Upload + Alert Bell + Menu + START LIVE DEMO */}
         <div className="flex items-center gap-2 shrink-0">
+          <a
+            href="/ani"
+            title="Open 6-Act Cinematic SONARX Demo Story (/ani)"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0B1526] border border-[#38BDF8]/50 hover:bg-[#11223D] text-[#38BDF8] hover:text-white text-[10px] font-mono font-bold cursor-pointer transition-colors"
+          >
+            <Film className="w-3.5 h-3.5 text-[#38BDF8]" />
+            <span>DEMO VIDEO</span>
+          </a>
+
           <button
             onClick={onOpenUpload}
             title="Upload Side-Scan Sonar Image for Real YOLOv8 ONNX Detection"
@@ -283,7 +292,7 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
                     className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#112038] text-left cursor-pointer"
                   >
                     <FileText className="w-3.5 h-3.5 text-[#F59E0B]" />
-                    <span>Export MoES Dossier</span>
+                    <span>Export MHA Dossier</span>
                   </button>
 
                   {onOpenCertificate && (
@@ -295,7 +304,7 @@ export const MissionTopHeader: React.FC<MissionTopHeaderProps> = ({
                       className="w-full px-3.5 py-2 flex items-center gap-2.5 hover:bg-[#112038] text-left cursor-pointer"
                     >
                       <Award className="w-3.5 h-3.5 text-[#F59E0B]" />
-                      <span>MoES Clearance Certificate</span>
+                      <span>MHA Clearance Certificate</span>
                     </button>
                   )}
                 </div>

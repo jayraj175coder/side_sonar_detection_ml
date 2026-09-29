@@ -245,7 +245,7 @@ export const OverviewPage: React.FC = () => {
                 <span className="w-2 h-2 rounded-full bg-[#FFB703] mt-2 shrink-0 shadow-[0_0_8px_#FFB703]" />
                 <div>
                   <strong className="block font-display font-semibold text-[15.5px] text-white">Prioritized anomaly reports</strong>
-                  <span className="text-[14px] text-slate-400">Findings are ranked and written up automatically, ready to hand to an operational MoES retrieval team.</span>
+                  <span className="text-[14px] text-slate-400">Findings are ranked and written up automatically, ready to hand to an operational MHA retrieval team.</span>
                 </div>
               </li>
 
@@ -426,7 +426,7 @@ export const OverviewPage: React.FC = () => {
             <span className="font-mono text-xs text-[#FFB703] font-bold block">05</span>
             <h3 className="font-display font-semibold text-base text-white group-hover:text-[#FFB703] transition-colors">Classify</h3>
             <p className="text-[13.5px] text-slate-400 leading-relaxed">
-              Remaining contacts are tagged to MoES debris taxonomy.
+              Remaining contacts are tagged to MHA debris taxonomy.
             </p>
           </div>
 
@@ -483,7 +483,7 @@ export const OverviewPage: React.FC = () => {
 
       {/* ── TECHNICAL STACK LINE ── */}
       <div className="text-center font-mono text-xs text-slate-500 pt-4 pb-2 border-t border-white/[0.08] reveal">
-        Python · YOLOv8n · ONNX Runtime · FastAPI · React · Vite · Leaflet · MoES SIH 2026
+        Python · YOLOv8n · ONNX Runtime · FastAPI · React · Vite · Leaflet · MHA AHS-2026
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════
@@ -517,7 +517,7 @@ export const OverviewPage: React.FC = () => {
       </div>
 
       <div className="text-center font-mono text-xs text-[#94A3B8] -mt-6">
-        Team DEAD BRAINCELLS — Smart India Hackathon 2026
+        Team SUBSEA PERCEPTION LAB — Autonomous Hydrographic Systems 2026
       </div>
     </div>
   );

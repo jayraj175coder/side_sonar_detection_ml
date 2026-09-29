@@ -2,7 +2,7 @@
 
 ## Automated Underwater Marine Debris & Acoustic Anomaly Perception Platform (Side-Scan Sonar)
 
-**Project Identifier:** OPR-26057  
+**Project Identifier:** OPR-740  
 **Mission Domain:** Automated Underwater Marine Debris and Benthic Anomaly Perception  
 **Field:** Marine Robotics & Oceanographic Defense  
 **Theme:** Ocean Conservation & Navigational Safety  
@@ -99,7 +99,7 @@ To guarantee generalization across different sonar hardware (Klein 3000/5000, Ed
 
 ### 3.2 Target Class Schema
 
-SONARX maps target detections into 4 operationally meaningful classes for coastal authorities (MoES / NIOT):
+SONARX maps target detections into 4 operationally meaningful classes for coastal authorities (MHA / NIOT):
 
 | Class ID | Class Identifier | Description | Operational Response |
 |---|---|---|---|
@@ -227,7 +227,7 @@ Oceanic debris does not remain static. Benthic currents displace abandoned fishi
    * 🟠 **`MOVED` (DRIFTED)**: Buoyant ghost net or debris displaced by benthic tidal currents. Computes displacement distance:
      $$\Delta r = 2 R_{earth} \arcsin \sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos \phi_1 \cos \phi_2 \sin^2\left(\frac{\Delta \lambda}{2}\right)}$$
      Calculates drift bearing $\theta$, drift velocity in knots, and correlates movement with regional hydrodynamic currents (e.g., SW Monsoon Undercurrent).
-   * 🟣 **`GONE` (SALVAGED)**: Confirmed absent in subsequent re-survey following cleanup operations; automatically bound to a **MoES Swachh Sagar Salvage Verification Ticket**.
+   * 🟣 **`GONE` (SALVAGED)**: Confirmed absent in subsequent re-survey following cleanup operations; automatically bound to a **MHA DeepWater Clearance Salvage Verification Ticket**.
 
 ### 7.4 Autonomous Drone / AUV Mission Telemetry & Real-Time Waterfall Visualizer
 
@@ -265,7 +265,7 @@ To conform with operational naval command-center standards (IHO S-44 Order 1A), 
 1. **Acoustic Primacy Layout (18% / 62% / 20%)**:
    - **Left Queue (18%)**: Continuous triage stream with acoustic noise rejection meters and confidence cutoff threshold sliders ($40\%$).
    - **Center Viewport (62%)**: Full-resolution dual-channel waterfall canvas displaying port and starboard acoustic swaths separated by the transducer nadir line, with real-time slant-to-ground range rectification ($R_g = \sqrt{R_s^2 - H^2}$).
-   - **Right Intelligence Panel (20%)**: Contact physics verification, ray-tracing shadow height geometry ($h = \frac{L_s \cdot H}{R_s + L_s}$), Platt probability calibration, and official MoES SHA-256 certificate generation.
+   - **Right Intelligence Panel (20%)**: Contact physics verification, ray-tracing shadow height geometry ($h = \frac{L_s \cdot H}{R_s + L_s}$), Platt probability calibration, and official MHA SHA-256 certificate generation.
 
 2. **Human Triage & Active Learning Ground-Truth Loop**:
    Operators can review candidate contacts and execute `CONFIRM`, `REJECT`, or `RE-CLASS` actions. Validated corrections can be exported directly as normalized YOLO format bounding box datasets (`.txt` labels + acoustic crops) to retrain and fine-tune subsequent neural checkpoints.
@@ -286,7 +286,7 @@ Benchmarking SONARX against established commercial hydrographic suites and marin
 | **Temporal Debris Lifecycle & Re-Survey** | ❌ None; surveys archived as isolated, disconnected files | ❌ None; acquisition only | ⚠️ Tactical target database without environmental drift physics | **Native 4-State Lifecycle Engine**: Tracks `NEW`, `STILL THERE`, `MOVED`, and `GONE` with digital acoustic fingerprints & benthic current drift vectors |
 | **Acoustic Signal Processing** | ⚠️ Basic post-processing gain curves (TVG/AGC) | ⚠️ Hardware analog-to-digital filtering only | ⚠️ Proprietary signal processing | **Comprehensive Physics Pipeline**: Lee 7×7 MMSE speckle filter, TVG attenuation correction, bottom-track nadir blanking, and CLAHE |
 | **AUV & Drone Edge Readiness** | ❌ Bulky desktop software requiring Windows license dongles | ❌ Hardware-tied to surface survey vessels | ⚠️ Specialized autonomous architectures for military UUVs | **Lightweight Edge-Ready Stack**: FastAPI + ONNX Runtime running at ~35ms CPU latency on embedded drone payload computers |
-| **Cost & Procurement Accessibility** | ❌ Expensive commercial licensing ($10,000–$35,000+ per seat) | ❌ Locked to specific OEM sonar hardware purchases | ❌ Multi-million dollar defense contract procurement | **Open-Standard Sovereign Architecture**: Tailored for MoES, NIOT, and national Blue Economy / Swachh Sagar initiatives |
+| **Cost & Procurement Accessibility** | ❌ Expensive commercial licensing ($10,000–$35,000+ per seat) | ❌ Locked to specific OEM sonar hardware purchases | ❌ Multi-million dollar defense contract procurement | **Open-Standard Sovereign Architecture**: Tailored for MHA, NIOT, and national Blue Economy / DeepWater Clearance initiatives |
 
 ---
 

@@ -553,7 +553,7 @@ export const MarineDriveVisualization: React.FC = () => {
     { step:2, icon:Activity,  title:'Echo Return Capture',     detail:'Time-of-flight backscatter columns',        color:'teal' },
     { step:3, icon:Eye,       title:'Waterfall Image Formation',detail:'16-bit SSS tiles rendered from amplitude', color:'blue' },
     { step:4, icon:Cpu,       title:'YOLOv8n ONNX Inference',  detail:'Edge AI: Ghost Nets, Debris, Pipeline',    color:'purple'},
-    { step:5, icon:Crosshair, title:'Target Geo-Tagging',      detail:'Projected to GPS → MoES dashboard',        color:'amber' },
+    { step:5, icon:Crosshair, title:'Target Geo-Tagging',      detail:'Projected to GPS → MHA dashboard',        color:'amber' },
   ];
 
   return (
@@ -570,7 +570,7 @@ export const MarineDriveVisualization: React.FC = () => {
             MARINE DRIVE
           </span>
           <span className="px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30
-            text-cyan-300 text-[10px] font-mono font-bold">SIH DEMO</span>
+            text-cyan-300 text-[10px] font-mono font-bold">AHS DEMO</span>
           <span className="hidden sm:block text-[10px] font-mono text-slate-500">
             // ANALYSIS NODE 02 · link ok
           </span>

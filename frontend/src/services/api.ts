@@ -110,7 +110,7 @@ export const API_CATALOG: ApiEndpointSpec[] = [
   {
     method: 'POST',
     path: '/api/v1/reports/export',
-    summary: 'Generate formal MoES / Hydrographic Survey Dossier in PDF or GeoJSON format',
+    summary: 'Generate formal MHA / Hydrographic Survey Dossier in PDF or GeoJSON format',
     tag: 'Reports',
     sampleRequest: {
       survey_id: 'SX-014',

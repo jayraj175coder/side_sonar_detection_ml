@@ -146,7 +146,7 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({
         });
 
         setInferenceMeta({
-          modelName: res.model_name || 'YOLOv8s-SIH-Marine-Debris-V2',
+          modelName: res.model_name || 'YOLOv8s-Subsea-Perception-V2',
           inferenceMs: res.inference_ms,
           noiseFilterPassed: top.noise_filter_passed ?? true,
           noiseFilterReason: top.noise_filter_reason || 'Passed acoustic geometry and shadow verification',
@@ -166,7 +166,7 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({
           targetStrengthDb: -26.0,
         });
         setInferenceMeta({
-          modelName: res.model_name || 'YOLOv8s-SIH-Marine-Debris-V2',
+          modelName: res.model_name || 'YOLOv8s-Subsea-Perception-V2',
           inferenceMs: res.inference_ms,
           noiseFilterPassed: false,
           noiseFilterReason: 'Acoustic returns below confidence cutoff or suppressed as natural bedrock',
@@ -286,9 +286,9 @@ export const UploadClassifyModal: React.FC<UploadClassifyModalProps> = ({
           `Real ONNX Inference (${inferenceMeta?.inferenceMs ?? 34}ms)`,
           `Measured Shadow Relief (${selectedSample.dimensions.shadow}m)`,
           `900 kHz High-Contrast Backscatter`,
-          `MoES Geodesic Pin Verified`,
+          `MHA Geodesic Pin Verified`,
         ],
-        recommendedAction: `Dispatch ROV inspection along MoES Mumbai Offshore Survey Track for ${selectedSample.category}.`,
+        recommendedAction: `Dispatch ROV inspection along MHA Mumbai Offshore Survey Track for ${selectedSample.category}.`,
         customImageUrl: uploadedPreviewUrl || selectedSample.fileUrl,
         customBbox: inferenceMeta?.bbox,
       });

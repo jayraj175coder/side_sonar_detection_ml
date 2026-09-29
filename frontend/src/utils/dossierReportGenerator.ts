@@ -315,7 +315,7 @@ export function generateDossierHTML(data: DossierReportData): string {
     <!-- Action Bar (Hidden in Print) -->
     <div class="action-bar no-print">
       <div style="font-size: 12px; font-weight: 600; color: #475569;">
-        MoES Subsea Intelligence Dossier &middot; Ready for PDF Export
+        MHA Subsea Intelligence Dossier &middot; Ready for PDF Export
       </div>
       <div style="display: flex; gap: 8px;">
         <button onclick="window.print()" class="btn btn-primary">
@@ -330,9 +330,9 @@ export function generateDossierHTML(data: DossierReportData): string {
     <!-- Header Strip -->
     <div class="header-strip">
       <div>
-        <div class="gov-badge">Ministry of Earth Sciences (MoES) &middot; Government of India</div>
+        <div class="gov-badge">Maritime Hydrographic Authority (MHA) &middot; Government of India</div>
         <h1>SUBSEA MARINE DEBRIS ANOMALY DOSSIER</h1>
-        <p class="subtitle">WGS-84 Automated Side-Scan Sonar Perception & Compliance Assessment &middot; Problem Statement 26057</p>
+        <p class="subtitle">WGS-84 Automated Side-Scan Sonar Perception & Compliance Assessment &middot; Problem Statement 740</p>
       </div>
       <div class="meta-box">
         <div>DOSSIER: <strong>${data.scanId}</strong></div>
@@ -447,7 +447,7 @@ export function generateDossierHTML(data: DossierReportData): string {
     <div class="compliance-footer">
       <div>
         <strong>National Institute of Ocean Technology (NIOT) &middot; Indian National Centre for Ocean Information Services (INCOIS)</strong><br>
-        Swachh Sagar Surakshit Sagar Automated Subsea Intelligence Platform &middot; All coordinates referenced to WGS-84 ellipsoid.
+        DeepWater Clearance Protocol Automated Subsea Intelligence Platform &middot; All coordinates referenced to WGS-84 ellipsoid.
       </div>
       <div style="text-align: right;">
         Report Generated: ${generatedAt}<br>

@@ -2,7 +2,7 @@
 ========================================================================================
 SONARX Advanced Synthetic Side-Scan Sonar (SSS) Generator — V2 Enhanced Dataset
 ========================================================================================
-Implements Tasks 2, 3, 4, 5, 6 & 7 for SIH 2026 PS 26057.
+Implements Tasks 2, 3, 4, 5, 6 & 7 for AHS-2026 OPR-740.
 
 Realistic Acoustic Physics Engine:
 1. Seabed Textures: Mud, Sand Ripples, Granite Outcrops, Gravel, Clay Ridges.

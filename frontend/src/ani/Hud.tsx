@@ -150,8 +150,15 @@ export default function Hud() {
             </span>
           ))}
         </div>
-        <div className="flex items-center gap-4">
-          <span ref={clock} className="hud-label tabular-nums text-white/60" />
+        <div className="flex items-center gap-3">
+          <span ref={clock} className="hud-label tabular-nums text-white/60 hidden sm:inline" />
+          <a
+            href="/"
+            className="cursor-target pointer-events-auto hud-label flex items-center gap-1.5 rounded border border-[#FFB703]/40 bg-[#FFB703]/10 px-2.5 py-1 text-[#FFB703] transition hover:bg-[#FFB703]/20 hover:text-white"
+            title="Return to Live SONARX Workstation"
+          >
+            <span>← LIVE DASHBOARD</span>
+          </a>
           <button
             className="cursor-target pointer-events-auto hud-label flex items-center gap-2 rounded border border-white/10 px-2.5 py-1 text-white/70 transition hover:border-[#FFB703]/60 hover:text-white"
             onClick={() => setSound(!on)}

@@ -33,7 +33,7 @@ function Preloader({ progress, ready, onEnter }: { progress: number; ready: bool
         <button className="cursor-target btn-primary" onClick={() => onEnter(true)}>Dive with sound</button>
         <button className="cursor-target panel-btn !px-4 !py-2.5" onClick={() => onEnter(false)}>Dive silently</button>
       </div>
-      <p className="hud-label absolute bottom-8 text-white/25">SIH 2026 · PS 26057 · Team Dead Braincells · best with headphones</p>
+      <p className="hud-label absolute bottom-8 text-white/25">AHS-2026 · OPR-740 · Team Subsea Perception Lab · best with headphones</p>
     </div>
   );
 }

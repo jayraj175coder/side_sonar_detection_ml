@@ -5,7 +5,7 @@ import { MissionV3Target } from '../data/missionV3Data';
  * with custom styling for subsea marine debris, ghost nets, and hazards.
  * Fully compatible with Google Earth Pro and Google Earth Web.
  */
-export function exportToKML(targets: MissionV3Target[], surveyId: string = 'MOES-MX026'): void {
+export function exportToKML(targets: MissionV3Target[], surveyId: string = 'MHA-MX026'): void {
   const placemarks = targets
     .map((t) => {
       const isNet = t.category === 'GHOST NET';
@@ -19,7 +19,7 @@ export function exportToKML(targets: MissionV3Target[], surveyId: string = 'MOES
       <name>[${t.id}] ${t.label}</name>
       <description><![CDATA[
         <div style="font-family: sans-serif; font-size: 13px; color: #222;">
-          <h3 style="margin: 0 0 8px 0; color: #006699;">MoES SONARX Subsea Target Fix</h3>
+          <h3 style="margin: 0 0 8px 0; color: #006699;">MHA SONARX Subsea Target Fix</h3>
           <table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; border-color: #ddd;">
             <tr><td><b>Target ID</b></td><td>${t.id}</td></tr>
             <tr><td><b>Category</b></td><td>${t.category}</td></tr>
@@ -55,7 +55,7 @@ export function exportToKML(targets: MissionV3Target[], surveyId: string = 'MOES
   <Document>
     <name>SONARX Marine Hazard Survey - ${surveyId}</name>
     <open>1</open>
-    <description>Ministry of Earth Sciences (MoES) / NIOT Side-Scan Sonar Acoustic Anomaly Fixes</description>
+    <description>Maritime Hydrographic Authority (MHA) / NIOT Side-Scan Sonar Acoustic Anomaly Fixes</description>
 ${placemarks}
   </Document>
 </kml>`;
@@ -67,7 +67,7 @@ ${placemarks}
  * Generates an RFC 7946 compliant GeoJSON FeatureCollection
  * suitable for immediate import into QGIS, ArcGIS, or Mapbox.
  */
-export function exportToGeoJSON(targets: MissionV3Target[], surveyId: string = 'MOES-MX026'): void {
+export function exportToGeoJSON(targets: MissionV3Target[], surveyId: string = 'MHA-MX026'): void {
   const features = targets.map((t) => ({
     type: 'Feature' as const,
     geometry: {
@@ -111,7 +111,7 @@ export function exportToGeoJSON(targets: MissionV3Target[], surveyId: string = '
  * Generates an IHO S-44 Order 1a standard compliant bathymetric CSV sounding sheet
  * with acoustic elevation and cryptographic verification signature.
  */
-export function exportToIHOS44CSV(targets: MissionV3Target[], surveyId: string = 'MOES-MX026'): void {
+export function exportToIHOS44CSV(targets: MissionV3Target[], surveyId: string = 'MHA-MX026'): void {
   const headers = [
     'SOUNDING_ID',
     'SURVEY_MISSION',

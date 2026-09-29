@@ -70,7 +70,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
       <div className="space-y-2">
         <div className="flex items-center justify-between text-[11px] font-mono">
           <span className="text-slate-400 font-bold uppercase tracking-wider">MODEL TRACK</span>
-          <span className="text-[#00B8D9] font-bold">Selected: SIH MARINE DEBRIS V2</span>
+          <span className="text-[#00B8D9] font-bold">Selected: AHS MARINE DEBRIS V2</span>
         </div>
 
         {/* Model Spec Box */}
@@ -81,7 +81,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
               Model:
             </span>
             <span className="text-[#FFB800] font-bold text-[11px]">
-              YOLOv8s-SIH-Marine-Debris-V2
+              YOLOv8s-Subsea-Perception-V2
             </span>
           </div>
 

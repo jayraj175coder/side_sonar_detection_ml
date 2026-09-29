@@ -40,7 +40,7 @@ class PredictionResponse(BaseModel):
 
     scan_id: str
     filename: str
-    model_name: str = "YOLOv8n-SIH-Marine-Debris-V2"
+    model_name: str = "YOLOv8n-Subsea-Perception-V2"
     model_version: str = "v2"
     image_width: int
     image_height: int
@@ -80,7 +80,7 @@ class ValidationMetrics(BaseModel):
     seafloor_anomaly_map50: Optional[float] = 0.5559
     benchmark_device: str = "NVIDIA T4 GPU / CPU ONNX Runtime"
     benchmark_latency_ms: float = 14.5
-    notes: str = "Evaluated on held-out test set (700 SSS images) from 5,205 multi-source acoustic survey dataset (Ref: OPR-26057)"
+    notes: str = "Evaluated on held-out test set (700 SSS images) from 5,205 multi-source acoustic survey dataset (Ref: OPR-740)"
 
 
 class ModelInfo(BaseModel):

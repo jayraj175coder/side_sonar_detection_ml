@@ -127,7 +127,7 @@ export const ConsoleTopBar: React.FC<ConsoleTopBarProps> = ({
           <button
             onClick={onExportIncidentReport}
             className="panel-btn flex items-center gap-1 border-[#38bdf8]/50 text-[#38bdf8] hover:bg-[#38bdf8] hover:text-[#05070B] transition-all"
-            title="Generate official Ministry of Earth Sciences marine pollution incident advisory"
+            title="Generate official Maritime Hydrographic Authority marine pollution incident advisory"
           >
             <FileText className="w-3 h-3" />
             <span className="hidden sm:inline">INCIDENT REPORT</span>

@@ -115,7 +115,7 @@ export const ScanHistoryPage: React.FC = () => {
 
         <div className="text-[10px] text-slate-400 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>MoES Multi-Pass Geographic Delta Engine Active</span>
+          <span>MHA Multi-Pass Geographic Delta Engine Active</span>
         </div>
       </div>
 

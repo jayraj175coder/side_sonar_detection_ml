@@ -22,7 +22,7 @@ const SCENE_CAPTIONS = [
   '02 DENOISE — Spatial bilateral filtering & CLAHE dynamically strip high-frequency speckle and enhance seabed texture.',
   '03 DETECT — YOLOv8n ONNX perception model proposes candidate bounding boxes across acoustic backscatter anomalies.',
   '04 FILTER — False positives (native basalt rock clusters & sand bedforms) rejected automatically via acoustic shadow geometry.',
-  '05 CLASSIFY — Surviving targets categorized under MoES marine debris taxonomy with physical dimensions and threat tags.',
+  '05 CLASSIFY — Surviving targets categorized under MHA marine debris taxonomy with physical dimensions and threat tags.',
   '06 REPORT — Structured, geotagged anomaly report compiled with WGS84 coordinates, depth profiles, and verification dossier.',
 ];
 
@@ -685,7 +685,7 @@ export const LiveDemoSequence: React.FC<LiveDemoSequenceProps> = ({ onComplete }
       <div className="relative z-10 max-w-2xl space-y-6">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#131B2A] border border-[#FFB703]/50 text-[10px] font-bold tracking-[0.25em] text-[#FFB703] uppercase shadow-[0_0_15px_rgba(255, 183, 3, )]">
           <Waves className="w-3.5 h-3.5" />
-          <span>MoES SIH 2026 // PROBLEM STATEMENT</span>
+          <span>MHA AHS-2026 // PROBLEM STATEMENT</span>
         </div>
 
         <h1 className="text-2xl md:text-4xl font-black text-[#F8FAFC] leading-tight tracking-tight drop-shadow-lg">

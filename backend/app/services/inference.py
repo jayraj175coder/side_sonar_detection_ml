@@ -47,11 +47,11 @@ def resolve_model_path(filename: str) -> Path:
 class SonarInferenceService:
     """
     Production ONNX Runtime Inference Engine.
-    Executes real deep-learning inference for Ministry of Earth Sciences (MoES)
+    Executes real deep-learning inference for Maritime Hydrographic Authority (MHA)
     marine debris, ghost net, subsea pipeline, and seabed anomaly perception.
 
     Flagship Model (Default):
-      - YOLOv8n-SIH-Marine-Debris-V2 (`marine_sonar_v2.onnx`)
+      - YOLOv8n-Subsea-Perception-V2 (`marine_sonar_v2.onnx`)
       - Target Classes: ghost_net_aldfg, anthropogenic_debris, pipeline_hazard, seafloor_anomaly
 
     Legacy / Reference Model:
@@ -64,11 +64,11 @@ class SonarInferenceService:
         self.v2_model_path = resolve_model_path("marine_sonar_v2.onnx")
         self.baseline_model_path = resolve_model_path("best.onnx")
 
-        # Hard default to V2 (SIH Marine Debris Flagship)
+        # Hard default to V2 (AHS Marine Debris Flagship)
         if self.v2_model_path.exists() and self.v2_model_path.is_file():
             self.active_path = self.v2_model_path
             self.model_version = "v2"
-            self.model_name = "YOLOv8s-SIH-Marine-Debris-V2"
+            self.model_name = "YOLOv8s-Subsea-Perception-V2"
         elif self.baseline_model_path.exists() and self.baseline_model_path.is_file():
             self.active_path = self.baseline_model_path
             self.model_version = "baseline"
@@ -76,7 +76,7 @@ class SonarInferenceService:
         else:
             self.active_path = self.v2_model_path
             self.model_version = "v2"
-            self.model_name = "YOLOv8s-SIH-Marine-Debris-V2"
+            self.model_name = "YOLOv8s-Subsea-Perception-V2"
 
         self.session: Optional[Any] = None
         self.input_name: Optional[str] = None
@@ -138,7 +138,7 @@ class SonarInferenceService:
             pass
 
     def switch_model(self, version: str) -> bool:
-        """Allows switching between SIH Flagship V2 and Legacy Reference baseline."""
+        """Allows switching between AHS Flagship V2 and Legacy Reference baseline."""
         if version == "baseline":
             target = resolve_model_path("best.onnx")
             if target.exists() and target.is_file():
@@ -150,7 +150,7 @@ class SonarInferenceService:
             target = resolve_model_path("marine_sonar_v2.onnx")
             if target.exists() and target.is_file():
                 self.model_version = "v2"
-                self.model_name = "YOLOv8s-SIH-Marine-Debris-V2"
+                self.model_name = "YOLOv8s-Subsea-Perception-V2"
                 self.v2_model_path = target
                 return self._load_session(target)
         return False

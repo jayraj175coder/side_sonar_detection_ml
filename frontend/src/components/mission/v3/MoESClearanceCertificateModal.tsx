@@ -38,7 +38,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
 
   // Physics height: h = (L_s * H_alt) / (R_s + L_s) -> with H=8.4m, Rs=25m
   const calculatedHeight = ((shadowM * 8.4) / (25.0 + shadowM)).toFixed(2);
-  const certRef = `MOES/DOM/2026/MX026-${targetId.replace('SX-', '')}`;
+  const certRef = `MHA/DOM/2026/MX026-${targetId.replace('SX-', '')}`;
   const sha256Hash = '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069';
 
   const handlePrint = () => {
@@ -47,7 +47,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
 
   const handleDownloadJSON = () => {
     const certData = {
-      certificate_authority: 'Ministry of Earth Sciences (MoES) - Govt of India',
+      certificate_authority: 'Maritime Hydrographic Authority (MHA) - Govt of India',
       organization: 'National Institute of Ocean Technology (NIOT)',
       program: 'Deep Ocean Mission // Marine Debris Survey 2026',
       certificate_ref: certRef,
@@ -56,7 +56,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
       target_intelligence: {
         id: targetId,
         classification: targetClass,
-        taxonomy_code: 'MoES-MD-26057',
+        taxonomy_code: 'MHA-MD-740',
         confidence_score: `${confidence}%`,
         coordinates_wgs84: {
           latitude_dd: lat,
@@ -78,7 +78,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
           'Heavy Drag Net Retrieval Grapple',
           'Acoustic Beacon Transponder (USBL Relocator)',
         ],
-        salvage_protocol: 'MoES SOP-MAR-784 Benthic Debris Extraction',
+        salvage_protocol: 'MHA SOP-MAR-784 Benthic Debris Extraction',
       },
     };
 
@@ -98,7 +98,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
         <div className="bg-[#05070B] px-5 py-3 border-b border-[#162136] flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-mono text-[#FFB703] font-bold">
             <ShieldCheck className="w-4 h-4 text-[#FFB703]" />
-            <span>OFFICIAL CLEARANCE CERTIFICATE · MOES / NIOT PROTOCOL</span>
+            <span>OFFICIAL CLEARANCE CERTIFICATE · MHA / NIOT PROTOCOL</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -134,7 +134,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
           {/* Government Official Letterhead */}
           <div className="text-center border-b border-[#162136] pb-5 space-y-1">
             <div className="inline-block px-3 py-1 bg-[#131B2A] border border-[#FFB703]/40 rounded-full text-[10px] font-mono font-bold text-[#FFB703] tracking-widest uppercase mb-1">
-              GOVERNMENT OF INDIA // MINISTRY OF EARTH SCIENCES
+              GOVERNMENT OF INDIA // MARITIME HYDROGRAPHIC AUTHORITY
             </div>
             <h1 className="text-lg md:text-xl font-black tracking-tight text-[#F8FAFC] uppercase font-sans">
               NATIONAL INSTITUTE OF OCEAN TECHNOLOGY (NIOT)
@@ -175,7 +175,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
                 </div>
                 <div>
                   <span className="text-[#94A3B8] text-[9px] uppercase block">TAXONOMY CODE</span>
-                  <strong className="text-[#38BDF8]">MoES-MD-26057</strong>
+                  <strong className="text-[#38BDF8]">MHA-MD-740</strong>
                 </div>
               </div>
             </div>
@@ -264,7 +264,7 @@ export const MoESClearanceCertificateModal: React.FC<MoESClearanceCertificateMod
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>SONARX AUTONOMOUS ACOUSTIC PIPELINE · CERTIFIED COMPLIANT</span>
               </div>
-              <div className="text-[8.5px] text-[#94A3B8]">MoES Specification Standard // S-100 Hydrographic Data Product</div>
+              <div className="text-[8.5px] text-[#94A3B8]">MHA Specification Standard // S-100 Hydrographic Data Product</div>
             </div>
 
             <div className="text-right space-y-1">

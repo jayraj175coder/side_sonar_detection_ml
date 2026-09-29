@@ -2,7 +2,7 @@
 ========================================================================================
 Marine Debris & Ghost Net AI Detection Model — Enhanced Dataset & YOLOv8 Trainer
 ========================================================================================
-Operational Reference: OPR-26057
+Operational Reference: OPR-740
 "Autonomous Marine Debris & Seabed Anomaly Perception System using Side-Scan Sonar Imagery"
 
 Target Classes:

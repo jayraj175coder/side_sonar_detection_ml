@@ -2,8 +2,8 @@
 
 # 🛰️ SONARX
 ### AI-Powered Autonomous Underwater Side-Scan Sonar Perception, Acoustic Fingerprinting & Marine Hazard Intelligence Platform
-#### Ministry of Earth Sciences (MoES) // Smart India Hackathon (SIH 26057)
-**Project Reference:** OPR-26057 / SIH-26057  
+#### Maritime Hydrographic Authority (MHA) // Autonomous Hydrographic Systems (OPR-740)
+**Project Reference:** OPR-740 / OPR-740  
 **Theme:** Ocean Conservation / Blue Economy / Subsea Critical Infrastructure Protection  
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%200.115-009688.svg?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
@@ -25,11 +25,11 @@
 
 ## 📌 Executive Summary
 
-**SONARX** is an end-to-end operational side-scan sonar (SSS) perception, acoustic signal enhancement, and geospatial intelligence platform engineered specifically for the **Ministry of Earth Sciences (MoES)** and the **National Institute of Ocean Technology (NIOT)** under Smart India Hackathon problem statement **SIH 26057**:
+**SONARX** is an end-to-end operational side-scan sonar (SSS) perception, acoustic signal enhancement, and geospatial intelligence platform engineered specifically for the **Maritime Hydrographic Authority (MHA)** and the **National Institute of Ocean Technology (NIOT)** under Autonomous Hydrographic Systems problem statement **OPR-740**:
 
 > **"AI-Driven Automated Marine Debris & Seabed Anomaly Perception System using Side-Scan Sonar Imagery"**
 
-By pairing an anchor-free **YOLOv8 ONNX Runtime** inference engine (trained on **5,205 multi-source acoustic survey tiles**) with **Acoustic Shadow Physics Verification**, **Digital Acoustic Fingerprinting (AFP)**, **Real-Time Autonomous Drone/AUV Telemetry**, and a **4-Phase Temporal Lifecycle Tracker (NEW · STILL THERE · MOVED · GONE)**, SONARX transforms raw hydrographic sonar waterfalls into actionable recovery operations, protecting India's Exclusive Economic Zone (EEZ) and supporting the **Swachh Sagar, Surakshit Sagar** clean oceans campaign.
+By pairing an anchor-free **YOLOv8 ONNX Runtime** inference engine (trained on **5,205 multi-source acoustic survey tiles**) with **Acoustic Shadow Physics Verification**, **Digital Acoustic Fingerprinting (AFP)**, **Real-Time Autonomous Drone/AUV Telemetry**, and a **4-Phase Temporal Lifecycle Tracker (NEW · STILL THERE · MOVED · GONE)**, SONARX transforms raw hydrographic sonar waterfalls into actionable recovery operations, protecting India's Exclusive Economic Zone (EEZ) and supporting the **DeepWater Clearance Protocol** clean oceans campaign.
 
 ---
 
@@ -58,7 +58,7 @@ How **SONARX** compares against established commercial hydrographic suites and m
 | **Salvage Route Optimization** | ❌ None; manual waypoint entry in separate chartplotters | ❌ Acquisition only | ⚠️ Tactical route planning focused on mine clearance corridors | **Integrated Multi-Vessel TSP Optimizer**: 2-Opt shortest flight route solver, bathymetric profile charts, energy reserve budgeting, and GPX/KML export |
 | **Acoustic Signal Processing** | ⚠️ Basic post-processing gain curves (TVG/AGC) | ⚠️ Hardware analog-to-digital filtering only | ⚠️ Proprietary signal processing | **Comprehensive Physics Pipeline**: Lee 7×7 MMSE speckle filter, TVG attenuation correction, bottom-track nadir blanking, and CLAHE |
 | **AUV & Drone Edge Readiness** | ❌ Bulky desktop software requiring Windows license dongles | ❌ Hardware-tied to surface survey vessels | ⚠️ Specialized autonomous architectures for military UUVs | **Lightweight Edge-Ready Stack**: FastAPI + ONNX Runtime running at ~35ms CPU latency on embedded drone payload computers |
-| **Cost & Procurement Accessibility** | ❌ Expensive commercial licensing ($10,000–$35,000+ per seat) | ❌ Locked to specific OEM sonar hardware purchases | ❌ Multi-million dollar defense contract procurement | **Open-Standard Sovereign Architecture**: Tailored for MoES, NIOT, and national Blue Economy / Swachh Sagar initiatives |
+| **Cost & Procurement Accessibility** | ❌ Expensive commercial licensing ($10,000–$35,000+ per seat) | ❌ Locked to specific OEM sonar hardware purchases | ❌ Multi-million dollar defense contract procurement | **Open-Standard Sovereign Architecture**: Tailored for MHA, NIOT, and national Blue Economy / DeepWater Clearance initiatives |
 
 ---
 
@@ -105,7 +105,7 @@ flowchart TD
         GISMap["Subsea GIS Map (Indian EEZ 6 Sectors + Heatmaps)"]
         RouteOptimizer["Smart Multi-Vessel TSP Route Optimizer (2-Opt + GPX Export)"]
         TargetTracking["Temporal AFP Lifecycle Tracking & Benthic Drift Vectors"]
-        Reports["MoES Swachh Sagar Clearance Dossiers (PDF / HTML / JSON)"]
+        Reports["MHA DeepWater Clearance Clearance Dossiers (PDF / HTML / JSON)"]
     end
 
     Image --> Letterbox --> TVG --> Lee --> CLAHE --> ONNX
@@ -122,7 +122,7 @@ flowchart TD
 
 ## 💻 9 Core Operational Workstation Modules
 
-SONARX delivers a full operational command-center suite built for marine survey engineers and MoES hydrographers:
+SONARX delivers a full operational command-center suite built for marine survey engineers and MHA hydrographers:
 
 1. **`Dashboard` (Command Center)**: High-level overview of live survey missions, autonomous fleet readiness (AUV / USV), cumulative marine debris tally, and Indian EEZ sector summaries.
 2. **`Upload & Analyze` (Workstation)**: Dual-mode ingestion of raw sonar waterfalls with optional companion navigation ping logs (XTF / CSV / JSON), real-time ONNX tensor execution, and bounding box shadow inspection.
@@ -130,7 +130,7 @@ SONARX delivers a full operational command-center suite built for marine survey 
    - **Top Tactical KPI & Filter Strip**: Interactive category filter pills (`17 TARGETS`, `8 VERIFIED`, `4 HIGH RISK`, `2 PIPELINES`, `3 ANOMALIES`), live survey coverage progress bar (`2.8 km²`, `62%`), Confidence Threshold slider (`40%`), Acoustic Shadow Gate toggle, and one-click `UPLOAD & ANALYZE` modal that runs real YOLOv8s ONNX inference and pins uploaded sonar targets directly into the live mission map.
    - **Column 1 — Multi-Mode Tactical Viewport (`MISSION MAP` | `SONAR VIEW` | `SPLIT VIEW` | `3D TERRAIN`)**: Interactive bathymetric swath corridor in the Indian EEZ (Mumbai Offshore Continental Shelf, `18.922°N, 72.821°E`), AUV-07 live acoustic fan-beam projection (`82.0m`), pipeline hazard zone polygons, boxed target callouts (`[SX-107]`, `[SX-103]`, `[SX-105]`, `[SX-101]`), 7-tool floating GIS toolbar (Select, Center, ROI Box, Distance Ruler, Waypoint Pin, Hazard Polygon, Clear), and map layer toggles.
    - **Column 2 — `SONAR PREVIEW` & `ACOUSTIC PROFILE` Cross-Section**: Target-specific acoustic backscatter & shadow morphology engine (rendering distinct monofilament mesh canopies for Ghost Nets, linked trap pots for Derelict Fishing Gear, linear high-backscatter trenches for Subsea Pipelines/Cables, rectangular metallic specular returns for Industrial Drums/Containers, structural hull ribs for Wreckage Anomalies, and flat sand-ripple returns for Suppressed Clutter), real-time YOLOv8 bounding box overlay, proportional acoustic cross-section elevation curve ($h = \frac{L_s \cdot H}{R_s + L_s}$), and 4 synchronized imaging mode switcher thumbnails (`Raw`, `Filtered`, `Shadow`, `Overlay`).
-   - **Column 3 — `TARGET DETAILS` & `HYDROGRAPHIC TELEMETRY (AUV-07)`**: Synchronized target crop inspection, verified/suppressed status badges, physical footprint & shadow geometry metrics (`✓ Valid` vs `✕ Flat`), AI evidence tags, recommended MoES remediation action with ROV dispatch, and live AUV-07 telemetry (`900 kHz`, `150 m` swath, `14.8 m` altitude, `3.2 kn`, `76%` battery, `1512 m/s` sound velocity, `5.05 GB` storage).
+   - **Column 3 — `TARGET DETAILS` & `HYDROGRAPHIC TELEMETRY (AUV-07)`**: Synchronized target crop inspection, verified/suppressed status badges, physical footprint & shadow geometry metrics (`✓ Valid` vs `✕ Flat`), AI evidence tags, recommended MHA remediation action with ROV dispatch, and live AUV-07 telemetry (`900 kHz`, `150 m` swath, `14.8 m` altitude, `3.2 kn`, `76%` battery, `1512 m/s` sound velocity, `5.05 GB` storage).
    - **Bottom `SURVEY TRACK TIMELINE`**: Interactive ping-by-ping sonar filmstrip (`PING 1` to `PING 2500`) with clickable target markers (`[SX-101]`, `[SX-107]`, `[SX-103]`, `[SX-105]`) and synchronized playback speed controls (`0.5x`, `1x`, `2x`, `4x`).
 4. **`Subsea Map` (GIS Reconnaissance)**: Interactive multi-layer marine GIS covering 6 Indian maritime sectors with bathymetric depth contours, 200 NM EEZ lines, offshore platform hazard zones, and contact heatmaps.
 5. **`Route Planner` (Smart Multi-Vessel TSP Optimizer)**:
@@ -142,7 +142,7 @@ SONARX delivers a full operational command-center suite built for marine survey 
    - Direct autopilot export in GPX / KML formats.
 6. **`Target Tracking` (Acoustic Fingerprinting & Temporal Drift)**: 4-phase lifecycle auditing (`NEW`, `STILL THERE`, `MOVED`, `GONE`) with benthic tidal current vectors and SHA-256 cryptographic hashes (`AFP-XXXX-SHA`).
 7. **`Analytics` (Hydrographic Data Intelligence)**: Depth vs mass correlations, debris class distributions, false positive reduction ratios, and sonar frequency performance breakdowns.
-8. **`Reports Dossier` (Swachh Sagar Official Clearance)**: One-click exportable hydrographic inspection dossiers in PDF, HTML, and JSON formats for the Ministry of Earth Sciences and port authorities.
+8. **`Reports Dossier` (DeepWater Clearance Official Clearance)**: One-click exportable hydrographic inspection dossiers in PDF, HTML, and JSON formats for the Maritime Hydrographic Authority and port authorities.
 9. **`Model Intel` (Acoustic Backbone Validation)**: Real-time neural metrics, confusion matrix, precision-recall curves, and physical validation benchmarks for the YOLOv8s ONNX runtime model.
 
 ---
@@ -159,7 +159,7 @@ When survey vessels or autonomous AUVs re-scan the sector, the **Temporal Re-Sur
 * 🟢 **NEW**: Discovered in current swath; no prior record within radius threshold.
 * 🔵 **STILL THERE (PERSISTENT)**: Stationary contact confirmed across multi-pass surveys ($\Delta r < 1.0\text{ m}$).
 * 🟠 **MOVED (DRIFTED)**: Buoyant ghost net or debris displaced by benthic tidal currents. Computes drift distance ($\Delta r$), bearing ($\theta$), drift speed, and aligns with local hydrodynamic current vectors.
-* 🟣 **GONE (SALVAGED)**: Confirmed absent in subsequent re-survey following MoES cleanup operations; automatically bound to a **Swachh Sagar Salvage Verification Ticket**.
+* 🟣 **GONE (SALVAGED)**: Confirmed absent in subsequent re-survey following MHA cleanup operations; automatically bound to a **DeepWater Clearance Salvage Verification Ticket**.
 
 ### 2. Autonomous Drone / AUV Mission Control Telemetry
 SONARX includes a dedicated **Mission Control Workstation** simulating an operational AUV deployment:
@@ -215,7 +215,7 @@ Curated Multi-Source Benchmark (5,205 SSS Tiles · ~1.8 GB)
 | **Kaggle Sonar-Mine** | Klein 3500 MCM Sonar MILCO passes | 225 | 36 | 39 | **300** |
 | **Clean Seabed Patches** | Uncontaminated sand ripples & mud (Hard Negatives) | 500 | 82 | 98 | **680** |
 | **Procedural Hydrodynamic ALDFG** | Hydrodynamic backscatter & acoustic shadow nets | 1,250 | 206 | 224 | **1,680** |
-| **TOTAL** | **Multi-Source Benchmark Suite (Ref: OPR-26057)** | **3,875** | **630** | **700** | **5,205** |
+| **TOTAL** | **Multi-Source Benchmark Suite (Ref: OPR-740)** | **3,875** | **630** | **700** | **5,205** |
 
 ---
 
@@ -428,7 +428,7 @@ $$\text{TPU Radius } r = \sqrt{\sigma_{\text{GNSS}}^2 + \sigma_{\text{ray}}^2 + 
 | `GET` | `/api/model` | Dynamic model architecture, active classes, and empirical validation metrics |
 | `GET` | `/api/datasets` | Multi-source dataset catalog and domain transfer taxonomy specifications |
 | `GET` | `/api/scans` | Paginated survey scan archive with digital acoustic fingerprint hashes |
-| `GET` | `/api/scans/{id}/report` | Structured JSON MoES acoustic inspection report |
+| `GET` | `/api/scans/{id}/report` | Structured JSON MHA acoustic inspection report |
 | `GET` | `/api/scans/{id}/report/html` | Printable executive HTML/PDF intelligence dossier |
 | `GET` | `/api/stats` | Aggregated debris and ghost net metrics |
 | `GET` | `/health` | Service health status and active ONNX session diagnostics |
@@ -437,17 +437,17 @@ $$\text{TPU Radius } r = \sqrt{\sigma_{\text{GNSS}}^2 + \sigma_{\text{ray}}^2 + 
 
 ## 📑 Presentation & Documentation Resources
 
-* **[Pitch Deck & Master Presentation Guide](SONARX_SIH2026_PRESENTATION_DECK.md)**: Slide-by-slide guide with on-screen layouts, speaker scripts, acoustic formulas, and judge defense cheat sheet.
+* **[Pitch Deck & Master Presentation Guide](SONARX_AHS-2026_PRESENTATION_DECK.md)**: Slide-by-slide guide with on-screen layouts, speaker scripts, acoustic formulas, and judge defense cheat sheet.
 * **[Technical Solution Report](TECHNICAL_REPORT.md)**: Scientific report covering acoustic physics, model derivation, and empirical analysis.
-* **[Live Demo Playbook](PRESENTATION_PLAYBOOK.md)**: 5-act live demonstration script for the SIH evaluation jury.
+* **[Live Demo Playbook](PRESENTATION_PLAYBOOK.md)**: 5-act live demonstration script for the AHS evaluation jury.
 
 ---
 
 ## 👥 Authors & Acknowledgments
 
 * **Project**: SONARX Marine Acoustic Perception Platform
-* **Competition**: Smart India Hackathon 2026 (SIH 26057)
-* **Target Ministry**: Ministry of Earth Sciences (MoES) / National Institute of Ocean Technology (NIOT)
-* **Campaign**: Swachh Sagar, Surakshit Sagar
+* **Competition**: Autonomous Hydrographic Systems 2026 (OPR-740)
+* **Target Ministry**: Maritime Hydrographic Authority (MHA) / National Institute of Ocean Technology (NIOT)
+* **Campaign**: DeepWater Clearance Protocol
 
 *Built with passion to protect our oceans and advance India's subsea autonomy.*

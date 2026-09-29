@@ -227,7 +227,7 @@ export const NewScanPage: React.FC = () => {
           result = {
             scan_id: scanId,
             filename: selectedFile?.name || 'sih_subsea_pipeline_trench.png',
-            model_name: 'YOLOv8s-SIH-Marine-Debris-V2',
+            model_name: 'YOLOv8s-Subsea-Perception-V2',
             model_version: 'v2',
             image_width: 1024,
             image_height: 512,
@@ -286,7 +286,7 @@ export const NewScanPage: React.FC = () => {
         result = {
           scan_id: scanId,
           filename: selectedFile?.name || 'sih_subsea_pipeline_trench.png',
-          model_name: 'YOLOv8s-SIH-Marine-Debris-V2',
+          model_name: 'YOLOv8s-Subsea-Perception-V2',
           model_version: 'v2',
           image_width: 1024,
           image_height: 512,
@@ -412,7 +412,7 @@ export const NewScanPage: React.FC = () => {
               MARINE DEBRIS INSPECTOR
             </h1>
             <span className="text-[9px] font-mono px-2 py-0.5 bg-[#FFB800]/10 border border-[#FFB800]/30 text-[#FFB800] font-bold rounded">
-              SIH 26057 // MoES
+              OPR-740 // MHA
             </span>
           </div>
           <p className="text-[11px] text-slate-400 font-sans mt-0.5">

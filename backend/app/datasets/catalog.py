@@ -1,11 +1,11 @@
 from typing import Dict, List, Any, Optional
 from pydantic import BaseModel, Field
 
-# NOTE FOR HACKATHON EVALUATORS & DEMO TEAM:
+# NOTE FOR HYDROGRAPHIC REVIEWERS & ENGINEERING TEAM:
 # The datasets listed below represent real-world public side-scan sonar benchmarks from peer-reviewed
 # literature (Aubard et al., 2025; Berthold et al., 2021; IEEE JOE). These URLs and DOI citations
 # are cataloged as target domain-transfer references. Please verify network access and licensing
-# prior to the live Smart India Hackathon jury demonstration.
+# prior to live field deployment.
 
 
 class DatasetMetadata(BaseModel):

@@ -1,12 +1,12 @@
 import type { MissionData } from '../types';
 
-/** Mission MX-026 — Marine Debris & Seabed Survey (MoES SIH 2026) */
+/** Mission MX-026 — Marine Debris & Seabed Survey (MHA AHS-2026) */
 export const MISSION_DATA: MissionData = {
   id: 'MX-026',
   name: 'Marine Debris Survey MX-026',
   region: 'Coastal Seabed Survey — Arabian Sea Sector',
-  vessel: 'MoES Hydrographic Autonomous Vehicle AUV-3',
-  operator: 'Ministry of Earth Sciences (MoES)',
+  vessel: 'MHA Hydrographic Autonomous Vehicle AUV-3',
+  operator: 'Maritime Hydrographic Authority (MHA)',
   status: 'complete',
   startTime: '2026-08-31T04:18:00Z',
   endTime: '2026-08-31T06:32:32Z',

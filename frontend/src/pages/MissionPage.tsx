@@ -289,7 +289,7 @@ export const MissionPage: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Export formal MoES incident report
+  // Export formal MHA incident report
   const handleExportReport = useCallback(() => {
     sonarAudio.playLockBeep?.();
     const site = SURVEY_SITES[0];
@@ -322,7 +322,9 @@ export const MissionPage: React.FC = () => {
         onStopDemo={handleStopDemo}
         isJudgeMode={isJudgeMode}
         onToggleJudgeMode={() => setIsJudgeMode((v) => !v)}
-        onOpenCinematicDemo={() => setShowCinematicDemo(true)}
+        onOpenCinematicDemo={() => {
+          window.location.href = '/ani';
+        }}
         onOpenUpload={() => setIsUploadModalOpen(true)}
         onExportReport={handleExportReport}
         onExportGeoJson={() => exportGeoJsonDossier(processedTargets)}
@@ -563,7 +565,7 @@ export const MissionPage: React.FC = () => {
         </div>
       )}
 
-      {/* ── MoES OFFICIAL CLEARANCE CERTIFICATE MODAL ── */}
+      {/* ── MHA OFFICIAL CLEARANCE CERTIFICATE MODAL ── */}
       <MoESClearanceCertificateModal
         isOpen={isCertificateModalOpen}
         onClose={() => setIsCertificateModalOpen(false)}

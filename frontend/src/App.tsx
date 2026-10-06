@@ -37,7 +37,7 @@ export const App: React.FC = () => {
       case 'analytics':     return { title: 'Mission Analytics',                  subtitle: 'Anomaly distributions, noise suppression ratios & survey efficiency metrics' };
       case 'tracking':      return { title: 'Temporal Target Tracking',           subtitle: 'Acoustic Fingerprint (AFP) lifecycle: NEW → STILL THERE → MOVED → GONE across multi-epoch surveys' };
       case 'route-planner': return { title: 'Smart Multi-Vessel TSP Route Optimizer', subtitle: 'Traveling Salesperson optimization for subsea cleanup fleet, fuel burn & GPX navigation export' };
-      case 'reports':       return { title: 'Marine Debris Anomaly Dossier',      subtitle: 'MoES compliance reports, WGS84 target registers & retrieval recommendations' };
+      case 'reports':       return { title: 'Marine Debris Anomaly Dossier',      subtitle: 'MHA compliance reports, WGS84 target registers & retrieval recommendations' };
       case 'model':     return { title: 'Model Intel',                    subtitle: 'YOLOv8s ONNX perception architecture, acoustic noise filter & validation metrics' };
       default:          return { title: 'SONARX',                         subtitle: 'Automated Side-Scan Sonar Intelligence for Marine Survey Teams' };
     }

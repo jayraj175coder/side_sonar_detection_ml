@@ -3,7 +3,7 @@
 Marine Sonar V2 — Side-Scan Sonar Object Detection Training Pipeline
 =============================================================================
 This pipeline trains YOLOv8 on curated Side-Scan Sonar datasets from
-OpenSonarDatasets (REMARO Network) for the Smart India Hackathon.
+OpenSonarDatasets (REMARO Network) for the Autonomous Hydrographic Systems.
 
 Target Classes:
   0: pipeline              (Source: SubPipe SSS dataset)

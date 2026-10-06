@@ -86,9 +86,9 @@ export default function ActImpact() {
 
         {/* end card */}
         <div className="im-end absolute inset-0 flex flex-col items-center justify-center gap-6 text-center">
-          <img src="/ani/sonarx-banner.png" alt="SONARX — MoES Subsea Intelligence · SIH 26057" className="h-[15vh] w-auto drop-shadow-[0_6px_30px_rgba(0,0,0,.45)]" />
+          <img src="/ani/sonarx-banner.png" alt="SONARX — MHA Subsea Intelligence · OPR-740" className="h-[15vh] w-auto drop-shadow-[0_6px_30px_rgba(0,0,0,.45)]" />
           <h2 className="display max-w-[70vw] text-[clamp(34px,4.6vw,84px)]">From sonar noise to verified marine intelligence.</h2>
-          <p className="hud-label text-white/60">Team {TEAM.name} · Team ID {TEAM.id} · SIH 2026 · PS {TEAM.ps} · MoES / NIOT</p>
+          <p className="hud-label text-white/60">Team {TEAM.name} · Team ID {TEAM.id} · AHS-2026 · PS {TEAM.ps} · MHA / NIOT</p>
           <div className="pointer-events-auto flex gap-3">
             <a href="/" className="cursor-target btn-primary">Open the live dashboard <ArrowRight size={16} /></a>
             <button className="cursor-target panel-btn !px-4 !py-2.5 flex items-center gap-2" onClick={() => scrollToY(0, 3.2)}><RotateCcw size={14} /> Replay</button>

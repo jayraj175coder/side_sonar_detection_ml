@@ -7,7 +7,7 @@ export function generateIncidentReportHTML(
   shadowGateActive: boolean
 ): string {
   const reportDate = new Date().toUTCString();
-  const reportId = `MoES-SSS-${site.code}-${Date.now().toString().slice(-6)}`;
+  const reportId = `MHA-SSS-${site.code}-${Date.now().toString().slice(-6)}`;
 
   // Priority ranking and action generator
   const prioritizedItems = [...confirmedItems]
@@ -245,7 +245,7 @@ export function generateIncidentReportHTML(
     <!-- 1. Header -->
     <div class="header">
       <div class="emblem-strip">
-        <span>GOVERNMENT OF INDIA · MINISTRY OF EARTH SCIENCES</span>
+        <span>GOVERNMENT OF INDIA · MARITIME HYDROGRAPHIC AUTHORITY</span>
         <span>INCIDENT REF: ${reportId}</span>
       </div>
       <h1>OFFICIAL MARINE LITTER & DEBRIS INCIDENT REPORT</h1>
@@ -253,7 +253,7 @@ export function generateIncidentReportHTML(
         SONARX Automated Side-Scan Sonar Perception & Seabed Anomaly Triage Register
       </div>
       <div class="note-badge">
-        PREPARED FOR: MINISTRY OF EARTH SCIENCES (MoES) / COASTAL MARINE AUTHORITY (AUTOMATED ADVISORY TEMPLATE)
+        PREPARED FOR: MARITIME HYDROGRAPHIC AUTHORITY (MHA) / COASTAL MARINE AUTHORITY (AUTOMATED ADVISORY TEMPLATE)
       </div>
     </div>
 

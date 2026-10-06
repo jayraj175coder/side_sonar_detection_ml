@@ -21,7 +21,7 @@ export const ModelInfoPage: React.FC = () => {
   const map50 = modelInfo?.metrics?.map50 ? (modelInfo.metrics.map50 * 100).toFixed(1) + '%' : '74.1%';
   const precision = modelInfo?.metrics?.precision ? (modelInfo.metrics.precision * 100).toFixed(1) + '%' : '77.7%';
   const recall = modelInfo?.metrics?.recall ? (modelInfo.metrics.recall * 100).toFixed(1) + '%' : '74.6%';
-  const modelName = modelInfo?.name || 'YOLOv8s-SIH-Marine-Debris-V2';
+  const modelName = modelInfo?.name || 'YOLOv8s-Subsea-Perception-V2';
   const latency = modelInfo?.metrics?.benchmark_latency_ms ? `${modelInfo.metrics.benchmark_latency_ms} ms` : '14.2 ms';
 
   return (

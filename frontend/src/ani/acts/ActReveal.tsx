@@ -32,7 +32,7 @@ export default function ActReveal() {
     tl.to(q('.rv-packet'), { left: '100%', duration: 0.5, ease: 'power1.inOut' }, 1.95);
     tl.to(q('.rv-packet'), { autoAlpha: 0, duration: 0.05 }, 2.45);
     tl.to(q('.rv-team'), { autoAlpha: 1, y: 0, duration: 0.1 }, 2.1);
-    tl.to(q('.rv-team'), { scrambleText: { text: `TEAM ${TEAM.name}  ·  SIH ${TEAM.ps}  ·  ID ${TEAM.id}`, chars: 'upperCase', speed: 0.6 }, duration: 0.35 }, 2.1);
+    tl.to(q('.rv-team'), { scrambleText: { text: `TEAM ${TEAM.name}  ·  AHS ${TEAM.ps}  ·  ID ${TEAM.id}`, chars: 'upperCase', speed: 0.6 }, duration: 0.35 }, 2.1);
     // 2.6 – 3.4 · everything else falls away; the chips dock into the HUD
     tl.to(q('.rv-brand, .rv-card, .rv-team, .rv-connector'), { autoAlpha: 0, y: -20, duration: 0.25 }, 2.6);
     const chips = q('.rv-chip');
@@ -68,7 +68,7 @@ export default function ActReveal() {
       <div className="rv-card panel invisible absolute inset-x-0 top-[38vh] mx-auto w-[min(880px,70vw)] p-7">
         <div className="mb-4 flex items-center justify-between">
           <span className="hud-label text-[#FFB703]">Problem statement · {TEAM.ps}</span>
-          <span className="hud-label text-white/35">SIH 2026</span>
+          <span className="hud-label text-white/35">AHS-2026</span>
         </div>
         <p className="text-[clamp(20px,1.9vw,32px)] leading-snug text-white/90" style={{ fontFamily: 'Space Grotesk' }}>
           Detect{' '}
@@ -79,7 +79,7 @@ export default function ActReveal() {
           <span className="kw" style={{ backgroundImage: 'linear-gradient(rgba(16,185,129,.3),rgba(16,185,129,.3))' }}>exact location</span>.
         </p>
         <div className="mt-5 flex gap-2">
-          <span className="rv-pill chip">MoES · NIOT</span>
+          <span className="rv-pill chip">MHA · NIOT</span>
           <span className="rv-pill chip !border-[#38BDF8]/40 !text-[#38BDF8]">Software</span>
           <span className="rv-pill chip !border-[#FFB703]/40 !text-[#FFB703]">Disaster management</span>
         </div>

@@ -389,13 +389,13 @@ export const CommandCenterDashboard: React.FC = () => {
                   <span>UPLOAD SONAR SCAN &rarr;</span>
                 </button>
 
-                <button
-                  onClick={() => setActiveTab('mission')}
+                <a
+                  href="/ani"
                   className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#09162A]/90 hover:bg-[#0D1F38] border border-[#38BDF8]/40 text-white font-mono font-bold text-xs transition-all cursor-pointer shadow-md active:scale-95"
                 >
                   <Play className="w-3.5 h-3.5 text-[#38BDF8] fill-[#38BDF8]" />
                   <span>WATCH DEMO</span>
-                </button>
+                </a>
               </div>
             </div>
 

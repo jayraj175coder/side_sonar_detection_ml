@@ -223,7 +223,7 @@ export const JudgeModeProofView: React.FC<JudgeModeProofViewProps> = ({
           {/* Recommended Operational Action */}
           <div className="p-2.5 bg-[#131B2A] border border-[#FFB703]/40 rounded-xs space-y-1 text-[8.5px]">
             <div className="font-bold text-[#FFB703] uppercase">
-              RECOMMENDED MOES RETRIEVAL ACTION:
+              RECOMMENDED MHA RETRIEVAL ACTION:
             </div>
             <p className="text-[#F8FAFC] leading-relaxed">
               Dispatch ROV retrieval within 48h to prevent continuous marine life entanglement and local gillnet damage.

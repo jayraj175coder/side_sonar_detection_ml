@@ -30,7 +30,7 @@ function reportLines(verified: Cand[]): Tok[][] {
     [p('{')],
     line(1, k('scan_id'), p(': '), str(`${MISSION.id}-L02`), p(',')),
     line(1, k('filename'), p(': '), str(MISSION.file), p(',')),
-    line(1, k('model_name'), p(': '), str(`${MODEL.name}-SIH-Marine-Debris-V2`), p(',')),
+    line(1, k('model_name'), p(': '), str(`${MODEL.name}-AHS-Marine-Debris-V2`), p(',')),
     line(1, k('inference_ms'), p(': '), num(MODEL.cpuMs), p(',')),
     line(1, k('total_detections'), p(': '), num(verified.length), p(',')),
     line(1, k('false_positives_suppressed'), p(': '), num(20), p(',')),

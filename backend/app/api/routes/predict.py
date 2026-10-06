@@ -34,7 +34,7 @@ async def predict_sonar_scan(
         None, ge=-180.0, le=180.0, description="Manual fallback longitude coordinate (WGS84)"
     ),
     model_version: Optional[str] = Form(
-        "v2", description="Model version: 'v2' (MoES Flagship) or 'baseline' (Legacy Reference)"
+        "v2", description="Model version: 'v2' (MHA Flagship) or 'baseline' (Legacy Reference)"
     ),
     noise_filtering_enabled: Optional[bool] = Form(
         True, description="Enable post-NMS acoustic geometry & shadow false-positive suppression"

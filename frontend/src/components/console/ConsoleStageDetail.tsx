@@ -536,7 +536,7 @@ export const ConsoleStageDetail: React.FC<ConsoleStageDetailProps> = ({
                   className="w-full flex items-center justify-center gap-1.5 py-1 bg-[#0c2538] border border-[#38bdf8]/60 hover:bg-[#38bdf8] hover:text-[#05070B] text-[#38bdf8] text-[8px] font-bold cursor-pointer transition-colors shadow-[0_0_10px_rgba(56,189,248,0.2)]"
                 >
                   <FileText className="w-2.5 h-2.5" />
-                  <span>EXPORT OFFICIAL INCIDENT REPORT (MoES / INCOIS)</span>
+                  <span>EXPORT OFFICIAL INCIDENT REPORT (MHA / INCOIS)</span>
                 </button>
               )}
             </div>

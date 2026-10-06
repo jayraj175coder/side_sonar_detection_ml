@@ -43,7 +43,7 @@ export interface AcousticFingerprintRecord {
   estimatedHeightM: number;
   acousticConfidence: number; // 0..1
   
-  // MoES Recovery / Action Status
+  // MHA Recovery / Action Status
   actionRecommendation: string;
   salvageTicketId?: string;
   verifiedBy?: string;
@@ -83,7 +83,7 @@ export const TEMPORAL_DEBRIS_RECORDS: AcousticFingerprintRecord[] = [
     latestPass: {
       passNumber: 3,
       surveyDate: '2026-09-17 14:45 IST',
-      surveyVesselOrDrone: 'MoES Autonomous Drone SSS-02',
+      surveyVesselOrDrone: 'MHA Autonomous Drone SSS-02',
       sonarFrequencyKhz: 900,
       towfishAltitudeM: 9.5,
       coordinates: { lat: 9.9258, lng: 76.1843 },
@@ -133,7 +133,7 @@ export const TEMPORAL_DEBRIS_RECORDS: AcousticFingerprintRecord[] = [
     latestPass: {
       passNumber: 4,
       surveyDate: '2026-09-15 11:20 IST',
-      surveyVesselOrDrone: 'MoES Subsea Drone SSS-01',
+      surveyVesselOrDrone: 'MHA Subsea Drone SSS-01',
       sonarFrequencyKhz: 900,
       towfishAltitudeM: 11.2,
       coordinates: { lat: 19.3822, lng: 71.3212 },
@@ -158,7 +158,7 @@ export const TEMPORAL_DEBRIS_RECORDS: AcousticFingerprintRecord[] = [
     targetClass: 'GHOST_NET',
     targetClassLabel: 'FAD & Abandoned Net Bundle',
     status: 'GONE',
-    statusDescription: 'Contact verified absent in Pass 3 following MoES Swachh Sagar recovery operation',
+    statusDescription: 'Contact verified absent in Pass 3 following MHA DeepWater Clearance recovery operation',
     sector: 'Visakhapatnam Continental Slope · Bay of Bengal',
     depthM: 44.0,
     firstDetectedDate: '2026-08-01',
@@ -183,7 +183,7 @@ export const TEMPORAL_DEBRIS_RECORDS: AcousticFingerprintRecord[] = [
     latestPass: {
       passNumber: 3,
       surveyDate: '2026-09-16 08:30 IST',
-      surveyVesselOrDrone: 'MoES Drone SSS-03 (Post-Salvage Verification)',
+      surveyVesselOrDrone: 'MHA Drone SSS-03 (Post-Salvage Verification)',
       sonarFrequencyKhz: 900,
       towfishAltitudeM: 8.5,
       coordinates: { lat: 17.6542, lng: 83.3421 },
@@ -198,7 +198,7 @@ export const TEMPORAL_DEBRIS_RECORDS: AcousticFingerprintRecord[] = [
     acousticConfidence: 0.985,
     actionRecommendation: 'CLEARED: 1.2 metric tons of ghost webbing recovered by NIOT Sagar Nidhi tender.',
     salvageTicketId: 'SWACHH-SAGAR-REC-2026-027',
-    verifiedBy: 'MoES Field Recovery Officer (Capt. R. Sharma)',
+    verifiedBy: 'MHA Field Recovery Officer (Capt. R. Sharma)',
     environmentalRiskScore: 12,
   },
   {
@@ -221,7 +221,7 @@ export const TEMPORAL_DEBRIS_RECORDS: AcousticFingerprintRecord[] = [
     baselinePass: {
       passNumber: 1,
       surveyDate: '2026-09-17 18:20 IST',
-      surveyVesselOrDrone: 'MoES Autonomous Drone SSS-04',
+      surveyVesselOrDrone: 'MHA Autonomous Drone SSS-04',
       sonarFrequencyKhz: 900,
       towfishAltitudeM: 10.5,
       coordinates: { lat: 11.6421, lng: 92.7682 },
@@ -233,7 +233,7 @@ export const TEMPORAL_DEBRIS_RECORDS: AcousticFingerprintRecord[] = [
     latestPass: {
       passNumber: 1,
       surveyDate: '2026-09-17 18:20 IST',
-      surveyVesselOrDrone: 'MoES Autonomous Drone SSS-04',
+      surveyVesselOrDrone: 'MHA Autonomous Drone SSS-04',
       sonarFrequencyKhz: 900,
       towfishAltitudeM: 10.5,
       coordinates: { lat: 11.6421, lng: 92.7682 },
@@ -283,7 +283,7 @@ export const TEMPORAL_DEBRIS_RECORDS: AcousticFingerprintRecord[] = [
     latestPass: {
       passNumber: 5,
       surveyDate: '2026-09-14 16:30 IST',
-      surveyVesselOrDrone: 'MoES AUV-Coromandel',
+      surveyVesselOrDrone: 'MHA AUV-Coromandel',
       sonarFrequencyKhz: 900,
       towfishAltitudeM: 7.2,
       coordinates: { lat: 13.0841, lng: 80.3130 },
@@ -333,7 +333,7 @@ export const TEMPORAL_DEBRIS_RECORDS: AcousticFingerprintRecord[] = [
     latestPass: {
       passNumber: 2,
       surveyDate: '2026-09-16 13:40 IST',
-      surveyVesselOrDrone: 'MoES Drone SSS-01',
+      surveyVesselOrDrone: 'MHA Drone SSS-01',
       sonarFrequencyKhz: 900,
       towfishAltitudeM: 5.8,
       coordinates: { lat: 22.5668, lng: 69.1205 },
